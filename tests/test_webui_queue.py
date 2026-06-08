@@ -130,11 +130,13 @@ class WebUIQueueTests(unittest.TestCase):
 
         fake = FakeImageClient()
         with tempfile.TemporaryDirectory() as tmp:
+            auth_settings_path = Path(tmp) / "auth-settings.json"
+            auth_settings_path.write_text(json.dumps({"source": "codex"}), encoding="utf-8")
             app = create_app(
                 output_root=Path(tmp),
                 client_factory=lambda: fake,
                 auth_checker=lambda: True,
-                auth_settings_path=Path(tmp) / "auth-settings.json",
+                auth_settings_path=auth_settings_path,
                 batch_delay_seconds=0,
                 auto_start_queue=False,
             )
@@ -160,11 +162,13 @@ class WebUIQueueTests(unittest.TestCase):
         fake = FakeImageClient()
         prompt = "文案标题设计偏儿童Q版卡通化，色彩偏淡彩"
         with tempfile.TemporaryDirectory() as tmp:
+            auth_settings_path = Path(tmp) / "auth-settings.json"
+            auth_settings_path.write_text(json.dumps({"source": "codex"}), encoding="utf-8")
             app = create_app(
                 output_root=Path(tmp),
                 client_factory=lambda: fake,
                 auth_checker=lambda: True,
-                auth_settings_path=Path(tmp) / "auth-settings.json",
+                auth_settings_path=auth_settings_path,
                 batch_delay_seconds=0,
                 auto_start_queue=False,
             )

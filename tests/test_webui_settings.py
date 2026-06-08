@@ -75,6 +75,7 @@ class WebUISettingsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             settings_path = root / "auth-settings.json"
+            settings_path.write_text(json.dumps({"source": "codex"}), encoding="utf-8")
             api_settings_path = root / "api-settings.json"
             api_settings_path.write_text(
                 json.dumps(
