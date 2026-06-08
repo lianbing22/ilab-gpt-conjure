@@ -45,6 +45,8 @@ if %ERRORLEVEL% NEQ 0 (
 
 echo Starting iLab GPT CONJURE at %URL%
 if not exist "output" mkdir "output"
+set "AUTH_SETTINGS_PATH=%PROJECT_DIR%output\webui-auth-settings.json"
+"%PYTHON_BIN%" -m codex_image.webui.startup_auth --settings-path "%AUTH_SETTINGS_PATH%" >nul
 set "LOG_FILE=%PROJECT_DIR%output\webui-server.log"
 echo Writing server log to %LOG_FILE%
 call :is_webui_ready

@@ -16,90 +16,79 @@
   }
   function hasOpenShortcutBlockingLayer() {
     return Boolean(document.querySelector(
-      "#promptTemplateDrawer.open, #galleryDrawer.open, #accountQuotaDrawer.open, .modal-overlay:not(.hidden), .prompt-popover:not(.hidden), .confirm-popover:not(.hidden), .compression-popover:not(.hidden), .task-notification-center:not(.hidden)"
+      "#promptTemplateDrawer.open, #galleryDrawer.open, .modal-overlay:not(.hidden), .prompt-popover:not(.hidden), .confirm-popover:not(.hidden), .compression-popover:not(.hidden), .task-notification-center:not(.hidden)"
     ));
   }
-  function handleRunTaskShortcut(event, els43, methods) {
+  function handleRunTaskShortcut(event, els42, methods) {
     if (!isRunTaskShortcut(event)) return;
-    if (hasOpenShortcutBlockingLayer() || els43.runButton.disabled) return;
+    if (hasOpenShortcutBlockingLayer() || els42.runButton.disabled) return;
     event.preventDefault();
     void call(methods, "runTask");
   }
-  function bindWebUIEvents(state33, els43, methods) {
+  function bindWebUIEvents(state32, els42, methods) {
     call(methods, "bindShellUiEvents");
     call(methods, "bindFormControlEvents");
-    els43.clearPromptButton.addEventListener("click", () => {
+    els42.clearPromptButton.addEventListener("click", () => {
       call(methods, "setPromptText", "");
       call(methods, "syncGalleryInputsFromPrompt");
       call(methods, "updatePromptCount");
       call(methods, "updateRequestPreview");
     });
-    els43.quickGalleryRail?.addEventListener("mouseover", (event) => call(methods, "handleQuickGalleryCategoryEvent", event));
-    els43.quickGalleryRail?.addEventListener("focusin", (event) => call(methods, "handleQuickGalleryCategoryEvent", event));
-    els43.quickGalleryRail?.addEventListener("click", (event) => call(methods, "handleQuickGalleryCategoryEvent", event));
-    els43.quickGalleryList?.addEventListener("scroll", () => call(methods, "scheduleQuickGalleryFocusUpdate"));
-    els43.quickGalleryList?.addEventListener("wheel", (event) => call(methods, "handleQuickGalleryBoundaryWheel", event), { passive: false });
-    els43.addGalleryCategoryButton?.addEventListener("click", () => call(methods, "createGalleryCategory"));
-    els43.addToGalleryClose?.addEventListener("click", () => call(methods, "closeAddToGallery"));
-    els43.addToGalleryModal?.addEventListener("click", (event) => {
-      if (event.target === els43.addToGalleryModal) call(methods, "closeAddToGallery");
+    els42.quickGalleryRail?.addEventListener("mouseover", (event) => call(methods, "handleQuickGalleryCategoryEvent", event));
+    els42.quickGalleryRail?.addEventListener("focusin", (event) => call(methods, "handleQuickGalleryCategoryEvent", event));
+    els42.quickGalleryRail?.addEventListener("click", (event) => call(methods, "handleQuickGalleryCategoryEvent", event));
+    els42.quickGalleryList?.addEventListener("scroll", () => call(methods, "scheduleQuickGalleryFocusUpdate"));
+    els42.quickGalleryList?.addEventListener("wheel", (event) => call(methods, "handleQuickGalleryBoundaryWheel", event), { passive: false });
+    els42.addGalleryCategoryButton?.addEventListener("click", () => call(methods, "createGalleryCategory"));
+    els42.addToGalleryClose?.addEventListener("click", () => call(methods, "closeAddToGallery"));
+    els42.addToGalleryModal?.addEventListener("click", (event) => {
+      if (event.target === els42.addToGalleryModal) call(methods, "closeAddToGallery");
     });
-    els43.saveToGalleryButton?.addEventListener("click", () => call(methods, "saveUploadToGallery"));
-    els43.accountQuotaButton?.addEventListener("click", () => call(methods, "openAccountQuotaDrawer"));
-    els43.accountQuotaDrawerClose?.addEventListener("click", () => call(methods, "closeAccountQuotaDrawer"));
-    els43.accountQuotaDrawerBackdrop?.addEventListener("click", () => call(methods, "closeAccountQuotaDrawer"));
-    els43.accountQuotaRefresh?.addEventListener("click", () => call(methods, "refreshAccountQuota", true));
-    els43.accountQuotaList?.addEventListener("click", (event) => {
-      const button = event.target?.closest("[data-account-manual-disabled-key]");
-      if (!button) return;
-      const accountKey = button.dataset.accountManualDisabledKey || "";
-      const nextDisabled = button.dataset.accountManualDisabledValue !== "true";
-      call(methods, "toggleAccountQueueEnabled", accountKey, nextDisabled, button);
+    els42.saveToGalleryButton?.addEventListener("click", () => call(methods, "saveUploadToGallery"));
+    els42.settingsButton?.addEventListener("click", () => call(methods, "openSettingsModal"));
+    els42.settingsModalClose?.addEventListener("click", () => call(methods, "closeSettingsModal"));
+    els42.settingsModal?.addEventListener("click", (event) => {
+      if (event.target === els42.settingsModal) call(methods, "closeSettingsModal");
     });
-    els43.settingsButton?.addEventListener("click", () => call(methods, "openSettingsModal"));
-    els43.settingsModalClose?.addEventListener("click", () => call(methods, "closeSettingsModal"));
-    els43.settingsModal?.addEventListener("click", (event) => {
-      if (event.target === els43.settingsModal) call(methods, "closeSettingsModal");
+    els42.saveSettingsButton?.addEventListener("click", () => call(methods, "saveSettings"));
+    els42.authSourceGroup?.addEventListener("click", (event) => call(methods, "handleAuthSourceClick", event));
+    els42.apiSourceSettingsButton?.addEventListener("click", () => call(methods, "openApiSettingsModal"));
+    els42.apiDirectSettingsButton?.addEventListener("click", () => call(methods, "openApiSettingsModal"));
+    els42.apiSettingsModalClose?.addEventListener("click", () => call(methods, "closeApiSettingsModal"));
+    els42.apiSettingsModal?.addEventListener("click", (event) => {
+      if (event.target === els42.apiSettingsModal) call(methods, "closeApiSettingsModal");
     });
-    els43.saveSettingsButton?.addEventListener("click", () => call(methods, "saveSettings"));
-    els43.authSourceGroup?.addEventListener("click", (event) => call(methods, "handleAuthSourceClick", event));
-    els43.authSourceGroup?.addEventListener("dblclick", (event) => call(methods, "handleAuthSourceDoubleClick", event));
-    els43.apiDirectSettingsButton?.addEventListener("click", () => call(methods, "openApiSettingsModal"));
-    els43.apiSettingsModalClose?.addEventListener("click", () => call(methods, "closeApiSettingsModal"));
-    els43.apiSettingsModal?.addEventListener("click", (event) => {
-      if (event.target === els43.apiSettingsModal) call(methods, "closeApiSettingsModal");
-    });
-    els43.saveApiSettingsButton?.addEventListener("click", () => call(methods, "saveApiSettings"));
-    els43.apiProviderQuick?.addEventListener("change", () => {
+    els42.saveApiSettingsButton?.addEventListener("click", () => call(methods, "saveApiSettings"));
+    els42.apiProviderQuick?.addEventListener("change", () => {
       call(methods, "readApiSettingsForm");
-      state33.apiSettings.active_provider_id = els43.apiProviderQuick?.value || call(methods, "currentApiProviderId");
+      state32.apiSettings.active_provider_id = els42.apiProviderQuick?.value || call(methods, "currentApiProviderId");
       call(methods, "populateApiSettingsForm");
       call(methods, "persistApiSettings");
-      call(methods, "renderAuthSource", state33.authStatus);
+      call(methods, "renderAuthSource", state32.authStatus);
       call(methods, "updateRequestPreview");
     });
-    els43.apiProvider?.addEventListener("change", () => {
+    els42.apiProvider?.addEventListener("change", () => {
       call(methods, "readApiSettingsForm");
-      state33.apiSettings.active_provider_id = els43.apiProvider?.value || call(methods, "currentApiProviderId");
+      state32.apiSettings.active_provider_id = els42.apiProvider?.value || call(methods, "currentApiProviderId");
       call(methods, "populateApiSettingsForm");
       call(methods, "persistApiSettings");
-      call(methods, "renderAuthSource", state33.authStatus);
+      call(methods, "renderAuthSource", state32.authStatus);
       call(methods, "updateRequestPreview");
     });
-    els43.addApiProviderButton?.addEventListener("click", () => call(methods, "addApiProvider"));
-    els43.deleteApiProviderButton?.addEventListener("click", () => call(methods, "deleteApiProvider"));
-    [els43.apiProviderName, els43.apiBaseUrl, els43.apiKey, els43.apiMode, els43.apiImageModel, els43.apiImagesConcurrency].filter(Boolean).forEach((element2) => {
+    els42.addApiProviderButton?.addEventListener("click", () => call(methods, "addApiProvider"));
+    els42.deleteApiProviderButton?.addEventListener("click", () => call(methods, "deleteApiProvider"));
+    [els42.apiProviderName, els42.apiBaseUrl, els42.apiKey, els42.apiMode, els42.apiImageModel, els42.apiImagesConcurrency].filter(Boolean).forEach((element2) => {
       element2?.addEventListener("input", () => {
         call(methods, "readApiSettingsForm");
         call(methods, "persistApiSettings");
-        call(methods, "renderAuthSource", state33.authStatus);
+        call(methods, "renderAuthSource", state32.authStatus);
         call(methods, "updateRequestPreview");
       });
     });
     call(methods, "bindOverlayPopoverEvents");
-    els43.runButton.addEventListener("click", () => call(methods, "runTask"));
-    document.addEventListener("keydown", (event) => handleRunTaskShortcut(event, els43, methods));
-    els43.refreshButton.addEventListener("click", () => {
+    els42.runButton.addEventListener("click", () => call(methods, "runTask"));
+    document.addEventListener("keydown", (event) => handleRunTaskShortcut(event, els42, methods));
+    els42.refreshButton.addEventListener("click", () => {
       void handleRefreshButtonClick(methods);
     });
     call(methods, "bindTaskListControlEvents");
@@ -109,8 +98,8 @@
   function call2(methods, name, ...args) {
     return methods[name]?.(...args);
   }
-  function bootWebUI(state33, els43, methods) {
-    bindWebUIEvents(state33, els43, methods);
+  function bootWebUI(state32, els42, methods) {
+    bindWebUIEvents(state32, els42, methods);
     call2(methods, "restoreThemePreference");
     call2(methods, "restoreSidebarWidth");
     call2(methods, "restoreMainModel");
@@ -133,12 +122,11 @@
     call2(methods, "refreshHealth");
     call2(methods, "refreshGallery");
     call2(methods, "refreshRecentAssets");
-    call2(methods, "refreshAccountQuota", false);
     const realtimeStarted = window.startRealtimeUpdates?.({ migrateLegacyArchives: true });
     if (realtimeStarted) {
       void window.refreshQueue?.();
       Promise.resolve(call2(methods, "refreshTasks", { migrateLegacyArchives: true })).finally(() => {
-        state33.realtimeSnapshotNeedsArchiveMigration = false;
+        state32.realtimeSnapshotNeedsArchiveMigration = false;
       });
     } else {
       void window.refreshQueue?.();
@@ -157,6 +145,8 @@
       sidebarResizeHandle: document.querySelector("#sidebarResizeHandle"),
       authSourceGroup: document.querySelector("#authSourceGroup"),
       authSourceDetail: document.querySelector("#authSourceDetail"),
+      apiSourceSettingsButton: document.querySelector("#apiSourceSettingsButton"),
+      githubLink: document.querySelector("#githubLink"),
       apiStatus: document.querySelector("#apiStatus"),
       apiDirectSettingsButton: document.querySelector("#apiDirectSettingsButton"),
       queueButton: document.querySelector("#queueButton"),
@@ -173,14 +163,6 @@
       taskHistoryShell: document.querySelector(".task-history-shell"),
       sidebarContent: document.querySelector(".sidebar-content"),
       taskActiveList: document.querySelector("#taskActiveList"),
-      accountQuotaButton: document.querySelector("#accountQuotaButton"),
-      accountQuotaBadge: document.querySelector("#accountQuotaBadge"),
-      accountQuotaDrawer: document.querySelector("#accountQuotaDrawer"),
-      accountQuotaDrawerClose: document.querySelector("#accountQuotaDrawerClose"),
-      accountQuotaDrawerBackdrop: document.querySelector("#accountQuotaDrawerBackdrop"),
-      accountQuotaRefresh: document.querySelector("#accountQuotaRefresh"),
-      accountQuotaSummary: document.querySelector("#accountQuotaSummary"),
-      accountQuotaList: document.querySelector("#accountQuotaList"),
       taskList: document.querySelector("#taskList"),
       taskSearch: document.querySelector("#taskSearch"),
       taskRatioFilter: document.querySelector("#taskRatioFilter"),
@@ -365,9 +347,9 @@
   }
 
   // codex_image/webui/frontend/src/legacy-bridge.ts
-  function installLegacyBridge(bridge40) {
-    window.__codexImageWebUI = bridge40;
-    return bridge40;
+  function installLegacyBridge(bridge39) {
+    window.__codexImageWebUI = bridge39;
+    return bridge39;
   }
   function bindBridgeMethod(name, options = {}) {
     const proxy2 = (...args) => {
@@ -385,11 +367,11 @@
 
   // codex_image/webui/frontend/src/state.ts
   function getLegacyBridge() {
-    const bridge40 = window.__codexImageWebUI;
-    if (!bridge40) {
+    const bridge39 = window.__codexImageWebUI;
+    if (!bridge39) {
       throw new Error("WebUI legacy bridge is not initialized");
     }
-    return bridge40;
+    return bridge39;
   }
   function getState() {
     return getLegacyBridge().state;
@@ -422,21 +404,21 @@
   var setStatus = (...args) => legacyMethod("setStatus", ...args);
   var getPromptText = (...args) => legacyMethod("getPromptText", ...args);
   function updateTaskInState(task) {
-    const state33 = getLegacyBridge().state;
+    const state32 = getLegacyBridge().state;
     if (!task?.task_id) return false;
     const taskId = String(task.task_id);
-    const previousIndex = state33.tasks.findIndex((item) => String(item.task_id) === taskId);
+    const previousIndex = state32.tasks.findIndex((item) => String(item.task_id) === taskId);
     if (previousIndex === -1) {
-      state33.tasks.unshift(task);
+      state32.tasks.unshift(task);
       return true;
     }
-    const previousTask = state33.tasks[previousIndex];
+    const previousTask = state32.tasks[previousIndex];
     if (previousTask?.local_pending) {
       revokeTaskUploadPreviewUrls(previousTask);
     }
-    state33.tasks = state33.tasks.map((item, index) => index === previousIndex ? task : item);
-    if (state33.pendingTaskId && String(state33.pendingTaskId) === taskId && !task.local_pending) {
-      state33.pendingTaskId = null;
+    state32.tasks = state32.tasks.map((item, index) => index === previousIndex ? task : item);
+    if (state32.pendingTaskId && String(state32.pendingTaskId) === taskId && !task.local_pending) {
+      state32.pendingTaskId = null;
     }
     return true;
   }
@@ -455,9 +437,9 @@
     return task.status || "";
   }
   function startUiClock() {
-    const state33 = getLegacyBridge().state;
-    if (state33.uiClockTimerId) return;
-    state33.uiClockTimerId = window.setInterval(updateElapsedDisplays, 100);
+    const state32 = getLegacyBridge().state;
+    if (state32.uiClockTimerId) return;
+    state32.uiClockTimerId = window.setInterval(updateElapsedDisplays, 100);
   }
   function updateElapsedDisplays() {
     updateTaskElapsedDisplays();
@@ -465,10 +447,10 @@
     updatePreviewElapsedDisplay();
   }
   function updateTaskElapsedDisplays() {
-    const { state: state33, els: els43 } = getLegacyBridge();
-    const root = els43.taskHistoryShell || els43.taskList;
+    const { state: state32, els: els42 } = getLegacyBridge();
+    const root = els42.taskHistoryShell || els42.taskList;
     if (!root) return;
-    const tasksById = new Map(state33.tasks.map((task) => [String(task.task_id), task]));
+    const tasksById = new Map(state32.tasks.map((task) => [String(task.task_id), task]));
     root.querySelectorAll("[data-task-status-id]").forEach((element2) => {
       const task = tasksById.get(String(element2.dataset.taskStatusId || ""));
       if (task) {
@@ -490,9 +472,9 @@
     });
   }
   function updatePreviewElapsedDisplay() {
-    const { els: els43 } = getLegacyBridge();
-    if (!els43.previewGrid) return;
-    els43.previewGrid.querySelectorAll("[data-preview-elapsed]").forEach((element2) => {
+    const { els: els42 } = getLegacyBridge();
+    if (!els42.previewGrid) return;
+    els42.previewGrid.querySelectorAll("[data-preview-elapsed]").forEach((element2) => {
       updateElapsedTimerElement(element2, elapsedMillisecondsSince(element2.dataset.previewStart));
     });
   }
@@ -528,74 +510,74 @@
     }
   }
   function updatePromptCount() {
-    const { els: els43 } = getLegacyBridge();
-    if (!els43.charCount) return;
-    els43.charCount.textContent = `${getPromptText().length} / 4000`;
+    const { els: els42 } = getLegacyBridge();
+    if (!els42.charCount) return;
+    els42.charCount.textContent = `${getPromptText().length} / 4000`;
   }
   function addPendingTask(task) {
-    const state33 = getLegacyBridge().state;
-    state33.pendingTaskId = task.task_id;
-    state33.selectedTaskId = task.task_id;
-    state33.tasks = [task, ...state33.tasks.filter((item) => item.task_id !== task.task_id)];
+    const state32 = getLegacyBridge().state;
+    state32.pendingTaskId = task.task_id;
+    state32.selectedTaskId = task.task_id;
+    state32.tasks = [task, ...state32.tasks.filter((item) => item.task_id !== task.task_id)];
     renderTasks();
     renderPreview(task);
   }
   function replacePendingTask(pendingTaskId, completedTask) {
-    const state33 = getLegacyBridge().state;
-    const removedPendingTasks = state33.tasks.filter((task) => task?.local_pending && (task.task_id === completedTask.task_id || task.task_id === pendingTaskId));
-    state33.tasks = [
+    const state32 = getLegacyBridge().state;
+    const removedPendingTasks = state32.tasks.filter((task) => task?.local_pending && (task.task_id === completedTask.task_id || task.task_id === pendingTaskId));
+    state32.tasks = [
       completedTask,
-      ...state33.tasks.filter((task) => task.task_id !== completedTask.task_id && task.task_id !== pendingTaskId)
+      ...state32.tasks.filter((task) => task.task_id !== completedTask.task_id && task.task_id !== pendingTaskId)
     ];
     removedPendingTasks.forEach(revokeTaskUploadPreviewUrls);
-    state33.selectedTaskId = completedTask.task_id;
-    state33.pendingTaskId = null;
+    state32.selectedTaskId = completedTask.task_id;
+    state32.pendingTaskId = null;
     renderTasks();
     renderPreview(completedTask);
   }
   function markPendingTaskFailed(pendingTaskId, message) {
-    const state33 = getLegacyBridge().state;
-    const task = state33.tasks.find((item) => item.task_id === pendingTaskId);
+    const state32 = getLegacyBridge().state;
+    const task = state32.tasks.find((item) => item.task_id === pendingTaskId);
     if (!task) return;
     task.status = "failed";
     task.error = message;
     task.updated_at = (/* @__PURE__ */ new Date()).toISOString();
-    state33.selectedTaskId = pendingTaskId;
-    state33.pendingTaskId = null;
+    state32.selectedTaskId = pendingTaskId;
+    state32.pendingTaskId = null;
     renderTasks();
     renderPreview(task);
   }
   function startRunFeedback(task, actionLabel = null) {
-    const { state: state33, els: els43 } = getLegacyBridge();
+    const { state: state32, els: els42 } = getLegacyBridge();
     stopRunFeedback();
-    state33.runFeedbackAction = actionLabel;
-    state33.runStartedAt = timestampMs(task.started_at || task.created_at) || Date.now();
-    state33.runTimerId = window.setInterval(updateRunFeedback, 100);
-    els43.runButton?.classList.add("running");
+    state32.runFeedbackAction = actionLabel;
+    state32.runStartedAt = timestampMs(task.started_at || task.created_at) || Date.now();
+    state32.runTimerId = window.setInterval(updateRunFeedback, 100);
+    els42.runButton?.classList.add("running");
     updateRunFeedback();
   }
   function updateRunFeedback() {
-    const { state: state33, els: els43 } = getLegacyBridge();
-    if (!state33.runStartedAt) return;
-    const elapsed = formatDurationTenths(elapsedMillisecondsSince(state33.runStartedAt));
-    const action = state33.runFeedbackAction || (state33.mode === "edit" ? "\u7F16\u8F91\u4E2D" : "\u751F\u6210\u4E2D");
-    if (els43.runButton) els43.runButton.textContent = `${action} ${elapsed}`;
+    const { state: state32, els: els42 } = getLegacyBridge();
+    if (!state32.runStartedAt) return;
+    const elapsed = formatDurationTenths(elapsedMillisecondsSince(state32.runStartedAt));
+    const action = state32.runFeedbackAction || (state32.mode === "edit" ? "\u7F16\u8F91\u4E2D" : "\u751F\u6210\u4E2D");
+    if (els42.runButton) els42.runButton.textContent = `${action} ${elapsed}`;
     setStatus(`${action}\uFF0C\u8BA1\u65F6 ${elapsed}`, "running");
     updateElapsedDisplays();
-    if (state33.selectedTaskId === state33.pendingTaskId) {
+    if (state32.selectedTaskId === state32.pendingTaskId) {
       renderPreview();
     }
   }
   function stopRunFeedback() {
-    const { state: state33, els: els43 } = getLegacyBridge();
-    if (state33.runTimerId) {
-      window.clearInterval(state33.runTimerId);
+    const { state: state32, els: els42 } = getLegacyBridge();
+    if (state32.runTimerId) {
+      window.clearInterval(state32.runTimerId);
     }
-    state33.runTimerId = null;
-    state33.runStartedAt = null;
-    state33.runFeedbackAction = null;
-    els43.runButton?.classList.remove("running");
-    if (els43.runButton) els43.runButton.textContent = state33.mode === "edit" ? "\u5F00\u59CB\u7F16\u8F91" : "\u5F00\u59CB\u751F\u6210";
+    state32.runTimerId = null;
+    state32.runStartedAt = null;
+    state32.runFeedbackAction = null;
+    els42.runButton?.classList.remove("running");
+    if (els42.runButton) els42.runButton.textContent = state32.mode === "edit" ? "\u5F00\u59CB\u7F16\u8F91" : "\u5F00\u59CB\u751F\u6210";
   }
 
   // codex_image/webui/frontend/src/state-defaults.ts
@@ -677,7 +659,6 @@
       galleryGridTransitionSeq: 0,
       galleryGridTransitionTimerId: null,
       queue: { waiting: [], running: [], summary: { waiting_count: 0, running_count: 0, channel_count: 0 } },
-      accountQuota: { items: [], summary: {} },
       queueRenderKey: null,
       queueRequestSeq: 0,
       queueDispatchSyncTimerId: null,
@@ -755,7 +736,6 @@
     canAddSourceToGallery: proxy("canAddSourceToGallery"),
     categoryLabel: proxy("categoryLabel"),
     categoryPromptRole: proxy("categoryPromptRole"),
-    closeAccountQuotaDrawer: proxy("closeAccountQuotaDrawer"),
     closeAddToGallery: proxy("closeAddToGallery"),
     closeApiSettingsModal: proxy("closeApiSettingsModal"),
     closeConfirmPopover: proxy("closeConfirmPopover"),
@@ -791,7 +771,6 @@
     gallerySource: proxy("gallerySource"),
     getPromptText: proxy("getPromptText"),
     handleAuthSourceClick: proxy("handleAuthSourceClick"),
-    handleAuthSourceDoubleClick: proxy("handleAuthSourceDoubleClick"),
     handleCustomDimensionInput: proxy("handleCustomDimensionInput"),
     handleQuickGalleryBoundaryWheel: proxy("handleQuickGalleryBoundaryWheel"),
     handleQuickGalleryCategoryEvent: proxy("handleQuickGalleryCategoryEvent"),
@@ -810,7 +789,6 @@
     normalizeApiSettings: proxy("normalizeApiSettings"),
     normalizeHexColor: proxy("normalizeHexColor"),
     notifyTaskUpdate: proxy("notifyTaskUpdate"),
-    openAccountQuotaDrawer: proxy("openAccountQuotaDrawer"),
     openAddToGallery: proxy("openAddToGallery"),
     openApiSettingsModal: proxy("openApiSettingsModal"),
     openConfirmPopover: proxy("openConfirmPopover"),
@@ -824,7 +802,6 @@
     positionPromptPopover: proxy("positionPromptPopover"),
     readApiSettingsForm: proxy("readApiSettingsForm"),
     recentColorsForDisplay: proxy("recentColorsForDisplay"),
-    refreshAccountQuota: proxy("refreshAccountQuota"),
     refreshApiSettings: proxy("refreshApiSettings"),
     refreshColorPalette: proxy("refreshColorPalette"),
     refreshGallery: proxy("refreshGallery"),
@@ -842,7 +819,6 @@
     removeFavoriteColor: proxy("removeFavoriteColor"),
     renderArchiveButton: proxy("renderArchiveButton"),
     renderArchiveModal: proxy("renderArchiveModal"),
-    renderAccountQuota: proxy("renderAccountQuota"),
     renderAuthSource: proxy("renderAuthSource"),
     renderBatchToolbar: proxy("renderBatchToolbar"),
     renderGalleryCategoryControls: proxy("renderGalleryCategoryControls"),
@@ -895,8 +871,6 @@
     taskHasViewableUpdate: proxy("taskHasViewableUpdate"),
     taskRetryStateText: proxy("taskRetryStateText"),
     taskTotalCount: proxy("taskTotalCount"),
-    accountQuotaLimitRowsHtml: proxy("accountQuotaLimitRowsHtml"),
-    toggleAccountQueueEnabled: proxy("toggleAccountQueueEnabled"),
     toggleColorPaletteManageMode: proxy("toggleColorPaletteManageMode"),
     updateCompression: proxy("updateCompression"),
     applyFirstReferenceImageAspectRatio: proxy("applyFirstReferenceImageAspectRatio"),
@@ -998,12 +972,12 @@
     });
   }
   function uploadPreviewUrlInUse(previewUrl, options = {}) {
-    const state33 = getState();
+    const state32 = getState();
     if (!previewUrl) return false;
     const ignoredCurrentSources = options.ignoredCurrentSources || /* @__PURE__ */ new Set();
     const ignoredTasks = options.ignoredTasks || /* @__PURE__ */ new Set();
-    if (sourceListUsesPreviewUrl(state33.images, previewUrl, ignoredCurrentSources)) return true;
-    return state33.tasks.some((task) => {
+    if (sourceListUsesPreviewUrl(state32.images, previewUrl, ignoredCurrentSources)) return true;
+    return state32.tasks.some((task) => {
       if (!task || ignoredTasks.has(task)) return false;
       return task.preview_url === previewUrl || sourceListUsesPreviewUrl(task.local_input_files, previewUrl) || sourceListUsesPreviewUrl(task.input_sources, previewUrl);
     });
@@ -1044,12 +1018,12 @@
     return source.name || "\u56FE\u5E93\u56FE\u7247";
   }
   function addGalleryInput(item, options = {}) {
-    const state33 = getState();
+    const state32 = getState();
     if (!item) return;
-    const alreadySelected = state33.images.some((source) => source.kind === "gallery" && source.id === item.id);
+    const alreadySelected = state32.images.some((source) => source.kind === "gallery" && source.id === item.id);
     if (!alreadySelected) {
-      state33.images.push(gallerySource(item));
-      if (state33.mode !== "edit") {
+      state32.images.push(gallerySource(item));
+      if (state32.mode !== "edit") {
         legacyMethod2("setMode", "edit");
       }
       legacyMethod2("renderImageStrip");
@@ -1068,14 +1042,14 @@
     return getState().images.filter((image) => image.kind === "upload");
   }
   function addImageFiles(files, options = {}) {
-    const state33 = getState();
+    const state32 = getState();
     const imageFiles = Array.from(files || []).filter((file) => file?.type?.startsWith("image/"));
     if (!imageFiles.length) {
       if (options.emptyMessage) setStatus2(options.emptyMessage, "error");
       return false;
     }
-    state33.images.push(...imageFiles.map((file) => uploadSource(file)));
-    if (state33.images.length > 0 && state33.mode !== "edit") {
+    state32.images.push(...imageFiles.map((file) => uploadSource(file)));
+    if (state32.images.length > 0 && state32.mode !== "edit") {
       legacyMethod2("setMode", "edit");
     }
     legacyMethod2("renderImageStrip");
@@ -1115,8 +1089,8 @@
     return `${prefix}\uFF0C\u56FE\u7247\u8F93\u5165\u533A\u5DF2\u805A\u7126\uFF0C\u8BF7\u6309 ${clipboardPasteShortcutLabel()} \u7C98\u8D34\u56FE\u7247`;
   }
   function focusImagePasteTarget() {
-    const els43 = getEls();
-    els43.imageUploadSource?.focus({ preventScroll: true });
+    const els42 = getEls();
+    els42.imageUploadSource?.focus({ preventScroll: true });
   }
   function handleImagePaste(event) {
     const files = imageFilesFromClipboardItems(event.clipboardData?.items);
@@ -1141,13 +1115,13 @@
     return files;
   }
   async function pasteClipboardImages() {
-    const els43 = getEls();
+    const els42 = getEls();
     if (!navigator.clipboard?.read) {
       focusImagePasteTarget();
       setStatus2(clipboardReadFallbackMessage("\u5F53\u524D\u6D4F\u89C8\u5668\u4E0D\u652F\u6301\u76F4\u63A5\u8BFB\u53D6\u526A\u8D34\u677F"), "error");
       return;
     }
-    els43.pasteClipboardButton.disabled = true;
+    els42.pasteClipboardButton.disabled = true;
     try {
       const files = await readClipboardImageFiles();
       const added = addImageFiles(files, {
@@ -1160,7 +1134,7 @@
       const reason = ["NotAllowedError", "SecurityError"].includes(String(error?.name || "")) ? "\u6D4F\u89C8\u5668\u62D2\u7EDD\u76F4\u63A5\u8BFB\u53D6\u526A\u8D34\u677F" : "\u65E0\u6CD5\u8BFB\u53D6\u526A\u8D34\u677F";
       setStatus2(clipboardReadFallbackMessage(reason), "error");
     } finally {
-      els43.pasteClipboardButton.disabled = false;
+      els42.pasteClipboardButton.disabled = false;
     }
   }
   function missingGalleryInputs() {
@@ -1170,45 +1144,45 @@
     return getState().images.filter((image) => image.kind === "asset" && image.missing);
   }
   function addReferenceAssetInput(item) {
-    const state33 = getState();
+    const state32 = getState();
     if (!item?.id) return;
-    const alreadySelected = state33.images.some((source) => source.kind === "asset" && source.id === item.id);
+    const alreadySelected = state32.images.some((source) => source.kind === "asset" && source.id === item.id);
     if (alreadySelected) return;
-    state33.images.push(assetSource(item));
-    if (state33.mode !== "edit") {
+    state32.images.push(assetSource(item));
+    if (state32.mode !== "edit") {
       legacyMethod2("setMode", "edit");
     }
     legacyMethod2("renderImageStrip");
     legacyMethod2("updateRequestPreview");
   }
   function collectReferenceOutput(url, options = {}) {
-    const state33 = getState();
+    const state32 = getState();
     if (!url) return;
-    if (state33.collectedReferences.some((item) => item.url === url)) {
+    if (state32.collectedReferences.some((item) => item.url === url)) {
       setStatus2("\u5DF2\u5728\u5F85\u52A0\u5165\u53C2\u8003\u56FE", "ok");
       return;
     }
-    state33.collectedReferences.push({
+    state32.collectedReferences.push({
       url,
       name: options.name || "",
       sourceTaskId: options.sourceTaskId || "",
       outputIndex: options.outputIndex || null
     });
     renderReferenceCollector();
-    setStatus2(`\u5DF2\u6682\u5B58 ${state33.collectedReferences.length} \u5F20\u53C2\u8003\u56FE`, "ok");
+    setStatus2(`\u5DF2\u6682\u5B58 ${state32.collectedReferences.length} \u5F20\u53C2\u8003\u56FE`, "ok");
   }
   function renderReferenceCollector() {
-    const state33 = getState();
-    const els43 = getEls();
-    if (!els43.referenceCollector) return;
-    const items = state33.collectedReferences;
+    const state32 = getState();
+    const els42 = getEls();
+    if (!els42.referenceCollector) return;
+    const items = state32.collectedReferences;
     if (!items.length) {
-      els43.referenceCollector.classList.add("hidden");
-      els43.referenceCollector.innerHTML = "";
+      els42.referenceCollector.classList.add("hidden");
+      els42.referenceCollector.innerHTML = "";
       return;
     }
-    els43.referenceCollector.classList.remove("hidden");
-    els43.referenceCollector.innerHTML = `
+    els42.referenceCollector.classList.remove("hidden");
+    els42.referenceCollector.innerHTML = `
     <div class="reference-collector-header">
       <span>\u5F85\u52A0\u5165\u53C2\u8003\u56FE \xB7 ${items.length} \u5F20</span>
       <div class="reference-collector-actions">
@@ -1225,9 +1199,9 @@
       `).join("")}
     </div>
   `;
-    els43.referenceCollector.querySelector("[data-reference-collector-add-all]")?.addEventListener("click", addCollectedReferencesToInput);
-    els43.referenceCollector.querySelector("[data-reference-collector-clear]")?.addEventListener("click", () => clearCollectedReferences());
-    els43.referenceCollector.querySelectorAll("[data-reference-collector-remove]").forEach((button) => {
+    els42.referenceCollector.querySelector("[data-reference-collector-add-all]")?.addEventListener("click", addCollectedReferencesToInput);
+    els42.referenceCollector.querySelector("[data-reference-collector-clear]")?.addEventListener("click", () => clearCollectedReferences());
+    els42.referenceCollector.querySelectorAll("[data-reference-collector-remove]").forEach((button) => {
       button.addEventListener("click", () => removeCollectedReference(button.dataset.referenceCollectorRemove));
     });
   }
@@ -1277,11 +1251,11 @@
     return ensureImageFilenameExtension(item?.name || `collected-reference-${index + 1}`, "image/png");
   }
   async function addCollectedReferencesToInput() {
-    const state33 = getState();
-    const els43 = getEls();
-    const items = state33.collectedReferences.slice();
+    const state32 = getState();
+    const els42 = getEls();
+    const items = state32.collectedReferences.slice();
     if (!items.length) return;
-    const addButton = els43.referenceCollector?.querySelector("[data-reference-collector-add-all]");
+    const addButton = els42.referenceCollector?.querySelector("[data-reference-collector-add-all]");
     if (addButton) addButton.disabled = true;
     try {
       const files = [];
@@ -1298,8 +1272,8 @@
     }
   }
   function bindInputSourceEvents() {
-    const els43 = getEls();
-    els43.pasteClipboardButton?.addEventListener("click", pasteClipboardImages);
+    const els42 = getEls();
+    els42.pasteClipboardButton?.addEventListener("click", pasteClipboardImages);
     document.addEventListener("paste", handleImagePaste);
   }
   function initInputSourcesFeature() {
@@ -1392,10 +1366,10 @@
     return remoteImageSourceFile(source);
   }
   function setImageEditorStatus(message, type = "") {
-    const els43 = getEls();
-    if (!els43.imageEditorStatus) return;
-    els43.imageEditorStatus.textContent = message || "";
-    els43.imageEditorStatus.className = `image-editor-status ${type || ""}`.trim();
+    const els42 = getEls();
+    if (!els42.imageEditorStatus) return;
+    els42.imageEditorStatus.textContent = message || "";
+    els42.imageEditorStatus.className = `image-editor-status ${type || ""}`.trim();
   }
   function nextImageEditorSession() {
     imageEditorState.sessionId += 1;
@@ -1525,8 +1499,8 @@
     pushImageEditorHistory();
   }
   function renderImageEditor() {
-    const els43 = getEls();
-    const visible = els43.imageEditorCanvas;
+    const els42 = getEls();
+    const visible = els42.imageEditorCanvas;
     const work = imageEditorState.workCanvas;
     if (!visible || !work) return;
     visible.width = work.width;
@@ -1562,12 +1536,12 @@
     restoreImageEditorSnapshot(imageEditorState.history[imageEditorState.historyIndex]);
   }
   function updateImageEditorControls() {
-    const els43 = getEls();
+    const els42 = getEls();
     const canUndo = imageEditorState.historyIndex > 0;
     const canRedo = imageEditorState.historyIndex >= 0 && imageEditorState.historyIndex < imageEditorState.history.length - 1;
-    if (els43.imageEditorUndo) els43.imageEditorUndo.disabled = !canUndo;
-    if (els43.imageEditorRedo) els43.imageEditorRedo.disabled = !canRedo;
-    if (els43.imageEditorStrokeValue) els43.imageEditorStrokeValue.textContent = `${imageEditorState.strokeWidth}px`;
+    if (els42.imageEditorUndo) els42.imageEditorUndo.disabled = !canUndo;
+    if (els42.imageEditorRedo) els42.imageEditorRedo.disabled = !canRedo;
+    if (els42.imageEditorStrokeValue) els42.imageEditorStrokeValue.textContent = `${imageEditorState.strokeWidth}px`;
     document.querySelectorAll("[data-image-editor-tool]").forEach((button) => {
       button.classList.toggle("active", button.dataset.imageEditorTool === imageEditorState.tool);
     });
@@ -1576,9 +1550,9 @@
     });
   }
   function updateImageEditorCropBox() {
-    const els43 = getEls();
-    const box = els43.imageEditorCropBox;
-    const canvas = els43.imageEditorCanvas;
+    const els42 = getEls();
+    const box = els42.imageEditorCropBox;
+    const canvas = els42.imageEditorCanvas;
     const crop = imageEditorState.crop;
     if (!box || !canvas || !crop) {
       box?.classList.add("hidden");
@@ -1895,19 +1869,19 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     legacyMethod3("updatePromptCount");
   }
   async function saveImageEdit() {
-    const state33 = getState();
-    const els43 = getEls();
+    const state32 = getState();
+    const els42 = getEls();
     const sessionId = imageEditorState.sessionId;
     const source = imageEditorState.source;
     const saveCanvas = imageEditorCanvasForSave();
-    if (!source || !isEditableImageSource(source) || !saveCanvas || !state33.images.includes(source)) {
+    if (!source || !isEditableImageSource(source) || !saveCanvas || !state32.images.includes(source)) {
       setImageEditorStatus("\u56FE\u7247\u7F16\u8F91\u4FDD\u5B58\u5931\u8D25", "error");
       return;
     }
-    if (els43.imageEditorSave) els43.imageEditorSave.disabled = true;
+    if (els42.imageEditorSave) els42.imageEditorSave.disabled = true;
     try {
       const blob = await imageEditorExportBlob(saveCanvas);
-      const sourceIndex = state33.images.indexOf(source);
+      const sourceIndex = state32.images.indexOf(source);
       if (sessionId !== imageEditorState.sessionId || imageEditorState.source !== source || sourceIndex < 0) {
         return;
       }
@@ -1924,7 +1898,7 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
         previewUrl: URL.createObjectURL(file),
         edited: true
       };
-      state33.images[sourceIndex] = nextSource;
+      state32.images[sourceIndex] = nextSource;
       legacyMethod3("revokeUploadPreviewUrl", source);
       legacyMethod3("syncPromptGalleryMentionsFromInputs");
       if (imageEditorState.hasInstructionMarks) ensureImageEditorPromptHint();
@@ -1935,13 +1909,13 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     } catch (error) {
       setImageEditorStatus(error.message || "\u56FE\u7247\u7F16\u8F91\u4FDD\u5B58\u5931\u8D25", "error");
     } finally {
-      if (els43.imageEditorSave) els43.imageEditorSave.disabled = false;
+      if (els42.imageEditorSave) els42.imageEditorSave.disabled = false;
     }
   }
   async function openImageEditor(index) {
-    const state33 = getState();
-    const els43 = getEls();
-    const source = state33.images[index];
+    const state32 = getState();
+    const els42 = getEls();
+    const source = state32.images[index];
     if (!source || !isEditableImageSource(source)) {
       legacyMethod3("setStatus", "\u8FD9\u5F20\u56FE\u7247\u65E0\u6CD5\u7F16\u8F91", "error");
       return;
@@ -1951,15 +1925,15 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     imageEditorState.source = source;
     imageEditorState.originalFile = null;
     imageEditorState.tool = "crop";
-    imageEditorState.color = els43.imageEditorColor?.value || "#ff3b30";
-    imageEditorState.strokeWidth = Number(els43.imageEditorStroke?.value || 8);
+    imageEditorState.color = els42.imageEditorColor?.value || "#ff3b30";
+    imageEditorState.strokeWidth = Number(els42.imageEditorStroke?.value || 8);
     imageEditorState.hasInstructionMarks = false;
     imageEditorState.drawing = null;
     setImageEditorStatus("");
-    if (els43.imageEditorSubtitle) {
-      els43.imageEditorSubtitle.textContent = legacyMethod3("sourceName", source) || "\u8F93\u5165\u56FE\u7247";
+    if (els42.imageEditorSubtitle) {
+      els42.imageEditorSubtitle.textContent = legacyMethod3("sourceName", source) || "\u8F93\u5165\u56FE\u7247";
     }
-    els43.imageEditorModal?.classList.remove("hidden");
+    els42.imageEditorModal?.classList.remove("hidden");
     try {
       const file = await imageEditorSourceFile(source);
       if (sessionId !== imageEditorState.sessionId || imageEditorState.source !== source) return;
@@ -1976,9 +1950,9 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     }
   }
   function closeImageEditor() {
-    const els43 = getEls();
+    const els42 = getEls();
     nextImageEditorSession();
-    els43.imageEditorModal?.classList.add("hidden");
+    els42.imageEditorModal?.classList.add("hidden");
     imageEditorState.sourceIndex = null;
     imageEditorState.source = null;
     imageEditorState.originalFile = null;
@@ -2019,8 +1993,8 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     }
   }
   function isImageEditorModalOpen() {
-    const els43 = getEls();
-    return Boolean(els43.imageEditorModal && !els43.imageEditorModal.classList.contains("hidden"));
+    const els42 = getEls();
+    return Boolean(els42.imageEditorModal && !els42.imageEditorModal.classList.contains("hidden"));
   }
   function handleImageEditorHistoryShortcut(event) {
     if (!isImageEditorModalOpen()) return false;
@@ -2043,11 +2017,11 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     return false;
   }
   function bindImageEditorEvents() {
-    const els43 = getEls();
-    els43.imageEditorClose?.addEventListener("click", closeImageEditor);
-    els43.imageEditorCancel?.addEventListener("click", closeImageEditor);
-    els43.imageEditorModal?.addEventListener("click", (event) => {
-      if (event.target === els43.imageEditorModal) closeImageEditor();
+    const els42 = getEls();
+    els42.imageEditorClose?.addEventListener("click", closeImageEditor);
+    els42.imageEditorCancel?.addEventListener("click", closeImageEditor);
+    els42.imageEditorModal?.addEventListener("click", (event) => {
+      if (event.target === els42.imageEditorModal) closeImageEditor();
     });
     document.querySelectorAll("[data-image-editor-tool]").forEach((button) => {
       button.addEventListener("click", () => setImageEditorTool(button.dataset.imageEditorTool));
@@ -2055,26 +2029,26 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     document.querySelectorAll("[data-image-editor-color]").forEach((button) => {
       button.addEventListener("click", () => {
         imageEditorState.color = button.dataset.imageEditorColor || imageEditorState.color;
-        if (els43.imageEditorColor) els43.imageEditorColor.value = imageEditorState.color;
+        if (els42.imageEditorColor) els42.imageEditorColor.value = imageEditorState.color;
         updateImageEditorControls();
       });
     });
-    els43.imageEditorColor?.addEventListener("input", () => {
-      imageEditorState.color = els43.imageEditorColor.value || imageEditorState.color;
+    els42.imageEditorColor?.addEventListener("input", () => {
+      imageEditorState.color = els42.imageEditorColor.value || imageEditorState.color;
       updateImageEditorControls();
     });
-    els43.imageEditorStroke?.addEventListener("input", () => {
-      imageEditorState.strokeWidth = Number(els43.imageEditorStroke.value || 8);
+    els42.imageEditorStroke?.addEventListener("input", () => {
+      imageEditorState.strokeWidth = Number(els42.imageEditorStroke.value || 8);
       updateImageEditorControls();
     });
-    els43.imageEditorUndo?.addEventListener("click", undoImageEdit);
-    els43.imageEditorRedo?.addEventListener("click", redoImageEdit);
-    els43.imageEditorReset?.addEventListener("click", resetImageEdit);
-    els43.imageEditorSave?.addEventListener("click", saveImageEdit);
-    els43.imageEditorCanvas?.addEventListener("pointerdown", handleImageEditorPointerDown);
-    els43.imageEditorCanvas?.addEventListener("pointermove", handleImageEditorPointerMove);
-    els43.imageEditorCanvas?.addEventListener("pointerup", handleImageEditorPointerUp);
-    els43.imageEditorCanvas?.addEventListener("pointercancel", handleImageEditorPointerCancel);
+    els42.imageEditorUndo?.addEventListener("click", undoImageEdit);
+    els42.imageEditorRedo?.addEventListener("click", redoImageEdit);
+    els42.imageEditorReset?.addEventListener("click", resetImageEdit);
+    els42.imageEditorSave?.addEventListener("click", saveImageEdit);
+    els42.imageEditorCanvas?.addEventListener("pointerdown", handleImageEditorPointerDown);
+    els42.imageEditorCanvas?.addEventListener("pointermove", handleImageEditorPointerMove);
+    els42.imageEditorCanvas?.addEventListener("pointerup", handleImageEditorPointerUp);
+    els42.imageEditorCanvas?.addEventListener("pointercancel", handleImageEditorPointerCancel);
   }
   function initImageEditorFeature() {
     if (imageEditorFeatureInitialized) return;
@@ -2099,9 +2073,9 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     event.target.value = "";
   }
   function clearImages() {
-    const state33 = getState();
-    legacyMethod4("revokeUploadPreviewUrls", state33.images);
-    state33.images = [];
+    const state32 = getState();
+    legacyMethod4("revokeUploadPreviewUrls", state32.images);
+    state32.images = [];
     legacyMethod4("syncPromptGalleryMentionsFromInputs");
     legacyMethod4("setMode", "generate");
     renderImageStrip();
@@ -2115,37 +2089,37 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     return icon;
   }
   function imageStripNeedsCompactGrid() {
-    const state33 = getState();
-    const els43 = getEls();
-    if (!els43.imageUploaderGrid || !state33.images.length) return false;
-    const availableWidth = Math.max(0, els43.imageUploaderGrid.clientWidth - 24);
+    const state32 = getState();
+    const els42 = getEls();
+    if (!els42.imageUploaderGrid || !state32.images.length) return false;
+    const availableWidth = Math.max(0, els42.imageUploaderGrid.clientWidth - 24);
     if (!availableWidth) return false;
-    const thumbCount = state33.images.length;
+    const thumbCount = state32.images.length;
     const fullSizeThumbsWidth = thumbCount * 116 + Math.max(0, thumbCount - 1) * 10;
     const fullSizeUploadWidth = 118;
     const fullSizeUploadGap = 10;
     return fullSizeThumbsWidth + fullSizeUploadGap + fullSizeUploadWidth > availableWidth;
   }
   function updateImageStripDensity() {
-    const state33 = getState();
-    const els43 = getEls();
-    const hasImages = Boolean(state33.images.length);
+    const state32 = getState();
+    const els42 = getEls();
+    const hasImages = Boolean(state32.images.length);
     const compactGrid = imageStripNeedsCompactGrid();
-    els43.imageUploaderGrid?.classList.toggle("has-images", hasImages);
-    els43.imageUploaderGrid?.classList.toggle("compact-grid", compactGrid);
+    els42.imageUploaderGrid?.classList.toggle("has-images", hasImages);
+    els42.imageUploaderGrid?.classList.toggle("compact-grid", compactGrid);
   }
   function wheelDeltaInPixels(event) {
     const dominantDelta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
     if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) return dominantDelta * 16;
     if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
-      const els43 = getEls();
-      return dominantDelta * Math.max(1, els43.imageStrip?.clientWidth || 1);
+      const els42 = getEls();
+      return dominantDelta * Math.max(1, els42.imageStrip?.clientWidth || 1);
     }
     return dominantDelta;
   }
   function handleImageStripWheel(event) {
-    const els43 = getEls();
-    const scrollTarget = els43.imageUploaderGrid?.classList.contains("compact-grid") ? els43.imageStrip : els43.imageThumbList;
+    const els42 = getEls();
+    const scrollTarget = els42.imageUploaderGrid?.classList.contains("compact-grid") ? els42.imageStrip : els42.imageThumbList;
     if (!scrollTarget) return;
     const maxScrollLeft = Math.max(0, scrollTarget.scrollWidth - scrollTarget.clientWidth);
     if (!maxScrollLeft) return;
@@ -2157,10 +2131,10 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     scrollTarget.scrollLeft = nextScrollLeft;
   }
   function renderImageStrip() {
-    const state33 = getState();
-    const els43 = getEls();
-    const hasImages = Boolean(state33.images.length);
-    const thumbList = els43.imageThumbList || els43.imageStrip;
+    const state32 = getState();
+    const els42 = getEls();
+    const hasImages = Boolean(state32.images.length);
+    const thumbList = els42.imageThumbList || els42.imageStrip;
     updateImageStripDensity();
     if (!thumbList) return;
     if (!hasImages) {
@@ -2169,7 +2143,7 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       return;
     }
     thumbList.innerHTML = "";
-    state33.images.forEach((source, index) => {
+    state32.images.forEach((source, index) => {
       const wrapper = document.createElement("div");
       wrapper.className = `thumb ${source.kind === "gallery" ? "gallery-thumb" : source.kind === "asset" ? "asset-thumb" : "upload-thumb"}${source.missing ? " missing-thumb" : ""}`;
       const image = document.createElement("img");
@@ -2205,11 +2179,11 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       remove.textContent = "\xD7";
       remove.addEventListener("click", (event) => {
         event.stopPropagation();
-        const removedSource = state33.images[index];
+        const removedSource = state32.images[index];
         legacyMethod4("revokeUploadPreviewUrl", removedSource, { ignoredCurrentSources: /* @__PURE__ */ new Set([removedSource]) });
-        state33.images.splice(index, 1);
+        state32.images.splice(index, 1);
         legacyMethod4("syncPromptGalleryMentionsFromInputs");
-        if (!state33.images.length) {
+        if (!state32.images.length) {
           legacyMethod4("setMode", "generate");
         }
         renderImageStrip();
@@ -2240,10 +2214,10 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     legacyMethod4("updateCustomRatioReferenceButtonState");
   }
   function bindImageStripEvents() {
-    const els43 = getEls();
-    els43.imageInput?.addEventListener("change", addImages);
-    els43.clearImagesButton?.addEventListener("click", clearImages);
-    els43.imageStrip?.addEventListener("wheel", handleImageStripWheel, { passive: false });
+    const els42 = getEls();
+    els42.imageInput?.addEventListener("change", addImages);
+    els42.clearImagesButton?.addEventListener("click", clearImages);
+    els42.imageStrip?.addEventListener("wheel", handleImageStripWheel, { passive: false });
     window.addEventListener("resize", updateImageStripDensity);
   }
   function initImageStripFeature() {
@@ -4281,9 +4255,6 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   function updateRequestPreview4() {
     legacyMethod12("updateRequestPreview");
   }
-  function refreshAccountQuota(refresh) {
-    return legacyMethod12("refreshAccountQuota", refresh);
-  }
   function currentApiMode2() {
     return legacyMethod12("currentApiMode");
   }
@@ -4292,9 +4263,6 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   }
   function apiModeLabel(mode) {
     return legacyMethod12("apiModeLabel", mode);
-  }
-  function openApiSettingsModal() {
-    legacyMethod12("openApiSettingsModal");
   }
   async function refreshHealth() {
     try {
@@ -4337,7 +4305,6 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       els9.apiStatus.className = `status-dot ${state8.authAvailable ? "ok" : "error"}`;
       els9.runButton.disabled = !state8.authAvailable;
       setStatus7(authSourceDetailText(data), state8.authAvailable ? "ok" : "error");
-      await refreshAccountQuota(false);
       updateRequestPreview4();
     } catch (error) {
       state8.pendingAuthSource = null;
@@ -4350,19 +4317,10 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     const button = event.target.closest?.("[data-auth-source]");
     if (!button) return;
     const source = button.dataset.authSource;
-    if (source === "api" && currentAuthSource2() === "api") {
-      openApiSettingsModal();
-      return;
-    }
     setAuthSource(source);
   }
-  function handleAuthSourceDoubleClick(event) {
-    const button = event.target.closest?.("[data-auth-source]");
-    if (!button || button.dataset.authSource !== "api") return;
-    openApiSettingsModal();
-  }
   function renderAuthSource(auth) {
-    const selected = state8.pendingAuthSource || auth?.selected_source || "auto";
+    const selected = state8.pendingAuthSource || auth?.selected_source || "codex";
     applyAuthSourceSelection(selected);
     if (els9.authSourceDetail) {
       const text = auth ? authSourceDetailText(auth) : "\u6388\u6743\u68C0\u67E5\u4E2D";
@@ -4371,60 +4329,39 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     }
   }
   function applyAuthSourceSelection(source) {
-    const selected = source || "auto";
+    const selected = source || "codex";
     els9.authSourceGroup?.querySelectorAll("[data-auth-source]").forEach((button) => {
       const active = button.dataset.authSource === selected;
       button.classList.toggle("active", active);
       button.setAttribute("aria-pressed", active ? "true" : "false");
     });
-    els9.accountQuotaButton?.classList.toggle("reserved-hidden", selected === "api");
-    els9.accountQuotaButton?.setAttribute("aria-hidden", selected === "api" ? "true" : "false");
-    if (selected === "api") {
-      els9.accountQuotaButton?.setAttribute("aria-expanded", "false");
-      els9.accountQuotaButton?.setAttribute("tabindex", "-1");
-    } else {
-      els9.accountQuotaButton?.removeAttribute("tabindex");
-    }
     els9.apiProviderQuick?.classList.add("hidden");
     updateModeSpecificSettings(selected);
   }
   function authSourceDetailText(auth) {
     if (!auth) return "\u6388\u6743\u68C0\u67E5\u4E2D";
     const selected = sourceLabel(auth.selected_source);
-    const effective = sourceLabel(auth.effective_source);
-    const cockpitCount = auth.sources?.cockpit?.account_count || 0;
     const effectiveApi = auth.effective_source === "api";
     if (!auth.auth_available) {
       if (auth.selected_source === "api" || effectiveApi) {
-        const provider = currentApiProviderLabel();
-        return `${selected}${provider ? ` \xB7 ${provider}` : ""} \u4E0D\u53EF\u7528`;
+        return `${selected} \u4E0D\u53EF\u7528`;
       }
       return `${selected} \u4E0D\u53EF\u7528`;
-    }
-    if (auth.selected_source === "auto") {
-      if (effectiveApi) {
-        const provider = currentApiProviderLabel();
-        const mode = apiModeLabel(currentApiMode2());
-        return `\u81EA\u52A8 \u2192 ${effective}${provider ? ` \xB7 ${provider}` : ""} \xB7 ${mode}`;
-      }
-      return `\u81EA\u52A8 \u2192 ${effective}${auth.effective_source === "cockpit" ? ` \xB7 ${cockpitCount}\u4E2A\u8D26\u53F7` : ""}`;
     }
     if (effectiveApi) {
       const provider = currentApiProviderLabel();
       const mode = apiModeLabel(currentApiMode2());
-      return `${effective}${provider ? ` \xB7 ${provider}` : ""} \xB7 ${mode}`;
+      return `API \xB7 ${provider} \xB7 ${mode}`;
     }
-    return `${effective}${auth.effective_source === "cockpit" ? ` \xB7 ${cockpitCount}\u4E2A\u8D26\u53F7` : ""}`;
+    return "Codex";
   }
   function sourceLabel(source) {
-    if (source === "cockpit") return "Cockpit\u591A\u8D26\u53F7";
-    if (source === "codex") return "Codex\u672C\u673A";
+    if (source === "codex") return "Codex";
     if (source === "api") return "API";
-    if (source === "auto") return "\u81EA\u52A8";
     return "\u672A\u751F\u6548";
   }
   function currentAuthSource2() {
-    return state8.pendingAuthSource || state8.authStatus?.selected_source || "auto";
+    return state8.pendingAuthSource || state8.authStatus?.selected_source || "codex";
   }
   function isDirectApiMode(authSource = currentAuthSource2()) {
     return authSource === "api" && currentApiMode2() !== "responses";
@@ -4631,7 +4568,7 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     updateModeSpecificSettings();
     updateRequestPreview5();
   }
-  function openApiSettingsModal2() {
+  function openApiSettingsModal() {
     closePromptPopover2();
     populateApiSettingsForm();
     setApiSettingsFeedback("\u4FDD\u5B58\u540E\u7ACB\u5373\u7528\u4E8E API \u6A21\u5F0F", "");
@@ -4756,7 +4693,6 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       refreshHealth,
       setAuthSource,
       handleAuthSourceClick,
-      handleAuthSourceDoubleClick,
       renderAuthSource,
       applyAuthSourceSelection,
       authSourceDetailText,
@@ -4780,7 +4716,7 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       currentApiProviderLabel: currentApiProviderLabel2,
       addApiProvider,
       deleteApiProvider,
-      openApiSettingsModal: openApiSettingsModal2,
+      openApiSettingsModal,
       closeApiSettingsModal,
       currentApiImageModel,
       currentApiMode: currentApiMode3,
@@ -4796,11 +4732,10 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     });
   }
 
-  // codex_image/webui/frontend/src/account-quota.ts
+  // codex_image/webui/frontend/src/storage-settings.ts
   var bridge10 = getLegacyBridge();
-  var state10 = bridge10.state;
   var els11 = bridge10.els;
-  var accountQuotaFeatureInitialized = false;
+  var storageSettingsFeatureInitialized = false;
   function legacyMethod14(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
@@ -4811,268 +4746,63 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   function setStatus9(message, type) {
     legacyMethod14("setStatus", message, type);
   }
-  function escapeHtml8(value) {
-    return legacyMethod14("escapeHtml", value);
-  }
-  async function refreshAccountQuota2(refresh = false) {
-    try {
-      const response = await fetch(`/api/accounts${refresh ? "?refresh=true" : ""}`);
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.detail || "\u989D\u5EA6\u8BFB\u53D6\u5931\u8D25");
-      state10.accountQuota = {
-        items: Array.isArray(data.items) ? data.items : [],
-        summary: data.summary || {},
-        message: data.message || ""
-      };
-      renderAccountQuota();
-      if (refresh) setStatus9("\u8D26\u53F7\u989D\u5EA6\u5DF2\u5237\u65B0", "ok");
-    } catch (error) {
-      if (els11.accountQuotaSummary) els11.accountQuotaSummary.textContent = error.message || "\u989D\u5EA6\u8BFB\u53D6\u5931\u8D25";
-      setStatus9(error.message || "\u989D\u5EA6\u8BFB\u53D6\u5931\u8D25", "error");
-    }
-  }
-  function renderAccountQuota() {
-    const items = state10.accountQuota.items || [];
-    const summary = state10.accountQuota.summary || {};
-    const count = Number(summary.count || items.length || 0);
-    if (els11.accountQuotaBadge) {
-      els11.accountQuotaBadge.textContent = String(count);
-      els11.accountQuotaBadge.classList.toggle("hidden", count === 0);
-    }
-    if (els11.accountQuotaSummary) {
-      if (state10.accountQuota.message) {
-        els11.accountQuotaSummary.textContent = state10.accountQuota.message;
-      } else if (count) {
-        const limited = Number(summary.limited_count || 0);
-        const unknown = Number(summary.unknown_count || 0);
-        const disabled = Number(summary.disabled_count || 0);
-        const usableChannels = Number(summary.usable_channel_count ?? Math.max(0, count - disabled));
-        els11.accountQuotaSummary.textContent = `\u8D26\u53F7 ${count} \xB7 \u53C2\u4E0E\u8F6E\u8BE2 ${usableChannels} \xB7 \u505C\u7528 ${disabled} \xB7 \u9650\u989D ${limited} \xB7 \u672A\u77E5 ${unknown}`;
-      } else {
-        els11.accountQuotaSummary.textContent = "\u6682\u65E0\u53EF\u7528\u672C\u5730\u8D26\u53F7";
-      }
-    }
-    if (!els11.accountQuotaList) return;
-    if (!items.length) {
-      els11.accountQuotaList.innerHTML = `<div class="queue-empty">${escapeHtml8(state10.accountQuota.message || "\u6682\u65E0\u989D\u5EA6\u7F13\u5B58\uFF0C\u70B9\u51FB\u5237\u65B0\u989D\u5EA6")}</div>`;
-      return;
-    }
-    els11.accountQuotaList.innerHTML = items.map((item) => accountQuotaCardHtml(item)).join("");
-  }
-  function accountQuotaCardHtml(item) {
-    const status = String(item.status || "unknown");
-    const manualDisabled = Boolean(item.manual_disabled);
-    const displayStatus = manualDisabled ? "disabled" : status;
-    const queueEnabled = item.queue_enabled !== false && !manualDisabled;
-    const plan = item.plan && item.plan !== "unknown" ? item.plan : "\u672A\u77E5\u5957\u9910";
-    const identity = item.email || item.user_id || item.account_id || item.account_key || "";
-    const error = item.refresh_error ? `<div class="account-quota-error">${escapeHtml8(item.refresh_error)}</div>` : "";
-    const canToggle = String(item.account_key || "").startsWith("cockpit:");
-    const toggle = canToggle ? `
-    <button
-      class="account-quota-toggle${queueEnabled ? " active" : ""}"
-      type="button"
-      role="switch"
-      aria-checked="${queueEnabled ? "true" : "false"}"
-      aria-label="\u53C2\u4E0E\u8F6E\u8BE2\uFF1A${queueEnabled ? "\u5F00" : "\u5173"}"
-      title="\u53C2\u4E0E\u8F6E\u8BE2\uFF1A${queueEnabled ? "\u5F00" : "\u5173"}"
-      data-account-manual-disabled-key="${escapeHtml8(item.account_key || "")}"
-      data-account-manual-disabled-value="${manualDisabled ? "true" : "false"}"
-    >
-      <span class="account-quota-switch-track" aria-hidden="true"></span>
-    </button>
-  ` : "";
-    return `
-    <article class="account-quota-card ${accountQuotaStatusClass(displayStatus)}">
-      <div class="account-quota-card-head">
-        <div>
-          <div class="account-quota-name">${escapeHtml8(item.label || item.account_key || "\u8D26\u53F7")}</div>
-          <div class="account-quota-meta">${escapeHtml8([plan, identity].filter(Boolean).join(" \xB7 "))}</div>
-        </div>
-        <span class="account-quota-status">${escapeHtml8(accountQuotaStatusText(displayStatus))}</span>
-      </div>
-      <div class="account-quota-limit-head">
-        <div class="account-quota-limit-title">Codex \u989D\u5EA6</div>
-        ${toggle}
-      </div>
-      ${accountQuotaLimitRowsHtml(item)}
-      ${error}
-    </article>
-  `;
-  }
-  function accountQuotaLimitRowsHtml(item) {
-    const rows = [
-      ["5 \u5C0F\u65F6", item.codex_5h_percent, item.codex_limits?.five_hour?.reset_after],
-      ["\u672C\u5468", item.codex_week_percent, item.codex_limits?.week?.reset_after]
-    ];
-    return `
-    <div class="account-quota-limits">
-      ${rows.map(([label, percent, resetAfter]) => accountQuotaLimitRowHtml(label, percent, resetAfter)).join("")}
-    </div>
-  `;
-  }
-  function accountQuotaLimitRowHtml(label, percent, resetAfter) {
-    const normalized = accountQuotaPercentValue(percent);
-    const percentText = normalized === null ? "\u672A\u77E5" : `${normalized}%`;
-    const resetText = resetAfter ? `\u91CD\u7F6E ${resetAfter}` : "\u91CD\u7F6E\u65F6\u95F4\u672A\u77E5";
-    const style = normalized === null ? "--quota-percent: 0%" : `--quota-percent: ${normalized}%`;
-    return `
-    <div class="account-quota-limit-row">
-      <div class="account-quota-limit-label">
-        <span>${escapeHtml8(label)}</span>
-        <strong>${escapeHtml8(percentText)}</strong>
-      </div>
-      <div class="account-quota-limit-bar" style="${style}"><span></span></div>
-      <div class="account-quota-reset">${escapeHtml8(resetText)}</div>
-    </div>
-  `;
-  }
-  function accountQuotaPercentValue(percent) {
-    if (percent === null || percent === void 0 || percent === "") return null;
-    const value = Number(percent);
-    if (!Number.isFinite(value)) return null;
-    return Math.min(100, Math.max(0, Math.round(value)));
-  }
-  function accountQuotaStatusClass(status) {
-    if (status === "ok") return "ok";
-    if (status === "limited") return "limited";
-    if (status === "disabled") return "disabled";
-    if (status === "error" || status === "disabled") return "error";
-    return "unknown";
-  }
-  function accountQuotaStatusText(status) {
-    if (status === "ok") return "\u53EF\u7528";
-    if (status === "limited") return "\u5DF2\u9650\u989D";
-    if (status === "error") return "\u5237\u65B0\u5931\u8D25";
-    if (status === "disabled") return "\u5DF2\u505C\u7528";
-    return "\u672A\u77E5";
-  }
-  async function toggleAccountQueueEnabled(accountKey, manualDisabled, button = null) {
-    if (!accountKey) return;
-    if (button) button.disabled = true;
-    try {
-      const response = await fetch(`/api/accounts/${encodeURIComponent(accountKey)}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ "manual_disabled": Boolean(manualDisabled) })
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.detail || "\u8D26\u53F7\u8BBE\u7F6E\u66F4\u65B0\u5931\u8D25");
-      state10.accountQuota = {
-        items: Array.isArray(data.items) ? data.items : [],
-        summary: data.summary || {},
-        message: data.message || ""
-      };
-      renderAccountQuota();
-      await window.refreshQueue?.();
-      setStatus9(manualDisabled ? "\u8D26\u53F7\u5DF2\u505C\u7528\uFF0C\u4E0D\u53C2\u4E0E\u8F6E\u8BE2" : "\u8D26\u53F7\u5DF2\u542F\u7528\uFF0C\u53C2\u4E0E\u8F6E\u8BE2", "ok");
-    } catch (error) {
-      setStatus9(error.message || "\u8D26\u53F7\u8BBE\u7F6E\u66F4\u65B0\u5931\u8D25", "error");
-      if (button) button.disabled = false;
-    }
-  }
-  function openAccountQuotaDrawer() {
-    els11.accountQuotaDrawer?.classList.add("open");
-    els11.accountQuotaDrawer?.setAttribute("aria-hidden", "false");
-    els11.accountQuotaButton?.setAttribute("aria-expanded", "true");
-    els11.accountQuotaDrawerBackdrop?.classList.remove("hidden");
-    refreshAccountQuota2(false);
-  }
-  function closeAccountQuotaDrawer() {
-    els11.accountQuotaDrawer?.classList.remove("open");
-    els11.accountQuotaDrawer?.setAttribute("aria-hidden", "true");
-    els11.accountQuotaButton?.setAttribute("aria-expanded", "false");
-    els11.accountQuotaDrawerBackdrop?.classList.add("hidden");
-  }
-  function initAccountQuotaFeature() {
-    if (accountQuotaFeatureInitialized) return;
-    accountQuotaFeatureInitialized = true;
-    Object.assign(getLegacyBridge().methods, {
-      refreshAccountQuota: refreshAccountQuota2,
-      renderAccountQuota,
-      accountQuotaCardHtml,
-      accountQuotaLimitRowsHtml,
-      accountQuotaLimitRowHtml,
-      accountQuotaPercentValue,
-      accountQuotaStatusClass,
-      accountQuotaStatusText,
-      toggleAccountQueueEnabled,
-      openAccountQuotaDrawer,
-      closeAccountQuotaDrawer
-    });
-  }
-
-  // codex_image/webui/frontend/src/storage-settings.ts
-  var bridge11 = getLegacyBridge();
-  var els12 = bridge11.els;
-  var storageSettingsFeatureInitialized = false;
-  function legacyMethod15(name, ...args) {
-    const method = getLegacyBridge().methods[name];
-    if (typeof method !== "function") {
-      throw new Error("Legacy method " + name + " is not initialized");
-    }
-    return method(...args);
-  }
-  function setStatus10(message, type) {
-    legacyMethod15("setStatus", message, type);
-  }
   function closePromptPopover3() {
-    legacyMethod15("closePromptPopover");
+    legacyMethod14("closePromptPopover");
   }
   async function refreshSettings() {
-    if (!els12.settingsInputRoot) return;
+    if (!els11.settingsInputRoot) return;
     try {
       const response = await fetch("/api/settings");
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || "\u8BBE\u7F6E\u8BFB\u53D6\u5931\u8D25");
       populateSettingsForm(data.settings || {});
     } catch (error) {
-      if (els12.settingsStatus) els12.settingsStatus.textContent = error.message || "\u8BBE\u7F6E\u8BFB\u53D6\u5931\u8D25";
+      if (els11.settingsStatus) els11.settingsStatus.textContent = error.message || "\u8BBE\u7F6E\u8BFB\u53D6\u5931\u8D25";
     }
   }
   function populateSettingsForm(settings) {
-    if (els12.settingsInputRoot) els12.settingsInputRoot.value = settings.input_root || "";
-    if (els12.settingsOutputRoot) els12.settingsOutputRoot.value = settings.output_root || "";
-    if (els12.settingsGalleryRoot) els12.settingsGalleryRoot.value = settings.gallery_root || "";
-    if (els12.settingsSourceDataRoot) els12.settingsSourceDataRoot.value = settings.source_data_root || "";
+    if (els11.settingsInputRoot) els11.settingsInputRoot.value = settings.input_root || "";
+    if (els11.settingsOutputRoot) els11.settingsOutputRoot.value = settings.output_root || "";
+    if (els11.settingsGalleryRoot) els11.settingsGalleryRoot.value = settings.gallery_root || "";
+    if (els11.settingsSourceDataRoot) els11.settingsSourceDataRoot.value = settings.source_data_root || "";
   }
   function openSettingsModal() {
     closePromptPopover3();
     refreshSettings();
-    if (els12.settingsStatus) els12.settingsStatus.textContent = "\u4FDD\u5B58\u540E\u91CD\u542F WebUI \u751F\u6548";
-    els12.settingsModal?.classList.remove("hidden");
-    els12.settingsModal?.setAttribute("aria-hidden", "false");
+    if (els11.settingsStatus) els11.settingsStatus.textContent = "\u4FDD\u5B58\u540E\u91CD\u542F WebUI \u751F\u6548";
+    els11.settingsModal?.classList.remove("hidden");
+    els11.settingsModal?.setAttribute("aria-hidden", "false");
   }
   function closeSettingsModal() {
-    els12.settingsModal?.classList.add("hidden");
-    els12.settingsModal?.setAttribute("aria-hidden", "true");
+    els11.settingsModal?.classList.add("hidden");
+    els11.settingsModal?.setAttribute("aria-hidden", "true");
   }
   async function saveSettings() {
-    if (!els12.saveSettingsButton) return;
-    els12.saveSettingsButton.disabled = true;
+    if (!els11.saveSettingsButton) return;
+    els11.saveSettingsButton.disabled = true;
     try {
       const response = await fetch("/api/settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          input_root: els12.settingsInputRoot?.value || "",
-          output_root: els12.settingsOutputRoot?.value || "",
-          gallery_root: els12.settingsGalleryRoot?.value || "",
-          source_data_root: els12.settingsSourceDataRoot?.value || ""
+          input_root: els11.settingsInputRoot?.value || "",
+          output_root: els11.settingsOutputRoot?.value || "",
+          gallery_root: els11.settingsGalleryRoot?.value || "",
+          source_data_root: els11.settingsSourceDataRoot?.value || ""
         })
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || "\u8BBE\u7F6E\u4FDD\u5B58\u5931\u8D25");
       populateSettingsForm(data.settings || {});
-      if (els12.settingsStatus) {
-        els12.settingsStatus.textContent = data.restart_required ? "\u5DF2\u4FDD\u5B58\uFF0C\u91CD\u542F WebUI \u540E\u751F\u6548" : "\u5DF2\u4FDD\u5B58";
+      if (els11.settingsStatus) {
+        els11.settingsStatus.textContent = data.restart_required ? "\u5DF2\u4FDD\u5B58\uFF0C\u91CD\u542F WebUI \u540E\u751F\u6548" : "\u5DF2\u4FDD\u5B58";
       }
-      setStatus10("\u8BBE\u7F6E\u5DF2\u4FDD\u5B58\uFF0C\u91CD\u542F WebUI \u540E\u751F\u6548", "ok");
+      setStatus9("\u8BBE\u7F6E\u5DF2\u4FDD\u5B58\uFF0C\u91CD\u542F WebUI \u540E\u751F\u6548", "ok");
     } catch (error) {
-      if (els12.settingsStatus) els12.settingsStatus.textContent = error.message || "\u8BBE\u7F6E\u4FDD\u5B58\u5931\u8D25";
-      setStatus10(error.message || "\u8BBE\u7F6E\u4FDD\u5B58\u5931\u8D25", "error");
+      if (els11.settingsStatus) els11.settingsStatus.textContent = error.message || "\u8BBE\u7F6E\u4FDD\u5B58\u5931\u8D25";
+      setStatus9(error.message || "\u8BBE\u7F6E\u4FDD\u5B58\u5931\u8D25", "error");
     } finally {
-      els12.saveSettingsButton.disabled = false;
+      els11.saveSettingsButton.disabled = false;
     }
   }
   function initStorageSettingsFeature() {
@@ -5093,25 +4823,25 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   var DEFAULT_COLOR_SWATCH_NAMES = ["\u767D\u8272", "\u9ED1\u8272", "\u6696\u7C73\u8272", "\u6D45\u7EFF", "\u54C1\u724C\u7EFF", "\u6843\u6A59", "\u6D45\u84DD", "\u6D45\u7C89"];
   var COLOR_PALETTE_ENDPOINT = "/api/color-palette";
   var COLOR_PALETTE_IMPORT_ENDPOINT = "/api/color-palette/import";
-  var bridge12 = getLegacyBridge();
-  var state11 = bridge12.state;
-  var els13 = bridge12.els;
+  var bridge11 = getLegacyBridge();
+  var state10 = bridge11.state;
+  var els12 = bridge11.els;
   var colorPaletteInitialized = false;
-  function legacyMethod16(name, ...args) {
+  function legacyMethod15(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy method " + name + " is not initialized");
     }
     return method(...args);
   }
-  function setStatus11(message, type) {
-    legacyMethod16("setStatus", message, type);
+  function setStatus10(message, type) {
+    legacyMethod15("setStatus", message, type);
   }
   function renderColorSuggest(...args) {
-    return legacyMethod16("renderColorSuggest", ...args);
+    return legacyMethod15("renderColorSuggest", ...args);
   }
   function updateColorSuggest(...args) {
-    return legacyMethod16("updateColorSuggest", ...args);
+    return legacyMethod15("updateColorSuggest", ...args);
   }
   function defaultColorPalette() {
     return {
@@ -5160,12 +4890,12 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       const response = await fetch(COLOR_PALETTE_ENDPOINT);
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || "\u989C\u8272\u914D\u7F6E\u8BFB\u53D6\u5931\u8D25");
-      state11.colorPalette = normalizeColorPalette(data.palette);
-      state11.selectedColorCode = state11.colorPalette.recent_colors[0] || favoriteColorsForDisplay()[0]?.hex || DEFAULT_COLOR_CODE;
+      state10.colorPalette = normalizeColorPalette(data.palette);
+      state10.selectedColorCode = state10.colorPalette.recent_colors[0] || favoriteColorsForDisplay()[0]?.hex || DEFAULT_COLOR_CODE;
       updateColorSuggest();
     } catch (error) {
       console.warn(error.message || "\u989C\u8272\u914D\u7F6E\u8BFB\u53D6\u5931\u8D25");
-      state11.colorPalette = defaultColorPalette();
+      state10.colorPalette = defaultColorPalette();
     }
   }
   async function persistColorPalette(payload) {
@@ -5176,8 +4906,8 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.detail || "\u989C\u8272\u914D\u7F6E\u4FDD\u5B58\u5931\u8D25");
-    state11.colorPalette = normalizeColorPalette(data.palette);
-    return state11.colorPalette;
+    state10.colorPalette = normalizeColorPalette(data.palette);
+    return state10.colorPalette;
   }
   async function importColorPalette(file) {
     if (!file) return;
@@ -5189,41 +4919,41 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.detail || "\u989C\u8272\u914D\u7F6E\u5BFC\u5165\u5931\u8D25");
-    state11.colorPalette = normalizeColorPalette(data.palette);
-    renderColorSuggest({ query: state11.selectedColorCode.slice(1), range: state11.activeColorRange });
-    els13.colorSuggest?.classList.remove("hidden");
-    els13.promptEditor?.focus({ preventScroll: true });
-    setStatus11(`\u5DF2\u5BFC\u5165 ${data.imported || 0} \u4E2A\u989C\u8272`, "ok");
+    state10.colorPalette = normalizeColorPalette(data.palette);
+    renderColorSuggest({ query: state10.selectedColorCode.slice(1), range: state10.activeColorRange });
+    els12.colorSuggest?.classList.remove("hidden");
+    els12.promptEditor?.focus({ preventScroll: true });
+    setStatus10(`\u5DF2\u5BFC\u5165 ${data.imported || 0} \u4E2A\u989C\u8272`, "ok");
   }
   function toggleColorPaletteManageMode() {
-    state11.colorPaletteManageMode = !state11.colorPaletteManageMode;
-    renderColorSuggest({ query: state11.selectedColorCode.slice(1), range: state11.activeColorRange });
-    els13.colorSuggest?.classList.remove("hidden");
-    els13.promptEditor?.focus({ preventScroll: true });
+    state10.colorPaletteManageMode = !state10.colorPaletteManageMode;
+    renderColorSuggest({ query: state10.selectedColorCode.slice(1), range: state10.activeColorRange });
+    els12.colorSuggest?.classList.remove("hidden");
+    els12.promptEditor?.focus({ preventScroll: true });
   }
   function favoriteColorsForDisplay() {
-    const favorites = Array.isArray(state11.colorPalette?.favorites) ? state11.colorPalette.favorites : [];
-    return Array.isArray(state11.colorPalette?.favorites) ? favorites : defaultColorPalette().favorites;
+    const favorites = Array.isArray(state10.colorPalette?.favorites) ? state10.colorPalette.favorites : [];
+    return Array.isArray(state10.colorPalette?.favorites) ? favorites : defaultColorPalette().favorites;
   }
   function recentColorsForDisplay() {
     const favoriteHex = new Set(favoriteColorsForDisplay().map((item) => item.hex));
-    return (state11.colorPalette?.recent_colors || []).filter((color) => !favoriteHex.has(color));
+    return (state10.colorPalette?.recent_colors || []).filter((color) => !favoriteHex.has(color));
   }
   function rememberRecentColor(colorCode) {
     const normalized = normalizeHexColor(colorCode);
     if (!normalized) return;
-    const recentLimit = state11.colorPalette?.recent_limit ?? 6;
-    const recentColors = dedupeColors([normalized, ...state11.colorPalette?.recent_colors || []]).slice(0, recentLimit);
-    state11.colorPalette = { ...state11.colorPalette, recent_colors: recentColors };
-    state11.selectedColorCode = normalized;
+    const recentLimit = state10.colorPalette?.recent_limit ?? 6;
+    const recentColors = dedupeColors([normalized, ...state10.colorPalette?.recent_colors || []]).slice(0, recentLimit);
+    state10.colorPalette = { ...state10.colorPalette, recent_colors: recentColors };
+    state10.selectedColorCode = normalized;
     void persistColorPalette({ recent_colors: recentColors }).catch((error) => {
       console.warn(error.message || "\u6700\u8FD1\u989C\u8272\u4FDD\u5B58\u5931\u8D25");
     });
   }
   async function saveFavoriteColor() {
-    const input = els13.colorSuggest?.querySelector("[data-color-hex-input]");
-    const nameInput = els13.colorSuggest?.querySelector("[data-color-name-input]");
-    const normalized = normalizeHexColor(input?.value || state11.selectedColorCode);
+    const input = els12.colorSuggest?.querySelector("[data-color-hex-input]");
+    const nameInput = els12.colorSuggest?.querySelector("[data-color-name-input]");
+    const normalized = normalizeHexColor(input?.value || state10.selectedColorCode);
     if (!normalized) return;
     const favorites = favoriteColorsForDisplay().filter((item) => item.hex !== normalized);
     favorites.push({
@@ -5233,9 +4963,9 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     });
     try {
       await persistColorPalette({ favorites });
-      renderColorSuggest({ query: normalized.slice(1), range: state11.activeColorRange });
-      els13.colorSuggest?.classList.remove("hidden");
-      els13.promptEditor?.focus({ preventScroll: true });
+      renderColorSuggest({ query: normalized.slice(1), range: state10.activeColorRange });
+      els12.colorSuggest?.classList.remove("hidden");
+      els12.promptEditor?.focus({ preventScroll: true });
     } catch (error) {
       console.warn(error.message || "\u5E38\u7528\u989C\u8272\u4FDD\u5B58\u5931\u8D25");
     }
@@ -5246,9 +4976,9 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     const favorites = favoriteColorsForDisplay().filter((item) => item.hex !== normalized);
     try {
       await persistColorPalette({ favorites });
-      renderColorSuggest({ query: state11.selectedColorCode.slice(1), range: state11.activeColorRange });
-      els13.colorSuggest?.classList.remove("hidden");
-      els13.promptEditor?.focus({ preventScroll: true });
+      renderColorSuggest({ query: state10.selectedColorCode.slice(1), range: state10.activeColorRange });
+      els12.colorSuggest?.classList.remove("hidden");
+      els12.promptEditor?.focus({ preventScroll: true });
     } catch (error) {
       console.warn(error.message || "\u5E38\u7528\u989C\u8272\u5220\u9664\u5931\u8D25");
     }
@@ -5339,75 +5069,75 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   // codex_image/webui/frontend/src/prompt-colors.ts
   var DEFAULT_COLOR_CODE2 = "#FFFFFF";
   var COLOR_PALETTE_EXPORT_CSS_ENDPOINT = "/api/color-palette/export.css";
-  var bridge13 = getLegacyBridge();
-  var state12 = bridge13.state;
-  var els14 = bridge13.els;
-  function legacyMethod17(name, ...args) {
+  var bridge12 = getLegacyBridge();
+  var state11 = bridge12.state;
+  var els13 = bridge12.els;
+  function legacyMethod16(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy method " + name + " is not initialized");
     }
     return method(...args);
   }
-  function escapeHtml9(value) {
-    return legacyMethod17("escapeHtml", value);
+  function escapeHtml8(value) {
+    return legacyMethod16("escapeHtml", value);
   }
-  function setStatus12(message, type) {
-    legacyMethod17("setStatus", message, type);
+  function setStatus11(message, type) {
+    legacyMethod16("setStatus", message, type);
   }
   function normalizeHexColor2(value) {
-    return legacyMethod17("normalizeHexColor", value);
+    return legacyMethod16("normalizeHexColor", value);
   }
   function favoriteColorsForDisplay2() {
-    return legacyMethod17("favoriteColorsForDisplay");
+    return legacyMethod16("favoriteColorsForDisplay");
   }
   function recentColorsForDisplay2() {
-    return legacyMethod17("recentColorsForDisplay");
+    return legacyMethod16("recentColorsForDisplay");
   }
   function saveFavoriteColor2() {
-    return legacyMethod17("saveFavoriteColor");
+    return legacyMethod16("saveFavoriteColor");
   }
   function toggleColorPaletteManageMode2() {
-    legacyMethod17("toggleColorPaletteManageMode");
+    legacyMethod16("toggleColorPaletteManageMode");
   }
   function importColorPalette2(file) {
-    return legacyMethod17("importColorPalette", file);
+    return legacyMethod16("importColorPalette", file);
   }
   function removeFavoriteColor2(colorCode) {
-    return legacyMethod17("removeFavoriteColor", colorCode);
+    return legacyMethod16("removeFavoriteColor", colorCode);
   }
   function rememberRecentColor2(colorCode) {
-    legacyMethod17("rememberRecentColor", colorCode);
+    legacyMethod16("rememberRecentColor", colorCode);
   }
   function getPromptText2() {
-    return legacyMethod17("getPromptText");
+    return legacyMethod16("getPromptText");
   }
   function appendPromptText(text) {
-    legacyMethod17("appendPromptText", text);
+    legacyMethod16("appendPromptText", text);
   }
   function syncPromptFromEditor() {
-    legacyMethod17("syncPromptFromEditor");
+    legacyMethod16("syncPromptFromEditor");
   }
   function updatePromptCount2() {
-    legacyMethod17("updatePromptCount");
+    legacyMethod16("updatePromptCount");
   }
   function updateRequestPreview6() {
-    legacyMethod17("updateRequestPreview");
+    legacyMethod16("updateRequestPreview");
   }
   function mentionRangeRect(range) {
-    return legacyMethod17("mentionRangeRect", range);
+    return legacyMethod16("mentionRangeRect", range);
   }
   function syncPromptAfterChipMutation() {
-    legacyMethod17("syncPromptAfterChipMutation");
+    legacyMethod16("syncPromptAfterChipMutation");
   }
   function setCaretAfterNode(node) {
-    legacyMethod17("setCaretAfterNode", node);
+    legacyMethod16("setCaretAfterNode", node);
   }
   function removePromptGalleryChip(chip) {
-    legacyMethod17("removePromptGalleryChip", chip);
+    legacyMethod16("removePromptGalleryChip", chip);
   }
   function updateColorSuggest2() {
-    if (!els14.colorSuggest || !els14.promptEditor) return;
+    if (!els13.colorSuggest || !els13.promptEditor) return;
     const match = activeColorMatch();
     if (!match) {
       hideColorSuggest();
@@ -5415,12 +5145,12 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     }
     renderColorSuggest2(match);
     positionColorSuggestAtCaret(match);
-    els14.colorSuggest.classList.remove("hidden");
+    els13.colorSuggest.classList.remove("hidden");
   }
   function activeColorMatch() {
     const selection = window.getSelection();
-    if (!selection || !selection.rangeCount || !selection.isCollapsed || !els14.promptEditor) return null;
-    if (!els14.promptEditor.contains(selection.anchorNode)) return null;
+    if (!selection || !selection.rangeCount || !selection.isCollapsed || !els13.promptEditor) return null;
+    if (!els13.promptEditor.contains(selection.anchorNode)) return null;
     const selectionRange = selection.getRangeAt(0);
     let container = selectionRange.startContainer;
     let offset = selectionRange.startOffset;
@@ -5444,37 +5174,37 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     };
   }
   function renderColorSuggest2(match) {
-    if (!els14.colorSuggest) return;
-    state12.activeColorRange = match.range ? match.range.cloneRange() : null;
+    if (!els13.colorSuggest) return;
+    state11.activeColorRange = match.range ? match.range.cloneRange() : null;
     const queryColor = match.query ? normalizeHexColor2(`#${match.query}`) : "";
     const favoriteColors = favoriteColorsForDisplay2();
     const recentColors = recentColorsForDisplay2();
-    const selected = queryColor || state12.selectedColorCode || recentColors[0] || favoriteColors[0]?.hex || DEFAULT_COLOR_CODE2;
-    state12.selectedColorCode = selected;
+    const selected = queryColor || state11.selectedColorCode || recentColors[0] || favoriteColors[0]?.hex || DEFAULT_COLOR_CODE2;
+    state11.selectedColorCode = selected;
     const typedValue = match.query ? `#${match.query.toUpperCase()}` : selected;
-    const actionLabel = state12.activeColorChip ? "\u66F4\u65B0" : "\u63D2\u5165";
-    const swatchRowClass = state12.colorPaletteManageMode ? "color-swatch-row is-managing" : "color-swatch-row";
-    els14.colorSuggest.innerHTML = `
+    const actionLabel = state11.activeColorChip ? "\u66F4\u65B0" : "\u63D2\u5165";
+    const swatchRowClass = state11.colorPaletteManageMode ? "color-swatch-row is-managing" : "color-swatch-row";
+    els13.colorSuggest.innerHTML = `
     <div class="color-suggest-main">
       <label class="color-picker-control" title="\u9009\u62E9\u989C\u8272">
-        <input type="color" value="${escapeHtml9(selected)}" data-color-picker>
+        <input type="color" value="${escapeHtml8(selected)}" data-color-picker>
         <span>\u53D6\u8272</span>
       </label>
-      <input class="color-hex-input" type="text" value="${escapeHtml9(typedValue)}" maxlength="7" spellcheck="false" data-color-hex-input>
+      <input class="color-hex-input" type="text" value="${escapeHtml8(typedValue)}" maxlength="7" spellcheck="false" data-color-hex-input>
       <button class="ghost-button text-sm color-insert-button" type="button" data-insert-color>${actionLabel}</button>
     </div>
     <div class="color-suggest-actions">
-      <input class="color-name-input" type="text" value="${escapeHtml9(colorNameForHex(selected) || "")}" maxlength="48" spellcheck="false" placeholder="\u5E38\u7528\u8272\u540D\u79F0" data-color-name-input>
+      <input class="color-name-input" type="text" value="${escapeHtml8(colorNameForHex(selected) || "")}" maxlength="48" spellcheck="false" placeholder="\u5E38\u7528\u8272\u540D\u79F0" data-color-name-input>
       <button class="ghost-button text-sm" type="button" data-save-favorite-color>\u4FDD\u5B58</button>
       <a class="ghost-button text-sm color-export-link" href="${COLOR_PALETTE_EXPORT_CSS_ENDPOINT}" target="_blank" rel="noopener" data-color-palette-export>\u5BFC\u51FA PS</a>
       <label class="ghost-button text-sm color-import-label" data-color-palette-import>
         \u5BFC\u5165 PS
         <input class="color-import-input" type="file" accept=".aco,.css,.html,.htm,.svg,.txt" data-color-palette-import-input>
       </label>
-      <button class="ghost-button text-sm color-manage-button" type="button" aria-pressed="${state12.colorPaletteManageMode ? "true" : "false"}" data-color-palette-manage>${state12.colorPaletteManageMode ? "\u5B8C\u6210" : "\u7BA1\u7406"}</button>
+      <button class="ghost-button text-sm color-manage-button" type="button" aria-pressed="${state11.colorPaletteManageMode ? "true" : "false"}" data-color-palette-manage>${state11.colorPaletteManageMode ? "\u5B8C\u6210" : "\u7BA1\u7406"}</button>
     </div>
     <div class="${swatchRowClass}" aria-label="\u5E38\u7528\u989C\u8272">
-      ${favoriteColors.map((item) => colorSwatchButton(item.hex, item.name, { removable: state12.colorPaletteManageMode })).join("")}
+      ${favoriteColors.map((item) => colorSwatchButton(item.hex, item.name, { removable: state11.colorPaletteManageMode })).join("")}
     </div>
     ${recentColors.length ? `
       <div class="color-recent-row" aria-label="\u6700\u8FD1\u989C\u8272">
@@ -5493,24 +5223,24 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     const normalized = normalizeHexColor2(color) || DEFAULT_COLOR_CODE2;
     return `
     <span class="color-swatch-item">
-      <button class="color-swatch-button" type="button" title="${escapeHtml9(label ? `${label} ${normalized}` : normalized)}" data-color-swatch="${escapeHtml9(normalized)}" style="--swatch-color: ${escapeHtml9(normalized)}">
-        <span>${escapeHtml9(label ? `${label} ${normalized}` : normalized)}</span>
+      <button class="color-swatch-button" type="button" title="${escapeHtml8(label ? `${label} ${normalized}` : normalized)}" data-color-swatch="${escapeHtml8(normalized)}" style="--swatch-color: ${escapeHtml8(normalized)}">
+        <span>${escapeHtml8(label ? `${label} ${normalized}` : normalized)}</span>
       </button>
-      ${removable ? `<button class="color-swatch-remove" type="button" title="\u5220\u9664\u5E38\u7528\u8272 ${escapeHtml9(label || normalized)}" aria-label="\u5220\u9664\u5E38\u7528\u8272 ${escapeHtml9(label || normalized)}" data-remove-favorite-color="${escapeHtml9(normalized)}">\xD7</button>` : ""}
+      ${removable ? `<button class="color-swatch-remove" type="button" title="\u5220\u9664\u5E38\u7528\u8272 ${escapeHtml8(label || normalized)}" aria-label="\u5220\u9664\u5E38\u7528\u8272 ${escapeHtml8(label || normalized)}" data-remove-favorite-color="${escapeHtml8(normalized)}">\xD7</button>` : ""}
     </span>
   `;
   }
   function bindColorSuggestEvents() {
-    if (!els14.colorSuggest) return;
-    const picker = els14.colorSuggest.querySelector("[data-color-picker]");
-    const input = els14.colorSuggest.querySelector("[data-color-hex-input]");
-    const nameInput = els14.colorSuggest.querySelector("[data-color-name-input]");
-    const insert = els14.colorSuggest.querySelector("[data-insert-color]");
+    if (!els13.colorSuggest) return;
+    const picker = els13.colorSuggest.querySelector("[data-color-picker]");
+    const input = els13.colorSuggest.querySelector("[data-color-hex-input]");
+    const nameInput = els13.colorSuggest.querySelector("[data-color-name-input]");
+    const insert = els13.colorSuggest.querySelector("[data-insert-color]");
     const keepPromptFocus = (event) => event.preventDefault();
     const syncColor = (value) => {
       const normalized = normalizeHexColor2(value);
       if (!normalized) return;
-      state12.selectedColorCode = normalized;
+      state11.selectedColorCode = normalized;
       if (picker) picker.value = normalized;
       if (input) input.value = normalized;
       if (nameInput) nameInput.value = colorNameForHex(normalized) || "";
@@ -5519,7 +5249,7 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     input?.addEventListener("input", () => {
       const normalized = normalizeHexColor2(input.value);
       if (!normalized) return;
-      state12.selectedColorCode = normalized;
+      state11.selectedColorCode = normalized;
       if (picker) picker.value = normalized;
     });
     input?.addEventListener("keydown", (event) => {
@@ -5530,45 +5260,45 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       if (event.key === "Escape") {
         event.preventDefault();
         hideColorSuggest();
-        els14.promptEditor?.focus();
+        els13.promptEditor?.focus();
       }
     });
     insert?.addEventListener("pointerdown", keepPromptFocus);
     insert?.addEventListener("mousedown", keepPromptFocus);
-    insert?.addEventListener("click", () => insertColorCode(input?.value || state12.selectedColorCode));
-    const saveFavorite = els14.colorSuggest.querySelector("[data-save-favorite-color]");
+    insert?.addEventListener("click", () => insertColorCode(input?.value || state11.selectedColorCode));
+    const saveFavorite = els13.colorSuggest.querySelector("[data-save-favorite-color]");
     saveFavorite?.addEventListener("pointerdown", keepPromptFocus);
     saveFavorite?.addEventListener("mousedown", keepPromptFocus);
     saveFavorite?.addEventListener("click", (event) => {
       event.stopPropagation();
       saveFavoriteColor2();
     });
-    const manageFavorite = els14.colorSuggest.querySelector("[data-color-palette-manage]");
+    const manageFavorite = els13.colorSuggest.querySelector("[data-color-palette-manage]");
     manageFavorite?.addEventListener("pointerdown", keepPromptFocus);
     manageFavorite?.addEventListener("mousedown", keepPromptFocus);
     manageFavorite?.addEventListener("click", (event) => {
       event.stopPropagation();
       toggleColorPaletteManageMode2();
     });
-    const importInput = els14.colorSuggest.querySelector("[data-color-palette-import-input]");
+    const importInput = els13.colorSuggest.querySelector("[data-color-palette-import-input]");
     importInput?.addEventListener("change", async () => {
       const file = importInput.files?.[0];
       if (!file) return;
       try {
         await importColorPalette2(file);
       } catch (error) {
-        setStatus12(error.message || "\u989C\u8272\u914D\u7F6E\u5BFC\u5165\u5931\u8D25", "error");
+        setStatus11(error.message || "\u989C\u8272\u914D\u7F6E\u5BFC\u5165\u5931\u8D25", "error");
         console.warn(error.message || "\u989C\u8272\u914D\u7F6E\u5BFC\u5165\u5931\u8D25");
       } finally {
         importInput.value = "";
       }
     });
-    els14.colorSuggest.querySelectorAll("[data-color-swatch]").forEach((button) => {
+    els13.colorSuggest.querySelectorAll("[data-color-swatch]").forEach((button) => {
       button.addEventListener("pointerdown", keepPromptFocus);
       button.addEventListener("mousedown", keepPromptFocus);
       button.addEventListener("click", () => insertColorCode(button.dataset.colorSwatch));
     });
-    els14.colorSuggest.querySelectorAll("[data-remove-favorite-color]").forEach((button) => {
+    els13.colorSuggest.querySelectorAll("[data-remove-favorite-color]").forEach((button) => {
       button.addEventListener("pointerdown", keepPromptFocus);
       button.addEventListener("mousedown", keepPromptFocus);
       button.addEventListener("click", (event) => {
@@ -5578,9 +5308,9 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     });
   }
   function insertColorCode(colorCode) {
-    const normalized = normalizeHexColor2(colorCode) || state12.selectedColorCode || DEFAULT_COLOR_CODE2;
-    if (state12.activeColorChip && els14.promptEditor?.contains(state12.activeColorChip)) {
-      const chip = state12.activeColorChip;
+    const normalized = normalizeHexColor2(colorCode) || state11.selectedColorCode || DEFAULT_COLOR_CODE2;
+    if (state11.activeColorChip && els13.promptEditor?.contains(state11.activeColorChip)) {
+      const chip = state11.activeColorChip;
       updateColorChip(chip, normalized);
       rememberRecentColor2(normalized);
       syncPromptAfterChipMutation();
@@ -5588,8 +5318,8 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       return;
     }
     let match = activeColorMatch();
-    if (!match?.range && state12.activeColorRange) {
-      match = { query: "", range: state12.activeColorRange };
+    if (!match?.range && state11.activeColorRange) {
+      match = { query: "", range: state11.activeColorRange };
     }
     let trailingSpace = null;
     if (match?.range) {
@@ -5603,9 +5333,9 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       if (currentText && !/\s$/.test(currentText)) {
         appendPromptText(" ");
       }
-      els14.promptEditor.append(createColorChip(normalized));
+      els13.promptEditor.append(createColorChip(normalized));
       trailingSpace = document.createTextNode(" ");
-      els14.promptEditor.append(trailingSpace);
+      els13.promptEditor.append(trailingSpace);
     }
     rememberRecentColor2(normalized);
     syncPromptFromEditor();
@@ -5615,11 +5345,11 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     setCaretAfterNode(trailingSpace);
   }
   function positionColorSuggestAtCaret(match) {
-    if (!els14.colorSuggest || !els14.promptEditor || !match?.range) return;
-    const host = els14.promptEditor.closest(".prompt-editor-wrap") || els14.promptEditor;
-    const anchorRect = mentionRangeRect(match.range) || els14.promptEditor.getBoundingClientRect();
+    if (!els13.colorSuggest || !els13.promptEditor || !match?.range) return;
+    const host = els13.promptEditor.closest(".prompt-editor-wrap") || els13.promptEditor;
+    const anchorRect = mentionRangeRect(match.range) || els13.promptEditor.getBoundingClientRect();
     positionPromptPopoverAtAnchor(
-      els14.colorSuggest,
+      els13.colorSuggest,
       host,
       anchorRect,
       {
@@ -5632,21 +5362,21 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     );
   }
   function openColorChipEditor(chip) {
-    if (!chip || !els14.promptEditor?.contains(chip)) return;
+    if (!chip || !els13.promptEditor?.contains(chip)) return;
     const normalized = normalizeHexColor2(chip.dataset.colorCode) || DEFAULT_COLOR_CODE2;
-    state12.activeColorChip = chip;
-    state12.activeColorRange = null;
-    state12.selectedColorCode = normalized;
+    state11.activeColorChip = chip;
+    state11.activeColorRange = null;
+    state11.selectedColorCode = normalized;
     renderColorSuggest2({ query: normalized.slice(1), range: null });
     positionColorSuggestAtChip(chip);
-    els14.colorSuggest?.classList.remove("hidden");
+    els13.colorSuggest?.classList.remove("hidden");
   }
   function positionColorSuggestAtChip(chip) {
-    if (!els14.colorSuggest || !els14.promptEditor || !chip) return;
-    const host = els14.promptEditor.closest(".prompt-editor-wrap") || els14.promptEditor;
+    if (!els13.colorSuggest || !els13.promptEditor || !chip) return;
+    const host = els13.promptEditor.closest(".prompt-editor-wrap") || els13.promptEditor;
     const chipRect = chip.getBoundingClientRect();
     positionPromptPopoverAtAnchor(
-      els14.colorSuggest,
+      els13.colorSuggest,
       host,
       chipRect,
       {
@@ -5742,16 +5472,16 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     return (lighter + 0.05) / (darker + 0.05);
   }
   function hideColorSuggest() {
-    if (!els14.colorSuggest) return;
-    els14.colorSuggest.classList.add("hidden");
-    els14.colorSuggest.innerHTML = "";
-    state12.activeColorRange = null;
-    state12.activeColorChip = null;
-    state12.colorPaletteManageMode = false;
-    els14.colorSuggest.style.removeProperty("--color-left");
-    els14.colorSuggest.style.removeProperty("--color-top");
-    els14.colorSuggest.style.removeProperty("--color-width");
-    els14.colorSuggest.style.removeProperty("--prompt-popover-max-height");
+    if (!els13.colorSuggest) return;
+    els13.colorSuggest.classList.add("hidden");
+    els13.colorSuggest.innerHTML = "";
+    state11.activeColorRange = null;
+    state11.activeColorChip = null;
+    state11.colorPaletteManageMode = false;
+    els13.colorSuggest.style.removeProperty("--color-left");
+    els13.colorSuggest.style.removeProperty("--color-top");
+    els13.colorSuggest.style.removeProperty("--color-width");
+    els13.colorSuggest.style.removeProperty("--prompt-popover-max-height");
   }
   function initPromptColorsFeature() {
     Object.assign(getLegacyBridge().methods, {
@@ -5781,9 +5511,9 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   var PROMPT_SNIPPET_TRIGGER_CHARS = "~\uFF5E\u301C\u223C\u02DC";
   var PROMPT_SNIPPET_BOUNDARY_CHARS = `\uFF0C\u3002,.\uFF1B;\uFF1A:\uFF01\uFF1F!?\u3001\uFF08\uFF09()[]\u3010\u3011"'\u201C\u201D\u2018\u2019`;
   var PROMPT_SNIPPET_TRIGGER_PATTERN = /(^|[\s\n，。,.；;：:！？!?、（）()\[\]【】"'“”‘’])([~～〜∼˜]+)([^\s~～〜∼˜@#，。,.；;：:！？!?、（）()\[\]【】"'“”‘’]*)$/;
-  var bridge14 = getLegacyBridge();
-  var state13 = bridge14.state;
-  var els15 = bridge14.els;
+  var bridge13 = getLegacyBridge();
+  var state12 = bridge13.state;
+  var els14 = bridge13.els;
   var promptSnippetSuggestEl = null;
   var promptSnippetSelectionButtonEl = null;
   var promptSnippetPopoverEl = null;
@@ -5792,42 +5522,42 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     chip: null,
     snippetId: null
   };
-  function legacyMethod18(name, ...args) {
+  function legacyMethod17(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy method " + name + " is not initialized");
     }
     return method(...args);
   }
-  function escapeHtml10(value) {
-    return legacyMethod18("escapeHtml", value);
+  function escapeHtml9(value) {
+    return legacyMethod17("escapeHtml", value);
   }
-  function setStatus13(message, type) {
-    legacyMethod18("setStatus", message, type);
+  function setStatus12(message, type) {
+    legacyMethod17("setStatus", message, type);
   }
   function getPromptText3() {
-    return legacyMethod18("getPromptText");
+    return legacyMethod17("getPromptText");
   }
   function promptTextFromRange(range) {
-    return legacyMethod18("promptTextFromRange", range);
+    return legacyMethod17("promptTextFromRange", range);
   }
   function rangeIntersectsNode(range, node) {
-    return legacyMethod18("rangeIntersectsNode", range, node);
+    return legacyMethod17("rangeIntersectsNode", range, node);
   }
   function appendPromptText2(text) {
-    legacyMethod18("appendPromptText", text);
+    legacyMethod17("appendPromptText", text);
   }
   function mentionRangeRect2(range) {
-    return legacyMethod18("mentionRangeRect", range);
+    return legacyMethod17("mentionRangeRect", range);
   }
   function removePromptGalleryChip2(chip) {
-    legacyMethod18("removePromptGalleryChip", chip);
+    legacyMethod17("removePromptGalleryChip", chip);
   }
   function syncPromptAfterChipMutation2() {
-    legacyMethod18("syncPromptAfterChipMutation");
+    legacyMethod17("syncPromptAfterChipMutation");
   }
   function setCaretAfterNode2(node) {
-    legacyMethod18("setCaretAfterNode", node);
+    legacyMethod17("setCaretAfterNode", node);
   }
   function normalizePromptSnippet(value) {
     if (!value || typeof value !== "object") return null;
@@ -5862,11 +5592,11 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       const response = await fetch(PROMPT_SNIPPETS_ENDPOINT);
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || "\u63D0\u793A\u8BCD\u7247\u6BB5\u8BFB\u53D6\u5931\u8D25");
-      state13.promptSnippets = normalizePromptSnippetList(data.snippets);
+      state12.promptSnippets = normalizePromptSnippetList(data.snippets);
       updatePromptSnippetSuggest();
     } catch (error) {
       console.warn(error.message || "\u63D0\u793A\u8BCD\u7247\u6BB5\u8BFB\u53D6\u5931\u8D25");
-      state13.promptSnippets = [];
+      state12.promptSnippets = [];
     }
   }
   function promptSnippetSuggestElement() {
@@ -5874,7 +5604,7 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     promptSnippetSuggestEl = document.createElement("div");
     promptSnippetSuggestEl.className = "prompt-snippet-suggest hidden";
     promptSnippetSuggestEl.setAttribute("aria-label", "\u63D0\u793A\u8BCD\u7247\u6BB5\u9009\u62E9\u5668");
-    els15.promptEditor?.closest(".prompt-editor-wrap")?.appendChild(promptSnippetSuggestEl);
+    els14.promptEditor?.closest(".prompt-editor-wrap")?.appendChild(promptSnippetSuggestEl);
     return promptSnippetSuggestEl;
   }
   function promptSnippetSelectionButtonElement() {
@@ -5890,7 +5620,7 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       event.stopPropagation();
       openPromptSnippetSavePopover();
     });
-    els15.promptEditor?.closest(".prompt-editor-wrap")?.appendChild(promptSnippetSelectionButtonEl);
+    els14.promptEditor?.closest(".prompt-editor-wrap")?.appendChild(promptSnippetSelectionButtonEl);
     return promptSnippetSelectionButtonEl;
   }
   function promptSnippetPopoverElement() {
@@ -5899,13 +5629,13 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     promptSnippetPopoverEl.className = "prompt-snippet-popover hidden";
     promptSnippetPopoverEl.setAttribute("role", "dialog");
     promptSnippetPopoverEl.setAttribute("aria-label", "\u63D0\u793A\u8BCD\u7247\u6BB5");
-    els15.promptEditor?.closest(".prompt-editor-wrap")?.appendChild(promptSnippetPopoverEl);
+    els14.promptEditor?.closest(".prompt-editor-wrap")?.appendChild(promptSnippetPopoverEl);
     return promptSnippetPopoverEl;
   }
   function activePromptSnippetMatch() {
     const selection = window.getSelection();
-    if (!selection || !selection.rangeCount || !selection.isCollapsed || !els15.promptEditor) return null;
-    if (!els15.promptEditor.contains(selection.anchorNode)) return null;
+    if (!selection || !selection.rangeCount || !selection.isCollapsed || !els14.promptEditor) return null;
+    if (!els14.promptEditor.contains(selection.anchorNode)) return null;
     const selectionRange = selection.getRangeAt(0);
     let container = selectionRange.startContainer;
     let offset = selectionRange.startOffset;
@@ -5932,7 +5662,7 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   }
   function updatePromptSnippetSuggest() {
     const suggest = promptSnippetSuggestElement();
-    if (!suggest || !els15.promptEditor) return;
+    if (!suggest || !els14.promptEditor) return;
     const match = activePromptSnippetMatch();
     if (!match) {
       hidePromptSnippetSuggest();
@@ -5944,15 +5674,15 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       hidePromptSnippetSuggest();
       return;
     }
-    state13.activePromptSnippetRange = match.range.cloneRange();
+    state12.activePromptSnippetRange = match.range.cloneRange();
     suggest.innerHTML = snippets.map((snippet) => `
-    <button type="button" class="prompt-snippet-option" data-prompt-snippet-id="${escapeHtml10(snippet.id)}">
-      <span class="prompt-snippet-option-tag">~${escapeHtml10(snippet.tag)}</span>
+    <button type="button" class="prompt-snippet-option" data-prompt-snippet-id="${escapeHtml9(snippet.id)}">
+      <span class="prompt-snippet-option-tag">~${escapeHtml9(snippet.tag)}</span>
       <span class="prompt-snippet-option-main">
-        <span>${escapeHtml10(snippet.title)}</span>
-        <small>${escapeHtml10(promptSnippetPreview(snippet.content))}</small>
+        <span>${escapeHtml9(snippet.title)}</span>
+        <small>${escapeHtml9(promptSnippetPreview(snippet.content))}</small>
       </span>
-      <small>${escapeHtml10(snippet.category)}</small>
+      <small>${escapeHtml9(snippet.category)}</small>
     </button>
   `).join("");
     suggest.querySelectorAll("[data-prompt-snippet-id]").forEach((button) => {
@@ -5967,8 +5697,8 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   }
   function promptSnippetsForQuery(query) {
     const normalized = String(query || "").trim().toLowerCase();
-    if (!normalized) return state13.promptSnippets.slice();
-    return state13.promptSnippets.filter((snippet) => snippet.tag.toLowerCase().includes(normalized) || snippet.title.toLowerCase().includes(normalized) || snippet.content.toLowerCase().includes(normalized));
+    if (!normalized) return state12.promptSnippets.slice();
+    return state12.promptSnippets.filter((snippet) => snippet.tag.toLowerCase().includes(normalized) || snippet.title.toLowerCase().includes(normalized) || snippet.content.toLowerCase().includes(normalized));
   }
   function promptSnippetPreview(text) {
     const clean = String(text || "").replace(/\s+/g, " ").trim();
@@ -5976,9 +5706,9 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   }
   function positionPromptSnippetSuggestAtCaret(match) {
     const suggest = promptSnippetSuggestElement();
-    if (!suggest || !els15.promptEditor || !match?.range) return;
-    const host = els15.promptEditor.closest(".prompt-editor-wrap") || els15.promptEditor;
-    const anchorRect = mentionRangeRect2(match.range) || els15.promptEditor.getBoundingClientRect();
+    if (!suggest || !els14.promptEditor || !match?.range) return;
+    const host = els14.promptEditor.closest(".prompt-editor-wrap") || els14.promptEditor;
+    const anchorRect = mentionRangeRect2(match.range) || els14.promptEditor.getBoundingClientRect();
     positionPromptPopoverAtAnchor(
       suggest,
       host,
@@ -5994,10 +5724,10 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   }
   function insertPromptSnippet(snippet) {
     const normalized = normalizePromptSnippet(snippet);
-    if (!normalized || !els15.promptEditor) return;
+    if (!normalized || !els14.promptEditor) return;
     let match = activePromptSnippetMatch();
-    if (!match?.range && state13.activePromptSnippetRange) {
-      match = { query: "", range: state13.activePromptSnippetRange };
+    if (!match?.range && state12.activePromptSnippetRange) {
+      match = { query: "", range: state12.activePromptSnippetRange };
     }
     let trailingSpace = null;
     if (match?.range) {
@@ -6009,9 +5739,9 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     } else {
       const currentText = getPromptText3();
       if (currentText && !/\s$/.test(currentText)) appendPromptText2(" ");
-      els15.promptEditor.append(createPromptSnippetChip(normalized));
+      els14.promptEditor.append(createPromptSnippetChip(normalized));
       trailingSpace = document.createTextNode(" ");
-      els15.promptEditor.append(trailingSpace);
+      els14.promptEditor.append(trailingSpace);
     }
     syncPromptAfterChipMutation2();
     hidePromptSnippetSuggest();
@@ -6078,11 +5808,11 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     return { snippet, end: tagStart + tag.length };
   }
   function findPromptSnippetById(id) {
-    return state13.promptSnippets.find((snippet) => snippet.id === id) || null;
+    return state12.promptSnippets.find((snippet) => snippet.id === id) || null;
   }
   function findPromptSnippetByTag(tag) {
     const key = String(tag || "").replace(/^[~～〜∼˜]+/, "").toLowerCase();
-    return state13.promptSnippets.find((snippet) => snippet.tag.toLowerCase() === key) || null;
+    return state12.promptSnippets.find((snippet) => snippet.tag.toLowerCase() === key) || null;
   }
   function expandPromptSnippets(prompt) {
     const text = String(prompt || "");
@@ -6094,9 +5824,9 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   }
   function getPromptSelectionForSnippet() {
     const selection = window.getSelection();
-    if (!selection || !selection.rangeCount || selection.isCollapsed || !els15.promptEditor) return null;
+    if (!selection || !selection.rangeCount || selection.isCollapsed || !els14.promptEditor) return null;
     const range = selection.getRangeAt(0);
-    if (!rangeIntersectsNode(range, els15.promptEditor)) return null;
+    if (!rangeIntersectsNode(range, els14.promptEditor)) return null;
     const text = promptTextFromRange(range).replace(/\u00a0/g, " ").trim();
     if (!text || selectionContainsPromptAtomicChip(range)) return null;
     return { range: range.cloneRange(), text };
@@ -6118,9 +5848,9 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   function showPromptSnippetSelectionButton(selection) {
     const button = promptSnippetSelectionButtonElement();
     if (!button || !selection?.range) return;
-    state13.promptSnippetSelectionRange = selection.range.cloneRange();
-    state13.promptSnippetSelectionText = selection.text;
-    const rect = promptSnippetSelectionAnchorRect(selection) || els15.promptEditor.getBoundingClientRect();
+    state12.promptSnippetSelectionRange = selection.range.cloneRange();
+    state12.promptSnippetSelectionText = selection.text;
+    const rect = promptSnippetSelectionAnchorRect(selection) || els14.promptEditor.getBoundingClientRect();
     const buttonWidth = 54;
     const buttonHeight = 30;
     const gap = 6;
@@ -6150,11 +5880,11 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     button?.style.removeProperty("--prompt-snippet-save-top");
   }
   function openPromptSnippetSavePopover() {
-    if (!state13.promptSnippetSelectionText || !state13.promptSnippetSelectionRange) return;
+    if (!state12.promptSnippetSelectionText || !state12.promptSnippetSelectionRange) return;
     const snippet = {
-      tag: suggestPromptSnippetTag(state13.promptSnippetSelectionText),
+      tag: suggestPromptSnippetTag(state12.promptSnippetSelectionText),
       title: "",
-      content: state13.promptSnippetSelectionText,
+      content: state12.promptSnippetSelectionText,
       category: "\u5E38\u7528"
     };
     renderPromptSnippetForm("save", snippet);
@@ -6169,9 +5899,9 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     promptSnippetPopoverState.chip = chip;
     promptSnippetPopoverState.snippetId = snippet.id;
     popover.innerHTML = `
-    <div class="prompt-snippet-popover-title">~${escapeHtml10(snippet.tag)}</div>
-    <div class="prompt-snippet-popover-meta">${escapeHtml10(snippet.title)} \xB7 ${escapeHtml10(snippet.category)}</div>
-    <div class="prompt-snippet-popover-preview">${escapeHtml10(snippet.content)}</div>
+    <div class="prompt-snippet-popover-title">~${escapeHtml9(snippet.tag)}</div>
+    <div class="prompt-snippet-popover-meta">${escapeHtml9(snippet.title)} \xB7 ${escapeHtml9(snippet.category)}</div>
+    <div class="prompt-snippet-popover-preview">${escapeHtml9(snippet.content)}</div>
     <div class="prompt-snippet-popover-actions">
       <button class="ghost-button text-sm" type="button" data-prompt-snippet-expand>\u5C55\u5F00</button>
       <button class="ghost-button text-sm" type="button" data-prompt-snippet-edit>\u7F16\u8F91</button>
@@ -6200,19 +5930,19 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       <div class="prompt-snippet-popover-title">${mode === "edit" ? "\u7F16\u8F91\u7247\u6BB5" : "\u6536\u85CF\u7247\u6BB5"}</div>
       <label class="prompt-snippet-field">
         <span>\u77ED\u6807\u7B7E</span>
-        <input class="prompt-snippet-input" type="text" maxlength="24" value="${escapeHtml10(snippet.tag || "")}" data-prompt-snippet-tag>
+        <input class="prompt-snippet-input" type="text" maxlength="24" value="${escapeHtml9(snippet.tag || "")}" data-prompt-snippet-tag>
       </label>
       <label class="prompt-snippet-field">
         <span>\u6807\u9898</span>
-        <input class="prompt-snippet-input" type="text" maxlength="80" value="${escapeHtml10(snippet.title || "")}" placeholder="\u9ED8\u8BA4\u4F7F\u7528\u77ED\u6807\u7B7E" data-prompt-snippet-title>
+        <input class="prompt-snippet-input" type="text" maxlength="80" value="${escapeHtml9(snippet.title || "")}" placeholder="\u9ED8\u8BA4\u4F7F\u7528\u77ED\u6807\u7B7E" data-prompt-snippet-title>
       </label>
       <label class="prompt-snippet-field">
         <span>\u5206\u7C7B</span>
-        <input class="prompt-snippet-input" type="text" maxlength="32" value="${escapeHtml10(snippet.category || "\u5E38\u7528")}" data-prompt-snippet-category>
+        <input class="prompt-snippet-input" type="text" maxlength="32" value="${escapeHtml9(snippet.category || "\u5E38\u7528")}" data-prompt-snippet-category>
       </label>
       <label class="prompt-snippet-field">
         <span>\u5185\u5BB9</span>
-        <textarea class="prompt-snippet-input prompt-snippet-textarea" maxlength="4000" data-prompt-snippet-content>${escapeHtml10(snippet.content || "")}</textarea>
+        <textarea class="prompt-snippet-input prompt-snippet-textarea" maxlength="4000" data-prompt-snippet-content>${escapeHtml9(snippet.content || "")}</textarea>
       </label>
       <div class="prompt-snippet-popover-actions">
         <button class="ghost-button text-sm" type="button" data-prompt-snippet-cancel>\u53D6\u6D88</button>
@@ -6246,7 +5976,7 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || "\u63D0\u793A\u8BCD\u7247\u6BB5\u4FDD\u5B58\u5931\u8D25");
-      state13.promptSnippets = normalizePromptSnippetList(data.snippets);
+      state12.promptSnippets = normalizePromptSnippetList(data.snippets);
       const snippet = normalizePromptSnippet(data.snippet);
       if (isEdit && promptSnippetPopoverState.chip) {
         updatePromptSnippetChip(promptSnippetPopoverState.chip, snippet);
@@ -6256,15 +5986,15 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       }
       closePromptSnippetPopover();
       hidePromptSnippetSelectionButton();
-      setStatus13("\u63D0\u793A\u8BCD\u7247\u6BB5\u5DF2\u4FDD\u5B58", "ok");
+      setStatus12("\u63D0\u793A\u8BCD\u7247\u6BB5\u5DF2\u4FDD\u5B58", "ok");
     } catch (error) {
-      setStatus13(error.message || "\u63D0\u793A\u8BCD\u7247\u6BB5\u4FDD\u5B58\u5931\u8D25", "error");
+      setStatus12(error.message || "\u63D0\u793A\u8BCD\u7247\u6BB5\u4FDD\u5B58\u5931\u8D25", "error");
     }
   }
   function replacePromptSelectionWithSnippet(snippet) {
-    if (!state13.promptSnippetSelectionRange || !els15.promptEditor) return;
-    const range = state13.promptSnippetSelectionRange;
-    if (!els15.promptEditor.contains(range.commonAncestorContainer)) return;
+    if (!state12.promptSnippetSelectionRange || !els14.promptEditor) return;
+    const range = state12.promptSnippetSelectionRange;
+    if (!els14.promptEditor.contains(range.commonAncestorContainer)) return;
     range.deleteContents();
     const chip = createPromptSnippetChip(snippet);
     const trailingSpace = document.createTextNode(" ");
@@ -6300,7 +6030,7 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   }
   function expandPromptSnippetChip(chip) {
     const snippet = promptSnippetFromChip(chip);
-    if (!snippet || !els15.promptEditor?.contains(chip)) return;
+    if (!snippet || !els14.promptEditor?.contains(chip)) return;
     const text = document.createTextNode(snippet.content);
     chip.replaceWith(text);
     closePromptSnippetPopover();
@@ -6319,14 +6049,14 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     positionPromptSnippetPopover(buttonRect);
   }
   function positionPromptSnippetPopoverAtChip(chip) {
-    if (!chip || !els15.promptEditor) return;
+    if (!chip || !els14.promptEditor) return;
     const chipRect = chip.getBoundingClientRect();
     positionPromptSnippetPopover(chipRect);
   }
   function positionPromptSnippetPopover(anchorRect) {
     const popover = promptSnippetPopoverElement();
-    if (!popover || !els15.promptEditor) return;
-    const host = els15.promptEditor.closest(".prompt-editor-wrap") || els15.promptEditor;
+    if (!popover || !els14.promptEditor) return;
+    const host = els14.promptEditor.closest(".prompt-editor-wrap") || els14.promptEditor;
     positionPromptPopoverAtAnchor(
       popover,
       host,
@@ -6351,8 +6081,8 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     promptSnippetPopoverState.mode = null;
     promptSnippetPopoverState.chip = null;
     promptSnippetPopoverState.snippetId = null;
-    state13.promptSnippetSelectionRange = null;
-    state13.promptSnippetSelectionText = "";
+    state12.promptSnippetSelectionRange = null;
+    state12.promptSnippetSelectionText = "";
   }
   function hidePromptSnippetSuggest() {
     const suggest = promptSnippetSuggestElement();
@@ -6363,12 +6093,12 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     suggest.style.removeProperty("--prompt-snippet-top");
     suggest.style.removeProperty("--prompt-snippet-width");
     suggest.style.removeProperty("--prompt-popover-max-height");
-    state13.activePromptSnippetRange = null;
+    state12.activePromptSnippetRange = null;
   }
   function handlePromptSnippetDocumentClick(target) {
     if (promptSnippetSuggestEl && !promptSnippetSuggestEl.classList.contains("hidden")) {
       const clickedSuggest = promptSnippetSuggestEl.contains(target);
-      const clickedPromptEditor = els15.promptEditor?.contains(target);
+      const clickedPromptEditor = els14.promptEditor?.contains(target);
       if (!clickedSuggest && !clickedPromptEditor) {
         hidePromptSnippetSuggest();
       }
@@ -6431,41 +6161,41 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   var PROMPT_TEMPLATE_IMPORT_ENDPOINT = "/api/prompt-templates/import";
   var PROMPT_TEMPLATE_EXPORT_ENDPOINT = "/api/prompt-templates/export.json";
   var DEFAULT_PROMPT_TEMPLATE_CATEGORIES = ["\u5E38\u7528", "\u4EBA\u50CF", "\u4EA7\u54C1", "\u4FEE\u590D", "\u6D77\u62A5", "\u7535\u5546"];
-  var bridge15 = getLegacyBridge();
-  var state14 = bridge15.state;
-  var els16 = bridge15.els;
+  var bridge14 = getLegacyBridge();
+  var state13 = bridge14.state;
+  var els15 = bridge14.els;
   var promptTemplateSearchAcceptManualInput = false;
   var lastPromptTemplateTrigger = null;
-  function legacyMethod19(name, ...args) {
+  function legacyMethod18(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy method " + name + " is not initialized");
     }
     return method(...args);
   }
-  function escapeHtml11(value) {
-    return legacyMethod19("escapeHtml", value);
+  function escapeHtml10(value) {
+    return legacyMethod18("escapeHtml", value);
   }
-  function setStatus14(message, type) {
-    legacyMethod19("setStatus", message, type);
+  function setStatus13(message, type) {
+    legacyMethod18("setStatus", message, type);
   }
   function getPromptText4() {
-    return legacyMethod19("getPromptText");
+    return legacyMethod18("getPromptText");
   }
   function appendPromptText3(text) {
-    legacyMethod19("appendPromptText", text);
+    legacyMethod18("appendPromptText", text);
   }
   function setPromptText(text) {
-    legacyMethod19("setPromptText", text);
+    legacyMethod18("setPromptText", text);
   }
   function syncPromptFromEditor2() {
-    legacyMethod19("syncPromptFromEditor");
+    legacyMethod18("syncPromptFromEditor");
   }
   function updatePromptCount3() {
-    legacyMethod19("updatePromptCount");
+    legacyMethod18("updatePromptCount");
   }
   function updateRequestPreview7() {
-    legacyMethod19("updateRequestPreview");
+    legacyMethod18("updateRequestPreview");
   }
   function normalizePromptTemplate(value) {
     if (!value || typeof value !== "object") return null;
@@ -6521,10 +6251,10 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     return categories;
   }
   function applyPromptTemplateSettingsResponse(data) {
-    state14.promptTemplates = normalizePromptTemplateList(data?.templates);
-    state14.promptTemplateCategories = normalizePromptTemplateCategoryList(data?.categories);
-    if (state14.promptTemplateCategory && !state14.promptTemplateCategories.some((category) => category.id === state14.promptTemplateCategory)) {
-      state14.promptTemplateCategory = "";
+    state13.promptTemplates = normalizePromptTemplateList(data?.templates);
+    state13.promptTemplateCategories = normalizePromptTemplateCategoryList(data?.categories);
+    if (state13.promptTemplateCategory && !state13.promptTemplateCategories.some((category) => category.id === state13.promptTemplateCategory)) {
+      state13.promptTemplateCategory = "";
     }
     renderPromptTemplateCategories();
     renderPromptTemplateCategoryPanel();
@@ -6539,21 +6269,21 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       applyPromptTemplateSettingsResponse(data);
     } catch (error) {
       console.warn(error.message || "\u63D0\u793A\u8BCD\u6A21\u677F\u8BFB\u53D6\u5931\u8D25");
-      state14.promptTemplates = [];
-      state14.promptTemplateCategories = normalizePromptTemplateCategoryList([]);
+      state13.promptTemplates = [];
+      state13.promptTemplateCategories = normalizePromptTemplateCategoryList([]);
       renderPromptTemplateCategories();
       renderPromptTemplateRecentDock();
       renderPromptTemplateList();
     }
   }
   function syncPromptTemplateSearchInput() {
-    const input = els16.promptTemplateSearch;
+    const input = els15.promptTemplateSearch;
     if (!input) return;
-    const nextValue = String(state14.promptTemplateQuery || "");
+    const nextValue = String(state13.promptTemplateQuery || "");
     if (input.value !== nextValue) input.value = nextValue;
   }
   function setPromptTemplateSearchLocked(locked) {
-    const input = els16.promptTemplateSearch;
+    const input = els15.promptTemplateSearch;
     if (!input) return;
     input.readOnly = locked;
     if (locked) {
@@ -6565,18 +6295,18 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   function guardPromptTemplateSearchInput(delays = [0, 120, 360, 900]) {
     delays.forEach((delay) => {
       window.setTimeout(() => {
-        if (!els16.promptTemplateDrawer?.classList.contains("open")) return;
+        if (!els15.promptTemplateDrawer?.classList.contains("open")) return;
         syncPromptTemplateSearchInput();
       }, delay);
     });
   }
   function openPromptTemplateDrawer() {
-    legacyMethod19("closeGallery", { restoreFocus: false });
-    lastPromptTemplateTrigger = document.activeElement instanceof HTMLElement ? document.activeElement : els16.promptTemplateButton;
-    els16.promptTemplateDrawer?.classList.add("open");
-    els16.promptTemplateDrawer?.setAttribute("aria-hidden", "false");
-    els16.promptTemplateDrawerBackdrop?.classList.remove("hidden");
-    els16.promptTemplateButton?.setAttribute("aria-expanded", "true");
+    legacyMethod18("closeGallery", { restoreFocus: false });
+    lastPromptTemplateTrigger = document.activeElement instanceof HTMLElement ? document.activeElement : els15.promptTemplateButton;
+    els15.promptTemplateDrawer?.classList.add("open");
+    els15.promptTemplateDrawer?.setAttribute("aria-hidden", "false");
+    els15.promptTemplateDrawerBackdrop?.classList.remove("hidden");
+    els15.promptTemplateButton?.setAttribute("aria-expanded", "true");
     promptTemplateSearchAcceptManualInput = false;
     setPromptTemplateSearchLocked(true);
     renderPromptTemplateCategories();
@@ -6585,50 +6315,50 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     guardPromptTemplateSearchInput();
     window.setTimeout(() => {
       syncPromptTemplateSearchInput();
-      els16.promptTemplateDrawerClose?.focus({ preventScroll: true });
+      els15.promptTemplateDrawerClose?.focus({ preventScroll: true });
     }, 0);
   }
   function closePromptTemplateDrawer(options = {}) {
     const restoreFocus = options?.restoreFocus !== false;
-    els16.promptTemplateDrawer?.classList.remove("open");
-    els16.promptTemplateDrawer?.setAttribute("aria-hidden", "true");
-    els16.promptTemplateDrawerBackdrop?.classList.add("hidden");
-    els16.promptTemplateButton?.setAttribute("aria-expanded", "false");
+    els15.promptTemplateDrawer?.classList.remove("open");
+    els15.promptTemplateDrawer?.setAttribute("aria-hidden", "true");
+    els15.promptTemplateDrawerBackdrop?.classList.add("hidden");
+    els15.promptTemplateButton?.setAttribute("aria-expanded", "false");
     promptTemplateSearchAcceptManualInput = false;
     setPromptTemplateSearchLocked(true);
     hidePromptTemplateDetail();
     hidePromptTemplateForm();
     hidePromptTemplateCategoryPanel();
     if (restoreFocus) {
-      const focusTarget = lastPromptTemplateTrigger || els16.promptTemplateButton;
+      const focusTarget = lastPromptTemplateTrigger || els15.promptTemplateButton;
       focusTarget?.focus?.({ preventScroll: true });
     }
   }
   function renderPromptTemplateCategories() {
-    if (!els16.promptTemplateCategoryList) return;
-    const categories = normalizePromptTemplateCategoryList(state14.promptTemplateCategories);
-    state14.promptTemplateCategories = categories;
-    els16.promptTemplateCategoryList.innerHTML = [
-      `<button class="prompt-template-category ${state14.promptTemplateCategory ? "" : "active"}" data-prompt-template-category="" type="button">\u5168\u90E8</button>`,
+    if (!els15.promptTemplateCategoryList) return;
+    const categories = normalizePromptTemplateCategoryList(state13.promptTemplateCategories);
+    state13.promptTemplateCategories = categories;
+    els15.promptTemplateCategoryList.innerHTML = [
+      `<button class="prompt-template-category ${state13.promptTemplateCategory ? "" : "active"}" data-prompt-template-category="" type="button">\u5168\u90E8</button>`,
       ...categories.map((category) => `
-      <button class="prompt-template-category ${state14.promptTemplateCategory === category.id ? "active" : ""}" data-prompt-template-category="${escapeHtml11(category.id)}" type="button">
-        ${escapeHtml11(category.name)}
+      <button class="prompt-template-category ${state13.promptTemplateCategory === category.id ? "active" : ""}" data-prompt-template-category="${escapeHtml10(category.id)}" type="button">
+        ${escapeHtml10(category.name)}
       </button>
     `)
     ].join("");
   }
   function renderPromptTemplateCategoryPanel() {
-    if (!els16.promptTemplateCategoryPanel) return;
-    const categories = normalizePromptTemplateCategoryList(state14.promptTemplateCategories);
-    els16.promptTemplateCategoryPanel.innerHTML = `
+    if (!els15.promptTemplateCategoryPanel) return;
+    const categories = normalizePromptTemplateCategoryList(state13.promptTemplateCategories);
+    els15.promptTemplateCategoryPanel.innerHTML = `
     <div class="prompt-template-category-create">
       <input class="control" type="text" maxlength="32" placeholder="\u65B0\u5206\u7C7B" data-prompt-template-category-new>
       <button class="ghost-button text-sm" type="button" data-prompt-template-category-create>\u6DFB\u52A0</button>
     </div>
     <div class="prompt-template-category-manage-list">
       ${categories.map((category) => `
-        <div class="prompt-template-category-manage-row" data-prompt-template-category-row="${escapeHtml11(category.id)}">
-          <input class="control" type="text" maxlength="32" value="${escapeHtml11(category.name)}" data-prompt-template-category-name>
+        <div class="prompt-template-category-manage-row" data-prompt-template-category-row="${escapeHtml10(category.id)}">
+          <input class="control" type="text" maxlength="32" value="${escapeHtml10(category.name)}" data-prompt-template-category-name>
           <button class="ghost-button text-sm" type="button" data-prompt-template-category-rename>\u4FDD\u5B58</button>
           <button class="ghost-button text-sm quiet-danger-button" type="button" data-prompt-template-category-delete ${category.id === "\u5E38\u7528" ? "disabled" : ""}>\u5220\u9664</button>
         </div>
@@ -6637,26 +6367,26 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   `;
   }
   function togglePromptTemplateCategoryPanel() {
-    if (!els16.promptTemplateCategoryPanel) return;
-    const isHidden = els16.promptTemplateCategoryPanel.classList.contains("hidden");
+    if (!els15.promptTemplateCategoryPanel) return;
+    const isHidden = els15.promptTemplateCategoryPanel.classList.contains("hidden");
     if (isHidden) {
       renderPromptTemplateCategoryPanel();
-      els16.promptTemplateCategoryPanel.classList.remove("hidden");
-      els16.promptTemplateCategoryManageButton?.setAttribute("aria-expanded", "true");
+      els15.promptTemplateCategoryPanel.classList.remove("hidden");
+      els15.promptTemplateCategoryManageButton?.setAttribute("aria-expanded", "true");
     } else {
       hidePromptTemplateCategoryPanel();
     }
   }
   function hidePromptTemplateCategoryPanel() {
-    els16.promptTemplateCategoryPanel?.classList.add("hidden");
-    els16.promptTemplateCategoryManageButton?.setAttribute("aria-expanded", "false");
+    els15.promptTemplateCategoryPanel?.classList.add("hidden");
+    els15.promptTemplateCategoryManageButton?.setAttribute("aria-expanded", "false");
   }
   function promptTemplatesForDisplay() {
-    const query = String(state14.promptTemplateQuery || "").trim().toLowerCase();
-    return (state14.promptTemplates || []).filter((template) => {
-      if (state14.promptTemplateFilter === "favorite" && !template.favorite) return false;
-      if (state14.promptTemplateFilter === "recent" && !template.last_used_at) return false;
-      if (state14.promptTemplateCategory && template.category !== state14.promptTemplateCategory) return false;
+    const query = String(state13.promptTemplateQuery || "").trim().toLowerCase();
+    return (state13.promptTemplates || []).filter((template) => {
+      if (state13.promptTemplateFilter === "favorite" && !template.favorite) return false;
+      if (state13.promptTemplateFilter === "recent" && !template.last_used_at) return false;
+      if (state13.promptTemplateCategory && template.category !== state13.promptTemplateCategory) return false;
       if (!query) return true;
       return [
         template.title,
@@ -6670,71 +6400,71 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     });
   }
   function renderPromptTemplateList() {
-    if (!els16.promptTemplateList) return;
+    if (!els15.promptTemplateList) return;
     const templates = promptTemplatesForDisplay();
-    if (els16.promptTemplateSummary) {
-      els16.promptTemplateSummary.className = "prompt-template-summary";
-      els16.promptTemplateSummary.textContent = templates.length ? `${templates.length} \u4E2A\u53EF\u7528\u6A21\u677F` : "\u6682\u65E0\u5339\u914D\u6A21\u677F";
+    if (els15.promptTemplateSummary) {
+      els15.promptTemplateSummary.className = "prompt-template-summary";
+      els15.promptTemplateSummary.textContent = templates.length ? `${templates.length} \u4E2A\u53EF\u7528\u6A21\u677F` : "\u6682\u65E0\u5339\u914D\u6A21\u677F";
     }
     if (!templates.length) {
-      els16.promptTemplateList.innerHTML = '<div class="prompt-template-empty">\u6682\u65E0\u6A21\u677F</div>';
+      els15.promptTemplateList.innerHTML = '<div class="prompt-template-empty">\u6682\u65E0\u6A21\u677F</div>';
       return;
     }
-    els16.promptTemplateList.innerHTML = templates.map((template) => `
-    <button class="prompt-template-card" type="button" data-prompt-template-id="${escapeHtml11(template.id)}">
-      ${template.thumbnail_url ? `<span class="prompt-template-card-thumb"><img src="${escapeHtml11(template.thumbnail_url)}" alt=""></span>` : ""}
-      <span class="prompt-template-card-title">${escapeHtml11(template.short_title)}</span>
-      <span class="prompt-template-card-subtitle">${escapeHtml11(template.title)}</span>
-      <span class="prompt-template-card-preview">${escapeHtml11(promptTemplatePreview(template.content, 64))}</span>
+    els15.promptTemplateList.innerHTML = templates.map((template) => `
+    <button class="prompt-template-card" type="button" data-prompt-template-id="${escapeHtml10(template.id)}">
+      ${template.thumbnail_url ? `<span class="prompt-template-card-thumb"><img src="${escapeHtml10(template.thumbnail_url)}" alt=""></span>` : ""}
+      <span class="prompt-template-card-title">${escapeHtml10(template.short_title)}</span>
+      <span class="prompt-template-card-subtitle">${escapeHtml10(template.title)}</span>
+      <span class="prompt-template-card-preview">${escapeHtml10(promptTemplatePreview(template.content, 64))}</span>
       <span class="prompt-template-card-meta">
-        <span>${escapeHtml11(template.category)}</span>
+        <span>${escapeHtml10(template.category)}</span>
         <span>${template.favorite ? "\u5DF2\u6536\u85CF" : `${template.usage_count || 0} \u6B21`}</span>
       </span>
     </button>
   `).join("");
   }
   function renderPromptTemplateRecentDock() {
-    if (!els16.promptTemplateRecentDock) return;
-    const recent = (state14.promptTemplates || []).filter((template) => template.last_used_at || template.favorite).slice(0, 4);
+    if (!els15.promptTemplateRecentDock) return;
+    const recent = (state13.promptTemplates || []).filter((template) => template.last_used_at || template.favorite).slice(0, 4);
     if (!recent.length) {
-      els16.promptTemplateRecentDock.classList.add("hidden");
-      els16.promptTemplateRecentDock.innerHTML = "";
+      els15.promptTemplateRecentDock.classList.add("hidden");
+      els15.promptTemplateRecentDock.innerHTML = "";
       return;
     }
-    els16.promptTemplateRecentDock.innerHTML = recent.map((template) => `
-    <button class="prompt-template-recent-chip" type="button" data-prompt-template-insert="${escapeHtml11(template.id)}">
-      ${escapeHtml11(template.short_title)}
+    els15.promptTemplateRecentDock.innerHTML = recent.map((template) => `
+    <button class="prompt-template-recent-chip" type="button" data-prompt-template-insert="${escapeHtml10(template.id)}">
+      ${escapeHtml10(template.short_title)}
     </button>
   `).join("");
-    els16.promptTemplateRecentDock.classList.remove("hidden");
+    els15.promptTemplateRecentDock.classList.remove("hidden");
   }
   function selectPromptTemplate(templateId) {
     const template = findPromptTemplateById(templateId);
-    if (!template || !els16.promptTemplateDetail) return;
-    state14.selectedPromptTemplateId = template.id;
+    if (!template || !els15.promptTemplateDetail) return;
+    state13.selectedPromptTemplateId = template.id;
     hidePromptTemplateForm();
-    els16.promptTemplateDetail.innerHTML = `
+    els15.promptTemplateDetail.innerHTML = `
     <div class="prompt-template-detail-header">
       <button class="ghost-button text-sm" type="button" data-prompt-template-back>\u8FD4\u56DE</button>
-      <button class="ghost-button text-sm" type="button" data-prompt-template-edit="${escapeHtml11(template.id)}">\u7F16\u8F91</button>
+      <button class="ghost-button text-sm" type="button" data-prompt-template-edit="${escapeHtml10(template.id)}">\u7F16\u8F91</button>
     </div>
-    ${template.thumbnail_url ? `<img class="prompt-template-detail-thumb" src="${escapeHtml11(template.thumbnail_url)}" alt="">` : ""}
-    <h3>${escapeHtml11(template.title)}</h3>
+    ${template.thumbnail_url ? `<img class="prompt-template-detail-thumb" src="${escapeHtml10(template.thumbnail_url)}" alt="">` : ""}
+    <h3>${escapeHtml10(template.title)}</h3>
     <div class="prompt-template-detail-meta">
-      <span>${escapeHtml11(template.category)}</span>
-      <span>${escapeHtml11(template.model_hint)}</span>
+      <span>${escapeHtml10(template.category)}</span>
+      <span>${escapeHtml10(template.model_hint)}</span>
       ${template.favorite ? "<span>\u6536\u85CF</span>" : ""}
     </div>
-    <div class="prompt-template-detail-content">${escapeHtml11(template.content)}</div>
-    ${template.notes ? `<p class="prompt-template-detail-notes">${escapeHtml11(template.notes)}</p>` : ""}
+    <div class="prompt-template-detail-content">${escapeHtml10(template.content)}</div>
+    ${template.notes ? `<p class="prompt-template-detail-notes">${escapeHtml10(template.notes)}</p>` : ""}
     <div class="prompt-template-detail-actions">
-      <button class="ghost-button text-sm" type="button" data-prompt-template-copy="${escapeHtml11(template.id)}">\u590D\u5236</button>
-      <button class="ghost-button text-sm" type="button" data-prompt-template-insert="${escapeHtml11(template.id)}">\u63D2\u5165</button>
-      <button class="run-button" type="button" data-prompt-template-replace="${escapeHtml11(template.id)}">\u66FF\u6362</button>
+      <button class="ghost-button text-sm" type="button" data-prompt-template-copy="${escapeHtml10(template.id)}">\u590D\u5236</button>
+      <button class="ghost-button text-sm" type="button" data-prompt-template-insert="${escapeHtml10(template.id)}">\u63D2\u5165</button>
+      <button class="run-button" type="button" data-prompt-template-replace="${escapeHtml10(template.id)}">\u66FF\u6362</button>
     </div>
   `;
-    els16.promptTemplateList?.classList.add("hidden");
-    els16.promptTemplateDetail.classList.remove("hidden");
+    els15.promptTemplateList?.classList.add("hidden");
+    els15.promptTemplateDetail.classList.remove("hidden");
   }
   async function applyPromptTemplate(template, mode) {
     if (!template) return;
@@ -6767,13 +6497,13 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     if (!template) return;
     try {
       await navigator.clipboard.writeText(template.content);
-      setStatus14("\u63D0\u793A\u8BCD\u6A21\u677F\u5DF2\u590D\u5236", "ok");
+      setStatus13("\u63D0\u793A\u8BCD\u6A21\u677F\u5DF2\u590D\u5236", "ok");
     } catch {
-      setStatus14("\u63D0\u793A\u8BCD\u6A21\u677F\u590D\u5236\u5931\u8D25", "error");
+      setStatus13("\u63D0\u793A\u8BCD\u6A21\u677F\u590D\u5236\u5931\u8D25", "error");
     }
   }
   function renderPromptTemplateForm(template = null) {
-    if (!els16.promptTemplateForm) return;
+    if (!els15.promptTemplateForm) return;
     const value = template || {
       id: "",
       title: "",
@@ -6786,35 +6516,35 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       favorite: false
     };
     hidePromptTemplateDetail();
-    els16.promptTemplateList?.classList.add("hidden");
+    els15.promptTemplateList?.classList.add("hidden");
     const categories = promptTemplateCategoriesForSelect(value.category);
-    els16.promptTemplateForm.innerHTML = `
-    <form class="prompt-template-form" data-prompt-template-form-id="${escapeHtml11(value.id || "")}">
+    els15.promptTemplateForm.innerHTML = `
+    <form class="prompt-template-form" data-prompt-template-form-id="${escapeHtml10(value.id || "")}">
       <div class="prompt-template-form-header">
         <button class="ghost-button text-sm" type="button" data-prompt-template-back>\u8FD4\u56DE</button>
-        ${value.id ? `<button class="ghost-button text-sm danger-button" type="button" data-prompt-template-delete="${escapeHtml11(value.id)}">\u5220\u9664</button>` : ""}
+        ${value.id ? `<button class="ghost-button text-sm danger-button" type="button" data-prompt-template-delete="${escapeHtml10(value.id)}">\u5220\u9664</button>` : ""}
       </div>
       <label class="prompt-template-field">
         <span>\u6807\u9898</span>
-        <input class="control" type="text" maxlength="80" value="${escapeHtml11(value.title || "")}" data-prompt-template-title>
+        <input class="control" type="text" maxlength="80" value="${escapeHtml10(value.title || "")}" data-prompt-template-title>
       </label>
       <label class="prompt-template-field">
         <span>\u77ED\u6807\u9898</span>
-        <input class="control" type="text" maxlength="12" value="${escapeHtml11(value.short_title || "")}" data-prompt-template-short-title>
+        <input class="control" type="text" maxlength="12" value="${escapeHtml10(value.short_title || "")}" data-prompt-template-short-title>
       </label>
       <label class="prompt-template-field">
         <span>\u5206\u7C7B</span>
         <select class="control" data-prompt-template-category-input>
-          ${categories.map((category) => `<option value="${escapeHtml11(category.id)}" ${category.id === value.category ? "selected" : ""}>${escapeHtml11(category.name)}</option>`).join("")}
+          ${categories.map((category) => `<option value="${escapeHtml10(category.id)}" ${category.id === value.category ? "selected" : ""}>${escapeHtml10(category.name)}</option>`).join("")}
         </select>
       </label>
       <label class="prompt-template-field prompt-template-field-full">
         <span>\u6807\u7B7E</span>
-        <input class="control" type="text" value="${escapeHtml11((value.tags || []).join("\uFF0C"))}" data-prompt-template-tags>
+        <input class="control" type="text" value="${escapeHtml10((value.tags || []).join("\uFF0C"))}" data-prompt-template-tags>
       </label>
       <div class="prompt-template-field prompt-template-field-full prompt-template-thumbnail-field">
         <span>\u7F29\u7565\u56FE</span>
-        <input type="hidden" value="${escapeHtml11(value.thumbnail_url || "")}" data-prompt-template-thumbnail-url>
+        <input type="hidden" value="${escapeHtml10(value.thumbnail_url || "")}" data-prompt-template-thumbnail-url>
         <div class="prompt-template-thumbnail-row">
           <div class="prompt-template-thumbnail-preview" data-prompt-template-thumbnail-preview></div>
           <button class="ghost-button text-sm" type="button" data-prompt-template-thumbnail-clear>\u6E05\u9664</button>
@@ -6823,11 +6553,11 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       </div>
       <label class="prompt-template-field prompt-template-field-full">
         <span>\u5185\u5BB9</span>
-        <textarea class="control prompt-template-textarea" maxlength="8000" data-prompt-template-content>${escapeHtml11(value.content || "")}</textarea>
+        <textarea class="control prompt-template-textarea" maxlength="8000" data-prompt-template-content>${escapeHtml10(value.content || "")}</textarea>
       </label>
       <label class="prompt-template-field prompt-template-field-full">
         <span>\u5907\u6CE8</span>
-        <textarea class="control prompt-template-notes" maxlength="500" data-prompt-template-notes>${escapeHtml11(value.notes || "")}</textarea>
+        <textarea class="control prompt-template-notes" maxlength="500" data-prompt-template-notes>${escapeHtml10(value.notes || "")}</textarea>
       </label>
       <label class="prompt-template-check">
         <input type="checkbox" ${value.favorite ? "checked" : ""} data-prompt-template-favorite>
@@ -6836,11 +6566,11 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       <button class="run-button prompt-template-save" type="submit">\u4FDD\u5B58</button>
     </form>
   `;
-    els16.promptTemplateForm.classList.remove("hidden");
+    els15.promptTemplateForm.classList.remove("hidden");
     renderPromptTemplateThumbnailPicker(value.thumbnail_url || "");
   }
   function promptTemplateCategoriesForSelect(selectedCategory) {
-    const categories = normalizePromptTemplateCategoryList(state14.promptTemplateCategories);
+    const categories = normalizePromptTemplateCategoryList(state13.promptTemplateCategories);
     const selected = String(selectedCategory || "").trim();
     if (selected && !categories.some((category) => category.id === selected)) {
       categories.push({ id: selected, name: selected, order: categories.length * 10 + 10 });
@@ -6850,7 +6580,7 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   function historyTemplateThumbnails() {
     const seen = /* @__PURE__ */ new Set();
     const items = [];
-    (state14.tasks || []).forEach((task) => {
+    (state13.tasks || []).forEach((task) => {
       const urls = [];
       if (Array.isArray(task?.outputs)) {
         task.outputs.forEach((output) => {
@@ -6871,14 +6601,14 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     return items.slice(0, 16);
   }
   function renderPromptTemplateThumbnailPicker(selectedUrl = "") {
-    const form = els16.promptTemplateForm?.querySelector(".prompt-template-form");
+    const form = els15.promptTemplateForm?.querySelector(".prompt-template-form");
     if (!form) return;
     const picker = form.querySelector("[data-prompt-template-thumbnail-picker]");
     const preview = form.querySelector("[data-prompt-template-thumbnail-preview]");
     const input = form.querySelector("[data-prompt-template-thumbnail-url]");
     if (input) input.value = selectedUrl;
     if (preview) {
-      preview.innerHTML = selectedUrl ? `<img src="${escapeHtml11(selectedUrl)}" alt=""><span>${escapeHtml11(promptTemplatePreview(selectedUrl, 30))}</span>` : "<span>\u672A\u9009\u62E9</span>";
+      preview.innerHTML = selectedUrl ? `<img src="${escapeHtml10(selectedUrl)}" alt=""><span>${escapeHtml10(promptTemplatePreview(selectedUrl, 30))}</span>` : "<span>\u672A\u9009\u62E9</span>";
     }
     if (!picker) return;
     const thumbnails = historyTemplateThumbnails();
@@ -6887,8 +6617,8 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       return;
     }
     picker.innerHTML = thumbnails.map((item) => `
-    <button class="prompt-template-thumbnail-option ${item.url === selectedUrl ? "active" : ""}" type="button" data-prompt-template-thumbnail-select="${escapeHtml11(item.url)}" title="${escapeHtml11(item.label)}">
-      <img src="${escapeHtml11(item.url)}" alt="">
+    <button class="prompt-template-thumbnail-option ${item.url === selectedUrl ? "active" : ""}" type="button" data-prompt-template-thumbnail-select="${escapeHtml10(item.url)}" title="${escapeHtml10(item.label)}">
+      <img src="${escapeHtml10(item.url)}" alt="">
     </button>
   `).join("");
   }
@@ -6896,12 +6626,12 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     renderPromptTemplateThumbnailPicker(String(url || "").trim());
   }
   function setPromptTemplateSummary(message, type = "") {
-    if (!els16.promptTemplateSummary) return;
-    els16.promptTemplateSummary.textContent = message;
-    els16.promptTemplateSummary.className = ["prompt-template-summary", type].filter(Boolean).join(" ");
+    if (!els15.promptTemplateSummary) return;
+    els15.promptTemplateSummary.textContent = message;
+    els15.promptTemplateSummary.className = ["prompt-template-summary", type].filter(Boolean).join(" ");
   }
   async function savePromptTemplateFromDrawer() {
-    const form = els16.promptTemplateForm?.querySelector(".prompt-template-form");
+    const form = els15.promptTemplateForm?.querySelector(".prompt-template-form");
     if (!form) return;
     const templateId = form.dataset.promptTemplateFormId || "";
     const payload = {
@@ -6925,9 +6655,9 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       if (!response.ok) throw new Error(data.detail || "\u63D0\u793A\u8BCD\u6A21\u677F\u4FDD\u5B58\u5931\u8D25");
       applyPromptTemplateSettingsResponse(data);
       hidePromptTemplateForm();
-      setStatus14("\u63D0\u793A\u8BCD\u6A21\u677F\u5DF2\u4FDD\u5B58", "ok");
+      setStatus13("\u63D0\u793A\u8BCD\u6A21\u677F\u5DF2\u4FDD\u5B58", "ok");
     } catch (error) {
-      setStatus14(error.message || "\u63D0\u793A\u8BCD\u6A21\u677F\u4FDD\u5B58\u5931\u8D25", "error");
+      setStatus13(error.message || "\u63D0\u793A\u8BCD\u6A21\u677F\u4FDD\u5B58\u5931\u8D25", "error");
     }
   }
   async function deletePromptTemplate(template) {
@@ -6939,9 +6669,9 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       applyPromptTemplateSettingsResponse(data);
       hidePromptTemplateForm();
       hidePromptTemplateDetail();
-      setStatus14("\u63D0\u793A\u8BCD\u6A21\u677F\u5DF2\u5220\u9664", "ok");
+      setStatus13("\u63D0\u793A\u8BCD\u6A21\u677F\u5DF2\u5220\u9664", "ok");
     } catch (error) {
-      setStatus14(error.message || "\u63D0\u793A\u8BCD\u6A21\u677F\u5220\u9664\u5931\u8D25", "error");
+      setStatus13(error.message || "\u63D0\u793A\u8BCD\u6A21\u677F\u5220\u9664\u5931\u8D25", "error");
     }
   }
   async function createPromptTemplateCategory(name) {
@@ -6957,9 +6687,9 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       if (!response.ok) throw new Error(data.detail || "\u6A21\u677F\u5206\u7C7B\u6DFB\u52A0\u5931\u8D25");
       applyPromptTemplateSettingsResponse(data);
       renderPromptTemplateCategoryPanel();
-      setStatus14("\u6A21\u677F\u5206\u7C7B\u5DF2\u6DFB\u52A0", "ok");
+      setStatus13("\u6A21\u677F\u5206\u7C7B\u5DF2\u6DFB\u52A0", "ok");
     } catch (error) {
-      setStatus14(error.message || "\u6A21\u677F\u5206\u7C7B\u6DFB\u52A0\u5931\u8D25", "error");
+      setStatus13(error.message || "\u6A21\u677F\u5206\u7C7B\u6DFB\u52A0\u5931\u8D25", "error");
     }
   }
   async function updatePromptTemplateCategory(categoryId, name) {
@@ -6975,9 +6705,9 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       if (!response.ok) throw new Error(data.detail || "\u6A21\u677F\u5206\u7C7B\u4FDD\u5B58\u5931\u8D25");
       applyPromptTemplateSettingsResponse(data);
       renderPromptTemplateCategoryPanel();
-      setStatus14("\u6A21\u677F\u5206\u7C7B\u5DF2\u4FDD\u5B58", "ok");
+      setStatus13("\u6A21\u677F\u5206\u7C7B\u5DF2\u4FDD\u5B58", "ok");
     } catch (error) {
-      setStatus14(error.message || "\u6A21\u677F\u5206\u7C7B\u4FDD\u5B58\u5931\u8D25", "error");
+      setStatus13(error.message || "\u6A21\u677F\u5206\u7C7B\u4FDD\u5B58\u5931\u8D25", "error");
     }
   }
   async function deletePromptTemplateCategory(categoryId) {
@@ -6988,9 +6718,9 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       if (!response.ok) throw new Error(data.detail || "\u6A21\u677F\u5206\u7C7B\u5220\u9664\u5931\u8D25");
       applyPromptTemplateSettingsResponse(data);
       renderPromptTemplateCategoryPanel();
-      setStatus14("\u6A21\u677F\u5206\u7C7B\u5DF2\u5220\u9664", "ok");
+      setStatus13("\u6A21\u677F\u5206\u7C7B\u5DF2\u5220\u9664", "ok");
     } catch (error) {
-      setStatus14(error.message || "\u6A21\u677F\u5206\u7C7B\u5220\u9664\u5931\u8D25", "error");
+      setStatus13(error.message || "\u6A21\u677F\u5206\u7C7B\u5220\u9664\u5931\u8D25", "error");
     }
   }
   async function importPromptTemplatePack(file) {
@@ -7004,15 +6734,15 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       applyPromptTemplateSettingsResponse(data);
       const message = `\u5DF2\u5BFC\u5165 ${data.imported || 0} \u4E2A\u6A21\u677F`;
       setPromptTemplateSummary(message, "ok");
-      setStatus14(message, "ok");
+      setStatus13(message, "ok");
     } catch (error) {
       const message = error.message || "\u6A21\u677F\u5305\u5BFC\u5165\u5931\u8D25";
       setPromptTemplateSummary(message, "error");
-      setStatus14(message, "error");
+      setStatus13(message, "error");
     }
   }
   async function exportPromptTemplatePack() {
-    const button = els16.promptTemplateExportButton;
+    const button = els15.promptTemplateExportButton;
     if (button) button.disabled = true;
     try {
       const response = await fetch(PROMPT_TEMPLATE_EXPORT_ENDPOINT, {
@@ -7041,60 +6771,60 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
         link.remove();
       }, 0);
       setPromptTemplateSummary("\u6A21\u677F\u5305\u5DF2\u5BFC\u51FA", "ok");
-      setStatus14("\u6A21\u677F\u5305\u5DF2\u5BFC\u51FA", "ok");
+      setStatus13("\u6A21\u677F\u5305\u5DF2\u5BFC\u51FA", "ok");
     } catch (error) {
       const message = error.message || "\u6A21\u677F\u5305\u5BFC\u51FA\u5931\u8D25";
       setPromptTemplateSummary(message, "error");
-      setStatus14(message, "error");
+      setStatus13(message, "error");
     } finally {
       if (button) button.disabled = false;
     }
   }
   function hidePromptTemplateDetail() {
-    if (!els16.promptTemplateDetail) return;
-    els16.promptTemplateDetail.classList.add("hidden");
-    els16.promptTemplateDetail.innerHTML = "";
-    els16.promptTemplateList?.classList.remove("hidden");
+    if (!els15.promptTemplateDetail) return;
+    els15.promptTemplateDetail.classList.add("hidden");
+    els15.promptTemplateDetail.innerHTML = "";
+    els15.promptTemplateList?.classList.remove("hidden");
   }
   function hidePromptTemplateForm() {
-    if (!els16.promptTemplateForm) return;
-    els16.promptTemplateForm.classList.add("hidden");
-    els16.promptTemplateForm.innerHTML = "";
-    els16.promptTemplateList?.classList.remove("hidden");
+    if (!els15.promptTemplateForm) return;
+    els15.promptTemplateForm.classList.add("hidden");
+    els15.promptTemplateForm.innerHTML = "";
+    els15.promptTemplateList?.classList.remove("hidden");
   }
   function findPromptTemplateById(id) {
-    return (state14.promptTemplates || []).find((template) => template.id === id) || null;
+    return (state13.promptTemplates || []).find((template) => template.id === id) || null;
   }
   function promptTemplatePreview(text, length = 80) {
     const clean = String(text || "").replace(/\s+/g, " ").trim();
     return clean.length > length ? `${clean.slice(0, length)}...` : clean;
   }
   function bindPromptTemplateEvents() {
-    els16.promptTemplateButton?.addEventListener("click", openPromptTemplateDrawer);
-    els16.promptTemplateDrawerClose?.addEventListener("click", closePromptTemplateDrawer);
-    els16.promptTemplateDrawerBackdrop?.addEventListener("click", closePromptTemplateDrawer);
-    els16.promptTemplateCreateButton?.addEventListener("click", () => renderPromptTemplateForm());
-    els16.promptTemplateCategoryManageButton?.addEventListener("click", togglePromptTemplateCategoryPanel);
-    els16.promptTemplateImportButton?.addEventListener("click", () => els16.promptTemplateImportInput?.click());
-    els16.promptTemplateExportButton?.addEventListener("click", () => {
+    els15.promptTemplateButton?.addEventListener("click", openPromptTemplateDrawer);
+    els15.promptTemplateDrawerClose?.addEventListener("click", closePromptTemplateDrawer);
+    els15.promptTemplateDrawerBackdrop?.addEventListener("click", closePromptTemplateDrawer);
+    els15.promptTemplateCreateButton?.addEventListener("click", () => renderPromptTemplateForm());
+    els15.promptTemplateCategoryManageButton?.addEventListener("click", togglePromptTemplateCategoryPanel);
+    els15.promptTemplateImportButton?.addEventListener("click", () => els15.promptTemplateImportInput?.click());
+    els15.promptTemplateExportButton?.addEventListener("click", () => {
       void exportPromptTemplatePack();
     });
-    els16.promptTemplateImportInput?.addEventListener("change", () => {
-      const input = els16.promptTemplateImportInput;
+    els15.promptTemplateImportInput?.addEventListener("change", () => {
+      const input = els15.promptTemplateImportInput;
       const file = input?.files?.[0];
       void importPromptTemplatePack(file);
       if (input) input.value = "";
     });
-    els16.promptTemplateSearch?.addEventListener("pointerdown", (event) => {
-      const input = els16.promptTemplateSearch;
+    els15.promptTemplateSearch?.addEventListener("pointerdown", (event) => {
+      const input = els15.promptTemplateSearch;
       if (!input?.readOnly) return;
       event.preventDefault();
       setPromptTemplateSearchLocked(false);
       syncPromptTemplateSearchInput();
       input.focus({ preventScroll: true });
     });
-    els16.promptTemplateSearch?.addEventListener("keydown", (event) => {
-      const input = els16.promptTemplateSearch;
+    els15.promptTemplateSearch?.addEventListener("keydown", (event) => {
+      const input = els15.promptTemplateSearch;
       if (input?.readOnly && !event.metaKey && !event.ctrlKey && !event.altKey) {
         const key = event.key || "";
         const isPrintable = key.length === 1;
@@ -7105,37 +6835,37 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
           promptTemplateSearchAcceptManualInput = true;
           const nextValue = isClearKey ? "" : key;
           input.value = nextValue;
-          state14.promptTemplateQuery = nextValue;
+          state13.promptTemplateQuery = nextValue;
           renderPromptTemplateList();
         }
         return;
       }
       promptTemplateSearchAcceptManualInput = true;
     });
-    els16.promptTemplateSearch?.addEventListener("paste", () => {
+    els15.promptTemplateSearch?.addEventListener("paste", () => {
       promptTemplateSearchAcceptManualInput = true;
     });
-    els16.promptTemplateSearch?.addEventListener("drop", () => {
+    els15.promptTemplateSearch?.addEventListener("drop", () => {
       promptTemplateSearchAcceptManualInput = true;
     });
-    els16.promptTemplateSearch?.addEventListener("blur", () => {
+    els15.promptTemplateSearch?.addEventListener("blur", () => {
       promptTemplateSearchAcceptManualInput = false;
       setPromptTemplateSearchLocked(true);
     });
-    els16.promptTemplateSearch?.addEventListener("input", () => {
+    els15.promptTemplateSearch?.addEventListener("input", () => {
       if (!promptTemplateSearchAcceptManualInput) {
         syncPromptTemplateSearchInput();
         guardPromptTemplateSearchInput([120, 360, 900]);
         return;
       }
-      state14.promptTemplateQuery = els16.promptTemplateSearch?.value || "";
+      state13.promptTemplateQuery = els15.promptTemplateSearch?.value || "";
       renderPromptTemplateList();
     });
-    els16.promptTemplateSearch?.addEventListener("focus", () => {
+    els15.promptTemplateSearch?.addEventListener("focus", () => {
       promptTemplateSearchAcceptManualInput = false;
       guardPromptTemplateSearchInput();
     });
-    els16.promptTemplateDrawer?.addEventListener("click", (event) => {
+    els15.promptTemplateDrawer?.addEventListener("click", (event) => {
       const target = event.target;
       const filter = target?.closest("[data-prompt-template-filter]");
       const category = target?.closest("[data-prompt-template-category]");
@@ -7152,21 +6882,21 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       const remove = target?.closest("[data-prompt-template-delete]");
       const back = target?.closest("[data-prompt-template-back]");
       if (filter) {
-        state14.promptTemplateFilter = filter.dataset.promptTemplateFilter || "all";
-        els16.promptTemplateDrawer?.querySelectorAll("[data-prompt-template-filter]").forEach((button) => {
+        state13.promptTemplateFilter = filter.dataset.promptTemplateFilter || "all";
+        els15.promptTemplateDrawer?.querySelectorAll("[data-prompt-template-filter]").forEach((button) => {
           button.classList.toggle("active", button === filter);
         });
         renderPromptTemplateList();
         return;
       }
       if (category) {
-        state14.promptTemplateCategory = category.dataset.promptTemplateCategory || "";
+        state13.promptTemplateCategory = category.dataset.promptTemplateCategory || "";
         renderPromptTemplateCategories();
         renderPromptTemplateList();
         return;
       }
       if (categoryCreate) {
-        const input = els16.promptTemplateCategoryPanel?.querySelector("[data-prompt-template-category-new]");
+        const input = els15.promptTemplateCategoryPanel?.querySelector("[data-prompt-template-category-new]");
         void createPromptTemplateCategory(input?.value || "");
         return;
       }
@@ -7210,11 +6940,11 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
         selectPromptTemplate(card.dataset.promptTemplateId);
       }
     });
-    els16.promptTemplateForm?.addEventListener("submit", (event) => {
+    els15.promptTemplateForm?.addEventListener("submit", (event) => {
       event.preventDefault();
       void savePromptTemplateFromDrawer();
     });
-    els16.promptTemplateRecentDock?.addEventListener("click", (event) => {
+    els15.promptTemplateRecentDock?.addEventListener("click", (event) => {
       const button = event.target?.closest("[data-prompt-template-insert]");
       if (!button) return;
       const template = findPromptTemplateById(button.dataset.promptTemplateInsert);
@@ -7259,9 +6989,9 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   }
 
   // codex_image/webui/frontend/src/prompt-serialization.ts
-  var bridge16 = getLegacyBridge();
-  var els17 = bridge16.els;
-  function legacyMethod20(name, ...args) {
+  var bridge15 = getLegacyBridge();
+  var els16 = bridge15.els;
+  function legacyMethod19(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy method " + name + " is not initialized");
@@ -7269,47 +6999,47 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     return method(...args);
   }
   function createGalleryChip(item) {
-    return legacyMethod20("createGalleryChip", item);
+    return legacyMethod19("createGalleryChip", item);
   }
   function createColorChip2(colorCode) {
-    return legacyMethod20("createColorChip", colorCode);
+    return legacyMethod19("createColorChip", colorCode);
   }
   function normalizeHexColor3(value) {
-    return legacyMethod20("normalizeHexColor", value);
+    return legacyMethod19("normalizeHexColor", value);
   }
   function findPromptSnippetRefAt2(promptText, cursor) {
-    return legacyMethod20("findPromptSnippetRefAt", promptText, cursor);
+    return legacyMethod19("findPromptSnippetRefAt", promptText, cursor);
   }
   function createPromptSnippetChip2(snippet) {
-    return legacyMethod20("createPromptSnippetChip", snippet);
+    return legacyMethod19("createPromptSnippetChip", snippet);
   }
   function updatePromptChipSelectionState() {
-    legacyMethod20("updatePromptChipSelectionState");
+    legacyMethod19("updatePromptChipSelectionState");
   }
   function galleryRefsByMentionLength(refs) {
-    return legacyMethod20("galleryRefsByMentionLength", refs);
+    return legacyMethod19("galleryRefsByMentionLength", refs);
   }
   function findGalleryRefMentionAt(promptText, cursor, refs) {
-    return legacyMethod20("findGalleryRefMentionAt", promptText, cursor, refs);
+    return legacyMethod19("findGalleryRefMentionAt", promptText, cursor, refs);
   }
   function hideMentionSuggest() {
-    legacyMethod20("hideMentionSuggest");
+    legacyMethod19("hideMentionSuggest");
   }
   function hideColorSuggest2() {
-    legacyMethod20("hideColorSuggest");
+    legacyMethod19("hideColorSuggest");
   }
   function hidePromptSnippetSuggest2() {
-    legacyMethod20("hidePromptSnippetSuggest");
+    legacyMethod19("hidePromptSnippetSuggest");
   }
   function hidePromptSnippetSelectionButton2() {
-    legacyMethod20("hidePromptSnippetSelectionButton");
+    legacyMethod19("hidePromptSnippetSelectionButton");
   }
   function closePromptSnippetPopover2() {
-    legacyMethod20("closePromptSnippetPopover");
+    legacyMethod19("closePromptSnippetPopover");
   }
   function getPromptText5() {
-    if (!els17.promptEditor) return els17.prompt.value;
-    return promptTextFromNode(els17.promptEditor).replace(/\u00a0/g, " ").trim();
+    if (!els16.promptEditor) return els16.prompt.value;
+    return promptTextFromNode(els16.promptEditor).replace(/\u00a0/g, " ").trim();
   }
   function promptTextFromNode(node) {
     let text = "";
@@ -7344,11 +7074,11 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   }
   function promptSelectionText() {
     const selection = window.getSelection();
-    if (!selection || !selection.rangeCount || !els17.promptEditor) return "";
+    if (!selection || !selection.rangeCount || !els16.promptEditor) return "";
     const parts = [];
     for (let index = 0; index < selection.rangeCount; index += 1) {
       const range = selection.getRangeAt(index);
-      if (range.collapsed || !rangeIntersectsNode2(range, els17.promptEditor)) continue;
+      if (range.collapsed || !rangeIntersectsNode2(range, els16.promptEditor)) continue;
       parts.push(promptTextFromRange2(range));
     }
     return parts.join("").replace(/\u00a0/g, " ");
@@ -7366,10 +7096,10 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     }
   }
   function selectPromptEditorContents() {
-    if (!els17.promptEditor) return;
-    els17.promptEditor.focus();
+    if (!els16.promptEditor) return;
+    els16.promptEditor.focus();
     const range = document.createRange();
-    range.selectNodeContents(els17.promptEditor);
+    range.selectNodeContents(els16.promptEditor);
     const selection = window.getSelection();
     if (!selection) return;
     selection.removeAllRanges();
@@ -7377,10 +7107,10 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     updatePromptChipSelectionState();
   }
   function setPromptText2(text) {
-    if (els17.promptEditor) {
-      els17.promptEditor.textContent = text || "";
+    if (els16.promptEditor) {
+      els16.promptEditor.textContent = text || "";
     }
-    els17.prompt.value = text || "";
+    els16.prompt.value = text || "";
     hideMentionSuggest();
     hideColorSuggest2();
     hidePromptSnippetSuggest2();
@@ -7388,21 +7118,21 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     closePromptSnippetPopover2();
   }
   function setPromptWithGalleryRefs(text, refs) {
-    if (!els17.promptEditor) {
+    if (!els16.promptEditor) {
       setPromptText2(text);
       return;
     }
     const refList = Array.isArray(refs) ? refs : [];
     const sortedRefs = galleryRefsByMentionLength(refList);
     const promptText = String(text || "");
-    els17.promptEditor.innerHTML = "";
+    els16.promptEditor.innerHTML = "";
     let cursor = 0;
     let plainStart = 0;
     while (cursor < promptText.length) {
       const refMatch = findGalleryRefMentionAt(promptText, cursor, sortedRefs);
       if (refMatch) {
         appendPromptText4(promptText.slice(plainStart, cursor));
-        els17.promptEditor.append(createGalleryChip(refMatch.ref));
+        els16.promptEditor.append(createGalleryChip(refMatch.ref));
         cursor = refMatch.end;
         plainStart = cursor;
         continue;
@@ -7412,7 +7142,7 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
         const match = colorMatch;
         const colorCode = normalizeHexColor3(match[0]);
         appendPromptText4(promptText.slice(plainStart, cursor));
-        els17.promptEditor.append(createColorChip2(colorCode));
+        els16.promptEditor.append(createColorChip2(colorCode));
         cursor += match[0].length;
         plainStart = cursor;
         continue;
@@ -7420,7 +7150,7 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       const snippetMatch = findPromptSnippetRefAt2(promptText, cursor);
       if (snippetMatch) {
         appendPromptText4(promptText.slice(plainStart, cursor));
-        els17.promptEditor.append(createPromptSnippetChip2(snippetMatch.snippet));
+        els16.promptEditor.append(createPromptSnippetChip2(snippetMatch.snippet));
         cursor = snippetMatch.end;
         plainStart = cursor;
         continue;
@@ -7435,18 +7165,18 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   }
   function appendPromptText4(text) {
     if (text) {
-      els17.promptEditor.append(document.createTextNode(text));
+      els16.promptEditor.append(document.createTextNode(text));
     }
   }
   function clearPromptEditorIfEmpty() {
-    if (!els17.promptEditor) return;
-    const visibleText = promptTextFromNode(els17.promptEditor).replace(/\u00a0/g, " ").trim();
+    if (!els16.promptEditor) return;
+    const visibleText = promptTextFromNode(els16.promptEditor).replace(/\u00a0/g, " ").trim();
     if (!visibleText) {
-      els17.promptEditor.textContent = "";
+      els16.promptEditor.textContent = "";
     }
   }
   function syncPromptFromEditor3() {
-    els17.prompt.value = getPromptText5();
+    els16.prompt.value = getPromptText5();
   }
   function initPromptSerializationFeature() {
     Object.assign(getLegacyBridge().methods, {
@@ -7465,69 +7195,69 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   }
 
   // codex_image/webui/frontend/src/prompt-gallery-chips.ts
-  var bridge17 = getLegacyBridge();
-  var state15 = bridge17.state;
-  var els18 = bridge17.els;
-  function legacyMethod21(name, ...args) {
+  var bridge16 = getLegacyBridge();
+  var state14 = bridge16.state;
+  var els17 = bridge16.els;
+  function legacyMethod20(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy method " + name + " is not initialized");
     }
     return method(...args);
   }
-  function escapeHtml12(value) {
-    return legacyMethod21("escapeHtml", value);
+  function escapeHtml11(value) {
+    return legacyMethod20("escapeHtml", value);
   }
   function categoryLabel4(category) {
-    return legacyMethod21("categoryLabel", category);
+    return legacyMethod20("categoryLabel", category);
   }
   function categoryPromptRole2(category) {
-    return legacyMethod21("categoryPromptRole", category);
+    return legacyMethod20("categoryPromptRole", category);
   }
   function findGalleryItem5(itemId) {
-    return legacyMethod21("findGalleryItem", itemId);
+    return legacyMethod20("findGalleryItem", itemId);
   }
   function addGalleryInput4(item, options) {
-    legacyMethod21("addGalleryInput", item, options);
+    legacyMethod20("addGalleryInput", item, options);
   }
   function gallerySource3(item) {
-    return legacyMethod21("gallerySource", item);
+    return legacyMethod20("gallerySource", item);
   }
   function galleryInputs2() {
-    return legacyMethod21("galleryInputs");
+    return legacyMethod20("galleryInputs");
   }
   function renderImageStrip5() {
-    legacyMethod21("renderImageStrip");
+    legacyMethod20("renderImageStrip");
   }
   function setMode3(mode) {
-    legacyMethod21("setMode", mode);
+    legacyMethod20("setMode", mode);
   }
   function updatePromptCount4() {
-    legacyMethod21("updatePromptCount");
+    legacyMethod20("updatePromptCount");
   }
   function updateRequestPreview8() {
-    legacyMethod21("updateRequestPreview");
+    legacyMethod20("updateRequestPreview");
   }
   function getPromptText6() {
-    return legacyMethod21("getPromptText");
+    return legacyMethod20("getPromptText");
   }
   function appendPromptText5(text) {
-    legacyMethod21("appendPromptText", text);
+    legacyMethod20("appendPromptText", text);
   }
   function syncPromptFromEditor4() {
-    legacyMethod21("syncPromptFromEditor");
+    legacyMethod20("syncPromptFromEditor");
   }
   function clearPromptEditorIfEmpty2() {
-    legacyMethod21("clearPromptEditorIfEmpty");
+    legacyMethod20("clearPromptEditorIfEmpty");
   }
   function hideColorSuggest3() {
-    legacyMethod21("hideColorSuggest");
+    legacyMethod20("hideColorSuggest");
   }
   function setCaretAfterNode3(node) {
-    legacyMethod21("setCaretAfterNode", node);
+    legacyMethod20("setCaretAfterNode", node);
   }
   function mentionRangeRect3(range) {
-    return legacyMethod21("mentionRangeRect", range);
+    return legacyMethod20("mentionRangeRect", range);
   }
   function galleryRefsByMentionLength2(refs) {
     return (Array.isArray(refs) ? refs : []).filter((ref) => ref?.name && !ref.missing && ref.image_url).slice().sort((left, right) => String(right.name || "").length - String(left.name || "").length);
@@ -7545,26 +7275,26 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     return null;
   }
   function updateMentionSuggest() {
-    if (!els18.mentionSuggest || !els18.promptEditor) return;
+    if (!els17.mentionSuggest || !els17.promptEditor) return;
     const match = activeMentionMatch();
     if (!match) {
       hideMentionSuggest2();
       return;
     }
     const query = match.query.toLowerCase();
-    const items = state15.galleryItems.filter((item) => item.name.toLowerCase().includes(query)).slice(0, 8);
+    const items = state14.galleryItems.filter((item) => item.name.toLowerCase().includes(query)).slice(0, 8);
     if (!items.length) {
       hideMentionSuggest2();
       return;
     }
-    els18.mentionSuggest.innerHTML = items.map((item) => `
-    <button type="button" class="mention-option" data-mention-id="${escapeHtml12(item.id)}">
-      <img src="${escapeHtml12(item.image_url)}" alt="">
-      <span>@${escapeHtml12(item.name)}</span>
-      <small>${escapeHtml12(categoryLabel4(item.category))}</small>
+    els17.mentionSuggest.innerHTML = items.map((item) => `
+    <button type="button" class="mention-option" data-mention-id="${escapeHtml11(item.id)}">
+      <img src="${escapeHtml11(item.image_url)}" alt="">
+      <span>@${escapeHtml11(item.name)}</span>
+      <small>${escapeHtml11(categoryLabel4(item.category))}</small>
     </button>
   `).join("");
-    els18.mentionSuggest.querySelectorAll("[data-mention-id]").forEach((button) => {
+    els17.mentionSuggest.querySelectorAll("[data-mention-id]").forEach((button) => {
       button.addEventListener("mousedown", (event) => {
         event.preventDefault();
         const item = findGalleryItem5(button.dataset.mentionId);
@@ -7572,12 +7302,12 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       });
     });
     positionMentionSuggestAtCaret(match);
-    els18.mentionSuggest.classList.remove("hidden");
+    els17.mentionSuggest.classList.remove("hidden");
   }
   function activeMentionMatch() {
     const selection = window.getSelection();
-    if (!selection || !selection.rangeCount || !selection.isCollapsed || !els18.promptEditor) return null;
-    if (!els18.promptEditor.contains(selection.anchorNode)) return null;
+    if (!selection || !selection.rangeCount || !selection.isCollapsed || !els17.promptEditor) return null;
+    if (!els17.promptEditor.contains(selection.anchorNode)) return null;
     const selectionRange = selection.getRangeAt(0);
     let container = selectionRange.startContainer;
     let offset = selectionRange.startOffset;
@@ -7614,9 +7344,9 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       if (currentText && !/\s$/.test(currentText)) {
         appendPromptText5(" ");
       }
-      els18.promptEditor.append(createGalleryChip2(item));
+      els17.promptEditor.append(createGalleryChip2(item));
       trailingSpace = document.createTextNode(" ");
-      els18.promptEditor.append(trailingSpace);
+      els17.promptEditor.append(trailingSpace);
     }
     addGalleryInput4(item, { syncPrompt: false });
     syncPromptFromEditor4();
@@ -7627,11 +7357,11 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     setCaretAfterNode3(trailingSpace);
   }
   function positionMentionSuggestAtCaret(match) {
-    if (!els18.mentionSuggest || !els18.promptEditor || !match?.range) return;
-    const host = els18.promptEditor.closest(".prompt-editor-wrap") || els18.promptEditor;
-    const anchorRect = mentionRangeRect3(match.range) || els18.promptEditor.getBoundingClientRect();
+    if (!els17.mentionSuggest || !els17.promptEditor || !match?.range) return;
+    const host = els17.promptEditor.closest(".prompt-editor-wrap") || els17.promptEditor;
+    const anchorRect = mentionRangeRect3(match.range) || els17.promptEditor.getBoundingClientRect();
     positionPromptPopoverAtAnchor(
-      els18.mentionSuggest,
+      els17.mentionSuggest,
       host,
       anchorRect,
       {
@@ -7678,7 +7408,7 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     return chip;
   }
   function removePromptGalleryChip3(chip) {
-    if (!chip || !els18.promptEditor?.contains(chip)) return;
+    if (!chip || !els17.promptEditor?.contains(chip)) return;
     const nextNode = chip.nextSibling;
     chip.remove();
     if (nextNode?.nodeType === Node.TEXT_NODE && !nextNode.textContent.trim()) {
@@ -7691,16 +7421,16 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     if (!galleryInputsChanged) updateRequestPreview8();
     hideMentionSuggest2();
     hideColorSuggest3();
-    setCaretToEnd(els18.promptEditor);
+    setCaretToEnd(els17.promptEditor);
   }
   function currentPromptGalleryIds() {
-    if (!els18.promptEditor) return /* @__PURE__ */ new Set();
+    if (!els17.promptEditor) return /* @__PURE__ */ new Set();
     return new Set(
-      Array.from(els18.promptEditor.querySelectorAll(".gallery-chip[data-gallery-id]")).map((chip) => chip.dataset.galleryId).filter(Boolean)
+      Array.from(els17.promptEditor.querySelectorAll(".gallery-chip[data-gallery-id]")).map((chip) => chip.dataset.galleryId).filter(Boolean)
     );
   }
   function ensurePromptGalleryMention(item) {
-    if (!item || !els18.promptEditor || currentPromptGalleryIds().has(item.id)) {
+    if (!item || !els17.promptEditor || currentPromptGalleryIds().has(item.id)) {
       syncPromptFromEditor4();
       return;
     }
@@ -7708,7 +7438,7 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     if (currentText && !/\s$/.test(currentText)) {
       appendPromptText5(" ");
     }
-    els18.promptEditor.append(createGalleryChip2(item));
+    els17.promptEditor.append(createGalleryChip2(item));
     appendPromptText5(" ");
     syncPromptFromEditor4();
     updatePromptCount4();
@@ -7716,11 +7446,11 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     hideColorSuggest3();
   }
   function syncGalleryInputsFromPrompt() {
-    const chips = Array.from(els18.promptEditor?.querySelectorAll(".gallery-chip[data-gallery-id]") || []);
+    const chips = Array.from(els17.promptEditor?.querySelectorAll(".gallery-chip[data-gallery-id]") || []);
     const mentionedIds = new Set(chips.map((chip) => chip.dataset.galleryId).filter(Boolean));
-    const beforeKey = imageSourcesKey(state15.images);
-    const uploads = state15.images.filter((source) => source.kind !== "gallery");
-    const existingById = new Map(state15.images.filter((source) => source.kind === "gallery").map((source) => [source.id, source]));
+    const beforeKey = imageSourcesKey(state14.images);
+    const uploads = state14.images.filter((source) => source.kind !== "gallery");
+    const existingById = new Map(state14.images.filter((source) => source.kind === "gallery").map((source) => [source.id, source]));
     const galleries = chips.map((chip) => {
       const itemId = chip.dataset.galleryId;
       const existing = existingById.get(itemId);
@@ -7738,9 +7468,9 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
         missing: true
       });
     }).filter((source) => source.id && mentionedIds.has(source.id));
-    state15.images = [...uploads, ...galleries];
-    if (imageSourcesKey(state15.images) === beforeKey) return false;
-    if (!state15.images.length) {
+    state14.images = [...uploads, ...galleries];
+    if (imageSourcesKey(state14.images) === beforeKey) return false;
+    if (!state14.images.length) {
       setMode3("generate");
     }
     renderImageStrip5();
@@ -7755,10 +7485,10 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     ]));
   }
   function syncPromptGalleryMentionsFromInputs() {
-    if (!els18.promptEditor) return false;
+    if (!els17.promptEditor) return false;
     const selectedGalleryIds = new Set(galleryInputs2().map((source) => source.id));
     let changed = false;
-    els18.promptEditor.querySelectorAll(".gallery-chip[data-gallery-id]").forEach((chip) => {
+    els17.promptEditor.querySelectorAll(".gallery-chip[data-gallery-id]").forEach((chip) => {
       if (!selectedGalleryIds.has(chip.dataset.galleryId)) {
         chip.remove();
         changed = true;
@@ -7771,16 +7501,16 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     return true;
   }
   function hideMentionSuggest2() {
-    if (!els18.mentionSuggest) return;
-    els18.mentionSuggest.classList.add("hidden");
-    els18.mentionSuggest.innerHTML = "";
-    els18.mentionSuggest.style.removeProperty("--mention-left");
-    els18.mentionSuggest.style.removeProperty("--mention-top");
-    els18.mentionSuggest.style.removeProperty("--mention-width");
-    els18.mentionSuggest.style.removeProperty("--prompt-popover-max-height");
+    if (!els17.mentionSuggest) return;
+    els17.mentionSuggest.classList.add("hidden");
+    els17.mentionSuggest.innerHTML = "";
+    els17.mentionSuggest.style.removeProperty("--mention-left");
+    els17.mentionSuggest.style.removeProperty("--mention-top");
+    els17.mentionSuggest.style.removeProperty("--mention-width");
+    els17.mentionSuggest.style.removeProperty("--prompt-popover-max-height");
   }
   function setCaretToEnd(element2) {
-    legacyMethod21("setCaretToEnd", element2);
+    legacyMethod20("setCaretToEnd", element2);
   }
   function initPromptGalleryChipsFeature() {
     Object.assign(getLegacyBridge().methods, {
@@ -7802,9 +7532,9 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   }
 
   // codex_image/webui/frontend/src/prompt-editor-paste.ts
-  var bridge18 = getLegacyBridge();
-  var els19 = bridge18.els;
-  function legacyMethod22(name, ...args) {
+  var bridge17 = getLegacyBridge();
+  var els18 = bridge17.els;
+  function legacyMethod21(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy method " + name + " is not initialized");
@@ -7812,22 +7542,22 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     return method(...args);
   }
   function rangeIntersectsNode3(range, node) {
-    return legacyMethod22("rangeIntersectsNode", range, node);
+    return legacyMethod21("rangeIntersectsNode", range, node);
   }
   function setCaretAfterNode4(node) {
-    legacyMethod22("setCaretAfterNode", node);
+    legacyMethod21("setCaretAfterNode", node);
   }
   function syncPromptAfterChipMutation3() {
-    legacyMethod22("syncPromptAfterChipMutation");
+    legacyMethod21("syncPromptAfterChipMutation");
   }
   function updateMentionSuggest2() {
-    legacyMethod22("updateMentionSuggest");
+    legacyMethod21("updateMentionSuggest");
   }
   function updateColorSuggest3() {
-    legacyMethod22("updateColorSuggest");
+    legacyMethod21("updateColorSuggest");
   }
   function updatePromptSnippetSuggest2() {
-    legacyMethod22("updatePromptSnippetSuggest");
+    legacyMethod21("updatePromptSnippetSuggest");
   }
   function clipboardHasImageFile(data) {
     return Array.from(data.items || []).some((item) => item.kind === "file" && item.type?.startsWith("image/"));
@@ -7867,20 +7597,20 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     return html ? promptPlainTextFromHtml(html) : "";
   }
   function insertPlainPromptText(text) {
-    if (!els19.promptEditor) return;
+    if (!els18.promptEditor) return;
     const normalized = normalizePromptPasteText(text);
     if (!normalized) return;
-    els19.promptEditor.focus();
+    els18.promptEditor.focus();
     const textNode = document.createTextNode(normalized);
     const selection = window.getSelection();
     if (!selection || !selection.rangeCount) {
-      els19.promptEditor.append(textNode);
+      els18.promptEditor.append(textNode);
       setCaretAfterNode4(textNode);
       return;
     }
     const range = selection.getRangeAt(0);
-    if (!rangeIntersectsNode3(range, els19.promptEditor)) {
-      els19.promptEditor.append(textNode);
+    if (!rangeIntersectsNode3(range, els18.promptEditor)) {
+      els18.promptEditor.append(textNode);
       setCaretAfterNode4(textNode);
       return;
     }
@@ -7889,7 +7619,7 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     setCaretAfterNode4(textNode);
   }
   function handlePromptEditorPaste(event) {
-    if (!event.clipboardData || !els19.promptEditor?.contains(event.target)) return;
+    if (!event.clipboardData || !els18.promptEditor?.contains(event.target)) return;
     if (clipboardHasImageFile(event.clipboardData)) return;
     const text = promptPasteTextFromClipboard(event.clipboardData);
     if (!text) return;
@@ -7902,10 +7632,10 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   }
 
   // codex_image/webui/frontend/src/prompt-editor-events.ts
-  var bridge19 = getLegacyBridge();
-  var state16 = bridge19.state;
-  var els20 = bridge19.els;
-  function legacyMethod23(name, ...args) {
+  var bridge18 = getLegacyBridge();
+  var state15 = bridge18.state;
+  var els19 = bridge18.els;
+  function legacyMethod22(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy method " + name + " is not initialized");
@@ -7913,82 +7643,82 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     return method(...args);
   }
   function getPromptText7() {
-    return legacyMethod23("getPromptText");
+    return legacyMethod22("getPromptText");
   }
   function promptTextFromNode2(node) {
-    return legacyMethod23("promptTextFromNode", node);
+    return legacyMethod22("promptTextFromNode", node);
   }
   function promptSelectionText2() {
-    return legacyMethod23("promptSelectionText");
+    return legacyMethod22("promptSelectionText");
   }
   function rangeIntersectsNode4(range, node) {
-    return legacyMethod23("rangeIntersectsNode", range, node);
+    return legacyMethod22("rangeIntersectsNode", range, node);
   }
   function selectPromptEditorContents2() {
-    legacyMethod23("selectPromptEditorContents");
+    legacyMethod22("selectPromptEditorContents");
   }
   function syncGalleryInputsFromPrompt2() {
-    return legacyMethod23("syncGalleryInputsFromPrompt");
+    return legacyMethod22("syncGalleryInputsFromPrompt");
   }
   function updateMentionSuggest3() {
-    legacyMethod23("updateMentionSuggest");
+    legacyMethod22("updateMentionSuggest");
   }
   function hideMentionSuggest3() {
-    legacyMethod23("hideMentionSuggest");
+    legacyMethod22("hideMentionSuggest");
   }
   function hideColorSuggest4() {
-    legacyMethod23("hideColorSuggest");
+    legacyMethod22("hideColorSuggest");
   }
   function updateColorSuggest4() {
-    legacyMethod23("updateColorSuggest");
+    legacyMethod22("updateColorSuggest");
   }
   function insertColorCode2(colorCode) {
-    legacyMethod23("insertColorCode", colorCode);
+    legacyMethod22("insertColorCode", colorCode);
   }
   function openColorChipEditor2(chip) {
-    legacyMethod23("openColorChipEditor", chip);
+    legacyMethod22("openColorChipEditor", chip);
   }
   function hidePromptSnippetSuggest3() {
-    legacyMethod23("hidePromptSnippetSuggest");
+    legacyMethod22("hidePromptSnippetSuggest");
   }
   function hidePromptSnippetSelectionButton3() {
-    legacyMethod23("hidePromptSnippetSelectionButton");
+    legacyMethod22("hidePromptSnippetSelectionButton");
   }
   function closePromptSnippetPopover3() {
-    legacyMethod23("closePromptSnippetPopover");
+    legacyMethod22("closePromptSnippetPopover");
   }
   function promptSnippetSuggestElement2() {
-    return legacyMethod23("promptSnippetSuggestElement");
+    return legacyMethod22("promptSnippetSuggestElement");
   }
   function findPromptSnippetById2(id) {
-    return legacyMethod23("findPromptSnippetById", id);
+    return legacyMethod22("findPromptSnippetById", id);
   }
   function insertPromptSnippet2(snippet) {
-    legacyMethod23("insertPromptSnippet", snippet);
+    legacyMethod22("insertPromptSnippet", snippet);
   }
   function updatePromptSnippetSuggest3() {
-    legacyMethod23("updatePromptSnippetSuggest");
+    legacyMethod22("updatePromptSnippetSuggest");
   }
   function updatePromptSnippetSelectionButton2() {
-    legacyMethod23("updatePromptSnippetSelectionButton");
+    legacyMethod22("updatePromptSnippetSelectionButton");
   }
   function openPromptSnippetChipPopover2(chip) {
-    legacyMethod23("openPromptSnippetChipPopover", chip);
+    legacyMethod22("openPromptSnippetChipPopover", chip);
   }
   function updatePromptCount5() {
-    legacyMethod23("updatePromptCount");
+    legacyMethod22("updatePromptCount");
   }
   function updateRequestPreview9() {
-    legacyMethod23("updateRequestPreview");
+    legacyMethod22("updateRequestPreview");
   }
   function removePromptGalleryChip4(chip) {
-    legacyMethod23("removePromptGalleryChip", chip);
+    legacyMethod22("removePromptGalleryChip", chip);
   }
   function findGalleryItem6(itemId) {
-    return legacyMethod23("findGalleryItem", itemId);
+    return legacyMethod22("findGalleryItem", itemId);
   }
   function insertGalleryMention2(item) {
-    legacyMethod23("insertGalleryMention", item);
+    legacyMethod22("insertGalleryMention", item);
   }
   function handlePromptEditorCopy(event) {
     if (!event.clipboardData) return;
@@ -7999,17 +7729,17 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   }
   function promptEditorFocusInside() {
     const activeElement = document.activeElement;
-    return Boolean(activeElement && els20.promptEditor && els20.promptEditor.contains(activeElement));
+    return Boolean(activeElement && els19.promptEditor && els19.promptEditor.contains(activeElement));
   }
   function updatePromptChipSelectionState2() {
-    const chips = Array.from(els20.promptEditor?.querySelectorAll(".gallery-chip, .color-chip, .prompt-snippet-chip") || []);
+    const chips = Array.from(els19.promptEditor?.querySelectorAll(".gallery-chip, .color-chip, .prompt-snippet-chip") || []);
     if (!chips.length) return;
     const selection = window.getSelection();
     const ranges = [];
-    if (selection && !selection.isCollapsed && selection.rangeCount && els20.promptEditor) {
+    if (selection && !selection.isCollapsed && selection.rangeCount && els19.promptEditor) {
       for (let index = 0; index < selection.rangeCount; index += 1) {
         const range = selection.getRangeAt(index);
-        if (rangeIntersectsNode4(range, els20.promptEditor)) ranges.push(range);
+        if (rangeIntersectsNode4(range, els19.promptEditor)) ranges.push(range);
       }
     }
     chips.forEach((chip) => {
@@ -8018,7 +7748,7 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     });
   }
   function syncPromptFromEditor5() {
-    els20.prompt.value = getPromptText7();
+    els19.prompt.value = getPromptText7();
   }
   function handlePromptEditorKeydown(event) {
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "a") {
@@ -8042,14 +7772,14 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       closePromptSnippetPopover3();
       return;
     }
-    if (event.key === "Enter" && !els20.colorSuggest.classList.contains("hidden")) {
+    if (event.key === "Enter" && !els19.colorSuggest.classList.contains("hidden")) {
       event.preventDefault();
-      const input = els20.colorSuggest.querySelector("[data-color-hex-input]");
-      insertColorCode2(input?.value || state16.selectedColorCode);
+      const input = els19.colorSuggest.querySelector("[data-color-hex-input]");
+      insertColorCode2(input?.value || state15.selectedColorCode);
       return;
     }
-    if (event.key === "Enter" && !els20.mentionSuggest.classList.contains("hidden")) {
-      const first = els20.mentionSuggest.querySelector("[data-mention-id]");
+    if (event.key === "Enter" && !els19.mentionSuggest.classList.contains("hidden")) {
+      const first = els19.mentionSuggest.querySelector("[data-mention-id]");
       if (first) {
         event.preventDefault();
         const item = findGalleryItem6(first.dataset.mentionId);
@@ -8069,21 +7799,21 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   }
   function handlePromptEditorClick(event) {
     const removeButton = event.target.closest?.("[data-remove-gallery-chip], [data-remove-color-chip], [data-remove-prompt-snippet-chip]");
-    if (removeButton && els20.promptEditor.contains(removeButton)) {
+    if (removeButton && els19.promptEditor.contains(removeButton)) {
       event.preventDefault();
       event.stopPropagation();
       removePromptGalleryChip4(removeButton.closest(".gallery-chip, .color-chip, .prompt-snippet-chip"));
       return;
     }
     const editColorButton = event.target.closest?.("[data-edit-color-chip]");
-    if (editColorButton && els20.promptEditor.contains(editColorButton)) {
+    if (editColorButton && els19.promptEditor.contains(editColorButton)) {
       event.preventDefault();
       event.stopPropagation();
       openColorChipEditor2(editColorButton.closest(".color-chip"));
       return;
     }
     const snippetChip = event.target.closest?.(".prompt-snippet-chip");
-    if (snippetChip && els20.promptEditor.contains(snippetChip) && !event.target.closest?.("[data-remove-prompt-snippet-chip]")) {
+    if (snippetChip && els19.promptEditor.contains(snippetChip) && !event.target.closest?.("[data-remove-prompt-snippet-chip]")) {
       event.preventDefault();
       event.stopPropagation();
       openPromptSnippetChipPopover2(snippetChip);
@@ -8091,8 +7821,8 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   }
   function promptChipAtCaretForDeletion(key) {
     const selection = window.getSelection();
-    if (!selection || !selection.rangeCount || !selection.isCollapsed || !els20.promptEditor) return null;
-    if (!els20.promptEditor.contains(selection.anchorNode)) return null;
+    if (!selection || !selection.rangeCount || !selection.isCollapsed || !els19.promptEditor) return null;
+    if (!els19.promptEditor.contains(selection.anchorNode)) return null;
     const range = selection.getRangeAt(0);
     const isBackspace = key === "Backspace";
     const container = range.startContainer;
@@ -8112,10 +7842,10 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     return null;
   }
   function promptChipFallbackForDeletion(key) {
-    if (!els20.promptEditor) return null;
-    const chips = Array.from(els20.promptEditor.querySelectorAll(".gallery-chip[data-gallery-id], .color-chip[data-color-code], .prompt-snippet-chip[data-prompt-snippet-tag]"));
+    if (!els19.promptEditor) return null;
+    const chips = Array.from(els19.promptEditor.querySelectorAll(".gallery-chip[data-gallery-id], .color-chip[data-color-code], .prompt-snippet-chip[data-prompt-snippet-tag]"));
     if (!chips.length) return null;
-    const textWithoutChips = Array.from(els20.promptEditor.childNodes).reduce((text, child) => {
+    const textWithoutChips = Array.from(els19.promptEditor.childNodes).reduce((text, child) => {
       if (child.nodeType === Node.ELEMENT_NODE && isPromptAtomicChip(child)) {
         return text;
       }
@@ -8129,7 +7859,7 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   }
   function promptChipFromEvent(event) {
     const chip = event.target.closest?.(".gallery-chip, .color-chip, .prompt-snippet-chip");
-    if (!chip || !els20.promptEditor?.contains(chip)) return null;
+    if (!chip || !els19.promptEditor?.contains(chip)) return null;
     return chip;
   }
   function handlePromptChipDragStart(event) {
@@ -8138,13 +7868,13 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       event.preventDefault();
       return;
     }
-    state16.draggedPromptChip = chip;
+    state15.draggedPromptChip = chip;
     chip.classList.add("prompt-chip-dragging");
     event.dataTransfer.effectAllowed = "move";
     event.dataTransfer.setData("text/plain", promptTextFromNode2(chip));
   }
   function handlePromptChipDragOver(event) {
-    if (!state16.draggedPromptChip) return;
+    if (!state15.draggedPromptChip) return;
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
     clearPromptChipDropClasses();
@@ -8156,20 +7886,20 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     handlePromptChipDrop(event);
   }
   function handlePromptChipDrop(event) {
-    const chip = state16.draggedPromptChip;
-    if (!chip || !els20.promptEditor?.contains(chip)) return;
+    const chip = state15.draggedPromptChip;
+    if (!chip || !els19.promptEditor?.contains(chip)) return;
     event.preventDefault();
     clearPromptChipDropClasses();
     const targetChip = promptDropTargetChip(event);
     if (targetChip) {
       const insertBefore = promptDropPlacement(event, targetChip) === "before" ? targetChip : targetChip.nextSibling;
-      els20.promptEditor.insertBefore(chip, insertBefore);
+      els19.promptEditor.insertBefore(chip, insertBefore);
     } else {
       const range = promptRangeFromPoint(event.clientX, event.clientY);
-      if (range && els20.promptEditor.contains(range.startContainer)) {
+      if (range && els19.promptEditor.contains(range.startContainer)) {
         range.insertNode(chip);
       } else {
-        els20.promptEditor.append(chip);
+        els19.promptEditor.append(chip);
       }
     }
     const trailingBoundary = normalizePromptChipBoundaries(chip);
@@ -8177,13 +7907,13 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     setCaretAfterNode5(trailingBoundary || chip);
   }
   function handlePromptChipDragEnd() {
-    state16.draggedPromptChip?.classList.remove("prompt-chip-dragging");
-    state16.draggedPromptChip = null;
+    state15.draggedPromptChip?.classList.remove("prompt-chip-dragging");
+    state15.draggedPromptChip = null;
     clearPromptChipDropClasses();
   }
   function promptDropTargetChip(event) {
     const chip = promptChipFromEvent(event);
-    if (!chip || chip === state16.draggedPromptChip) return null;
+    if (!chip || chip === state15.draggedPromptChip) return null;
     return chip;
   }
   function promptDropPlacement(event, chip) {
@@ -8194,7 +7924,7 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     return position < size / 2 ? "before" : "after";
   }
   function clearPromptChipDropClasses() {
-    els20.promptEditor?.querySelectorAll(".prompt-chip-drop-before, .prompt-chip-drop-after").forEach((chip) => {
+    els19.promptEditor?.querySelectorAll(".prompt-chip-drop-before, .prompt-chip-drop-after").forEach((chip) => {
       chip.classList.remove("prompt-chip-drop-before", "prompt-chip-drop-after");
     });
   }
@@ -8213,7 +7943,7 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     return null;
   }
   function normalizePromptChipBoundaries(chip) {
-    if (!chip || !els20.promptEditor?.contains(chip)) return null;
+    if (!chip || !els19.promptEditor?.contains(chip)) return null;
     ensurePromptChipLeadingBoundary(chip);
     return ensurePromptChipTrailingBoundary(chip);
   }
@@ -8223,7 +7953,7 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     if (previousNode.nodeType === Node.TEXT_NODE && /[\s\u00a0]$/.test(previousNode.textContent || "")) {
       return null;
     }
-    els20.promptEditor.insertBefore(document.createTextNode(" "), chip);
+    els19.promptEditor.insertBefore(document.createTextNode(" "), chip);
     return chip.previousSibling;
   }
   function ensurePromptChipTrailingBoundary(chip) {
@@ -8235,7 +7965,7 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     if (nextNode.nodeType === Node.TEXT_NODE && /^[\s\u00a0]/.test(nextNode.textContent || "")) {
       return null;
     }
-    els20.promptEditor.insertBefore(document.createTextNode(" "), nextNode);
+    els19.promptEditor.insertBefore(document.createTextNode(" "), nextNode);
     return chip.nextSibling;
   }
   function syncPromptAfterChipMutation4() {
@@ -8255,10 +7985,10 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     return rects.length ? rects[0] : null;
   }
   function clearPromptEditorIfEmpty3() {
-    if (!els20.promptEditor) return;
-    const visibleText = promptTextFromNode2(els20.promptEditor).replace(/\u00a0/g, " ").trim();
+    if (!els19.promptEditor) return;
+    const visibleText = promptTextFromNode2(els19.promptEditor).replace(/\u00a0/g, " ").trim();
     if (!visibleText) {
-      els20.promptEditor.textContent = "";
+      els19.promptEditor.textContent = "";
     }
   }
   function setCaretToEnd2(element2) {
@@ -8280,10 +8010,10 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     if (!selection) return;
     selection.removeAllRanges();
     selection.addRange(range);
-    els20.promptEditor?.focus();
+    els19.promptEditor?.focus();
   }
   function bindPromptEditorEvents() {
-    els20.promptEditor?.addEventListener("input", () => {
+    els19.promptEditor?.addEventListener("input", () => {
       syncPromptFromEditor5();
       updatePromptCount5();
       const galleryInputsChanged = syncGalleryInputsFromPrompt2();
@@ -8292,27 +8022,27 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
       updatePromptSnippetSuggest3();
       if (!galleryInputsChanged) updateRequestPreview9();
     });
-    els20.promptEditor?.addEventListener("keyup", (event) => {
+    els19.promptEditor?.addEventListener("keyup", (event) => {
       if (event.key === "Escape") return;
       updateMentionSuggest3();
       updateColorSuggest4();
       updatePromptSnippetSuggest3();
       updatePromptSnippetSelectionButton2();
     });
-    els20.promptEditor?.addEventListener("keydown", handlePromptEditorKeydown);
-    els20.promptEditor?.addEventListener("copy", handlePromptEditorCopy);
-    els20.promptEditor?.addEventListener("paste", handlePromptEditorPaste);
-    els20.promptEditor?.addEventListener("click", handlePromptEditorClick);
-    els20.promptEditor?.addEventListener("dragstart", handlePromptChipDragStart);
-    els20.promptEditor?.addEventListener("dragover", handlePromptChipDragOver);
-    els20.promptEditor?.addEventListener("drop", handlePromptChipDrop);
-    els20.promptEditor?.addEventListener("dragend", handlePromptChipDragEnd);
-    els20.promptEditor?.addEventListener("mouseup", updatePromptSnippetSelectionButton2);
-    els20.promptEditor?.addEventListener("blur", () => {
+    els19.promptEditor?.addEventListener("keydown", handlePromptEditorKeydown);
+    els19.promptEditor?.addEventListener("copy", handlePromptEditorCopy);
+    els19.promptEditor?.addEventListener("paste", handlePromptEditorPaste);
+    els19.promptEditor?.addEventListener("click", handlePromptEditorClick);
+    els19.promptEditor?.addEventListener("dragstart", handlePromptChipDragStart);
+    els19.promptEditor?.addEventListener("dragover", handlePromptChipDragOver);
+    els19.promptEditor?.addEventListener("drop", handlePromptChipDrop);
+    els19.promptEditor?.addEventListener("dragend", handlePromptChipDragEnd);
+    els19.promptEditor?.addEventListener("mouseup", updatePromptSnippetSelectionButton2);
+    els19.promptEditor?.addEventListener("blur", () => {
       window.setTimeout(() => {
         hideMentionSuggest3();
         hidePromptSnippetSuggest3();
-        if (!els20.colorSuggest?.contains(document.activeElement) && !promptEditorFocusInside()) hideColorSuggest4();
+        if (!els19.colorSuggest?.contains(document.activeElement) && !promptEditorFocusInside()) hideColorSuggest4();
       }, 160);
     });
     document.addEventListener("selectionchange", () => {
@@ -8358,9 +8088,9 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
   }
 
   // codex_image/webui/frontend/src/prompt-model.ts
-  var bridge20 = getLegacyBridge();
-  var els21 = bridge20.els;
-  function legacyMethod24(name, ...args) {
+  var bridge19 = getLegacyBridge();
+  var els20 = bridge19.els;
+  function legacyMethod23(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy method " + name + " is not initialized");
@@ -8368,22 +8098,22 @@ ${IMAGE_EDITOR_PROMPT_HINT}` : IMAGE_EDITOR_PROMPT_HINT;
     return method(...args);
   }
   function getPromptText8() {
-    return legacyMethod24("getPromptText");
+    return legacyMethod23("getPromptText");
   }
   function expandPromptSnippets2(prompt) {
-    return legacyMethod24("expandPromptSnippets", prompt);
+    return legacyMethod23("expandPromptSnippets", prompt);
   }
   function galleryInputs3() {
-    return legacyMethod24("galleryInputs");
+    return legacyMethod23("galleryInputs");
   }
   function uploadInputs2() {
-    return legacyMethod24("uploadInputs");
+    return legacyMethod23("uploadInputs");
   }
   function referenceAssetInputs2() {
-    return legacyMethod24("referenceAssetInputs");
+    return legacyMethod23("referenceAssetInputs");
   }
   function categoryPromptRole3(category) {
-    return legacyMethod24("categoryPromptRole", category);
+    return legacyMethod23("categoryPromptRole", category);
   }
   function promptTokenReplacement(prompt) {
     return expandPromptSnippets2(prompt);
@@ -8413,7 +8143,7 @@ ${galleryText}`;
     return currentPromptFidelity() === "original" ? expandPromptSnippets2(getPromptText8()) : buildPromptForModel();
   }
   function currentPromptFidelity() {
-    const value = els21.promptFidelity?.value || "strict";
+    const value = els20.promptFidelity?.value || "strict";
     return ["strict", "original", "off"].includes(value) ? value : "strict";
   }
   function initPromptModelFeature() {
@@ -8428,10 +8158,10 @@ ${galleryText}`;
   }
 
   // codex_image/webui/frontend/src/prompt.ts
-  var bridge21 = getLegacyBridge();
-  var els22 = bridge21.els;
+  var bridge20 = getLegacyBridge();
+  var els21 = bridge20.els;
   var promptFeatureInitialized = false;
-  function legacyMethod25(name, ...args) {
+  function legacyMethod24(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy method " + name + " is not initialized");
@@ -8439,16 +8169,16 @@ ${galleryText}`;
     return method(...args);
   }
   function closePromptColorSuggest() {
-    legacyMethod25("hideColorSuggest");
+    legacyMethod24("hideColorSuggest");
   }
   function handlePromptSnippetDocumentClick2(target) {
-    legacyMethod25("handlePromptSnippetDocumentClick", target);
+    legacyMethod24("handlePromptSnippetDocumentClick", target);
   }
   function handlePromptDocumentClick(event) {
     const target = event.target;
-    if (els22.colorSuggest && !els22.colorSuggest.classList.contains("hidden")) {
-      const clickedColorSuggest = els22.colorSuggest.contains(target);
-      const clickedPromptEditor = els22.promptEditor?.contains(target);
+    if (els21.colorSuggest && !els21.colorSuggest.classList.contains("hidden")) {
+      const clickedColorSuggest = els21.colorSuggest.contains(target);
+      const clickedPromptEditor = els21.promptEditor?.contains(target);
       if (!clickedColorSuggest && !clickedPromptEditor) {
         closePromptColorSuggest();
       }
@@ -8469,13 +8199,13 @@ ${galleryText}`;
   }
 
   // codex_image/webui/frontend/src/prompt-find-replace.ts
-  var bridge22 = getLegacyBridge();
-  var els23 = bridge22.els;
+  var bridge21 = getLegacyBridge();
+  var els22 = bridge21.els;
   var PROMPT_FIND_ELEMENT_NODE = 1;
   var PROMPT_FIND_TEXT_NODE = 3;
   var promptFindInitialized = false;
   var promptFindMatches = [];
-  function legacyMethod26(name, ...args) {
+  function legacyMethod25(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy method " + name + " is not initialized");
@@ -8483,22 +8213,22 @@ ${galleryText}`;
     return method(...args);
   }
   function syncPromptAfterFindMutation() {
-    legacyMethod26("syncPromptFromEditor");
-    legacyMethod26("syncGalleryInputsFromPrompt");
-    legacyMethod26("updatePromptCount");
-    legacyMethod26("updateRequestPreview");
+    legacyMethod25("syncPromptFromEditor");
+    legacyMethod25("syncGalleryInputsFromPrompt");
+    legacyMethod25("updatePromptCount");
+    legacyMethod25("updateRequestPreview");
   }
   function promptFindCell() {
-    return els23.promptFindPanel?.closest(".prompt-template-recent-cell") || null;
+    return els22.promptFindPanel?.closest(".prompt-template-recent-cell") || null;
   }
   function promptFindQuery() {
-    return String(els23.promptFindInput?.value || "");
+    return String(els22.promptFindInput?.value || "");
   }
   function promptFindReplacement() {
-    return String(els23.promptReplaceInput?.value || "");
+    return String(els22.promptReplaceInput?.value || "");
   }
   function isPromptFindOpen() {
-    return Boolean(els23.promptFindPanel && !els23.promptFindPanel.classList.contains("hidden"));
+    return Boolean(els22.promptFindPanel && !els22.promptFindPanel.classList.contains("hidden"));
   }
   function isNodeInsidePromptAtomicChip(node) {
     const element2 = node.nodeType === PROMPT_FIND_ELEMENT_NODE ? node : node.parentElement || (node.parentNode?.nodeType === PROMPT_FIND_ELEMENT_NODE ? node.parentNode : null);
@@ -8519,7 +8249,7 @@ ${galleryText}`;
     Array.from(node.childNodes || []).forEach((child) => collectPromptFindMatchesFromNode(child, needle, matches));
   }
   function collectPromptFindMatches(query = promptFindQuery()) {
-    const root = els23.promptEditor;
+    const root = els22.promptEditor;
     const needle = String(query || "");
     if (!root || !needle) return [];
     root.normalize();
@@ -8528,14 +8258,14 @@ ${galleryText}`;
     return matches;
   }
   function promptFindActionButtons() {
-    return Array.from(els23.promptFindPanel?.querySelectorAll("[data-prompt-find-action]") || []);
+    return Array.from(els22.promptFindPanel?.querySelectorAll("[data-prompt-find-action]") || []);
   }
   function setPromptFindStatus(message) {
-    if (els23.promptFindStatus) els23.promptFindStatus.textContent = message;
+    if (els22.promptFindStatus) els22.promptFindStatus.textContent = message;
   }
   function setPromptFindCount(count = promptFindMatches.length) {
-    if (els23.promptFindCount) {
-      els23.promptFindCount.textContent = `${count} \u5904`;
+    if (els22.promptFindCount) {
+      els22.promptFindCount.textContent = `${count} \u5904`;
     }
   }
   function updatePromptFindControls() {
@@ -8580,17 +8310,17 @@ ${galleryText}`;
     updatePromptFindControls();
   }
   function setPromptFindOpen(open) {
-    if (!els23.promptFindPanel) return;
-    els23.promptFindPanel.classList.toggle("hidden", !open);
+    if (!els22.promptFindPanel) return;
+    els22.promptFindPanel.classList.toggle("hidden", !open);
     promptFindCell()?.classList.toggle("find-active", open);
-    els23.promptFindButton?.setAttribute("aria-expanded", open ? "true" : "false");
+    els22.promptFindButton?.setAttribute("aria-expanded", open ? "true" : "false");
     if (open) {
       clearPromptFindResult();
-      els23.promptFindInput?.focus({ preventScroll: true });
+      els22.promptFindInput?.focus({ preventScroll: true });
       return;
     }
     clearPromptFindResult();
-    els23.promptFindButton?.focus({ preventScroll: true });
+    els22.promptFindButton?.focus({ preventScroll: true });
   }
   function handlePromptFindAction(action) {
     if (action === "count") {
@@ -8619,8 +8349,8 @@ ${galleryText}`;
       return;
     }
     const activeElement = document.activeElement;
-    const insidePromptEditor = Boolean(activeElement && els23.promptEditor?.contains(activeElement));
-    const insideFindPanel = Boolean(activeElement && els23.promptFindPanel?.contains(activeElement));
+    const insidePromptEditor = Boolean(activeElement && els22.promptEditor?.contains(activeElement));
+    const insideFindPanel = Boolean(activeElement && els22.promptFindPanel?.contains(activeElement));
     if (!insidePromptEditor && !insideFindPanel) return;
     event.preventDefault();
     setPromptFindOpen(true);
@@ -8628,27 +8358,27 @@ ${galleryText}`;
   function initPromptFindReplaceFeature() {
     if (promptFindInitialized) return;
     promptFindInitialized = true;
-    if (!els23.promptFindButton || !els23.promptFindPanel || !els23.promptFindInput) return;
-    els23.promptFindButton.addEventListener("click", () => setPromptFindOpen(!isPromptFindOpen()));
+    if (!els22.promptFindButton || !els22.promptFindPanel || !els22.promptFindInput) return;
+    els22.promptFindButton.addEventListener("click", () => setPromptFindOpen(!isPromptFindOpen()));
     bindPromptFindActionButtons();
-    els23.promptFindClose?.addEventListener("click", () => setPromptFindOpen(false));
-    els23.promptFindPanel.addEventListener("keydown", handlePromptFindKeydown);
-    els23.promptFindInput.addEventListener("input", () => {
+    els22.promptFindClose?.addEventListener("click", () => setPromptFindOpen(false));
+    els22.promptFindPanel.addEventListener("keydown", handlePromptFindKeydown);
+    els22.promptFindInput.addEventListener("input", () => {
       clearPromptFindResult();
     });
-    els23.promptReplaceInput?.addEventListener("input", () => {
+    els22.promptReplaceInput?.addEventListener("input", () => {
       setPromptFindStatus("");
       updatePromptFindControls();
     });
-    els23.clearPromptButton?.addEventListener("click", () => {
+    els22.clearPromptButton?.addEventListener("click", () => {
       if (isPromptFindOpen()) window.setTimeout(() => clearPromptFindResult(), 0);
     });
     document.addEventListener("keydown", handlePromptFindShortcut);
   }
 
   // codex_image/webui/frontend/src/output-controls.ts
-  var { els: els24 } = getLegacyBridge();
-  function legacyMethod27(name, ...args) {
+  var { els: els23 } = getLegacyBridge();
+  function legacyMethod26(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy method " + name + " is not initialized");
@@ -8656,7 +8386,7 @@ ${galleryText}`;
     return method(...args);
   }
   function buildPreviewRequest() {
-    return legacyMethod27("buildPreviewRequest");
+    return legacyMethod26("buildPreviewRequest");
   }
   function updateRangeProgress(input) {
     if (!input) return;
@@ -8667,38 +8397,38 @@ ${galleryText}`;
     input.style.setProperty("--range-progress", `${Math.max(0, Math.min(100, progress))}%`);
   }
   function currentQuantity() {
-    const value = Number.parseInt(els24.nInput?.value || "1", 10);
+    const value = Number.parseInt(els23.nInput?.value || "1", 10);
     if (Number.isNaN(value)) return 1;
     return Math.min(4, Math.max(1, value));
   }
   function updateQuantity() {
-    if (!els24.nInput) return;
-    els24.nInput.value = String(currentQuantity());
-    if (els24.nValue) {
-      els24.nValue.textContent = els24.nInput.value;
+    if (!els23.nInput) return;
+    els23.nInput.value = String(currentQuantity());
+    if (els23.nValue) {
+      els23.nValue.textContent = els23.nInput.value;
     }
-    if (els24.nInput.matches?.('input[type="range"]')) {
-      updateRangeProgress(els24.nInput);
+    if (els23.nInput.matches?.('input[type="range"]')) {
+      updateRangeProgress(els23.nInput);
     }
   }
   function updateCompression() {
-    const compressionEnabled = els24.outputFormat.value !== "png";
-    els24.compression.disabled = !compressionEnabled;
+    const compressionEnabled = els23.outputFormat.value !== "png";
+    els23.compression.disabled = !compressionEnabled;
     if (!compressionEnabled) {
       closeCompressionPopover();
     }
-    els24.compressionValue.textContent = `${els24.compression.value}%`;
-    updateRangeProgress(els24.compression);
+    els23.compressionValue.textContent = `${els23.compression.value}%`;
+    updateRangeProgress(els23.compression);
   }
   function openCompressionPopover() {
-    if (!els24.compressionPopover || els24.outputFormat.value === "png") return;
-    els24.compressionPopover.classList.remove("hidden");
-    els24.compressionPopover.setAttribute("aria-hidden", "false");
+    if (!els23.compressionPopover || els23.outputFormat.value === "png") return;
+    els23.compressionPopover.classList.remove("hidden");
+    els23.compressionPopover.setAttribute("aria-hidden", "false");
   }
   function closeCompressionPopover() {
-    if (!els24.compressionPopover) return;
-    els24.compressionPopover.classList.add("hidden");
-    els24.compressionPopover.setAttribute("aria-hidden", "true");
+    if (!els23.compressionPopover) return;
+    els23.compressionPopover.classList.add("hidden");
+    els23.compressionPopover.setAttribute("aria-hidden", "true");
   }
   function handleOutputFormatDoubleClick(event) {
     const button = event.target.closest("[data-val]");
@@ -8711,8 +8441,8 @@ ${galleryText}`;
     });
   }
   function updateRequestPreview10() {
-    if (!els24.requestJson) return;
-    els24.requestJson.textContent = JSON.stringify(buildPreviewRequest(), null, 2);
+    if (!els23.requestJson) return;
+    els23.requestJson.textContent = JSON.stringify(buildPreviewRequest(), null, 2);
   }
 
   // codex_image/webui/frontend/src/main-model-combobox.ts
@@ -8720,18 +8450,18 @@ ${galleryText}`;
   var MAIN_MODEL_OPTIONS = ["gpt-5.5", "gpt-5.4", "gpt-5.4-mini", "gpt-5.3-codex", "gpt-5.2"];
   var RETIRED_MAIN_MODEL_OPTIONS = /* @__PURE__ */ new Set(["gpt-5.3-codex-spark"]);
   var MAIN_MODEL_STORAGE_KEY = "codex-image-main-model";
-  var bridge23 = getLegacyBridge();
-  var state17 = bridge23.state;
-  var els25 = bridge23.els;
-  function legacyMethod28(name, ...args) {
+  var bridge22 = getLegacyBridge();
+  var state16 = bridge22.state;
+  var els24 = bridge22.els;
+  function legacyMethod27(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy method " + name + " is not initialized");
     }
     return method(...args);
   }
-  function escapeHtml13(value) {
-    return legacyMethod28("escapeHtml", value);
+  function escapeHtml12(value) {
+    return legacyMethod27("escapeHtml", value);
   }
   function mainModelOptionsForQuery(query) {
     const normalized = String(query || "").trim().toLowerCase();
@@ -8739,39 +8469,39 @@ ${galleryText}`;
     return MAIN_MODEL_OPTIONS.filter((model) => model.toLowerCase().includes(normalized));
   }
   function openMainModelCombobox({ showAll = false } = {}) {
-    if (!els25.mainModel || !els25.mainModelOptions || !els25.mainModelCombobox) return;
+    if (!els24.mainModel || !els24.mainModelOptions || !els24.mainModelCombobox) return;
     if (showAll) {
-      state17.mainModelShowAllOptions = true;
+      state16.mainModelShowAllOptions = true;
       const selectedIndex = MAIN_MODEL_OPTIONS.indexOf(currentMainModel());
-      state17.mainModelOptionIndex = selectedIndex >= 0 ? selectedIndex : 0;
+      state16.mainModelOptionIndex = selectedIndex >= 0 ? selectedIndex : 0;
     }
-    state17.mainModelComboboxOpen = true;
+    state16.mainModelComboboxOpen = true;
     renderMainModelOptions();
-    els25.mainModelOptions.classList.remove("hidden");
-    els25.mainModelCombobox.setAttribute("aria-expanded", "true");
-    els25.mainModel.setAttribute("aria-expanded", "true");
+    els24.mainModelOptions.classList.remove("hidden");
+    els24.mainModelCombobox.setAttribute("aria-expanded", "true");
+    els24.mainModel.setAttribute("aria-expanded", "true");
   }
   function closeMainModelCombobox() {
-    state17.mainModelComboboxOpen = false;
-    state17.mainModelOptionIndex = 0;
-    state17.mainModelShowAllOptions = false;
-    els25.mainModelOptions?.classList.add("hidden");
-    els25.mainModelCombobox?.setAttribute("aria-expanded", "false");
-    els25.mainModel?.setAttribute("aria-expanded", "false");
-    els25.mainModel?.removeAttribute("aria-activedescendant");
+    state16.mainModelComboboxOpen = false;
+    state16.mainModelOptionIndex = 0;
+    state16.mainModelShowAllOptions = false;
+    els24.mainModelOptions?.classList.add("hidden");
+    els24.mainModelCombobox?.setAttribute("aria-expanded", "false");
+    els24.mainModel?.setAttribute("aria-expanded", "false");
+    els24.mainModel?.removeAttribute("aria-activedescendant");
   }
   function renderMainModelOptions() {
-    if (!els25.mainModel || !els25.mainModelOptions) return;
-    const query = state17.mainModelShowAllOptions ? "" : els25.mainModel.value;
+    if (!els24.mainModel || !els24.mainModelOptions) return;
+    const query = state16.mainModelShowAllOptions ? "" : els24.mainModel.value;
     const options = mainModelOptionsForQuery(query);
-    state17.mainModelOptionIndex = Math.min(Math.max(0, state17.mainModelOptionIndex), Math.max(0, options.length - 1));
+    state16.mainModelOptionIndex = Math.min(Math.max(0, state16.mainModelOptionIndex), Math.max(0, options.length - 1));
     if (!options.length) {
-      els25.mainModelOptions.innerHTML = `<div class="model-combobox-empty" role="option" aria-disabled="true">\u6309\u5F53\u524D\u8F93\u5165\u4F7F\u7528\u81EA\u5B9A\u4E49\u6A21\u578B</div>`;
-      els25.mainModel.removeAttribute("aria-activedescendant");
+      els24.mainModelOptions.innerHTML = `<div class="model-combobox-empty" role="option" aria-disabled="true">\u6309\u5F53\u524D\u8F93\u5165\u4F7F\u7528\u81EA\u5B9A\u4E49\u6A21\u578B</div>`;
+      els24.mainModel.removeAttribute("aria-activedescendant");
       return;
     }
-    els25.mainModelOptions.innerHTML = options.map((model, index) => {
-      const active = index === state17.mainModelOptionIndex;
+    els24.mainModelOptions.innerHTML = options.map((model, index) => {
+      const active = index === state16.mainModelOptionIndex;
       const selected = model === currentMainModel();
       return `
       <button
@@ -8780,59 +8510,59 @@ ${galleryText}`;
         type="button"
         role="option"
         aria-selected="${selected ? "true" : "false"}"
-        data-main-model-option="${escapeHtml13(model)}"
-      >${escapeHtml13(model)}</button>
+        data-main-model-option="${escapeHtml12(model)}"
+      >${escapeHtml12(model)}</button>
     `;
     }).join("");
-    els25.mainModel.setAttribute("aria-activedescendant", `mainModelOption-${state17.mainModelOptionIndex}`);
-    els25.mainModelOptions.querySelectorAll("[data-main-model-option]").forEach((button) => {
+    els24.mainModel.setAttribute("aria-activedescendant", `mainModelOption-${state16.mainModelOptionIndex}`);
+    els24.mainModelOptions.querySelectorAll("[data-main-model-option]").forEach((button) => {
       button.addEventListener("mousedown", (event) => event.preventDefault());
       button.addEventListener("click", () => selectMainModelOption(button.dataset.mainModelOption));
     });
   }
   function selectMainModelOption(model) {
-    if (!els25.mainModel || !model) return;
-    els25.mainModel.value = model;
+    if (!els24.mainModel || !model) return;
+    els24.mainModel.value = model;
     persistMainModel();
     updateRequestPreview10();
     closeMainModelCombobox();
-    els25.mainModel.focus();
+    els24.mainModel.focus();
   }
   function handleMainModelKeydown(event) {
-    if (!els25.mainModelOptions) return;
-    const options = mainModelOptionsForQuery(els25.mainModel?.value || "");
+    if (!els24.mainModelOptions) return;
+    const options = mainModelOptionsForQuery(els24.mainModel?.value || "");
     if (event.key === "ArrowDown") {
       event.preventDefault();
-      if (!state17.mainModelComboboxOpen) {
-        state17.mainModelShowAllOptions = true;
-        state17.mainModelOptionIndex = 0;
+      if (!state16.mainModelComboboxOpen) {
+        state16.mainModelShowAllOptions = true;
+        state16.mainModelOptionIndex = 0;
         openMainModelCombobox();
         return;
       }
-      if (options.length) state17.mainModelOptionIndex = (state17.mainModelOptionIndex + 1) % options.length;
+      if (options.length) state16.mainModelOptionIndex = (state16.mainModelOptionIndex + 1) % options.length;
       renderMainModelOptions();
     } else if (event.key === "ArrowUp") {
       event.preventDefault();
-      if (!state17.mainModelComboboxOpen) {
-        state17.mainModelShowAllOptions = true;
-        state17.mainModelOptionIndex = Math.max(0, MAIN_MODEL_OPTIONS.length - 1);
+      if (!state16.mainModelComboboxOpen) {
+        state16.mainModelShowAllOptions = true;
+        state16.mainModelOptionIndex = Math.max(0, MAIN_MODEL_OPTIONS.length - 1);
         openMainModelCombobox();
         return;
       }
-      if (options.length) state17.mainModelOptionIndex = (state17.mainModelOptionIndex - 1 + options.length) % options.length;
+      if (options.length) state16.mainModelOptionIndex = (state16.mainModelOptionIndex - 1 + options.length) % options.length;
       renderMainModelOptions();
-    } else if (event.key === "Enter" && state17.mainModelComboboxOpen && options.length) {
+    } else if (event.key === "Enter" && state16.mainModelComboboxOpen && options.length) {
       event.preventDefault();
-      selectMainModelOption(options[state17.mainModelOptionIndex]);
+      selectMainModelOption(options[state16.mainModelOptionIndex]);
     } else if (event.key === "Escape") {
       closeMainModelCombobox();
     }
   }
   function currentMainModel() {
-    return (els25.mainModel?.value || DEFAULT_MAIN_MODEL).trim() || DEFAULT_MAIN_MODEL;
+    return (els24.mainModel?.value || DEFAULT_MAIN_MODEL).trim() || DEFAULT_MAIN_MODEL;
   }
   function restoreMainModel() {
-    if (!els25.mainModel) return;
+    if (!els24.mainModel) return;
     try {
       const saved = localStorage.getItem(MAIN_MODEL_STORAGE_KEY);
       let model = (saved || DEFAULT_MAIN_MODEL).trim() || DEFAULT_MAIN_MODEL;
@@ -8840,14 +8570,14 @@ ${galleryText}`;
         model = DEFAULT_MAIN_MODEL;
         localStorage.setItem(MAIN_MODEL_STORAGE_KEY, model);
       }
-      els25.mainModel.value = model;
+      els24.mainModel.value = model;
     } catch {
-      els25.mainModel.value = DEFAULT_MAIN_MODEL;
+      els24.mainModel.value = DEFAULT_MAIN_MODEL;
     }
     renderMainModelOptions();
   }
   function persistMainModel() {
-    if (!els25.mainModel) return;
+    if (!els24.mainModel) return;
     try {
       localStorage.setItem(MAIN_MODEL_STORAGE_KEY, currentMainModel());
     } catch {
@@ -8933,8 +8663,8 @@ ${galleryText}`;
   var GPT_IMAGE_2_MIN_PIXELS = 655360;
   var GPT_IMAGE_2_MAX_PIXELS = 8294400;
   var GPT_IMAGE_2_MAX_LONG_SHORT_RATIO = 3;
-  var { els: els26 } = getLegacyBridge();
-  function legacyMethod29(name, ...args) {
+  var { els: els25 } = getLegacyBridge();
+  function legacyMethod28(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy method " + name + " is not initialized");
@@ -8942,7 +8672,7 @@ ${galleryText}`;
     return method(...args);
   }
   function currentPromptFidelity2() {
-    return legacyMethod29("currentPromptFidelity");
+    return legacyMethod28("currentPromptFidelity");
   }
   function presetDimensions(resolution, ratio) {
     const defaultPreset = GPT_IMAGE_2_SIZE_PRESETS[DEFAULT_RESOLUTION];
@@ -8970,7 +8700,7 @@ ${galleryText}`;
   function customDimensionValue(input) {
     return normalizeCustomDimension(input?.value);
   }
-  function customSizeValidationMessage(width = customDimensionValue(els26.customWidth), height = customDimensionValue(els26.customHeight)) {
+  function customSizeValidationMessage(width = customDimensionValue(els25.customWidth), height = customDimensionValue(els25.customHeight)) {
     if (width === null || height === null) return "\u8BF7\u8F93\u5165\u5BBD\u5EA6\u548C\u9AD8\u5EA6";
     if (width < 16 || width > 3840 || height < 16 || height > 3840) return "\u5BBD\u9AD8\u9700\u5728 16-3840 px \u4E4B\u95F4";
     if (width % 16 !== 0 || height % 16 !== 0) return "\u5BBD\u9AD8\u9700\u4E3A 16 \u7684\u500D\u6570";
@@ -8990,11 +8720,11 @@ ${galleryText}`;
     return null;
   }
   function currentSize() {
-    if (els26.size.value !== "custom") return els26.size.value;
-    return `${els26.customWidth.value}x${els26.customHeight.value}`;
+    if (els25.size.value !== "custom") return els25.size.value;
+    return `${els25.customWidth.value}x${els25.customHeight.value}`;
   }
   function currentImageToolModel() {
-    return currentAuthSource2() === "api" ? currentApiImageModel() : els26.model.value;
+    return currentAuthSource2() === "api" ? currentApiImageModel() : els25.model.value;
   }
   function currentTaskParams() {
     const params = {
@@ -9003,10 +8733,10 @@ ${galleryText}`;
       size: currentSize(),
       n: currentQuantity(),
       prompt_fidelity: currentPromptFidelity2(),
-      quality: els26.quality.value,
-      output_format: els26.outputFormat.value,
-      moderation: els26.moderation.value,
-      output_compression: els26.outputFormat.value === "png" ? null : Number(els26.compression.value)
+      quality: els25.quality.value,
+      output_format: els25.outputFormat.value,
+      moderation: els25.moderation.value,
+      output_compression: els25.outputFormat.value === "png" ? null : Number(els25.compression.value)
     };
     if (currentAuthSource2() === "api") {
       params.api_provider_id = currentApiProviderId();
@@ -9019,9 +8749,9 @@ ${galleryText}`;
   // codex_image/webui/frontend/src/custom-size-controls.ts
   var CUSTOM_SIZE_TRANSITION_MS = 220;
   var CUSTOM_SIZE_HEIGHT_SNAP_TOLERANCE = 4;
-  var bridge24 = getLegacyBridge();
-  var state18 = bridge24.state;
-  var els27 = bridge24.els;
+  var bridge23 = getLegacyBridge();
+  var state17 = bridge23.state;
+  var els26 = bridge23.els;
   var customSizeTransitionTimers = /* @__PURE__ */ new WeakMap();
   function measuredElementHeight2(element2) {
     if (!element2) return 0;
@@ -9029,19 +8759,19 @@ ${galleryText}`;
   }
   function handleSizeModeEvent(event) {
     const button = event.target.closest?.("[data-custom-size-mode]");
-    if (!button || !els27.sizeModeGroup?.contains(button)) return;
+    if (!button || !els26.sizeModeGroup?.contains(button)) return;
     setCustomSizeMode(button.dataset.customSizeMode === "custom");
   }
   function setCustomSizeMode(isCustom) {
-    if (els27.customSizeToggle) els27.customSizeToggle.checked = Boolean(isCustom);
+    if (els26.customSizeToggle) els26.customSizeToggle.checked = Boolean(isCustom);
     updateSizeFromPreset();
   }
   function swapCustomSizeDimensions(event) {
     event?.preventDefault?.();
-    if (!els27.customWidth || !els27.customHeight) return;
-    const width = els27.customWidth.value;
-    els27.customWidth.value = els27.customHeight.value;
-    els27.customHeight.value = width;
+    if (!els26.customWidth || !els26.customHeight) return;
+    const width = els26.customWidth.value;
+    els26.customWidth.value = els26.customHeight.value;
+    els26.customHeight.value = width;
     if (typeof swapCustomRatioDigits === "function") swapCustomRatioDigits();
     updateCustomSize();
     updatePixelPreview("custom");
@@ -9058,8 +8788,8 @@ ${galleryText}`;
     return digit ? Number(digit) : null;
   }
   function customAspectRatioFromManualInputs() {
-    const widthRatio = customRatioDigitValue(els27.customRatioWidth);
-    const heightRatio = customRatioDigitValue(els27.customRatioHeight);
+    const widthRatio = customRatioDigitValue(els26.customRatioWidth);
+    const heightRatio = customRatioDigitValue(els26.customRatioHeight);
     if (!widthRatio || !heightRatio) return null;
     return widthRatio / heightRatio;
   }
@@ -9069,22 +8799,22 @@ ${galleryText}`;
     return String(boundedValue);
   }
   function updateCustomRatioFieldState() {
-    const locked = Boolean(state18.customAspectRatioLocked);
-    els27.customRatioField?.classList.toggle("active", locked);
+    const locked = Boolean(state17.customAspectRatioLocked);
+    els26.customRatioField?.classList.toggle("active", locked);
   }
   function setCustomAspectRatioFromManualInputs() {
     const ratio = customAspectRatioFromManualInputs();
-    state18.customAspectRatioLocked = Boolean(ratio);
-    state18.customAspectRatioValue = ratio;
-    state18.customAspectRatioSource = "manual";
+    state17.customAspectRatioLocked = Boolean(ratio);
+    state17.customAspectRatioValue = ratio;
+    state17.customAspectRatioSource = "manual";
     updateCustomRatioFieldState();
   }
   function applyCustomAspectRatioFromWidth() {
-    if (!state18.customAspectRatioLocked || !state18.customAspectRatioValue) return;
-    if (!els27.customWidth || !els27.customHeight) return;
-    const width = customDimensionValue(els27.customWidth);
+    if (!state17.customAspectRatioLocked || !state17.customAspectRatioValue) return;
+    if (!els26.customWidth || !els26.customHeight) return;
+    const width = customDimensionValue(els26.customWidth);
     if (!width) return;
-    els27.customHeight.value = normalizeAspectDimension(width / state18.customAspectRatioValue);
+    els26.customHeight.value = normalizeAspectDimension(width / state17.customAspectRatioValue);
   }
   function handleCustomRatioInput(input) {
     sanitizeCustomRatioInput(input);
@@ -9125,13 +8855,13 @@ ${galleryText}`;
     return { width: best.width, height: best.height };
   }
   function firstReferenceImageSource() {
-    return (Array.isArray(state18.images) ? state18.images : []).find((source) => source && !source.missing && Boolean(sourceUrlForAspectRatio(source)));
+    return (Array.isArray(state17.images) ? state17.images : []).find((source) => source && !source.missing && Boolean(sourceUrlForAspectRatio(source)));
   }
   function updateCustomRatioReferenceButtonState() {
-    if (!els27.customRatioFromImageButton) return;
+    if (!els26.customRatioFromImageButton) return;
     const enabled = Boolean(firstReferenceImageSource());
-    els27.customRatioFromImageButton.disabled = !enabled;
-    els27.customRatioFromImageButton.setAttribute("aria-disabled", enabled ? "false" : "true");
+    els26.customRatioFromImageButton.disabled = !enabled;
+    els26.customRatioFromImageButton.setAttribute("aria-disabled", enabled ? "false" : "true");
   }
   function sourceUrlForAspectRatio(source) {
     if (!source || source.missing) return "";
@@ -9155,9 +8885,9 @@ ${galleryText}`;
     });
   }
   function applyCustomAspectRatioDigits(widthRatio, heightRatio) {
-    if (!els27.customRatioWidth || !els27.customRatioHeight) return;
-    els27.customRatioWidth.value = String(widthRatio || "");
-    els27.customRatioHeight.value = String(heightRatio || "");
+    if (!els26.customRatioWidth || !els26.customRatioHeight) return;
+    els26.customRatioWidth.value = String(widthRatio || "");
+    els26.customRatioHeight.value = String(heightRatio || "");
     setCustomAspectRatioFromManualInputs();
     applyCustomAspectRatioFromWidth();
     updateCustomSize();
@@ -9179,33 +8909,33 @@ ${galleryText}`;
     });
   }
   function handleCustomDimensionInput(input) {
-    if (!state18.customAspectRatioLocked || !state18.customAspectRatioValue) return;
-    if (!els27.customWidth || !els27.customHeight) return;
+    if (!state17.customAspectRatioLocked || !state17.customAspectRatioValue) return;
+    if (!els26.customWidth || !els26.customHeight) return;
     const value = customDimensionValue(input);
     if (!value) return;
-    if (input === els27.customWidth) {
-      els27.customHeight.value = normalizeAspectDimension(value / state18.customAspectRatioValue);
+    if (input === els26.customWidth) {
+      els26.customHeight.value = normalizeAspectDimension(value / state17.customAspectRatioValue);
       return;
     }
-    if (input === els27.customHeight) {
-      els27.customWidth.value = normalizeAspectDimension(value * state18.customAspectRatioValue);
+    if (input === els26.customHeight) {
+      els26.customWidth.value = normalizeAspectDimension(value * state17.customAspectRatioValue);
     }
   }
   function swapCustomRatioDigits() {
-    if (!els27.customRatioWidth || !els27.customRatioHeight) return;
-    const widthRatio = els27.customRatioWidth.value;
-    els27.customRatioWidth.value = els27.customRatioHeight.value;
-    els27.customRatioHeight.value = widthRatio;
+    if (!els26.customRatioWidth || !els26.customRatioHeight) return;
+    const widthRatio = els26.customRatioWidth.value;
+    els26.customRatioWidth.value = els26.customRatioHeight.value;
+    els26.customRatioHeight.value = widthRatio;
     setCustomAspectRatioFromManualInputs();
   }
   function updateSizeFromPreset(event = null) {
     const changedControl = sizeControlName(event?.target);
     syncRatioAndOrientation(changedControl);
-    if (els27.customSizeToggle?.checked) {
-      if (els27.size?.value !== "custom") {
+    if (els26.customSizeToggle?.checked) {
+      if (els26.size?.value !== "custom") {
         populateCustomSizeFromCurrentPreset();
       }
-      els27.size.value = "custom";
+      els26.size.value = "custom";
       if (typeof setCustomAspectRatioFromManualInputs === "function") setCustomAspectRatioFromManualInputs();
       if (typeof applyCustomAspectRatioFromWidth === "function") applyCustomAspectRatioFromWidth();
       updateCustomSize();
@@ -9213,35 +8943,35 @@ ${galleryText}`;
       updateRequestPreview10();
       return;
     }
-    const size = sizeForPreset(els27.resolution?.value, els27.ratio?.value);
-    els27.size.value = size;
+    const size = sizeForPreset(els26.resolution?.value, els26.ratio?.value);
+    els26.size.value = size;
     updatePixelPreview(size);
     updateCustomSize();
     updateRequestPreview10();
   }
   function populateCustomSizeFromCurrentPreset() {
-    if (!els27.customWidth || !els27.customHeight) return;
-    const [width, height] = sizeForPreset(els27.resolution?.value, els27.ratio?.value).split("x");
+    if (!els26.customWidth || !els26.customHeight) return;
+    const [width, height] = sizeForPreset(els26.resolution?.value, els26.ratio?.value).split("x");
     if (!width || !height) return;
-    els27.customWidth.value = width;
-    els27.customHeight.value = height;
+    els26.customWidth.value = width;
+    els26.customHeight.value = height;
   }
   function sizeControlName(target) {
-    if (target === els27.resolution) return "resolution";
-    if (target === els27.ratio) return "ratio";
-    if (target === els27.orientation) return "orientation";
+    if (target === els26.resolution) return "resolution";
+    if (target === els26.ratio) return "ratio";
+    if (target === els26.orientation) return "orientation";
     return null;
   }
   function syncRatioAndOrientation(changedControl) {
-    if (!els27.resolution || !els27.ratio || !els27.orientation) return;
-    if (!GPT_IMAGE_2_SIZE_PRESETS[els27.resolution.value]) {
-      setSizeControlValue(els27.resolution, DEFAULT_RESOLUTION);
+    if (!els26.resolution || !els26.ratio || !els26.orientation) return;
+    if (!GPT_IMAGE_2_SIZE_PRESETS[els26.resolution.value]) {
+      setSizeControlValue(els26.resolution, DEFAULT_RESOLUTION);
     }
-    if (!RATIO_ORIENTATION[els27.ratio.value]) {
-      setSizeControlValue(els27.ratio, DEFAULT_RATIO);
+    if (!RATIO_ORIENTATION[els26.ratio.value]) {
+      setSizeControlValue(els26.ratio, DEFAULT_RATIO);
     }
-    if (!ORIENTATION_DEFAULT_RATIOS[els27.orientation.value]) {
-      setSizeControlValue(els27.orientation, RATIO_ORIENTATION[els27.ratio.value] || DEFAULT_ORIENTATION);
+    if (!ORIENTATION_DEFAULT_RATIOS[els26.orientation.value]) {
+      setSizeControlValue(els26.orientation, RATIO_ORIENTATION[els26.ratio.value] || DEFAULT_ORIENTATION);
     }
     if (changedControl === "orientation") {
       syncRatioFromOrientation();
@@ -9250,22 +8980,22 @@ ${galleryText}`;
     syncOrientationFromRatio();
   }
   function syncOrientationFromRatio() {
-    const nextOrientation = RATIO_ORIENTATION[els27.ratio.value] || DEFAULT_ORIENTATION;
-    setSizeControlValue(els27.orientation, nextOrientation);
+    const nextOrientation = RATIO_ORIENTATION[els26.ratio.value] || DEFAULT_ORIENTATION;
+    setSizeControlValue(els26.orientation, nextOrientation);
   }
   function syncRatioFromOrientation() {
-    const orientation = els27.orientation.value;
+    const orientation = els26.orientation.value;
     if (orientation === "square") {
-      setSizeControlValue(els27.ratio, DEFAULT_RATIO);
+      setSizeControlValue(els26.ratio, DEFAULT_RATIO);
       return;
     }
-    if (RATIO_ORIENTATION[els27.ratio.value] === orientation) return;
-    const counterpart = RATIO_COUNTERPARTS[els27.ratio.value];
+    if (RATIO_ORIENTATION[els26.ratio.value] === orientation) return;
+    const counterpart = RATIO_COUNTERPARTS[els26.ratio.value];
     if (counterpart && RATIO_ORIENTATION[counterpart] === orientation) {
-      setSizeControlValue(els27.ratio, counterpart);
+      setSizeControlValue(els26.ratio, counterpart);
       return;
     }
-    setSizeControlValue(els27.ratio, ORIENTATION_DEFAULT_RATIOS[orientation] || DEFAULT_RATIO);
+    setSizeControlValue(els26.ratio, ORIENTATION_DEFAULT_RATIOS[orientation] || DEFAULT_RATIO);
   }
   function setSizeControlValue(select, value) {
     if (!select || select.value === value) return false;
@@ -9274,63 +9004,63 @@ ${galleryText}`;
     return true;
   }
   function updatePixelPreview(size) {
-    if (!els27.pixelPreview) return;
+    if (!els26.pixelPreview) return;
     if (size === "auto") {
-      els27.pixelPreview.textContent = "\u8F93\u51FA\u50CF\u7D20: auto\uFF08OpenAI \u81EA\u52A8\u9009\u62E9\uFF09";
+      els26.pixelPreview.textContent = "\u8F93\u51FA\u50CF\u7D20: auto\uFF08OpenAI \u81EA\u52A8\u9009\u62E9\uFF09";
       return;
     }
     if (size === "custom") {
       const message = customSizeValidationMessage();
       if (message) {
-        els27.pixelPreview.textContent = `\u8F93\u51FA\u50CF\u7D20: ${message}`;
+        els26.pixelPreview.textContent = `\u8F93\u51FA\u50CF\u7D20: ${message}`;
         return;
       }
-      els27.pixelPreview.textContent = `\u8F93\u51FA\u50CF\u7D20: ${customDimensionValue(els27.customWidth)} x ${customDimensionValue(els27.customHeight)} px`;
+      els26.pixelPreview.textContent = `\u8F93\u51FA\u50CF\u7D20: ${customDimensionValue(els26.customWidth)} x ${customDimensionValue(els26.customHeight)} px`;
       return;
     }
     const [width, height] = String(size).split("x");
-    els27.pixelPreview.textContent = `\u8F93\u51FA\u50CF\u7D20: ${width} x ${height} px`;
+    els26.pixelPreview.textContent = `\u8F93\u51FA\u50CF\u7D20: ${width} x ${height} px`;
   }
   function syncSizeControlsFromSize(size) {
     if (!size || size === "auto") {
-      if (els27.customSizeToggle) els27.customSizeToggle.checked = false;
-      if (els27.resolution) els27.resolution.value = DEFAULT_RESOLUTION;
-      if (els27.ratio) els27.ratio.value = DEFAULT_RATIO;
-      if (els27.orientation) els27.orientation.value = DEFAULT_ORIENTATION;
+      if (els26.customSizeToggle) els26.customSizeToggle.checked = false;
+      if (els26.resolution) els26.resolution.value = DEFAULT_RESOLUTION;
+      if (els26.ratio) els26.ratio.value = DEFAULT_RATIO;
+      if (els26.orientation) els26.orientation.value = DEFAULT_ORIENTATION;
       updateSizeFromPreset();
-      syncRadioButtons(els27.resolution, els27.ratio, els27.orientation);
+      syncRadioButtons(els26.resolution, els26.ratio, els26.orientation);
       return;
     }
     const presetMatch = findPresetForSize(size);
     if (presetMatch) {
-      if (els27.customSizeToggle) els27.customSizeToggle.checked = false;
-      els27.resolution.value = presetMatch.resolution;
-      els27.ratio.value = presetMatch.ratio;
-      els27.orientation.value = presetMatch.orientation;
+      if (els26.customSizeToggle) els26.customSizeToggle.checked = false;
+      els26.resolution.value = presetMatch.resolution;
+      els26.ratio.value = presetMatch.ratio;
+      els26.orientation.value = presetMatch.orientation;
       updateSizeFromPreset();
-      syncRadioButtons(els27.resolution, els27.ratio, els27.orientation);
+      syncRadioButtons(els26.resolution, els26.ratio, els26.orientation);
       return;
     }
     const [width, height] = String(size).split("x");
     if (width && height) {
-      if (els27.customSizeToggle) els27.customSizeToggle.checked = true;
-      els27.size.value = "custom";
-      els27.customWidth.value = width;
-      els27.customHeight.value = height;
+      if (els26.customSizeToggle) els26.customSizeToggle.checked = true;
+      els26.size.value = "custom";
+      els26.customWidth.value = width;
+      els26.customHeight.value = height;
       updatePixelPreview("custom");
       updateCustomSize();
       updateRequestPreview10();
     }
   }
   function setCustomSizeModeLayout(isCustom) {
-    els27.customSize?.classList.toggle("hidden", !isCustom);
-    els27.customSize?.classList.toggle("custom-size-collapsed", !isCustom);
-    els27.customSize?.setAttribute("aria-hidden", isCustom ? "false" : "true");
-    els27.settingsGrid?.classList.toggle("custom-size-mode", isCustom);
+    els26.customSize?.classList.toggle("hidden", !isCustom);
+    els26.customSize?.classList.toggle("custom-size-collapsed", !isCustom);
+    els26.customSize?.setAttribute("aria-hidden", isCustom ? "false" : "true");
+    els26.settingsGrid?.classList.toggle("custom-size-mode", isCustom);
   }
   function measureCustomSizeModeHeight(isCustom) {
-    const grid = els27.settingsGrid;
-    const customSize = els27.customSize;
+    const grid = els26.settingsGrid;
+    const customSize = els26.customSize;
     if (!grid) return 0;
     const originalHeight = grid.style.height;
     const originalGridTransition = grid.style.transition;
@@ -9360,30 +9090,30 @@ ${galleryText}`;
     return height;
   }
   function transitionCustomSizeMode(isCustom) {
-    const grid = els27.settingsGrid;
-    const customSize = els27.customSize;
+    const grid = els26.settingsGrid;
+    const customSize = els26.customSize;
     if (!grid || !customSize) {
       setCustomSizeModeLayout(isCustom);
-      state18.customSizeMode = isCustom;
+      state17.customSizeMode = isCustom;
       return;
     }
-    if (state18.customSizeMode === null) {
-      state18.customSizeMode = isCustom;
+    if (state17.customSizeMode === null) {
+      state17.customSizeMode = isCustom;
       grid.style.height = "";
       grid.classList.remove("is-size-transitioning");
       setCustomSizeModeLayout(isCustom);
       return;
     }
     const pendingTimerId = customSizeTransitionTimers.get(grid);
-    if (state18.customSizeMode === isCustom && !pendingTimerId) {
+    if (state17.customSizeMode === isCustom && !pendingTimerId) {
       grid.style.height = "";
       grid.classList.remove("is-size-transitioning");
       setCustomSizeModeLayout(isCustom);
       return;
     }
-    state18.customSizeMode = isCustom;
-    state18.customSizeTransitionSeq += 1;
-    const transitionSeq = state18.customSizeTransitionSeq;
+    state17.customSizeMode = isCustom;
+    state17.customSizeTransitionSeq += 1;
+    const transitionSeq = state17.customSizeTransitionSeq;
     if (pendingTimerId) {
       window.clearTimeout(pendingTimerId);
       customSizeTransitionTimers.delete(grid);
@@ -9412,7 +9142,7 @@ ${galleryText}`;
       grid.classList.add("custom-size-mode");
       void grid.offsetHeight;
       window.requestAnimationFrame(() => {
-        if (transitionSeq !== state18.customSizeTransitionSeq) return;
+        if (transitionSeq !== state17.customSizeTransitionSeq) return;
         customSize.classList.remove("custom-size-collapsed");
         grid.style.height = `${targetHeight}px`;
       });
@@ -9423,14 +9153,14 @@ ${galleryText}`;
       grid.classList.add("custom-size-mode");
       void grid.offsetHeight;
       window.requestAnimationFrame(() => {
-        if (transitionSeq !== state18.customSizeTransitionSeq) return;
+        if (transitionSeq !== state17.customSizeTransitionSeq) return;
         customSize.classList.add("custom-size-collapsed");
         grid.classList.remove("custom-size-mode");
         grid.style.height = `${targetHeight}px`;
       });
     }
     const timerId = window.setTimeout(() => {
-      if (transitionSeq !== state18.customSizeTransitionSeq) return;
+      if (transitionSeq !== state17.customSizeTransitionSeq) return;
       setCustomSizeModeLayout(isCustom);
       grid.style.height = "";
       grid.classList.remove("is-size-transitioning");
@@ -9439,26 +9169,26 @@ ${galleryText}`;
     customSizeTransitionTimers.set(grid, timerId);
   }
   function updateCustomSize() {
-    const isCustom = els27.size?.value === "custom";
+    const isCustom = els26.size?.value === "custom";
     transitionCustomSizeMode(isCustom);
-    if (els27.customSizeToggle) els27.customSizeToggle.checked = isCustom;
-    els27.sizeModeGroup?.querySelectorAll("[data-custom-size-mode]").forEach((button) => {
+    if (els26.customSizeToggle) els26.customSizeToggle.checked = isCustom;
+    els26.sizeModeGroup?.querySelectorAll("[data-custom-size-mode]").forEach((button) => {
       const active = button.dataset.customSizeMode === (isCustom ? "custom" : "preset");
       button.classList.toggle("active", active);
       button.setAttribute("aria-pressed", active ? "true" : "false");
     });
     const message = isCustom ? customSizeValidationMessage() : "";
-    els27.customSize?.classList.toggle("has-error", Boolean(message));
-    if (els27.customSizeHint) {
-      els27.customSizeHint.textContent = message || "\u5355\u4F4D px \xB7 16-3840 \xB7 16\u500D\u6570 \xB7 \u22643:1";
+    els26.customSize?.classList.toggle("has-error", Boolean(message));
+    if (els26.customSizeHint) {
+      els26.customSizeHint.textContent = message || "\u5355\u4F4D px \xB7 16-3840 \xB7 16\u500D\u6570 \xB7 \u22643:1";
     }
     updateCustomRatioFieldState();
   }
 
   // codex_image/webui/frontend/src/form-controls.ts
-  var bridge25 = getLegacyBridge();
-  var state19 = bridge25.state;
-  var els28 = bridge25.els;
+  var bridge24 = getLegacyBridge();
+  var state18 = bridge24.state;
+  var els27 = bridge24.els;
   var formControlsInitialized = false;
   var formControlEventsBound = false;
   function bindFormControlEvents() {
@@ -9468,54 +9198,54 @@ ${galleryText}`;
       button.addEventListener("click", () => setMode4(button.dataset.mode));
     });
     [
-      els28.mainModel,
-      els28.model,
-      els28.size,
-      els28.customWidth,
-      els28.customHeight,
-      els28.quality,
-      els28.outputFormat,
-      els28.moderation,
-      els28.compression,
-      els28.nInput,
-      els28.promptFidelity
+      els27.mainModel,
+      els27.model,
+      els27.size,
+      els27.customWidth,
+      els27.customHeight,
+      els27.quality,
+      els27.outputFormat,
+      els27.moderation,
+      els27.compression,
+      els27.nInput,
+      els27.promptFidelity
     ].filter(Boolean).forEach((element2) => element2.addEventListener("input", () => {
       persistMainModel();
       updateQuantity();
       updateCompression();
-      if (element2 === els28.customWidth || element2 === els28.customHeight) handleCustomDimensionInput(element2);
+      if (element2 === els27.customWidth || element2 === els27.customHeight) handleCustomDimensionInput(element2);
       updateCustomSize();
-      if (element2 === els28.customWidth || element2 === els28.customHeight) updatePixelPreview("custom");
+      if (element2 === els27.customWidth || element2 === els27.customHeight) updatePixelPreview("custom");
       updateRequestPreview10();
     }));
-    els28.mainModel?.addEventListener("focus", () => openMainModelCombobox({ showAll: true }));
-    els28.mainModel?.addEventListener("click", () => {
-      if (!state19.mainModelComboboxOpen) openMainModelCombobox({ showAll: true });
+    els27.mainModel?.addEventListener("focus", () => openMainModelCombobox({ showAll: true }));
+    els27.mainModel?.addEventListener("click", () => {
+      if (!state18.mainModelComboboxOpen) openMainModelCombobox({ showAll: true });
     });
-    els28.mainModel?.addEventListener("input", () => {
-      state19.mainModelShowAllOptions = false;
+    els27.mainModel?.addEventListener("input", () => {
+      state18.mainModelShowAllOptions = false;
       openMainModelCombobox();
       renderMainModelOptions();
     });
-    els28.mainModel?.addEventListener("keydown", handleMainModelKeydown);
-    els28.mainModelToggle?.addEventListener("click", (event) => {
+    els27.mainModel?.addEventListener("keydown", handleMainModelKeydown);
+    els27.mainModelToggle?.addEventListener("click", (event) => {
       event.preventDefault();
-      if (state19.mainModelComboboxOpen) {
+      if (state18.mainModelComboboxOpen) {
         closeMainModelCombobox();
       } else {
         openMainModelCombobox({ showAll: true });
-        els28.mainModel?.focus();
+        els27.mainModel?.focus();
       }
     });
     document.addEventListener("click", (event) => {
-      if (!els28.mainModelCombobox || els28.mainModelCombobox.contains(event.target)) return;
+      if (!els27.mainModelCombobox || els27.mainModelCombobox.contains(event.target)) return;
       closeMainModelCombobox();
     });
-    [els28.resolution, els28.ratio, els28.orientation].filter(Boolean).forEach((element2) => {
+    [els27.resolution, els27.ratio, els27.orientation].filter(Boolean).forEach((element2) => {
       element2.addEventListener("input", updateSizeFromPreset);
       element2.addEventListener("change", updateSizeFromPreset);
     });
-    [els28.customRatioWidth, els28.customRatioHeight].filter(Boolean).forEach((element2) => {
+    [els27.customRatioWidth, els27.customRatioHeight].filter(Boolean).forEach((element2) => {
       element2.addEventListener("input", () => {
         handleCustomRatioInput(element2);
         updateCustomSize();
@@ -9523,25 +9253,25 @@ ${galleryText}`;
         updateRequestPreview10();
       });
     });
-    els28.sizeModeGroup?.addEventListener("click", handleSizeModeEvent);
-    els28.swapCustomSizeButton?.addEventListener("click", swapCustomSizeDimensions);
-    els28.customRatioFromImageButton?.addEventListener("click", (event) => {
+    els27.sizeModeGroup?.addEventListener("click", handleSizeModeEvent);
+    els27.swapCustomSizeButton?.addEventListener("click", swapCustomSizeDimensions);
+    els27.customRatioFromImageButton?.addEventListener("click", (event) => {
       void applyFirstReferenceImageAspectRatio(event);
     });
-    if (els28.customSizeToggle) {
-      els28.customSizeToggle.addEventListener("change", updateSizeFromPreset);
+    if (els27.customSizeToggle) {
+      els27.customSizeToggle.addEventListener("change", updateSizeFromPreset);
     }
-    els28.outputFormatGroup?.addEventListener("dblclick", handleOutputFormatDoubleClick);
+    els27.outputFormatGroup?.addEventListener("dblclick", handleOutputFormatDoubleClick);
   }
   function setMode4(mode) {
-    state19.mode = mode;
+    state18.mode = mode;
     document.querySelectorAll("[data-mode]").forEach((button) => {
       button.classList.toggle("active", button.dataset.mode === mode);
     });
-    if (!state19.runTimerId) {
-      els28.runButton.textContent = mode === "edit" ? "\u5F00\u59CB\u7F16\u8F91" : "\u5F00\u59CB\u751F\u6210";
+    if (!state18.runTimerId) {
+      els27.runButton.textContent = mode === "edit" ? "\u5F00\u59CB\u7F16\u8F91" : "\u5F00\u59CB\u751F\u6210";
     }
-    syncRadioButtons(els28.quality, els28.outputFormat, els28.moderation);
+    syncRadioButtons(els27.quality, els27.outputFormat, els27.moderation);
     updateRequestPreview10();
   }
   function initFormControlsFeature() {
@@ -9586,119 +9316,119 @@ ${galleryText}`;
   }
 
   // codex_image/webui/frontend/src/task-list-render.ts
-  var bridge26 = getLegacyBridge();
-  var state20 = bridge26.state;
-  var els29 = bridge26.els;
+  var bridge25 = getLegacyBridge();
+  var state19 = bridge25.state;
+  var els28 = bridge25.els;
   var EXPANDED_TASK_GROUP_INITIAL_CARD_COUNT = 24;
   var EXPANDED_TASK_GROUP_CHUNK_SIZE = 48;
   var expandedTaskGroupRenderToken = 0;
   var queueTaskIdsCacheKey = "";
   var queueTaskIdsCache = null;
-  function legacyMethod30(name, ...args) {
+  function legacyMethod29(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy bridge method " + name + " is not available");
     }
     return method(...args);
   }
-  function escapeHtml14(...args) {
-    return legacyMethod30("escapeHtml", ...args);
+  function escapeHtml13(...args) {
+    return legacyMethod29("escapeHtml", ...args);
   }
   function updateDocumentTitle(...args) {
-    return legacyMethod30("updateDocumentTitle", ...args);
+    return legacyMethod29("updateDocumentTitle", ...args);
   }
   function isTaskArchived(...args) {
-    return legacyMethod30("isTaskArchived", ...args);
+    return legacyMethod29("isTaskArchived", ...args);
   }
   function taskArchived(...args) {
-    return legacyMethod30("taskArchived", ...args);
+    return legacyMethod29("taskArchived", ...args);
   }
   function renderBatchToolbar(...args) {
-    return legacyMethod30("renderBatchToolbar", ...args);
+    return legacyMethod29("renderBatchToolbar", ...args);
   }
   function updateTaskElapsedDisplays2(...args) {
-    return legacyMethod30("updateTaskElapsedDisplays", ...args);
+    return legacyMethod29("updateTaskElapsedDisplays", ...args);
   }
   function taskBackendLabel2(...args) {
-    return legacyMethod30("taskBackendLabel", ...args);
+    return legacyMethod29("taskBackendLabel", ...args);
   }
   function formatTaskStatus2(...args) {
-    return legacyMethod30("formatTaskStatus", ...args);
+    return legacyMethod29("formatTaskStatus", ...args);
   }
   function ensureExpandedTaskGroupKey(...args) {
-    return legacyMethod30("ensureExpandedTaskGroupKey", ...args);
+    return legacyMethod29("ensureExpandedTaskGroupKey", ...args);
   }
   function renderTaskHistoryAnchors(...args) {
-    return legacyMethod30("renderTaskHistoryAnchors", ...args);
+    return legacyMethod29("renderTaskHistoryAnchors", ...args);
   }
   function scrollExpandedTaskGroupToTop(...args) {
-    return legacyMethod30("scrollExpandedTaskGroupToTop", ...args);
+    return legacyMethod29("scrollExpandedTaskGroupToTop", ...args);
   }
   function captureTaskHistoryLayout(...args) {
-    return legacyMethod30("captureTaskHistoryLayout", ...args);
+    return legacyMethod29("captureTaskHistoryLayout", ...args);
   }
   function animateTaskHistoryLayout(...args) {
-    return legacyMethod30("animateTaskHistoryLayout", ...args);
+    return legacyMethod29("animateTaskHistoryLayout", ...args);
   }
-  var taskRatio = (...args) => legacyMethod30("taskRatio", ...args);
-  var taskOrientation = (...args) => legacyMethod30("taskOrientation", ...args);
-  var taskPromptFidelity = (...args) => legacyMethod30("taskPromptFidelity", ...args);
-  var taskResolution = (...args) => legacyMethod30("taskResolution", ...args);
-  var taskInputPreviewUrls = (...args) => legacyMethod30("taskInputPreviewUrls", ...args);
-  var taskThumbnailUrls = (...args) => legacyMethod30("taskThumbnailUrls", ...args);
-  var taskOutputUrls = (...args) => legacyMethod30("taskOutputUrls", ...args);
-  var taskImageBlockStates = (...args) => legacyMethod30("taskImageBlockStates", ...args);
-  var compressTaskImageBlockStates = (...args) => legacyMethod30("compressTaskImageBlockStates", ...args);
-  var taskImageStatusCounts = (...args) => legacyMethod30("taskImageStatusCounts", ...args);
-  var taskFailureMessage = (...args) => legacyMethod30("taskFailureMessage", ...args);
-  var taskRetryStateText2 = (...args) => legacyMethod30("taskRetryStateText", ...args);
-  var taskRuntimeText2 = (...args) => legacyMethod30("taskRuntimeText", ...args);
-  var taskCompletionTimestampTitle = (...args) => legacyMethod30("taskCompletionTimestampTitle", ...args);
-  var timestampMs2 = (...args) => legacyMethod30("timestampMs", ...args);
+  var taskRatio = (...args) => legacyMethod29("taskRatio", ...args);
+  var taskOrientation = (...args) => legacyMethod29("taskOrientation", ...args);
+  var taskPromptFidelity = (...args) => legacyMethod29("taskPromptFidelity", ...args);
+  var taskResolution = (...args) => legacyMethod29("taskResolution", ...args);
+  var taskInputPreviewUrls = (...args) => legacyMethod29("taskInputPreviewUrls", ...args);
+  var taskThumbnailUrls = (...args) => legacyMethod29("taskThumbnailUrls", ...args);
+  var taskOutputUrls = (...args) => legacyMethod29("taskOutputUrls", ...args);
+  var taskImageBlockStates = (...args) => legacyMethod29("taskImageBlockStates", ...args);
+  var compressTaskImageBlockStates = (...args) => legacyMethod29("compressTaskImageBlockStates", ...args);
+  var taskImageStatusCounts = (...args) => legacyMethod29("taskImageStatusCounts", ...args);
+  var taskFailureMessage = (...args) => legacyMethod29("taskFailureMessage", ...args);
+  var taskRetryStateText2 = (...args) => legacyMethod29("taskRetryStateText", ...args);
+  var taskRuntimeText2 = (...args) => legacyMethod29("taskRuntimeText", ...args);
+  var taskCompletionTimestampTitle = (...args) => legacyMethod29("taskCompletionTimestampTitle", ...args);
+  var timestampMs2 = (...args) => legacyMethod29("timestampMs", ...args);
   function renderTasks2() {
     const query = taskSearchQuery();
     const filters = taskFilterValues();
-    const visibleTasks = state20.tasks.filter((task) => !isTaskArchived(task.task_id));
+    const visibleTasks = state19.tasks.filter((task) => !isTaskArchived(task.task_id));
     const tasks = visibleTasks.filter((task) => {
       return taskMatchesSearch(task, query) && taskMatchesFilters(task, filters);
     });
     const visibleTaskIds = visibleTasks.map((task) => String(task.task_id));
-    state20.batchSelectedTaskIds = state20.batchSelectedTaskIds.filter((taskId) => visibleTaskIds.includes(String(taskId)));
+    state19.batchSelectedTaskIds = state19.batchSelectedTaskIds.filter((taskId) => visibleTaskIds.includes(String(taskId)));
     renderBatchToolbar();
     const activeGroup = activeTaskGroup(tasks, query);
     const groups = taskHistoryGroups(tasks, query);
     const expandedGroup = ensureExpandedTaskGroupKey(groups);
     const layout = taskAnchorLayout(groups, expandedGroup?.key || null, query);
     const nextRenderKey = taskListRenderKey(tasks, query, layout, filters, activeGroup);
-    if (state20.tasksRenderKey === nextRenderKey) {
+    if (state19.tasksRenderKey === nextRenderKey) {
       updateTaskElapsedDisplays2();
       return;
     }
-    state20.tasksRenderKey = nextRenderKey;
+    state19.tasksRenderKey = nextRenderKey;
     renderTaskHistoryAnchors(layout);
     const activeHtml = activeGroup ? activeTaskGroupHtml(activeGroup) : "";
     renderActiveTaskGroup(activeHtml);
     if (!tasks.length) {
       expandedTaskGroupRenderToken += 1;
-      els29.taskList.innerHTML = `<div class="task-meta">\u6682\u65E0\u5386\u53F2\u4EFB\u52A1</div>`;
+      els28.taskList.innerHTML = `<div class="task-meta">\u6682\u65E0\u5386\u53F2\u4EFB\u52A1</div>`;
       updateDocumentTitle();
       return;
     }
     if (!layout.expandedGroup) {
       expandedTaskGroupRenderToken += 1;
-      els29.taskList.innerHTML = "";
+      els28.taskList.innerHTML = "";
       updateDocumentTitle();
       return;
     }
     const group = layout.expandedGroup;
-    els29.taskList.innerHTML = renderExpandedTaskGroupShellHtml(group);
+    els28.taskList.innerHTML = renderExpandedTaskGroupShellHtml(group);
     scheduleExpandedTaskGroupItemsRender(group, layout.expandedKey || group?.key || null);
     updateDocumentTitle();
   }
   function renderActiveTaskGroup(activeHtml) {
-    if (!els29.taskActiveList) return;
-    els29.taskActiveList.innerHTML = activeHtml;
-    els29.taskActiveList.classList.toggle("hidden", !activeHtml);
+    if (!els28.taskActiveList) return;
+    els28.taskActiveList.innerHTML = activeHtml;
+    els28.taskActiveList.classList.toggle("hidden", !activeHtml);
   }
   function taskAnchorLayout(groups, expandedKey, query) {
     if (query) {
@@ -9730,10 +9460,10 @@ ${galleryText}`;
   }
   function animateExpandedTaskGroupBody(groupKey) {
     const escapedGroupKey = cssEscape(groupKey);
-    const body = els29.taskList?.querySelector(
+    const body = els28.taskList?.querySelector(
       `.task-group-items-expanded[data-expanded-task-group-items-key="${escapedGroupKey}"]`
     );
-    const headerButton = els29.taskList?.querySelector(
+    const headerButton = els28.taskList?.querySelector(
       `.task-group[data-task-group="${escapedGroupKey}"] .task-group-header-split`
     );
     if (!body) return;
@@ -9754,8 +9484,8 @@ ${galleryText}`;
     body.addEventListener("transitionend", handleTransitionEnd);
   }
   function expandedTaskGroupItemsContainer(groupKey) {
-    if (!els29.taskList) return null;
-    return els29.taskList.querySelector(
+    if (!els28.taskList) return null;
+    return els28.taskList.querySelector(
       `.task-group-items-expanded[data-expanded-task-group-items-key="${cssEscape(groupKey)}"]`
     );
   }
@@ -9793,14 +9523,14 @@ ${galleryText}`;
     requestAnimationFrame(renderChunk);
   }
   function taskCardRoot() {
-    return els29.taskHistoryShell || els29.sidebarContent || els29.taskList;
+    return els28.taskHistoryShell || els28.sidebarContent || els28.taskList;
   }
   function taskCardElement(taskId) {
     const root = taskCardRoot();
     if (!root || taskId == null) return null;
     return root.querySelector(`.task-card[data-task-id="${cssEscape(taskId)}"]`);
   }
-  function updateTaskSelectionVisuals(taskId = state20.selectedTaskId) {
+  function updateTaskSelectionVisuals(taskId = state19.selectedTaskId) {
     const root = taskCardRoot();
     if (!root) return;
     const selectedId = taskId == null ? "" : String(taskId);
@@ -9819,14 +9549,14 @@ ${galleryText}`;
     updateDocumentTitle();
   }
   function taskSearchQuery() {
-    return els29.taskSearch.value.trim().toLowerCase();
+    return els28.taskSearch.value.trim().toLowerCase();
   }
   function taskFilterValues() {
     return {
-      ratio: els29.taskRatioFilter?.value || "",
-      orientation: els29.taskOrientationFilter?.value || "",
-      promptFidelity: els29.taskPromptFidelityFilter?.value || "",
-      resolution: els29.taskResolutionFilter?.value || ""
+      ratio: els28.taskRatioFilter?.value || "",
+      orientation: els28.taskOrientationFilter?.value || "",
+      promptFidelity: els28.taskPromptFidelityFilter?.value || "",
+      resolution: els28.taskResolutionFilter?.value || ""
     };
   }
   function taskMatchesSearch(task, query) {
@@ -9841,17 +9571,17 @@ ${galleryText}`;
     return true;
   }
   function filteredVisibleTasks(query = taskSearchQuery(), filters = taskFilterValues()) {
-    return state20.tasks.filter((task) => {
+    return state19.tasks.filter((task) => {
       return !isTaskArchived(task.task_id) && taskMatchesSearch(task, query) && taskMatchesFilters(task, filters);
     });
   }
   function clearTaskListFiltersForActiveGroup() {
     let changed = false;
-    if (els29.taskSearch?.value) {
-      els29.taskSearch.value = "";
+    if (els28.taskSearch?.value) {
+      els28.taskSearch.value = "";
       changed = true;
     }
-    [els29.taskRatioFilter, els29.taskOrientationFilter, els29.taskPromptFidelityFilter, els29.taskResolutionFilter].filter(Boolean).forEach((element2) => {
+    [els28.taskRatioFilter, els28.taskOrientationFilter, els28.taskPromptFidelityFilter, els28.taskResolutionFilter].filter(Boolean).forEach((element2) => {
       if (element2.value) {
         element2.value = "";
         changed = true;
@@ -9860,7 +9590,7 @@ ${galleryText}`;
     return changed;
   }
   function revealActiveTaskGroup() {
-    const activeTasks = state20.tasks.filter((task) => !isTaskArchived(task.task_id) && isAlwaysVisibleTask(task));
+    const activeTasks = state19.tasks.filter((task) => !isTaskArchived(task.task_id) && isAlwaysVisibleTask(task));
     if (!activeTasks.length) return;
     const visibleActiveTasks = filteredVisibleTasks().filter((task) => isAlwaysVisibleTask(task));
     const clearedControls = visibleActiveTasks.length ? false : clearTaskListFiltersForActiveGroup();
@@ -9871,11 +9601,11 @@ ${galleryText}`;
     }
     scrollExpandedTaskGroupToTop("smooth");
     if (clearedControls) {
-      legacyMethod30("setStatus", "\u5DF2\u663E\u793A\u8FDB\u884C\u4E2D\u4EFB\u52A1", "ok");
+      legacyMethod29("setStatus", "\u5DF2\u663E\u793A\u8FDB\u884C\u4E2D\u4EFB\u52A1", "ok");
     }
   }
   function renderExpandedTaskGroupShellHtml(group) {
-    const groupKey = escapeHtml14(group.key);
+    const groupKey = escapeHtml13(group.key);
     return `
     <section class="task-group task-group-expanded" data-task-group="${groupKey}">
       <button
@@ -9884,11 +9614,11 @@ ${galleryText}`;
         data-task-group-toggle-key="${groupKey}"
         data-task-group-expanded="true"
         aria-expanded="false"
-        aria-label="\u6536\u8D77 ${escapeHtml14(group.label)}"
+        aria-label="\u6536\u8D77 ${escapeHtml13(group.label)}"
       >
         <span class="task-group-label-button">
           <span class="task-group-title">
-            <span class="task-group-label">${escapeHtml14(group.label)}</span>
+            <span class="task-group-label">${escapeHtml13(group.label)}</span>
             <span class="task-group-count-separator" aria-hidden="true"> \xB7 </span>
             <span class="task-group-count">${group.tasks.length}</span>
           </span>
@@ -9930,7 +9660,7 @@ ${galleryText}`;
     return `
     <div ${sectionClass} ${sectionData}>
       <div class="task-active-section-title">
-        <span>${escapeHtml14(label)}</span>
+        <span>${escapeHtml13(label)}</span>
         <span class="task-active-section-count">${tasks.length}</span>
       </div>
       <div class="task-active-section-items">
@@ -9959,9 +9689,9 @@ ${galleryText}`;
     };
   }
   function activeTaskGroupHtml(group) {
-    const groupKey = escapeHtml14(group.key);
+    const groupKey = escapeHtml13(group.key);
     const sections = activeTaskSections(group.tasks || []);
-    const dispatchPending = Boolean(legacyMethod30("isQueueDispatchPending"));
+    const dispatchPending = Boolean(legacyMethod29("isQueueDispatchPending"));
     const body = [
       activeTaskSectionHtml("running", "\u8FD0\u884C\u4E2D", sections.running),
       activeTaskSectionHtml("waiting", "\u7B49\u5F85\u4E2D", sections.waiting),
@@ -9976,7 +9706,7 @@ ${galleryText}`;
       >
         <span class="task-group-label-button">
           <span class="task-group-title">
-            <span class="task-group-label">${escapeHtml14(group.label)}</span>
+            <span class="task-group-label">${escapeHtml13(group.label)}</span>
             <span class="task-group-count-separator" aria-hidden="true"> \xB7 </span>
             <span class="task-group-count">${group.tasks.length}</span>
           </span>
@@ -9989,7 +9719,7 @@ ${galleryText}`;
   `;
   }
   function expandedTaskGroupHtml(group) {
-    const groupKey = escapeHtml14(group.key);
+    const groupKey = escapeHtml13(group.key);
     return `
     <section class="task-group task-group-expanded" data-task-group="${groupKey}">
       <button
@@ -9998,11 +9728,11 @@ ${galleryText}`;
         data-task-group-toggle-key="${groupKey}"
         data-task-group-expanded="true"
         aria-expanded="true"
-        aria-label="\u6536\u8D77 ${escapeHtml14(group.label)}"
+        aria-label="\u6536\u8D77 ${escapeHtml13(group.label)}"
       >
         <span class="task-group-label-button">
           <span class="task-group-title">
-            <span class="task-group-label">${escapeHtml14(group.label)}</span>
+            <span class="task-group-label">${escapeHtml13(group.label)}</span>
             <span class="task-group-count-separator" aria-hidden="true"> \xB7 </span>
             <span class="task-group-count">${group.tasks.length}</span>
           </span>
@@ -10043,19 +9773,19 @@ ${galleryText}`;
   }
   function taskQueueActionStripHtml(task, queueSection = taskQueueSection(task), waitingIndex = waitingQueueIndex(task?.task_id)) {
     if (!queueSection) return "";
-    const taskId = escapeHtml14(task.task_id);
+    const taskId = escapeHtml13(task.task_id);
     if (queueSection === "running") {
       return `
-      <div class="task-queue-actions task-queue-actions-running" role="group" aria-label="\u8FD0\u884C\u4EFB\u52A1\u961F\u5217\u64CD\u4F5C" data-task-queue-section="${escapeHtml14(queueSection)}">
+      <div class="task-queue-actions task-queue-actions-running" role="group" aria-label="\u8FD0\u884C\u4EFB\u52A1\u961F\u5217\u64CD\u4F5C" data-task-queue-section="${escapeHtml13(queueSection)}">
         <button class="task-queue-action task-queue-cancel-button" type="button" data-task-queue-cancel-id="${taskId}" aria-label="\u53D6\u6D88\u8FD0\u884C\u4EFB\u52A1" title="\u53D6\u6D88\u8FD0\u884C\u4EFB\u52A1">\u53D6\u6D88</button>
       </div>
     `;
     }
-    const waitingCount = (state20.queue.waiting || []).length;
+    const waitingCount = (state19.queue.waiting || []).length;
     const disableMoveUp = waitingIndex <= 0;
     const disableMoveDown = waitingIndex < 0 || waitingIndex >= waitingCount - 1;
     return `
-    <div class="task-queue-actions task-queue-actions-waiting" role="group" aria-label="\u7B49\u5F85\u4EFB\u52A1\u961F\u5217\u64CD\u4F5C" data-task-queue-section="${escapeHtml14(queueSection)}">
+    <div class="task-queue-actions task-queue-actions-waiting" role="group" aria-label="\u7B49\u5F85\u4EFB\u52A1\u961F\u5217\u64CD\u4F5C" data-task-queue-section="${escapeHtml13(queueSection)}">
       <button class="task-queue-drag-handle" type="button" draggable="true" data-task-queue-drag-handle-id="${taskId}" aria-label="\u62D6\u52A8\u8C03\u6574\u7B49\u5F85\u987A\u5E8F" title="\u62D6\u52A8\u6392\u5E8F">
         <svg class="task-queue-drag-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
           <path d="M5 3.5h.1M5 8h.1M5 12.5h.1M10.5 3.5h.1M10.5 8h.1M10.5 12.5h.1" />
@@ -10093,32 +9823,32 @@ ${galleryText}`;
   }
   function taskCardHtml(task) {
     const image = taskThumbHtml(task);
-    const active = String(task.task_id) === String(state20.selectedTaskId) ? " active" : "";
+    const active = String(task.task_id) === String(state19.selectedTaskId) ? " active" : "";
     const unread = taskHasUnreadUpdate(task);
     const unreadClass = unread ? " unread" : "";
-    const statusClass = task.status ? ` ${escapeHtml14(task.status)}` : "";
-    const title = escapeHtml14(task.prompt || task.mode || "Untitled");
+    const statusClass = task.status ? ` ${escapeHtml13(task.status)}` : "";
+    const title = escapeHtml13(task.prompt || task.mode || "Untitled");
     const statusLight = taskStatusLightHtml(task);
-    const statusMeta = escapeHtml14(taskMetaDetailsText(task));
+    const statusMeta = escapeHtml13(taskMetaDetailsText(task));
     const imageBlocks = taskImageBlocksHtml(task);
-    const imageSummary = escapeHtml14(taskImageSummaryText(task));
+    const imageSummary = escapeHtml13(taskImageSummaryText(task));
     const retryText = taskRetryStateText2(task);
     const runtime = taskRuntimeText2(task);
     const completionTitle = taskCompletionTimestampTitle(task);
-    const taskId = escapeHtml14(task.task_id);
-    const runtimeTitle = completionTitle ? ` title="${escapeHtml14(completionTitle)}"` : "";
-    const runtimeHtml = runtime ? `<div class="task-runtime" data-task-runtime-id="${taskId}" data-task-completed-at-id="${taskId}"${runtimeTitle}>${escapeHtml14(runtime)}</div>` : "";
-    const retryHtml = retryText ? `<div class="task-retry-state" data-task-retry-id="${taskId}">${escapeHtml14(retryText)}</div>` : "";
-    const batchSelected = state20.batchSelectedTaskIds.includes(String(task.task_id));
-    const batchClass = state20.batchMode ? " batch-mode" : "";
+    const taskId = escapeHtml13(task.task_id);
+    const runtimeTitle = completionTitle ? ` title="${escapeHtml13(completionTitle)}"` : "";
+    const runtimeHtml = runtime ? `<div class="task-runtime" data-task-runtime-id="${taskId}" data-task-completed-at-id="${taskId}"${runtimeTitle}>${escapeHtml13(runtime)}</div>` : "";
+    const retryHtml = retryText ? `<div class="task-retry-state" data-task-retry-id="${taskId}">${escapeHtml13(retryText)}</div>` : "";
+    const batchSelected = state19.batchSelectedTaskIds.includes(String(task.task_id));
+    const batchClass = state19.batchMode ? " batch-mode" : "";
     const batchSelectedClass = batchSelected ? " batch-selected" : "";
     const queueIds = queueTaskIdsBySection();
     const queueSection = taskQueueSection(task, queueIds);
-    const queueClass = queueSection ? ` queue-${escapeHtml14(queueSection)}` : "";
+    const queueClass = queueSection ? ` queue-${escapeHtml13(queueSection)}` : "";
     const queueTaskData = queueSection === "waiting" ? ` data-queue-task-id="${taskId}"` : "";
     const queueActions = taskQueueActionStripHtml(task, queueSection, waitingQueueIndex(task.task_id, queueIds));
     const taskActions = taskCardActionsHtml(taskId, queueSection);
-    const batchSelect = state20.batchMode ? `
+    const batchSelect = state19.batchMode ? `
       <button class="task-select-button" type="button" data-batch-select-task-id="${taskId}" aria-pressed="${batchSelected ? "true" : "false"}" aria-label="\u9009\u62E9\u4F1A\u8BDD">
         <span></span>
       </button>
@@ -10133,7 +9863,7 @@ ${galleryText}`;
           ${unreadDot}
           <div class="task-title">${title}</div>
         </div>
-        <div class="task-status-row" aria-label="${escapeHtml14(taskStatusAccessibleLabel2(task))}">
+        <div class="task-status-row" aria-label="${escapeHtml13(taskStatusAccessibleLabel2(task))}">
           ${statusLight}
           <span class="task-status-meta">${statusMeta}</span>
         </div>
@@ -10151,7 +9881,7 @@ ${galleryText}`;
   }
   function taskHasUnreadUpdate(task) {
     if (!task || task.local_pending) return false;
-    if (String(task.task_id) === String(state20.selectedTaskId)) return false;
+    if (String(task.task_id) === String(state19.selectedTaskId)) return false;
     if (!task.viewed_at) return false;
     if (!taskHasViewableUpdate(task)) return false;
     const viewedAt = timestampMs2(task.viewed_at);
@@ -10212,14 +9942,14 @@ ${galleryText}`;
     return Boolean(task?.local_pending || ["submitting", "queued", "running"].includes(status));
   }
   function queueTaskIdsBySection() {
-    const runningIds = (state20.queue.running || []).map((task) => String(task.task_id || ""));
-    const waitingIds = (state20.queue.waiting || []).map((task) => String(task.task_id || ""));
+    const runningIds = (state19.queue.running || []).map((task) => String(task.task_id || ""));
+    const waitingIds = (state19.queue.waiting || []).map((task) => String(task.task_id || ""));
     const cacheKey = `${runningIds.join("|")}::${waitingIds.join("|")}`;
     if (queueTaskIdsCache && queueTaskIdsCacheKey === cacheKey) return queueTaskIdsCache;
     queueTaskIdsCacheKey = cacheKey;
     queueTaskIdsCache = {
-      running: new Map((state20.queue.running || []).map((task, index) => [String(task.task_id), index])),
-      waiting: new Map((state20.queue.waiting || []).map((task, index) => [String(task.task_id), index]))
+      running: new Map((state19.queue.running || []).map((task, index) => [String(task.task_id), index])),
+      waiting: new Map((state19.queue.waiting || []).map((task, index) => [String(task.task_id), index]))
     };
     return queueTaskIdsCache;
   }
@@ -10255,10 +9985,10 @@ ${galleryText}`;
       filters,
       activeQueue: activeQueueTaskListRenderKey(),
       activeGroup: activeGroup ? [activeGroup.key, activeGroup.label, activeGroup.tasks.length] : null,
-      batchMode: state20.batchMode,
-      batchSelectedTaskIds: state20.batchSelectedTaskIds.map(String).sort(),
-      archivedTaskIds: state20.tasks.filter(taskArchived).map((task) => String(task.task_id)).sort(),
-      expandedTaskGroupKey: state20.expandedTaskGroupKey,
+      batchMode: state19.batchMode,
+      batchSelectedTaskIds: state19.batchSelectedTaskIds.map(String).sort(),
+      archivedTaskIds: state19.tasks.filter(taskArchived).map((task) => String(task.task_id)).sort(),
+      expandedTaskGroupKey: state19.expandedTaskGroupKey,
       queryMode: Boolean(layout.queryMode),
       expandedGroup: layout.expandedGroup ? [layout.expandedGroup.key, layout.expandedGroup.label, layout.expandedGroup.tasks.length] : null,
       anchorGroups: [
@@ -10298,8 +10028,8 @@ ${galleryText}`;
   }
   function activeQueueTaskListRenderKey() {
     return {
-      running: (state20.queue.running || []).map((task) => String(task.task_id || "")),
-      waiting: (state20.queue.waiting || []).map((task) => String(task.task_id || ""))
+      running: (state19.queue.running || []).map((task) => String(task.task_id || "")),
+      waiting: (state19.queue.waiting || []).map((task) => String(task.task_id || ""))
     };
   }
   function taskThumbShowsLoading(task) {
@@ -10311,13 +10041,13 @@ ${galleryText}`;
     const outputThumbnailUrl = taskThumbnailUrls(task)[0];
     const inputPreviewUrl = taskInputPreviewUrls(task)[0];
     const imageUrl = outputThumbnailUrl || outputUrl || task.preview_url || inputPreviewUrl;
-    const safeClassName = escapeHtml14(className);
+    const safeClassName = escapeHtml13(className);
     if (imageUrl && inputPreviewUrl) {
       const loadingSpinner = taskThumbShowsLoading(task) ? '<span class="task-thumb-stack-spinner" aria-hidden="true"></span>' : "";
       return `
       <div class="${safeClassName} task-thumb-stack" aria-label="\u56FE\u751F\u56FE\u4EFB\u52A1\u7F29\u7565\u56FE">
-        <img class="task-thumb-reference" src="${escapeHtml14(inputPreviewUrl)}" alt="" loading="lazy" decoding="async">
-        <img class="task-thumb-output" src="${escapeHtml14(imageUrl)}" alt="" loading="lazy" decoding="async">
+        <img class="task-thumb-reference" src="${escapeHtml13(inputPreviewUrl)}" alt="" loading="lazy" decoding="async">
+        <img class="task-thumb-output" src="${escapeHtml13(imageUrl)}" alt="" loading="lazy" decoding="async">
         ${loadingSpinner}
       </div>
     `;
@@ -10325,7 +10055,7 @@ ${galleryText}`;
     if (imageUrl) {
       return `
       <div class="${safeClassName} task-thumb-single" aria-label="\u6587\u751F\u56FE\u4EFB\u52A1\u7F29\u7565\u56FE">
-        <img class="task-thumb-single-image" src="${escapeHtml14(imageUrl)}" alt="" loading="lazy" decoding="async">
+        <img class="task-thumb-single-image" src="${escapeHtml13(imageUrl)}" alt="" loading="lazy" decoding="async">
         <span class="task-thumb-mode-badge" aria-hidden="true">\u6587</span>
       </div>
     `;
@@ -10337,8 +10067,8 @@ ${galleryText}`;
   }
   function taskStatusLightHtml(task) {
     const tone = taskStatusTone(task);
-    const label = escapeHtml14(formatTaskStatus2(task) || "\u672A\u77E5\u72B6\u6001");
-    const taskId = escapeHtml14(task?.task_id || "");
+    const label = escapeHtml13(formatTaskStatus2(task) || "\u672A\u77E5\u72B6\u6001");
+    const taskId = escapeHtml13(task?.task_id || "");
     return `
     <span class="task-status-light ${tone}" aria-hidden="true"></span>
     <span class="task-status-label" data-task-status-id="${taskId}">${label}</span>
@@ -10425,23 +10155,23 @@ ${galleryText}`;
   }
 
   // codex_image/webui/frontend/src/task-history-anchors.ts
-  var bridge27 = getLegacyBridge();
-  var state21 = bridge27.state;
-  var els30 = bridge27.els;
+  var bridge26 = getLegacyBridge();
+  var state20 = bridge26.state;
+  var els29 = bridge26.els;
   var taskHistoryAnchorInsetObserver = null;
   var TASK_HISTORY_LAYOUT_EASING = "ease";
   var TASK_HISTORY_LAYOUT_DURATION_MS = 180;
   var TASK_GROUP_ORDER = ["active", "today", "yesterday", "last7", "older", "search"];
   var TASK_HISTORY_ALL_COLLAPSED_SENTINEL = "__all_collapsed__";
-  function legacyMethod31(name, ...args) {
+  function legacyMethod30(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy bridge method " + name + " is not available");
     }
     return method(...args);
   }
-  function escapeHtml15(...args) {
-    return legacyMethod31("escapeHtml", ...args);
+  function escapeHtml14(...args) {
+    return legacyMethod30("escapeHtml", ...args);
   }
   function element(node) {
     return node instanceof HTMLElement ? node : null;
@@ -10457,15 +10187,15 @@ ${galleryText}`;
   function restoreExpandedTaskGroupKey() {
     try {
       const stored = localStorage.getItem(TASK_HISTORY_EXPANDED_GROUP_STORAGE_KEY) || "";
-      state21.expandedTaskGroupKey = stored || null;
+      state20.expandedTaskGroupKey = stored || null;
     } catch {
-      state21.expandedTaskGroupKey = null;
+      state20.expandedTaskGroupKey = null;
     }
   }
   function persistExpandedTaskGroupKey() {
     try {
-      if (state21.expandedTaskGroupKey) {
-        localStorage.setItem(TASK_HISTORY_EXPANDED_GROUP_STORAGE_KEY, state21.expandedTaskGroupKey);
+      if (state20.expandedTaskGroupKey) {
+        localStorage.setItem(TASK_HISTORY_EXPANDED_GROUP_STORAGE_KEY, state20.expandedTaskGroupKey);
       } else {
         localStorage.removeItem(TASK_HISTORY_EXPANDED_GROUP_STORAGE_KEY);
       }
@@ -10473,8 +10203,8 @@ ${galleryText}`;
     }
   }
   function syncTaskHistoryAnchorInset() {
-    const shell = element(els30.taskHistoryShell);
-    const sidebarContent = element(els30.sidebarContent);
+    const shell = element(els29.taskHistoryShell);
+    const sidebarContent = element(els29.sidebarContent);
     if (!shell || !sidebarContent) return;
     const scrollbarInset = Math.max(0, sidebarContent.offsetWidth - sidebarContent.clientWidth);
     shell.style.setProperty("--task-history-scrollbar-offset", `${scrollbarInset}px`);
@@ -10496,18 +10226,18 @@ ${galleryText}`;
   function ensureExpandedTaskGroupKey2(groups) {
     const visible = groups.filter((group) => Array.isArray(group?.tasks) && group.tasks.length);
     if (!visible.length) {
-      state21.expandedTaskGroupKey = null;
+      state20.expandedTaskGroupKey = null;
       persistExpandedTaskGroupKey();
       return null;
     }
-    if (isAllCollapsedExpandedTaskGroupKey(state21.expandedTaskGroupKey)) {
+    if (isAllCollapsedExpandedTaskGroupKey(state20.expandedTaskGroupKey)) {
       return null;
     }
-    const existing = visible.find((group) => String(group.key) === String(state21.expandedTaskGroupKey));
+    const existing = visible.find((group) => String(group.key) === String(state20.expandedTaskGroupKey));
     if (existing) return existing;
-    const fallbackKey = nearestVisibleGroupKey(visible, state21.expandedTaskGroupKey);
+    const fallbackKey = nearestVisibleGroupKey(visible, state20.expandedTaskGroupKey);
     const fallback = visible.find((group) => String(group.key) === String(fallbackKey)) || visible[0] || null;
-    state21.expandedTaskGroupKey = fallback?.key || null;
+    state20.expandedTaskGroupKey = fallback?.key || null;
     persistExpandedTaskGroupKey();
     return fallback;
   }
@@ -10521,23 +10251,23 @@ ${galleryText}`;
   }
   function setExpandedTaskGroupKey(groupKey, { immediate = false } = {}) {
     const key = normalizedExpandedTaskGroupKey(groupKey);
-    if (state21.expandedTaskGroupKey === key) {
+    if (state20.expandedTaskGroupKey === key) {
       if (immediate) applyImmediateAnchorSelection(isAllCollapsedExpandedTaskGroupKey(key) ? "" : key);
       return false;
     }
-    state21.expandedTaskGroupKey = key;
+    state20.expandedTaskGroupKey = key;
     persistExpandedTaskGroupKey();
     if (immediate) applyImmediateAnchorSelection(isAllCollapsedExpandedTaskGroupKey(key) ? "" : key);
-    state21.tasksRenderKey = null;
+    state20.tasksRenderKey = null;
     return true;
   }
   function scrollExpandedTaskGroupToTop2(behavior = "smooth") {
-    const sidebarContent = element(els30.sidebarContent);
+    const sidebarContent = element(els29.sidebarContent);
     if (!sidebarContent) return;
     sidebarContent.scrollTo({ top: 0, behavior });
   }
   function anchorRowHtml(group) {
-    const key = escapeHtml15(group.key);
+    const key = escapeHtml14(group.key);
     return `
     <button
       class="task-history-anchor-row"
@@ -10545,11 +10275,11 @@ ${galleryText}`;
       data-task-group-anchor-key="${key}"
       data-task-group-toggle-key="${key}"
       aria-expanded="false"
-      aria-label="\u5C55\u5F00 ${escapeHtml15(group.label)}"
+      aria-label="\u5C55\u5F00 ${escapeHtml14(group.label)}"
     >
       <span class="task-history-anchor-label">
         <span class="task-group-title">
-          <span class="task-group-label">${escapeHtml15(group.label)}</span>
+          <span class="task-group-label">${escapeHtml14(group.label)}</span>
           <span class="task-group-count-separator" aria-hidden="true"> \xB7 </span>
           <span class="task-group-count">${group.tasks.length}</span>
         </span>
@@ -10568,8 +10298,8 @@ ${galleryText}`;
   `;
   }
   function renderTaskHistoryAnchors2(layout) {
-    const topAnchors = element(els30.taskHistoryTopAnchors);
-    const bottomAnchors = element(els30.taskHistoryBottomAnchors);
+    const topAnchors = element(els29.taskHistoryTopAnchors);
+    const bottomAnchors = element(els29.taskHistoryBottomAnchors);
     if (!topAnchors || !bottomAnchors) return;
     syncTaskHistoryAnchorInset();
     topAnchors.innerHTML = layout.top.map((group) => anchorRowHtml(group)).join("");
@@ -10579,7 +10309,7 @@ ${galleryText}`;
     applyImmediateAnchorSelection(layout.expandedKey || "");
   }
   function taskHistoryLayoutElements() {
-    const shell = element(els30.taskHistoryShell);
+    const shell = element(els29.taskHistoryShell);
     if (!shell) return [];
     return Array.from(
       shell.querySelectorAll(".task-history-anchor-row, .task-group-header-split")
@@ -10652,9 +10382,9 @@ ${galleryText}`;
     });
   }
   function initTaskHistoryAnchorsFeature() {
-    if (typeof ResizeObserver === "function" && !taskHistoryAnchorInsetObserver && element(els30.sidebarContent)) {
+    if (typeof ResizeObserver === "function" && !taskHistoryAnchorInsetObserver && element(els29.sidebarContent)) {
       taskHistoryAnchorInsetObserver = new ResizeObserver(() => syncTaskHistoryAnchorInset());
-      taskHistoryAnchorInsetObserver.observe(element(els30.sidebarContent));
+      taskHistoryAnchorInsetObserver.observe(element(els29.sidebarContent));
     }
     syncTaskHistoryAnchorInset();
     Object.assign(getLegacyBridge().methods, {
@@ -10669,10 +10399,10 @@ ${galleryText}`;
   }
 
   // codex_image/webui/frontend/src/task-archive-controls.ts
-  var bridge28 = getLegacyBridge();
-  var state22 = bridge28.state;
-  var els31 = bridge28.els;
-  function legacyMethod32(name, ...args) {
+  var bridge27 = getLegacyBridge();
+  var state21 = bridge27.state;
+  var els30 = bridge27.els;
+  function legacyMethod31(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy bridge method " + name + " is not available");
@@ -10683,26 +10413,26 @@ ${galleryText}`;
   function errorMessage(error, fallback) {
     return error instanceof Error ? error.message || fallback : fallback;
   }
-  function setStatus15(...args) {
-    return legacyMethod32("setStatus", ...args);
+  function setStatus14(...args) {
+    return legacyMethod31("setStatus", ...args);
   }
   function renderTasks3(...args) {
-    return legacyMethod32("renderTasks", ...args);
+    return legacyMethod31("renderTasks", ...args);
   }
   function closePromptPopover4(...args) {
-    return legacyMethod32("closePromptPopover", ...args);
+    return legacyMethod31("closePromptPopover", ...args);
   }
   function taskThumbHtml2(...args) {
-    return legacyMethod32("taskThumbHtml", ...args);
+    return legacyMethod31("taskThumbHtml", ...args);
   }
-  function escapeHtml16(...args) {
-    return legacyMethod32("escapeHtml", ...args);
+  function escapeHtml15(...args) {
+    return legacyMethod31("escapeHtml", ...args);
   }
   function formatTaskStatus3(...args) {
-    return legacyMethod32("formatTaskStatus", ...args);
+    return legacyMethod31("formatTaskStatus", ...args);
   }
   function openTaskDeleteConfirm(...args) {
-    return legacyMethod32("openTaskDeleteConfirm", ...args);
+    return legacyMethod31("openTaskDeleteConfirm", ...args);
   }
   function taskArchived2(task) {
     return Boolean(task?.archived_at);
@@ -10710,9 +10440,9 @@ ${galleryText}`;
   function restoreLegacyArchivedTasks() {
     try {
       const stored = JSON.parse(localStorage.getItem(ARCHIVED_TASKS_STORAGE_KEY) || "[]");
-      state22.legacyArchivedTaskIds = Array.isArray(stored) ? stored.filter(Boolean).map(String) : [];
+      state21.legacyArchivedTaskIds = Array.isArray(stored) ? stored.filter(Boolean).map(String) : [];
     } catch {
-      state22.legacyArchivedTaskIds = [];
+      state21.legacyArchivedTaskIds = [];
     }
   }
   function clearLegacyArchivedTasks() {
@@ -10720,23 +10450,23 @@ ${galleryText}`;
       localStorage.removeItem(ARCHIVED_TASKS_STORAGE_KEY);
     } catch {
     }
-    state22.legacyArchivedTaskIds = [];
+    state21.legacyArchivedTaskIds = [];
   }
   function isTaskArchived2(taskId) {
     const id = String(taskId);
-    const task = state22.tasks.find((item) => String(item.task_id) === id);
-    return taskArchived2(task) || state22.legacyArchivedTaskIds.includes(id);
+    const task = state21.tasks.find((item) => String(item.task_id) === id);
+    return taskArchived2(task) || state21.legacyArchivedTaskIds.includes(id);
   }
   function firstVisibleTaskId() {
-    return state22.tasks.find((task) => !isTaskArchived2(task.task_id))?.task_id || null;
+    return state21.tasks.find((task) => !isTaskArchived2(task.task_id))?.task_id || null;
   }
   function replaceTask(updatedTask) {
     if (!updatedTask?.task_id) return;
-    state22.tasks = state22.tasks.map((task) => String(task.task_id) === String(updatedTask.task_id) ? updatedTask : task);
+    state21.tasks = state21.tasks.map((task) => String(task.task_id) === String(updatedTask.task_id) ? updatedTask : task);
   }
   function cleanupSessionSelections() {
-    const taskIds = new Set(state22.tasks.map((task) => String(task.task_id)));
-    state22.batchSelectedTaskIds = state22.batchSelectedTaskIds.filter((taskId) => {
+    const taskIds = new Set(state21.tasks.map((task) => String(task.task_id)));
+    state21.batchSelectedTaskIds = state21.batchSelectedTaskIds.filter((taskId) => {
       return taskIds.has(String(taskId)) && !isTaskArchived2(taskId);
     });
   }
@@ -10751,8 +10481,8 @@ ${galleryText}`;
     return data.task;
   }
   async function migrateLegacyArchivedTasks() {
-    const ids = state22.legacyArchivedTaskIds.filter((taskId) => {
-      const task = state22.tasks.find((item) => String(item.task_id) === String(taskId));
+    const ids = state21.legacyArchivedTaskIds.filter((taskId) => {
+      const task = state21.tasks.find((item) => String(item.task_id) === String(taskId));
       return task && !taskArchived2(task);
     });
     if (!ids.length) {
@@ -10773,9 +10503,9 @@ ${galleryText}`;
     }
   }
   function renderArchiveButton() {
-    if (!els31.archiveButton) return;
-    const count = state22.tasks.filter((task) => isTaskArchived2(task.task_id)).length;
-    els31.archiveButton.textContent = count ? `\u4F1A\u8BDD\u5F52\u6863 ${count}` : "\u4F1A\u8BDD\u5F52\u6863";
+    if (!els30.archiveButton) return;
+    const count = state21.tasks.filter((task) => isTaskArchived2(task.task_id)).length;
+    els30.archiveButton.textContent = count ? `\u4F1A\u8BDD\u5F52\u6863 ${count}` : "\u4F1A\u8BDD\u5F52\u6863";
   }
   async function restoreArchivedTask(taskId) {
     try {
@@ -10784,35 +10514,35 @@ ${galleryText}`;
       renderTasks3();
       renderArchiveButton();
       renderArchiveModal();
-      setStatus15("\u4F1A\u8BDD\u5DF2\u6062\u590D", "ok");
+      setStatus14("\u4F1A\u8BDD\u5DF2\u6062\u590D", "ok");
     } catch (error) {
-      setStatus15(errorMessage(error, "\u6062\u590D\u5931\u8D25"), "error");
+      setStatus14(errorMessage(error, "\u6062\u590D\u5931\u8D25"), "error");
     }
   }
   function openArchiveModal() {
     closePromptPopover4();
     renderArchiveModal();
-    els31.archiveModal?.classList.remove("hidden");
-    els31.archiveModal?.setAttribute("aria-hidden", "false");
+    els30.archiveModal?.classList.remove("hidden");
+    els30.archiveModal?.setAttribute("aria-hidden", "false");
   }
   function closeArchiveModal() {
-    els31.archiveModal?.classList.add("hidden");
-    els31.archiveModal?.setAttribute("aria-hidden", "true");
+    els30.archiveModal?.classList.add("hidden");
+    els30.archiveModal?.setAttribute("aria-hidden", "true");
   }
   function renderArchiveModal() {
-    if (!els31.archiveList || !els31.archiveCount) return;
-    const archivedTasks = state22.tasks.filter((task) => isTaskArchived2(task.task_id));
-    els31.archiveCount.textContent = archivedTasks.length ? `${archivedTasks.length} \u4E2A\u5F52\u6863\u4F1A\u8BDD` : "\u6682\u65E0\u5F52\u6863\u4F1A\u8BDD";
+    if (!els30.archiveList || !els30.archiveCount) return;
+    const archivedTasks = state21.tasks.filter((task) => isTaskArchived2(task.task_id));
+    els30.archiveCount.textContent = archivedTasks.length ? `${archivedTasks.length} \u4E2A\u5F52\u6863\u4F1A\u8BDD` : "\u6682\u65E0\u5F52\u6863\u4F1A\u8BDD";
     if (!archivedTasks.length) {
-      els31.archiveList.innerHTML = `<div class="archive-empty">\u6682\u65E0\u5F52\u6863\u4F1A\u8BDD</div>`;
+      els30.archiveList.innerHTML = `<div class="archive-empty">\u6682\u65E0\u5F52\u6863\u4F1A\u8BDD</div>`;
       return;
     }
-    els31.archiveList.innerHTML = archivedTasks.map((task) => {
+    els30.archiveList.innerHTML = archivedTasks.map((task) => {
       const image = taskThumbHtml2(task, "archive-thumb");
-      const title = escapeHtml16(task.prompt || task.mode || "Untitled");
-      const status = escapeHtml16(formatTaskStatus3(task));
-      const size = escapeHtml16(task.output_size || task.params?.size || "");
-      const taskId = escapeHtml16(task.task_id);
+      const title = escapeHtml15(task.prompt || task.mode || "Untitled");
+      const status = escapeHtml15(formatTaskStatus3(task));
+      const size = escapeHtml15(task.output_size || task.params?.size || "");
+      const taskId = escapeHtml15(task.task_id);
       return `
       <article class="archive-card" data-archive-select-task-id="${taskId}">
         ${image}
@@ -10827,19 +10557,19 @@ ${galleryText}`;
       </article>
     `;
     }).join("");
-    els31.archiveList.querySelectorAll("[data-archive-select-task-id]").forEach((card) => {
+    els30.archiveList.querySelectorAll("[data-archive-select-task-id]").forEach((card) => {
       card.addEventListener("click", () => {
-        legacyMethod32("selectTask", card.dataset.archiveSelectTaskId);
+        legacyMethod31("selectTask", card.dataset.archiveSelectTaskId);
         closeArchiveModal();
       });
     });
-    els31.archiveList.querySelectorAll("[data-restore-archive-task-id]").forEach((button) => {
+    els30.archiveList.querySelectorAll("[data-restore-archive-task-id]").forEach((button) => {
       button.addEventListener("click", (event) => {
         event.stopPropagation();
         restoreArchivedTask(button.dataset.restoreArchiveTaskId);
       });
     });
-    els31.archiveList.querySelectorAll("[data-delete-archive-task-id]").forEach((button) => {
+    els30.archiveList.querySelectorAll("[data-delete-archive-task-id]").forEach((button) => {
       button.addEventListener("click", (event) => {
         event.stopPropagation();
         openTaskDeleteConfirm(button, button.dataset.deleteArchiveTaskId);
@@ -10866,10 +10596,10 @@ ${galleryText}`;
   }
 
   // codex_image/webui/frontend/src/task-batch-controls.ts
-  var bridge29 = getLegacyBridge();
-  var state23 = bridge29.state;
-  var els32 = bridge29.els;
-  function legacyMethod33(name, ...args) {
+  var bridge28 = getLegacyBridge();
+  var state22 = bridge28.state;
+  var els31 = bridge28.els;
+  function legacyMethod32(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy bridge method " + name + " is not available");
@@ -10880,43 +10610,43 @@ ${galleryText}`;
   function errorMessage2(error, fallback) {
     return error instanceof Error ? error.message || fallback : fallback;
   }
-  function setStatus16(...args) {
-    return legacyMethod33("setStatus", ...args);
+  function setStatus15(...args) {
+    return legacyMethod32("setStatus", ...args);
   }
   function isTaskArchived3(...args) {
-    return legacyMethod33("isTaskArchived", ...args);
+    return legacyMethod32("isTaskArchived", ...args);
   }
   function renderTasks4(...args) {
-    return legacyMethod33("renderTasks", ...args);
+    return legacyMethod32("renderTasks", ...args);
   }
   function setTaskArchiveState2(...args) {
-    return legacyMethod33("setTaskArchiveState", ...args);
+    return legacyMethod32("setTaskArchiveState", ...args);
   }
   function replaceTask2(...args) {
-    return legacyMethod33("replaceTask", ...args);
+    return legacyMethod32("replaceTask", ...args);
   }
   function firstVisibleTaskId2(...args) {
-    return legacyMethod33("firstVisibleTaskId", ...args);
+    return legacyMethod32("firstVisibleTaskId", ...args);
   }
   function renderArchiveButton2(...args) {
-    return legacyMethod33("renderArchiveButton", ...args);
+    return legacyMethod32("renderArchiveButton", ...args);
   }
   function renderArchiveModal2(...args) {
-    return legacyMethod33("renderArchiveModal", ...args);
+    return legacyMethod32("renderArchiveModal", ...args);
   }
   function renderPreview2(...args) {
-    return legacyMethod33("renderPreview", ...args);
+    return legacyMethod32("renderPreview", ...args);
   }
   function openConfirmPopover4(...args) {
-    return legacyMethod33("openConfirmPopover", ...args);
+    return legacyMethod32("openConfirmPopover", ...args);
   }
   function deleteTaskById(...args) {
-    return legacyMethod33("deleteTaskById", ...args);
+    return legacyMethod32("deleteTaskById", ...args);
   }
   function toggleBatchMode(force) {
-    state23.batchMode = typeof force === "boolean" ? force : !state23.batchMode;
-    if (!state23.batchMode) {
-      state23.batchSelectedTaskIds = [];
+    state22.batchMode = typeof force === "boolean" ? force : !state22.batchMode;
+    if (!state22.batchMode) {
+      state22.batchSelectedTaskIds = [];
       finishBatchMarqueeSelection();
     }
     renderTasks4();
@@ -10925,32 +10655,32 @@ ${galleryText}`;
   function toggleBatchTaskSelection(taskId) {
     const id = String(taskId || "");
     if (!id || isTaskArchived3(id)) return;
-    if (state23.batchSelectedTaskIds.includes(id)) {
+    if (state22.batchSelectedTaskIds.includes(id)) {
       removeBatchSelectedTaskId(id);
     } else {
-      state23.batchSelectedTaskIds.push(id);
+      state22.batchSelectedTaskIds.push(id);
     }
     renderTasks4();
   }
   function removeBatchSelectedTaskId(taskId) {
     const id = String(taskId || "");
-    state23.batchSelectedTaskIds = state23.batchSelectedTaskIds.filter((item) => item !== id);
+    state22.batchSelectedTaskIds = state22.batchSelectedTaskIds.filter((item) => item !== id);
   }
   function renderBatchToolbar2() {
-    if (!els32.batchToolbar) return;
-    els32.batchToolbar.classList.toggle("hidden", !state23.batchMode);
-    els32.taskList?.classList.toggle("batch-marquee-enabled", state23.batchMode);
-    els32.batchManageButton?.classList.toggle("active", state23.batchMode);
-    const count = state23.batchSelectedTaskIds.length;
-    if (els32.batchSelectedCount) {
-      els32.batchSelectedCount.textContent = `\u5DF2\u9009\u62E9 ${count} \u4E2A`;
+    if (!els31.batchToolbar) return;
+    els31.batchToolbar.classList.toggle("hidden", !state22.batchMode);
+    els31.taskList?.classList.toggle("batch-marquee-enabled", state22.batchMode);
+    els31.batchManageButton?.classList.toggle("active", state22.batchMode);
+    const count = state22.batchSelectedTaskIds.length;
+    if (els31.batchSelectedCount) {
+      els31.batchSelectedCount.textContent = `\u5DF2\u9009\u62E9 ${count} \u4E2A`;
     }
-    [els32.batchArchiveButton, els32.batchDeleteButton].forEach((button) => {
+    [els31.batchArchiveButton, els31.batchDeleteButton].forEach((button) => {
       if (button) button.disabled = count === 0;
     });
   }
   async function archiveSelectedTasks() {
-    const ids = state23.batchSelectedTaskIds.slice();
+    const ids = state22.batchSelectedTaskIds.slice();
     if (!ids.length) return;
     const updatedTasks = [];
     try {
@@ -10959,34 +10689,34 @@ ${galleryText}`;
         updatedTasks.push(updatedTask);
       }
       updatedTasks.forEach(replaceTask2);
-      if (ids.includes(String(state23.selectedTaskId))) {
-        state23.selectedTaskId = firstVisibleTaskId2();
+      if (ids.includes(String(state22.selectedTaskId))) {
+        state22.selectedTaskId = firstVisibleTaskId2();
       }
-      state23.batchSelectedTaskIds = [];
-      state23.batchMode = false;
+      state22.batchSelectedTaskIds = [];
+      state22.batchMode = false;
       renderTasks4();
       renderArchiveButton2();
       renderArchiveModal2();
       renderPreview2();
-      setStatus16(`\u5DF2\u5F52\u6863 ${ids.length} \u4E2A\u4F1A\u8BDD`, "ok");
+      setStatus15(`\u5DF2\u5F52\u6863 ${ids.length} \u4E2A\u4F1A\u8BDD`, "ok");
     } catch (error) {
       updatedTasks.forEach(replaceTask2);
       renderTasks4();
       renderArchiveButton2();
       renderArchiveModal2();
       renderPreview2();
-      setStatus16(errorMessage2(error, "\u6279\u91CF\u5F52\u6863\u5931\u8D25"), "error");
+      setStatus15(errorMessage2(error, "\u6279\u91CF\u5F52\u6863\u5931\u8D25"), "error");
     }
   }
   function openBatchDeleteConfirm() {
-    const selectedTasks = state23.batchSelectedTaskIds.map((taskId) => state23.tasks.find((task) => String(task.task_id) === String(taskId))).filter(Boolean);
+    const selectedTasks = state22.batchSelectedTaskIds.map((taskId) => state22.tasks.find((task) => String(task.task_id) === String(taskId))).filter(Boolean);
     const deletableTasks = selectedTasks.filter((task) => task.status !== "running" && !task.local_pending);
     const skippedCount = selectedTasks.length - deletableTasks.length;
     if (!deletableTasks.length) {
-      setStatus16("\u9009\u4E2D\u7684\u4F1A\u8BDD\u6B63\u5728\u8FD0\u884C\uFF0C\u4E0D\u80FD\u5220\u9664", "error");
+      setStatus15("\u9009\u4E2D\u7684\u4F1A\u8BDD\u6B63\u5728\u8FD0\u884C\uFF0C\u4E0D\u80FD\u5220\u9664", "error");
       return;
     }
-    openConfirmPopover4(els32.batchDeleteButton, {
+    openConfirmPopover4(els31.batchDeleteButton, {
       title: `\u5220\u9664 ${deletableTasks.length} \u4E2A\u4F1A\u8BDD\uFF1F`,
       message: "\u4F1A\u540C\u65F6\u5220\u9664\u672C\u5730\u56FE\u7247\u6587\u4EF6\u3002",
       detail: skippedCount ? `${skippedCount} \u4E2A\u8FD0\u884C\u4E2D\u4EFB\u52A1\u4F1A\u4FDD\u7559` : "",
@@ -11001,34 +10731,34 @@ ${galleryText}`;
       for (const task of deletableTasks) {
         await deleteTaskById(task.task_id);
       }
-      state23.batchSelectedTaskIds = [];
-      state23.batchMode = false;
+      state22.batchSelectedTaskIds = [];
+      state22.batchMode = false;
       renderTasks4();
       renderArchiveButton2();
       renderArchiveModal2();
       renderPreview2();
       const skippedText = skippedCount ? `\uFF0C${skippedCount} \u4E2A\u8FD0\u884C\u4E2D\u672A\u5220\u9664` : "";
-      setStatus16(`\u5DF2\u5220\u9664 ${deletableTasks.length} \u4E2A\u4F1A\u8BDD${skippedText}`, "ok");
+      setStatus15(`\u5DF2\u5220\u9664 ${deletableTasks.length} \u4E2A\u4F1A\u8BDD${skippedText}`, "ok");
     } catch (error) {
       renderTasks4();
       renderArchiveButton2();
       renderArchiveModal2();
       renderPreview2();
-      setStatus16(errorMessage2(error, "\u6279\u91CF\u5220\u9664\u5931\u8D25"), "error");
+      setStatus15(errorMessage2(error, "\u6279\u91CF\u5220\u9664\u5931\u8D25"), "error");
     }
   }
   function handleTaskListPointerDown(event) {
-    if (!state23.batchMode || !els32.taskList || event.button !== 0) return;
+    if (!state22.batchMode || !els31.taskList || event.button !== 0) return;
     if (event.target.closest("button, input, select, textarea, a")) return;
-    if (!event.target.closest(".task-card[data-task-id]") && event.target !== els32.taskList) return;
-    state23.batchSelectionDrag = {
+    if (!event.target.closest(".task-card[data-task-id]") && event.target !== els31.taskList) return;
+    state22.batchSelectionDrag = {
       pointerId: event.pointerId,
       startX: event.clientX,
       startY: event.clientY,
       currentX: event.clientX,
       currentY: event.clientY,
       active: false,
-      originSelectedTaskIds: state23.batchSelectedTaskIds.slice(),
+      originSelectedTaskIds: state22.batchSelectedTaskIds.slice(),
       marquee: null
     };
     window.addEventListener("pointermove", handleTaskListPointerMove);
@@ -11036,7 +10766,7 @@ ${galleryText}`;
     window.addEventListener("pointercancel", handleTaskListPointerUp);
   }
   function handleTaskListPointerMove(event) {
-    const drag = state23.batchSelectionDrag;
+    const drag = state22.batchSelectionDrag;
     if (!drag || event.pointerId !== drag.pointerId) return;
     drag.currentX = event.clientX;
     drag.currentY = event.clientY;
@@ -11044,8 +10774,8 @@ ${galleryText}`;
       const distance = Math.hypot(drag.currentX - drag.startX, drag.currentY - drag.startY);
       if (distance < 6) return;
       drag.active = true;
-      state23.suppressTaskClickAfterDrag = true;
-      els32.taskList?.classList.add("batch-marquee-active");
+      state22.suppressTaskClickAfterDrag = true;
+      els31.taskList?.classList.add("batch-marquee-active");
       drag.marquee = document.createElement("div");
       drag.marquee.className = "batch-selection-marquee";
       document.body.appendChild(drag.marquee);
@@ -11054,7 +10784,7 @@ ${galleryText}`;
     updateBatchMarqueeSelection();
   }
   function handleTaskListPointerUp(event) {
-    const drag = state23.batchSelectionDrag;
+    const drag = state22.batchSelectionDrag;
     if (!drag || event.pointerId !== drag.pointerId) return;
     if (drag.active) {
       event.preventDefault();
@@ -11063,7 +10793,7 @@ ${galleryText}`;
     finishBatchMarqueeSelection();
   }
   function updateBatchMarqueeSelection() {
-    const drag = state23.batchSelectionDrag;
+    const drag = state22.batchSelectionDrag;
     if (!drag?.active) return;
     const selectionRect = normalizeSelectionRect(drag.startX, drag.startY, drag.currentX, drag.currentY);
     if (drag.marquee) {
@@ -11073,7 +10803,7 @@ ${galleryText}`;
       drag.marquee.style.height = `${selectionRect.height}px`;
     }
     const nextSelectedIds = new Set(drag.originSelectedTaskIds.map(String));
-    els32.taskList.querySelectorAll(TASK_CARD_SELECTOR).forEach((card) => {
+    els31.taskList.querySelectorAll(TASK_CARD_SELECTOR).forEach((card) => {
       const cardRect = card.getBoundingClientRect();
       if (rectsIntersect(selectionRect, cardRect)) {
         nextSelectedIds.add(String(card.dataset.taskId));
@@ -11084,11 +10814,11 @@ ${galleryText}`;
   function applyBatchSelectionPreview(taskIds) {
     const nextIds = taskIds.map(String).filter((id) => id && !isTaskArchived3(id));
     const nextSet = new Set(nextIds);
-    const previous = state23.batchSelectedTaskIds.map(String).sort().join("|");
+    const previous = state22.batchSelectedTaskIds.map(String).sort().join("|");
     const next = nextIds.slice().sort().join("|");
     if (previous === next) return;
-    state23.batchSelectedTaskIds = nextIds;
-    els32.taskList.querySelectorAll(TASK_CARD_SELECTOR).forEach((card) => {
+    state22.batchSelectedTaskIds = nextIds;
+    els31.taskList.querySelectorAll(TASK_CARD_SELECTOR).forEach((card) => {
       const selected = nextSet.has(String(card.dataset.taskId));
       card.classList.toggle("batch-selected", selected);
       const selectButton = card.querySelector("[data-batch-select-task-id]");
@@ -11114,12 +10844,12 @@ ${galleryText}`;
     return selectionRect.left <= cardRect.right && selectionRect.right >= cardRect.left && selectionRect.top <= cardRect.bottom && selectionRect.bottom >= cardRect.top;
   }
   function finishBatchMarqueeSelection() {
-    const drag = state23.batchSelectionDrag;
+    const drag = state22.batchSelectionDrag;
     if (drag?.marquee) {
       drag.marquee.remove();
     }
-    state23.batchSelectionDrag = null;
-    els32.taskList?.classList.remove("batch-marquee-active");
+    state22.batchSelectionDrag = null;
+    els31.taskList?.classList.remove("batch-marquee-active");
     window.removeEventListener("pointermove", handleTaskListPointerMove);
     window.removeEventListener("pointerup", handleTaskListPointerUp);
     window.removeEventListener("pointercancel", handleTaskListPointerUp);
@@ -11145,10 +10875,10 @@ ${galleryText}`;
   }
 
   // codex_image/webui/frontend/src/task-actions.ts
-  var bridge30 = getLegacyBridge();
-  var state24 = bridge30.state;
-  var els33 = bridge30.els;
-  function legacyMethod34(name, ...args) {
+  var bridge29 = getLegacyBridge();
+  var state23 = bridge29.state;
+  var els32 = bridge29.els;
+  function legacyMethod33(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy bridge method " + name + " is not available");
@@ -11169,53 +10899,53 @@ ${galleryText}`;
   function isTaskActionConflict(error) {
     return error instanceof TaskActionHttpError && error.status === 409;
   }
-  function setStatus17(...args) {
-    return legacyMethod34("setStatus", ...args);
+  function setStatus16(...args) {
+    return legacyMethod33("setStatus", ...args);
   }
   function closePromptPopover5(...args) {
-    return legacyMethod34("closePromptPopover", ...args);
+    return legacyMethod33("closePromptPopover", ...args);
   }
   function setTaskArchiveState3(...args) {
-    return legacyMethod34("setTaskArchiveState", ...args);
+    return legacyMethod33("setTaskArchiveState", ...args);
   }
   function replaceTask3(...args) {
-    return legacyMethod34("replaceTask", ...args);
+    return legacyMethod33("replaceTask", ...args);
   }
   function removeBatchSelectedTaskId2(...args) {
-    return legacyMethod34("removeBatchSelectedTaskId", ...args);
+    return legacyMethod33("removeBatchSelectedTaskId", ...args);
   }
   function firstVisibleTaskId3(...args) {
-    return legacyMethod34("firstVisibleTaskId", ...args);
+    return legacyMethod33("firstVisibleTaskId", ...args);
   }
   function renderTasks5(...args) {
-    return legacyMethod34("renderTasks", ...args);
+    return legacyMethod33("renderTasks", ...args);
   }
   function updateTaskSelectionVisuals2(...args) {
-    return legacyMethod34("updateTaskSelectionVisuals", ...args);
+    return legacyMethod33("updateTaskSelectionVisuals", ...args);
   }
   function renderArchiveButton3(...args) {
-    return legacyMethod34("renderArchiveButton", ...args);
+    return legacyMethod33("renderArchiveButton", ...args);
   }
   function renderArchiveModal3(...args) {
-    return legacyMethod34("renderArchiveModal", ...args);
+    return legacyMethod33("renderArchiveModal", ...args);
   }
   function renderPreview3(...args) {
-    return legacyMethod34("renderPreview", ...args);
+    return legacyMethod33("renderPreview", ...args);
   }
   function openConfirmPopover5(...args) {
-    return legacyMethod34("openConfirmPopover", ...args);
+    return legacyMethod33("openConfirmPopover", ...args);
   }
   function canRetryFailedTask(...args) {
-    return legacyMethod34("canRetryFailedTask", ...args);
+    return legacyMethod33("canRetryFailedTask", ...args);
   }
   function canAcceptTaskSuccesses(...args) {
-    return legacyMethod34("canAcceptTaskSuccesses", ...args);
+    return legacyMethod33("canAcceptTaskSuccesses", ...args);
   }
   function currentApiProviderId2(...args) {
-    return legacyMethod34("currentApiProviderId", ...args);
+    return legacyMethod33("currentApiProviderId", ...args);
   }
   function updateTaskInState2(...args) {
-    return legacyMethod34("updateTaskInState", ...args);
+    return legacyMethod33("updateTaskInState", ...args);
   }
   async function refreshTaskAfterActionConflict(taskId) {
     const normalizedTaskId = String(taskId || "").trim();
@@ -11226,12 +10956,12 @@ ${galleryText}`;
       if (!response.ok || !data.task) return false;
       const updatedTask = data.task;
       updateTaskInState2(updatedTask);
-      state24.selectedTaskId = updatedTask.task_id;
+      state23.selectedTaskId = updatedTask.task_id;
       renderTasks5();
       renderArchiveButton3();
       renderArchiveModal3();
       renderPreview3(updatedTask);
-      setStatus17("\u4EFB\u52A1\u72B6\u6001\u5DF2\u66F4\u65B0", "ok");
+      setStatus16("\u4EFB\u52A1\u72B6\u6001\u5DF2\u66F4\u65B0", "ok");
       return true;
     } catch (error) {
       console.warn(error);
@@ -11239,22 +10969,22 @@ ${galleryText}`;
     }
   }
   async function archiveTask(taskId) {
-    const task = state24.tasks.find((item) => String(item.task_id) === String(taskId));
+    const task = state23.tasks.find((item) => String(item.task_id) === String(taskId));
     if (!task) return;
     try {
       const updatedTask = await setTaskArchiveState3(taskId, true);
       replaceTask3(updatedTask);
       removeBatchSelectedTaskId2(taskId);
-      if (String(state24.selectedTaskId) === String(taskId)) {
-        state24.selectedTaskId = firstVisibleTaskId3();
+      if (String(state23.selectedTaskId) === String(taskId)) {
+        state23.selectedTaskId = firstVisibleTaskId3();
       }
       renderTasks5();
       renderArchiveButton3();
       renderArchiveModal3();
       renderPreview3();
-      setStatus17("\u4F1A\u8BDD\u5DF2\u5F52\u6863", "ok");
+      setStatus16("\u4F1A\u8BDD\u5DF2\u5F52\u6863", "ok");
     } catch (error) {
-      setStatus17(errorMessage3(error, "\u5F52\u6863\u5931\u8D25"), "error");
+      setStatus16(errorMessage3(error, "\u5F52\u6863\u5931\u8D25"), "error");
     }
   }
   async function deleteTask(taskId) {
@@ -11265,9 +10995,9 @@ ${galleryText}`;
       renderArchiveButton3();
       renderArchiveModal3();
       renderPreview3();
-      setStatus17("\u4EFB\u52A1\u5DF2\u5220\u9664", "ok");
+      setStatus16("\u4EFB\u52A1\u5DF2\u5220\u9664", "ok");
     } catch (error) {
-      setStatus17(errorMessage3(error, "\u5220\u9664\u5931\u8D25"), "error");
+      setStatus16(errorMessage3(error, "\u5220\u9664\u5931\u8D25"), "error");
     }
   }
   async function deleteTaskById2(taskId) {
@@ -11278,18 +11008,18 @@ ${galleryText}`;
     if (!response.ok) {
       throw new Error(data.detail || "\u5220\u9664\u5931\u8D25");
     }
-    state24.tasks = state24.tasks.filter((item) => String(item.task_id) !== String(taskId));
+    state23.tasks = state23.tasks.filter((item) => String(item.task_id) !== String(taskId));
     removeBatchSelectedTaskId2(taskId);
-    if (String(state24.selectedTaskId) === String(taskId)) {
-      state24.selectedTaskId = firstVisibleTaskId3();
+    if (String(state23.selectedTaskId) === String(taskId)) {
+      state23.selectedTaskId = firstVisibleTaskId3();
     }
   }
   async function retryFailedTask(taskId) {
     closePromptPopover5();
-    const task = state24.tasks.find((item) => String(item.task_id) === String(taskId));
+    const task = state23.tasks.find((item) => String(item.task_id) === String(taskId));
     if (!task || !canRetryFailedTask(task)) {
       if (await refreshTaskAfterActionConflict(taskId)) return;
-      setStatus17("\u8FD9\u4E2A\u4EFB\u52A1\u6CA1\u6709\u53EF\u91CD\u8BD5\u7684\u5931\u8D25\u56FE\u7247", "error");
+      setStatus16("\u8FD9\u4E2A\u4EFB\u52A1\u6CA1\u6709\u53EF\u91CD\u8BD5\u7684\u5931\u8D25\u56FE\u7247", "error");
       return;
     }
     try {
@@ -11301,23 +11031,23 @@ ${galleryText}`;
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new TaskActionHttpError(data.detail || "\u91CD\u8BD5\u5931\u8D25\u56FE\u7247\u5931\u8D25", response.status);
       const updatedTask = data.task;
-      state24.tasks = [updatedTask, ...state24.tasks.filter((item) => String(item.task_id) !== String(taskId))];
-      state24.selectedTaskId = updatedTask.task_id;
+      state23.tasks = [updatedTask, ...state23.tasks.filter((item) => String(item.task_id) !== String(taskId))];
+      state23.selectedTaskId = updatedTask.task_id;
       renderTasks5();
       renderPreview3(updatedTask);
       await window.refreshQueue?.();
-      setStatus17("\u5DF2\u91CD\u65B0\u5165\u961F\u5931\u8D25\u56FE\u7247", "ok");
+      setStatus16("\u5DF2\u91CD\u65B0\u5165\u961F\u5931\u8D25\u56FE\u7247", "ok");
     } catch (error) {
       if (isTaskActionConflict(error) && await refreshTaskAfterActionConflict(taskId)) return;
-      setStatus17(errorMessage3(error, "\u91CD\u8BD5\u5931\u8D25\u56FE\u7247\u5931\u8D25"), "error");
+      setStatus16(errorMessage3(error, "\u91CD\u8BD5\u5931\u8D25\u56FE\u7247\u5931\u8D25"), "error");
     }
   }
   async function acceptTaskSuccesses(taskId) {
     closePromptPopover5();
-    const task = state24.tasks.find((item) => String(item.task_id) === String(taskId));
+    const task = state23.tasks.find((item) => String(item.task_id) === String(taskId));
     if (!task || !canAcceptTaskSuccesses(task)) {
       if (await refreshTaskAfterActionConflict(taskId)) return;
-      setStatus17("\u8FD9\u4E2A\u4EFB\u52A1\u6CA1\u6709\u53EF\u63A5\u53D7\u7684\u6210\u529F\u56FE\u7247", "error");
+      setStatus16("\u8FD9\u4E2A\u4EFB\u52A1\u6CA1\u6709\u53EF\u63A5\u53D7\u7684\u6210\u529F\u56FE\u7247", "error");
       return;
     }
     try {
@@ -11329,22 +11059,22 @@ ${galleryText}`;
       if (!response.ok) throw new TaskActionHttpError(data.detail || "\u63A5\u53D7\u6210\u529F\u7ED3\u679C\u5931\u8D25", response.status);
       const updatedTask = data.task;
       updateTaskInState2(updatedTask);
-      state24.selectedTaskId = updatedTask.task_id;
+      state23.selectedTaskId = updatedTask.task_id;
       renderTasks5();
       renderArchiveButton3();
       renderArchiveModal3();
       renderPreview3(updatedTask);
-      setStatus17("\u5DF2\u63A5\u53D7\u6210\u529F\u7ED3\u679C", "ok");
+      setStatus16("\u5DF2\u63A5\u53D7\u6210\u529F\u7ED3\u679C", "ok");
     } catch (error) {
       if (isTaskActionConflict(error) && await refreshTaskAfterActionConflict(taskId)) return;
-      setStatus17(errorMessage3(error, "\u63A5\u53D7\u6210\u529F\u7ED3\u679C\u5931\u8D25"), "error");
+      setStatus16(errorMessage3(error, "\u63A5\u53D7\u6210\u529F\u7ED3\u679C\u5931\u8D25"), "error");
     }
   }
   async function markTaskViewed(taskId) {
-    if (!taskId || state24.taskViewedRequestIds.has(String(taskId))) return;
-    const task = state24.tasks.find((item) => String(item.task_id) === String(taskId));
+    if (!taskId || state23.taskViewedRequestIds.has(String(taskId))) return;
+    const task = state23.tasks.find((item) => String(item.task_id) === String(taskId));
     if (!task || task.local_pending) return;
-    state24.taskViewedRequestIds.add(String(taskId));
+    state23.taskViewedRequestIds.add(String(taskId));
     const viewedAt = (/* @__PURE__ */ new Date()).toISOString();
     task.viewed_at = viewedAt;
     updateTaskSelectionVisuals2(taskId);
@@ -11360,15 +11090,15 @@ ${galleryText}`;
     } catch (error) {
       console.warn(error);
     } finally {
-      state24.taskViewedRequestIds.delete(String(taskId));
+      state23.taskViewedRequestIds.delete(String(taskId));
     }
   }
   function openTaskDeleteConfirm2(deleteButton, taskId) {
     closePromptPopover5();
-    const task = state24.tasks.find((item) => String(item.task_id) === String(taskId));
+    const task = state23.tasks.find((item) => String(item.task_id) === String(taskId));
     if (!task) return;
     if (task.status === "running" || task.local_pending) {
-      setStatus17("\u8FD0\u884C\u4E2D\u7684\u4EFB\u52A1\u4E0D\u80FD\u5220\u9664", "error");
+      setStatus16("\u8FD0\u884C\u4E2D\u7684\u4EFB\u52A1\u4E0D\u80FD\u5220\u9664", "error");
       return;
     }
     const title = task.prompt || task.mode || taskId;
@@ -11395,10 +11125,10 @@ ${galleryText}`;
   }
 
   // codex_image/webui/frontend/src/task-submit.ts
-  var bridge31 = getLegacyBridge();
-  var state25 = bridge31.state;
-  var els34 = bridge31.els;
-  function legacyMethod35(name, ...args) {
+  var bridge30 = getLegacyBridge();
+  var state24 = bridge30.state;
+  var els33 = bridge30.els;
+  function legacyMethod34(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy bridge method " + name + " is not available");
@@ -11409,150 +11139,150 @@ ${galleryText}`;
   function errorMessage4(error, fallback) {
     return error instanceof Error ? error.message || fallback : fallback;
   }
-  function setStatus18(...args) {
-    return legacyMethod35("setStatus", ...args);
+  function setStatus17(...args) {
+    return legacyMethod34("setStatus", ...args);
   }
   function setMode5(...args) {
-    return legacyMethod35("setMode", ...args);
+    return legacyMethod34("setMode", ...args);
   }
   function setPromptWithGalleryRefs2(...args) {
-    return legacyMethod35("setPromptWithGalleryRefs", ...args);
+    return legacyMethod34("setPromptWithGalleryRefs", ...args);
   }
   function persistMainModel2(...args) {
-    return legacyMethod35("persistMainModel", ...args);
+    return legacyMethod34("persistMainModel", ...args);
   }
   function normalizeApiSettings2(...args) {
-    return legacyMethod35("normalizeApiSettings", ...args);
+    return legacyMethod34("normalizeApiSettings", ...args);
   }
   function normalizeApiImagesConcurrency2(...args) {
-    return legacyMethod35("normalizeApiImagesConcurrency", ...args);
+    return legacyMethod34("normalizeApiImagesConcurrency", ...args);
   }
   function persistApiSettings2(...args) {
-    return legacyMethod35("persistApiSettings", ...args);
+    return legacyMethod34("persistApiSettings", ...args);
   }
   function populateApiSettingsForm2(...args) {
-    return legacyMethod35("populateApiSettingsForm", ...args);
+    return legacyMethod34("populateApiSettingsForm", ...args);
   }
   function syncSizeControlsFromSize2(...args) {
-    return legacyMethod35("syncSizeControlsFromSize", ...args);
+    return legacyMethod34("syncSizeControlsFromSize", ...args);
   }
   function updatePromptCount6(...args) {
-    return legacyMethod35("updatePromptCount", ...args);
+    return legacyMethod34("updatePromptCount", ...args);
   }
   function updateQuantity2(...args) {
-    return legacyMethod35("updateQuantity", ...args);
+    return legacyMethod34("updateQuantity", ...args);
   }
   function syncRadioButtons2(...args) {
-    return legacyMethod35("syncRadioButtons", ...args);
+    return legacyMethod34("syncRadioButtons", ...args);
   }
   function updateCompression2(...args) {
-    return legacyMethod35("updateCompression", ...args);
+    return legacyMethod34("updateCompression", ...args);
   }
   function updateCustomSize2(...args) {
-    return legacyMethod35("updateCustomSize", ...args);
+    return legacyMethod34("updateCustomSize", ...args);
   }
   function updateRequestPreview11(...args) {
-    return legacyMethod35("updateRequestPreview", ...args);
+    return legacyMethod34("updateRequestPreview", ...args);
   }
   function currentTaskParams2(...args) {
-    return legacyMethod35("currentTaskParams", ...args);
+    return legacyMethod34("currentTaskParams", ...args);
   }
   function uploadInputs3(...args) {
-    return legacyMethod35("uploadInputs", ...args);
+    return legacyMethod34("uploadInputs", ...args);
   }
   function galleryInputs4(...args) {
-    return legacyMethod35("galleryInputs", ...args);
+    return legacyMethod34("galleryInputs", ...args);
   }
   function referenceAssetInputs3(...args) {
-    return legacyMethod35("referenceAssetInputs", ...args);
+    return legacyMethod34("referenceAssetInputs", ...args);
   }
   function currentAuthSource3(...args) {
-    return legacyMethod35("currentAuthSource", ...args);
+    return legacyMethod34("currentAuthSource", ...args);
   }
   function backendForAuthSource2(...args) {
-    return legacyMethod35("backendForAuthSource", ...args);
+    return legacyMethod34("backendForAuthSource", ...args);
   }
   function currentApiMode4(...args) {
-    return legacyMethod35("currentApiMode", ...args);
+    return legacyMethod34("currentApiMode", ...args);
   }
   function getPromptText9(...args) {
-    return legacyMethod35("getPromptText", ...args);
+    return legacyMethod34("getPromptText", ...args);
   }
   function currentPromptForModel2(...args) {
-    return legacyMethod35("currentPromptForModel", ...args);
+    return legacyMethod34("currentPromptForModel", ...args);
   }
   function currentPromptFidelity3(...args) {
-    return legacyMethod35("currentPromptFidelity", ...args);
+    return legacyMethod34("currentPromptFidelity", ...args);
   }
   function currentApiProviderId3(...args) {
-    return legacyMethod35("currentApiProviderId", ...args);
+    return legacyMethod34("currentApiProviderId", ...args);
   }
   function currentApiProviderLabel3(...args) {
-    return legacyMethod35("currentApiProviderLabel", ...args);
+    return legacyMethod34("currentApiProviderLabel", ...args);
   }
   function currentApiImagesConcurrency2(...args) {
-    return legacyMethod35("currentApiImagesConcurrency", ...args);
+    return legacyMethod34("currentApiImagesConcurrency", ...args);
   }
   function currentMainModel2(...args) {
-    return legacyMethod35("currentMainModel", ...args);
+    return legacyMethod34("currentMainModel", ...args);
   }
   function sourcePreviewUrl3(...args) {
-    return legacyMethod35("sourcePreviewUrl", ...args);
+    return legacyMethod34("sourcePreviewUrl", ...args);
   }
   function syncPromptFromEditor6(...args) {
-    return legacyMethod35("syncPromptFromEditor", ...args);
+    return legacyMethod34("syncPromptFromEditor", ...args);
   }
   function syncGalleryInputsFromPrompt3(...args) {
-    return legacyMethod35("syncGalleryInputsFromPrompt", ...args);
+    return legacyMethod34("syncGalleryInputsFromPrompt", ...args);
   }
   function missingGalleryInputs2(...args) {
-    return legacyMethod35("missingGalleryInputs", ...args);
+    return legacyMethod34("missingGalleryInputs", ...args);
   }
   function missingReferenceAssetInputs2(...args) {
-    return legacyMethod35("missingReferenceAssetInputs", ...args);
+    return legacyMethod34("missingReferenceAssetInputs", ...args);
   }
   function customSizeValidationMessage2(...args) {
-    return legacyMethod35("customSizeValidationMessage", ...args);
+    return legacyMethod34("customSizeValidationMessage", ...args);
   }
   function updatePixelPreview2(...args) {
-    return legacyMethod35("updatePixelPreview", ...args);
+    return legacyMethod34("updatePixelPreview", ...args);
   }
   function addPendingTask2(...args) {
-    return legacyMethod35("addPendingTask", ...args);
+    return legacyMethod34("addPendingTask", ...args);
   }
   function replacePendingTask2(...args) {
-    return legacyMethod35("replacePendingTask", ...args);
+    return legacyMethod34("replacePendingTask", ...args);
   }
   function startRunFeedback2(...args) {
-    return legacyMethod35("startRunFeedback", ...args);
+    return legacyMethod34("startRunFeedback", ...args);
   }
   function stopRunFeedback2(...args) {
-    return legacyMethod35("stopRunFeedback", ...args);
+    return legacyMethod34("stopRunFeedback", ...args);
   }
   function markPendingTaskFailed2(...args) {
-    return legacyMethod35("markPendingTaskFailed", ...args);
+    return legacyMethod34("markPendingTaskFailed", ...args);
   }
   function refreshRecentAssets2(...args) {
-    return legacyMethod35("refreshRecentAssets", ...args);
+    return legacyMethod34("refreshRecentAssets", ...args);
   }
   function renderPreview4(...args) {
-    return legacyMethod35("renderPreview", ...args);
+    return legacyMethod34("renderPreview", ...args);
   }
   function applyTaskToForm(task) {
     const params = task.params || {};
     setMode5(task.mode || "generate");
     setPromptWithGalleryRefs2(task.prompt || "", task.gallery_refs || []);
     const mainModel = params.main_model || task.request?.model;
-    if (mainModel && els34.mainModel) {
-      els34.mainModel.value = mainModel;
+    if (mainModel && els33.mainModel) {
+      els33.mainModel.value = mainModel;
       persistMainModel2();
     }
     if (params.api_mode) {
-      state25.apiSettings = normalizeApiSettings2(state25.apiSettings);
-      if (params.api_provider_id && state25.apiSettings.providers.some((provider) => provider.id === params.api_provider_id)) {
-        state25.apiSettings.active_provider_id = params.api_provider_id;
+      state24.apiSettings = normalizeApiSettings2(state24.apiSettings);
+      if (params.api_provider_id && state24.apiSettings.providers.some((provider) => provider.id === params.api_provider_id)) {
+        state24.apiSettings.active_provider_id = params.api_provider_id;
       }
-      state25.apiSettings.providers = state25.apiSettings.providers.map((provider) => provider.id === state25.apiSettings.active_provider_id ? {
+      state24.apiSettings.providers = state24.apiSettings.providers.map((provider) => provider.id === state24.apiSettings.active_provider_id ? {
         ...provider,
         api_mode: params.api_mode,
         images_concurrency: params.api_images_concurrency ? normalizeApiImagesConcurrency2(params.api_images_concurrency) : provider.images_concurrency
@@ -11560,28 +11290,28 @@ ${galleryText}`;
       persistApiSettings2();
       populateApiSettingsForm2();
     }
-    if (els34.promptFidelity) {
+    if (els33.promptFidelity) {
       const fidelity = ["strict", "original", "off"].includes(params.prompt_fidelity) ? params.prompt_fidelity : "strict";
-      els34.promptFidelity.value = fidelity;
-      els34.promptFidelity.dispatchEvent(new Event("change"));
+      els33.promptFidelity.value = fidelity;
+      els33.promptFidelity.dispatchEvent(new Event("change"));
     }
-    if (params.model) els34.model.value = params.model;
+    if (params.model) els33.model.value = params.model;
     if (params.size) syncSizeControlsFromSize2(params.size);
-    if (params.n && els34.nInput) {
-      els34.nInput.value = String(params.n);
+    if (params.n && els33.nInput) {
+      els33.nInput.value = String(params.n);
     }
-    if (params.quality) els34.quality.value = params.quality;
-    if (params.output_format) els34.outputFormat.value = params.output_format;
-    if (params.moderation) els34.moderation.value = params.moderation;
+    if (params.quality) els33.quality.value = params.quality;
+    if (params.output_format) els33.outputFormat.value = params.output_format;
+    if (params.moderation) els33.moderation.value = params.moderation;
     if (params.output_compression !== null && params.output_compression !== void 0) {
-      els34.compression.value = params.output_compression;
+      els33.compression.value = params.output_compression;
     }
-    [els34.quality, els34.outputFormat, els34.moderation].forEach((element2) => {
+    [els33.quality, els33.outputFormat, els33.moderation].forEach((element2) => {
       element2.dispatchEvent(new Event("change"));
     });
     updatePromptCount6();
     updateQuantity2();
-    syncRadioButtons2(els34.nInput);
+    syncRadioButtons2(els33.nInput);
     updateCompression2();
     updateCustomSize2();
     updateRequestPreview11();
@@ -11595,7 +11325,7 @@ ${galleryText}`;
     const isApi = authSource === "api";
     const requestedBackend = backendForAuthSource2(authSource, isApi ? currentApiMode4() : null);
     const payload = {
-      mode: state25.mode,
+      mode: state24.mode,
       auth_source: authSource,
       requested_backend: requestedBackend,
       prompt: getPromptText9(),
@@ -11614,7 +11344,7 @@ ${galleryText}`;
     };
     if (isApi) {
       const apiMode = currentApiMode4();
-      const action = state25.mode === "edit" || uploads.length || assets.length || galleries.length ? "edit" : "generate";
+      const action = state24.mode === "edit" || uploads.length || assets.length || galleries.length ? "edit" : "generate";
       payload.api_provider_id = currentApiProviderId3();
       payload.api_provider_name = currentApiProviderLabel3();
       payload.webui_api_provider_id = payload.api_provider_id;
@@ -11647,7 +11377,7 @@ ${galleryText}`;
   function createPendingTask() {
     const taskId = `pending-${Date.now()}`;
     const now = (/* @__PURE__ */ new Date()).toISOString();
-    const localInputFiles = state25.images.slice();
+    const localInputFiles = state24.images.slice();
     const previewSource = localInputFiles[0];
     const request = buildPreviewRequest2();
     return {
@@ -11656,7 +11386,7 @@ ${galleryText}`;
       created_at: now,
       updated_at: now,
       started_at: now,
-      mode: state25.mode,
+      mode: state24.mode,
       status: "submitting",
       prompt: getPromptText9(),
       prompt_for_model: currentPromptForModel2(),
@@ -11673,7 +11403,7 @@ ${galleryText}`;
     };
   }
   function addQueuedTask(task) {
-    replacePendingTask2(state25.pendingTaskId || task.task_id, task);
+    replacePendingTask2(state24.pendingTaskId || task.task_id, task);
   }
   async function runTask() {
     syncPromptFromEditor6();
@@ -11684,26 +11414,26 @@ ${galleryText}`;
     const galleries = galleryInputs4();
     const assets = referenceAssetInputs3();
     if (missingGalleryInputs2().length) {
-      setStatus18("\u6709\u56FE\u5E93\u53C2\u8003\u56FE\u5DF2\u5220\u9664\uFF0C\u8BF7\u79FB\u9664\u540E\u518D\u751F\u6210", "error");
+      setStatus17("\u6709\u56FE\u5E93\u53C2\u8003\u56FE\u5DF2\u5220\u9664\uFF0C\u8BF7\u79FB\u9664\u540E\u518D\u751F\u6210", "error");
       return;
     }
     if (missingReferenceAssetInputs2().length) {
-      setStatus18("\u6709\u6700\u8FD1\u4E0A\u4F20\u53C2\u8003\u56FE\u5DF2\u5220\u9664\uFF0C\u8BF7\u79FB\u9664\u540E\u518D\u751F\u6210", "error");
+      setStatus17("\u6709\u6700\u8FD1\u4E0A\u4F20\u53C2\u8003\u56FE\u5DF2\u5220\u9664\uFF0C\u8BF7\u79FB\u9664\u540E\u518D\u751F\u6210", "error");
       return;
     }
     if (!prompt) {
-      setStatus18("\u8BF7\u8F93\u5165\u63D0\u793A\u8BCD", "error");
+      setStatus17("\u8BF7\u8F93\u5165\u63D0\u793A\u8BCD", "error");
       return;
     }
-    if (state25.mode === "edit" && !uploads.length && !assets.length && !galleries.length) {
-      setStatus18("\u7F16\u8F91\u6A21\u5F0F\u81F3\u5C11\u9700\u8981 1 \u5F20\u56FE\u7247", "error");
+    if (state24.mode === "edit" && !uploads.length && !assets.length && !galleries.length) {
+      setStatus17("\u7F16\u8F91\u6A21\u5F0F\u81F3\u5C11\u9700\u8981 1 \u5F20\u56FE\u7247", "error");
       return;
     }
-    const customSizeError = els34.size?.value === "custom" ? customSizeValidationMessage2() : "";
+    const customSizeError = els33.size?.value === "custom" ? customSizeValidationMessage2() : "";
     if (customSizeError) {
       updateCustomSize2();
       updatePixelPreview2("custom");
-      setStatus18(customSizeError, "error");
+      setStatus17(customSizeError, "error");
       return;
     }
     const form = new FormData();
@@ -11722,27 +11452,27 @@ ${galleryText}`;
       form.append("api_provider_id", currentApiProviderId3());
       form.append("api_mode", currentApiMode4());
     }
-    if (els34.outputFormat.value !== "png") {
+    if (els33.outputFormat.value !== "png") {
       form.append("output_compression", String(params.output_compression));
     }
     galleries.forEach((source) => form.append("gallery_image_ids", source.id));
     assets.forEach((source) => form.append("reference_asset_ids", source.id));
-    if (state25.mode === "generate") {
+    if (state24.mode === "generate") {
       uploads.forEach((source) => form.append("reference_images", source.file));
     } else {
       uploads.forEach((source) => form.append("images", source.file));
     }
     const pendingTask = createPendingTask();
     addPendingTask2(pendingTask);
-    if (els34.requestJson) {
-      els34.requestJson.textContent = JSON.stringify(pendingTask.request, null, 2);
+    if (els33.requestJson) {
+      els33.requestJson.textContent = JSON.stringify(pendingTask.request, null, 2);
     }
     startRunFeedback2(pendingTask, "\u63D0\u4EA4\u4E2D");
-    els34.runButton.disabled = true;
+    els33.runButton.disabled = true;
     const controller = new AbortController();
     const submitTimeoutId = window.setTimeout(() => controller.abort(), SUBMIT_TASK_TIMEOUT_MS);
     try {
-      const response = await fetch(state25.mode === "edit" ? "/api/edit" : "/api/generate", {
+      const response = await fetch(state24.mode === "edit" ? "/api/edit" : "/api/generate", {
         method: "POST",
         body: form,
         signal: controller.signal
@@ -11752,11 +11482,11 @@ ${galleryText}`;
         throw new Error(data.detail || "\u8BF7\u6C42\u5931\u8D25");
       }
       addQueuedTask(data.task);
-      if (els34.requestJson) {
-        els34.requestJson.textContent = JSON.stringify(data.request || {}, null, 2);
+      if (els33.requestJson) {
+        els33.requestJson.textContent = JSON.stringify(data.request || {}, null, 2);
       }
       stopRunFeedback2();
-      setStatus18("\u4EFB\u52A1\u5DF2\u52A0\u5165\u961F\u5217", "ok");
+      setStatus17("\u4EFB\u52A1\u5DF2\u52A0\u5165\u961F\u5217", "ok");
       await window.refreshQueue?.();
       await refreshRecentAssets2();
       renderPreview4(data.task);
@@ -11764,11 +11494,11 @@ ${galleryText}`;
       stopRunFeedback2();
       const message = error instanceof DOMException && error.name === "AbortError" ? "\u63D0\u4EA4\u4EFB\u52A1\u8D85\u65F6\uFF0C\u540E\u7AEF\u6CA1\u6709\u53CA\u65F6\u8FD4\u56DE\u3002\u8BF7\u5237\u65B0\u961F\u5217\u540E\u786E\u8BA4\u662F\u5426\u5DF2\u5165\u961F\uFF0C\u518D\u51B3\u5B9A\u662F\u5426\u91CD\u8BD5\u3002" : errorMessage4(error, "\u4EFB\u52A1\u63D0\u4EA4\u5931\u8D25");
       markPendingTaskFailed2(pendingTask.task_id, message);
-      setStatus18(message, "error");
+      setStatus17(message, "error");
     } finally {
       window.clearTimeout(submitTimeoutId);
       stopRunFeedback2();
-      els34.runButton.disabled = !state25.authAvailable;
+      els33.runButton.disabled = !state24.authAvailable;
     }
   }
   function initTaskSubmitFeature() {
@@ -11782,58 +11512,58 @@ ${galleryText}`;
   }
 
   // codex_image/webui/frontend/src/task-list-controls.ts
-  var bridge32 = getLegacyBridge();
-  var state26 = bridge32.state;
-  var els35 = bridge32.els;
-  function legacyMethod36(name, ...args) {
+  var bridge31 = getLegacyBridge();
+  var state25 = bridge31.state;
+  var els34 = bridge31.els;
+  function legacyMethod35(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy bridge method " + name + " is not available");
     }
     return method(...args);
   }
-  var renderTasks6 = () => legacyMethod36("renderTasks");
-  var setExpandedTaskGroupKey2 = (...args) => legacyMethod36("setExpandedTaskGroupKey", ...args);
-  var scrollExpandedTaskGroupToTop3 = (...args) => legacyMethod36("scrollExpandedTaskGroupToTop", ...args);
-  var captureTaskHistoryLayout3 = (...args) => legacyMethod36("captureTaskHistoryLayout", ...args);
-  var animateTaskHistoryLayout3 = (...args) => legacyMethod36("animateTaskHistoryLayout", ...args);
-  var archiveTask2 = (...args) => legacyMethod36("archiveTask", ...args);
-  var openTaskDeleteConfirm3 = (...args) => legacyMethod36("openTaskDeleteConfirm", ...args);
-  var toggleBatchMode2 = (...args) => legacyMethod36("toggleBatchMode", ...args);
-  var toggleBatchTaskSelection2 = (...args) => legacyMethod36("toggleBatchTaskSelection", ...args);
-  var archiveSelectedTasks2 = (...args) => legacyMethod36("archiveSelectedTasks", ...args);
-  var openBatchDeleteConfirm2 = (...args) => legacyMethod36("openBatchDeleteConfirm", ...args);
-  var handleTaskListPointerDown2 = (...args) => legacyMethod36("handleTaskListPointerDown", ...args);
-  var openArchiveModal2 = (...args) => legacyMethod36("openArchiveModal", ...args);
-  var closeArchiveModal2 = (...args) => legacyMethod36("closeArchiveModal", ...args);
+  var renderTasks6 = () => legacyMethod35("renderTasks");
+  var setExpandedTaskGroupKey2 = (...args) => legacyMethod35("setExpandedTaskGroupKey", ...args);
+  var scrollExpandedTaskGroupToTop3 = (...args) => legacyMethod35("scrollExpandedTaskGroupToTop", ...args);
+  var captureTaskHistoryLayout3 = (...args) => legacyMethod35("captureTaskHistoryLayout", ...args);
+  var animateTaskHistoryLayout3 = (...args) => legacyMethod35("animateTaskHistoryLayout", ...args);
+  var archiveTask2 = (...args) => legacyMethod35("archiveTask", ...args);
+  var openTaskDeleteConfirm3 = (...args) => legacyMethod35("openTaskDeleteConfirm", ...args);
+  var toggleBatchMode2 = (...args) => legacyMethod35("toggleBatchMode", ...args);
+  var toggleBatchTaskSelection2 = (...args) => legacyMethod35("toggleBatchTaskSelection", ...args);
+  var archiveSelectedTasks2 = (...args) => legacyMethod35("archiveSelectedTasks", ...args);
+  var openBatchDeleteConfirm2 = (...args) => legacyMethod35("openBatchDeleteConfirm", ...args);
+  var handleTaskListPointerDown2 = (...args) => legacyMethod35("handleTaskListPointerDown", ...args);
+  var openArchiveModal2 = (...args) => legacyMethod35("openArchiveModal", ...args);
+  var closeArchiveModal2 = (...args) => legacyMethod35("closeArchiveModal", ...args);
   var taskListControlsInitialized = false;
   var taskListControlEventsBound = false;
   function bindTaskListControlEvents() {
     if (taskListControlEventsBound) return;
     taskListControlEventsBound = true;
-    els35.archiveButton?.addEventListener("click", openArchiveModal2);
-    els35.archiveModalClose?.addEventListener("click", closeArchiveModal2);
-    els35.archiveModal?.addEventListener("click", (event) => {
-      if (event.target === els35.archiveModal) closeArchiveModal2();
+    els34.archiveButton?.addEventListener("click", openArchiveModal2);
+    els34.archiveModalClose?.addEventListener("click", closeArchiveModal2);
+    els34.archiveModal?.addEventListener("click", (event) => {
+      if (event.target === els34.archiveModal) closeArchiveModal2();
     });
-    els35.batchManageButton?.addEventListener("click", () => toggleBatchMode2());
-    els35.batchArchiveButton?.addEventListener("click", archiveSelectedTasks2);
-    els35.batchDeleteButton?.addEventListener("click", openBatchDeleteConfirm2);
-    els35.batchCancelButton?.addEventListener("click", () => toggleBatchMode2(false));
-    els35.taskSearch.addEventListener("input", renderTasks6);
-    [els35.taskRatioFilter, els35.taskOrientationFilter, els35.taskPromptFidelityFilter, els35.taskResolutionFilter].filter(Boolean).forEach((element2) => {
+    els34.batchManageButton?.addEventListener("click", () => toggleBatchMode2());
+    els34.batchArchiveButton?.addEventListener("click", archiveSelectedTasks2);
+    els34.batchDeleteButton?.addEventListener("click", openBatchDeleteConfirm2);
+    els34.batchCancelButton?.addEventListener("click", () => toggleBatchMode2(false));
+    els34.taskSearch.addEventListener("input", renderTasks6);
+    [els34.taskRatioFilter, els34.taskOrientationFilter, els34.taskPromptFidelityFilter, els34.taskResolutionFilter].filter(Boolean).forEach((element2) => {
       element2.addEventListener("change", renderTasks6);
     });
     bindTaskListEvents();
   }
   function bindTaskListEvents() {
-    const interactiveRoot = els35.taskHistoryShell || els35.sidebarContent || els35.taskList;
+    const interactiveRoot = els34.taskHistoryShell || els34.sidebarContent || els34.taskList;
     interactiveRoot?.addEventListener("click", handleTaskListClick);
     interactiveRoot?.addEventListener("keydown", handleTaskListKeydown);
-    els35.taskList?.addEventListener("pointerdown", handleTaskListPointerDown2);
+    els34.taskList?.addEventListener("pointerdown", handleTaskListPointerDown2);
   }
   function taskHistoryInteractiveRoot() {
-    return els35.taskHistoryShell || els35.sidebarContent || els35.taskList;
+    return els34.taskHistoryShell || els34.sidebarContent || els34.taskList;
   }
   function commitExpandedTaskGroupKey(nextKey, behavior = null) {
     const previousLayout = captureTaskHistoryLayout3();
@@ -11850,8 +11580,8 @@ ${galleryText}`;
     commitExpandedTaskGroupKey(nextKey);
   }
   function handleTaskListClick(event) {
-    if (state26.suppressTaskClickAfterDrag) {
-      state26.suppressTaskClickAfterDrag = false;
+    if (state25.suppressTaskClickAfterDrag) {
+      state25.suppressTaskClickAfterDrag = false;
       event.preventDefault();
       event.stopPropagation();
       return;
@@ -11888,11 +11618,11 @@ ${galleryText}`;
     const card = event.target.closest(".task-card[data-task-id]");
     const root = taskHistoryInteractiveRoot();
     if (!card || !root?.contains(card)) return;
-    if (state26.batchMode) {
+    if (state25.batchMode) {
       toggleBatchTaskSelection2(card.dataset.taskId);
       return;
     }
-    legacyMethod36("selectTask", card.dataset.taskId);
+    legacyMethod35("selectTask", card.dataset.taskId);
   }
   function handleTaskListKeydown(event) {
     if (event.key !== "Enter" && event.key !== " ") return;
@@ -11900,10 +11630,10 @@ ${galleryText}`;
     const root = taskHistoryInteractiveRoot();
     if (!card || !root?.contains(card) || event.target.closest("button")) return;
     event.preventDefault();
-    if (state26.batchMode) {
+    if (state25.batchMode) {
       toggleBatchTaskSelection2(card.dataset.taskId);
     } else {
-      legacyMethod36("selectTask", card.dataset.taskId);
+      legacyMethod35("selectTask", card.dataset.taskId);
     }
   }
   function initTaskListControlsFeature() {
@@ -11936,16 +11666,16 @@ ${galleryText}`;
     window.updateQueueElapsedDisplays = updateQueueElapsedDisplays;
   }
   function bindQueueControls() {
-    const els43 = getEls();
-    els43.queueButton?.addEventListener("click", jumpToActiveTaskGroup);
+    const els42 = getEls();
+    els42.queueButton?.addEventListener("click", jumpToActiveTaskGroup);
   }
   function startRealtimeUpdates({ migrateLegacyArchives = false } = {}) {
-    const state33 = getState();
+    const state32 = getState();
     if (!window.EventSource) return false;
     closeRealtimeUpdates();
-    state33.realtimeSnapshotNeedsArchiveMigration = migrateLegacyArchives;
+    state32.realtimeSnapshotNeedsArchiveMigration = migrateLegacyArchives;
     const source = new EventSource(REALTIME_EVENTS_URL);
-    state33.realtimeSource = source;
+    state32.realtimeSource = source;
     source.onmessage = (event) => {
       handleRealtimeMessage(event).catch((error) => {
         console.error(error);
@@ -11953,10 +11683,10 @@ ${galleryText}`;
       });
     };
     source.onerror = () => {
-      if (state33.realtimeSource !== source) return;
-      const shouldMigrateArchives = state33.realtimeSnapshotNeedsArchiveMigration;
+      if (state32.realtimeSource !== source) return;
+      const shouldMigrateArchives = state32.realtimeSnapshotNeedsArchiveMigration;
       closeRealtimeUpdates();
-      state33.realtimeSnapshotNeedsArchiveMigration = false;
+      state32.realtimeSnapshotNeedsArchiveMigration = false;
       void refreshQueue();
       void getLegacyBridge().methods.refreshTasks({ migrateLegacyArchives: shouldMigrateArchives });
       getLegacyBridge().methods.setStatus("\u5B9E\u65F6\u72B6\u6001\u8FDE\u63A5\u5DF2\u65AD\u5F00\uFF0C\u5237\u65B0\u9875\u9762\u53EF\u6062\u590D", "error");
@@ -11964,10 +11694,10 @@ ${galleryText}`;
     return true;
   }
   function closeRealtimeUpdates() {
-    const state33 = getState();
-    if (!state33.realtimeSource) return;
-    state33.realtimeSource.close();
-    state33.realtimeSource = null;
+    const state32 = getState();
+    if (!state32.realtimeSource) return;
+    state32.realtimeSource.close();
+    state32.realtimeSource = null;
   }
   async function handleRealtimeMessage(event) {
     if (!event.data) return;
@@ -11975,14 +11705,14 @@ ${galleryText}`;
     await handleRealtimePayload(payload);
   }
   async function handleRealtimePayload(payload) {
-    const bridge40 = getLegacyBridge();
-    const state33 = bridge40.state;
+    const bridge39 = getLegacyBridge();
+    const state32 = bridge39.state;
     if (payload?.type === "snapshot") {
       applyQueueState(payload.queue);
-      await bridge40.methods.applyTasksSnapshot(payload.tasks || [], {
-        migrateLegacyArchives: state33.realtimeSnapshotNeedsArchiveMigration
+      await bridge39.methods.applyTasksSnapshot(payload.tasks || [], {
+        migrateLegacyArchives: state32.realtimeSnapshotNeedsArchiveMigration
       });
-      state33.realtimeSnapshotNeedsArchiveMigration = false;
+      state32.realtimeSnapshotNeedsArchiveMigration = false;
       return;
     }
     if (payload?.type === "queue") {
@@ -11991,26 +11721,26 @@ ${galleryText}`;
       return;
     }
     if (payload?.type === "task") {
-      const previousTask = state33.tasks.find((item) => String(item.task_id) === String(payload.task?.task_id));
-      bridge40.methods.notifyTaskUpdate?.(previousTask, payload.task);
-      bridge40.methods.applyTaskUpdate(payload.task);
+      const previousTask = state32.tasks.find((item) => String(item.task_id) === String(payload.task?.task_id));
+      bridge39.methods.notifyTaskUpdate?.(previousTask, payload.task);
+      bridge39.methods.applyTaskUpdate(payload.task);
     }
   }
   async function refreshQueue() {
-    const bridge40 = getLegacyBridge();
-    const state33 = bridge40.state;
-    const requestSeq = ++state33.queueRequestSeq;
+    const bridge39 = getLegacyBridge();
+    const state32 = bridge39.state;
+    const requestSeq = ++state32.queueRequestSeq;
     try {
       const response = await fetch("/api/queue");
       const data = await response.json();
-      if (requestSeq !== state33.queueRequestSeq) return;
+      if (requestSeq !== state32.queueRequestSeq) return;
       if (!response.ok) {
         throw new Error(data.detail || "\u961F\u5217\u8BFB\u53D6\u5931\u8D25");
       }
-      state33.queue = normalizeQueueState(data);
+      state32.queue = normalizeQueueState(data);
       renderQueue();
     } catch (error) {
-      bridge40.methods.setStatus(errorMessage5(error, "\u961F\u5217\u8BFB\u53D6\u5931\u8D25"), "error");
+      bridge39.methods.setStatus(errorMessage5(error, "\u961F\u5217\u8BFB\u53D6\u5931\u8D25"), "error");
     }
   }
   function defaultQueueState() {
@@ -12028,17 +11758,17 @@ ${galleryText}`;
     getState().queueRequestSeq += 1;
   }
   function applyQueueState(queue) {
-    const state33 = getState();
+    const state32 = getState();
     invalidateQueueRequests();
-    state33.queue = normalizeQueueState(queue);
+    state32.queue = normalizeQueueState(queue);
     renderQueue();
   }
   function renderQueue() {
-    const bridge40 = getLegacyBridge();
-    const state33 = bridge40.state;
-    const summary = state33.queue.summary || {};
-    const waitingCount = Number(summary.waiting_count ?? state33.queue.waiting.length ?? 0);
-    const runningCount = Number(summary.running_count ?? state33.queue.running.length ?? 0);
+    const bridge39 = getLegacyBridge();
+    const state32 = bridge39.state;
+    const summary = state32.queue.summary || {};
+    const waitingCount = Number(summary.waiting_count ?? state32.queue.waiting.length ?? 0);
+    const runningCount = Number(summary.running_count ?? state32.queue.running.length ?? 0);
     const channelCount = Number(summary.channel_count ?? 0);
     const usableChannelCount = Number(summary.usable_channel_count ?? channelCount);
     const dispatchPending = isQueueDispatchPending();
@@ -12049,23 +11779,23 @@ ${galleryText}`;
       usableChannelCount,
       dispatchPending
     });
-    bridge40.methods.updateDocumentTitle();
+    bridge39.methods.updateDocumentTitle();
     if (dispatchPending) {
       scheduleQueueDispatchSync();
     } else {
       clearQueueDispatchSync();
     }
     const nextRenderKey = queueListRenderKey();
-    if (state33.queueRenderKey === nextRenderKey) {
+    if (state32.queueRenderKey === nextRenderKey) {
       updateQueueElapsedDisplays();
       return;
     }
-    state33.queueRenderKey = nextRenderKey;
+    state32.queueRenderKey = nextRenderKey;
     renderActiveTaskGroupForQueueChange();
   }
   function renderActiveTaskGroupForQueueChange() {
-    const bridge40 = getLegacyBridge();
-    bridge40.methods.renderTasks?.();
+    const bridge39 = getLegacyBridge();
+    bridge39.methods.renderTasks?.();
   }
   function renderQueueStatusChip({
     waitingCount,
@@ -12074,55 +11804,55 @@ ${galleryText}`;
     usableChannelCount,
     dispatchPending
   }) {
-    const els43 = getEls();
+    const els42 = getEls();
     const total = waitingCount + runningCount;
     const channelText = usableChannelCount === channelCount ? `\u901A\u9053 ${channelCount}` : `\u53EF\u7528\u901A\u9053 ${usableChannelCount}/${channelCount}`;
     const text = dispatchPending ? `\u8C03\u5EA6\u4E2D \xB7 \u7B49\u5F85 ${waitingCount}` : total ? `\u8FD0\u884C ${runningCount} \xB7 \u7B49\u5F85 ${waitingCount}` : "\u6682\u65E0\u6392\u961F";
     const label = total ? `\u961F\u5217\u72B6\u6001\uFF1A${text} \xB7 ${channelText}\u3002\u70B9\u51FB\u8DF3\u8F6C\u5230\u8FDB\u884C\u4E2D\u4EFB\u52A1` : "\u961F\u5217\u72B6\u6001\uFF1A\u6682\u65E0\u6392\u961F";
-    if (els43.queueStatusText) els43.queueStatusText.textContent = text;
-    if (els43.queueButton) {
-      els43.queueButton.setAttribute("aria-label", label);
-      els43.queueButton.title = total ? "\u8DF3\u8F6C\u5230\u8FDB\u884C\u4E2D\u4EFB\u52A1" : "\u6682\u65E0\u6392\u961F\u4EFB\u52A1";
-      els43.queueButton.classList.toggle("has-queue", total > 0 || dispatchPending);
+    if (els42.queueStatusText) els42.queueStatusText.textContent = text;
+    if (els42.queueButton) {
+      els42.queueButton.setAttribute("aria-label", label);
+      els42.queueButton.title = total ? "\u8DF3\u8F6C\u5230\u8FDB\u884C\u4E2D\u4EFB\u52A1" : "\u6682\u65E0\u6392\u961F\u4EFB\u52A1";
+      els42.queueButton.classList.toggle("has-queue", total > 0 || dispatchPending);
     }
   }
   function jumpToActiveTaskGroup() {
-    const bridge40 = getLegacyBridge();
-    const state33 = bridge40.state;
-    const hasActiveTasks = Boolean((state33.queue.running || []).length || (state33.queue.waiting || []).length);
+    const bridge39 = getLegacyBridge();
+    const state32 = bridge39.state;
+    const hasActiveTasks = Boolean((state32.queue.running || []).length || (state32.queue.waiting || []).length);
     if (!hasActiveTasks) return;
-    bridge40.methods.revealActiveTaskGroup?.();
+    bridge39.methods.revealActiveTaskGroup?.();
   }
   function isQueueDispatchPending() {
-    const state33 = getState();
-    const summary = state33.queue.summary || {};
-    const waitingCount = Number(summary.waiting_count ?? state33.queue.waiting.length ?? 0);
-    const runningCount = Number(summary.running_count ?? state33.queue.running.length ?? 0);
+    const state32 = getState();
+    const summary = state32.queue.summary || {};
+    const waitingCount = Number(summary.waiting_count ?? state32.queue.waiting.length ?? 0);
+    const runningCount = Number(summary.running_count ?? state32.queue.running.length ?? 0);
     const channelCount = Number(summary.channel_count ?? 0);
     const usableChannelCount = Number(summary.usable_channel_count ?? channelCount);
     return waitingCount > 0 && runningCount === 0 && usableChannelCount > 0;
   }
   function scheduleQueueDispatchSync() {
-    const state33 = getState();
-    if (state33.queueDispatchSyncTimerId) return;
-    state33.queueDispatchSyncTimerId = window.setTimeout(() => {
-      state33.queueDispatchSyncTimerId = null;
+    const state32 = getState();
+    if (state32.queueDispatchSyncTimerId) return;
+    state32.queueDispatchSyncTimerId = window.setTimeout(() => {
+      state32.queueDispatchSyncTimerId = null;
       if (isQueueDispatchPending()) {
         void refreshQueue();
       }
     }, QUEUE_DISPATCH_RESYNC_DELAY_MS);
   }
   function clearQueueDispatchSync() {
-    const state33 = getState();
-    if (!state33.queueDispatchSyncTimerId) return;
-    window.clearTimeout(state33.queueDispatchSyncTimerId);
-    state33.queueDispatchSyncTimerId = null;
+    const state32 = getState();
+    if (!state32.queueDispatchSyncTimerId) return;
+    window.clearTimeout(state32.queueDispatchSyncTimerId);
+    state32.queueDispatchSyncTimerId = null;
   }
   function queueListRenderKey() {
-    const state33 = getState();
+    const state32 = getState();
     return JSON.stringify({
-      summary: state33.queue.summary || {},
-      running: (state33.queue.running || []).map((task) => [
+      summary: state32.queue.summary || {},
+      running: (state32.queue.running || []).map((task) => [
         task.task_id,
         task.status,
         task.viewed_at,
@@ -12132,7 +11862,7 @@ ${galleryText}`;
         task.started_at,
         task.attempts
       ]),
-      waiting: (state33.queue.waiting || []).map((task) => [
+      waiting: (state32.queue.waiting || []).map((task) => [
         task.task_id,
         task.status,
         task.prompt,
@@ -12142,11 +11872,11 @@ ${galleryText}`;
     });
   }
   function queueItemTitleText(task, position = null) {
-    const bridge40 = getLegacyBridge();
+    const bridge39 = getLegacyBridge();
     const queueTask = task;
-    const prefix = position ? `#${position}` : bridge40.methods.formatTaskStatus(task) || "\u4EFB\u52A1";
+    const prefix = position ? `#${position}` : bridge39.methods.formatTaskStatus(task) || "\u4EFB\u52A1";
     const mode = taskModeLabel(task);
-    const count = `${bridge40.methods.taskTotalCount(task)} \u5F20`;
+    const count = `${bridge39.methods.taskTotalCount(task)} \u5F20`;
     const size = queueTask.output_size || task.params?.size || "";
     return [prefix, mode, count, size].filter(Boolean).join(" \xB7 ");
   }
@@ -12156,7 +11886,7 @@ ${galleryText}`;
     return "";
   }
   async function promoteQueueTask(taskId) {
-    const bridge40 = getLegacyBridge();
+    const bridge39 = getLegacyBridge();
     if (!taskId) return;
     invalidateQueueRequests();
     try {
@@ -12164,9 +11894,9 @@ ${galleryText}`;
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.detail || "\u7F6E\u9876\u5931\u8D25");
       applyQueueState(data);
-      await bridge40.methods.refreshTasks();
+      await bridge39.methods.refreshTasks();
     } catch (error) {
-      bridge40.methods.setStatus(errorMessage5(error, "\u7F6E\u9876\u5931\u8D25"), "error");
+      bridge39.methods.setStatus(errorMessage5(error, "\u7F6E\u9876\u5931\u8D25"), "error");
     }
   }
   function moveQueueTask(taskId, direction) {
@@ -12184,11 +11914,11 @@ ${galleryText}`;
     void reorderQueue(nextIds);
   }
   function deleteQueuedTask(button, taskId) {
-    const bridge40 = getLegacyBridge();
+    const bridge39 = getLegacyBridge();
     if (!taskId) return;
-    const task = bridge40.state.queue.waiting.find((item) => item.task_id === taskId);
+    const task = bridge39.state.queue.waiting.find((item) => item.task_id === taskId);
     const title = task ? queueItemTitleText(task, task.queue_position || null) : taskId;
-    bridge40.methods.openConfirmPopover(button, {
+    bridge39.methods.openConfirmPopover(button, {
       title: "\u5220\u9664\u7B49\u5F85\u4EFB\u52A1\uFF1F",
       message: "\u4F1A\u4ECE\u961F\u5217\u548C\u5386\u53F2\u5217\u8868\u4E2D\u79FB\u9664\u3002",
       detail: title,
@@ -12199,39 +11929,39 @@ ${galleryText}`;
     });
   }
   async function performDeleteQueuedTask(taskId) {
-    const bridge40 = getLegacyBridge();
-    const state33 = bridge40.state;
+    const bridge39 = getLegacyBridge();
+    const state32 = bridge39.state;
     invalidateQueueRequests();
     try {
       const response = await fetch(`/api/queue/${encodeURIComponent(taskId)}`, { method: "DELETE" });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.detail || "\u5220\u9664\u961F\u5217\u4EFB\u52A1\u5931\u8D25");
-      state33.tasks = state33.tasks.filter((item) => item.task_id !== taskId);
-      if (state33.selectedTaskId === taskId) {
-        state33.selectedTaskId = state33.tasks[0]?.task_id || null;
+      state32.tasks = state32.tasks.filter((item) => item.task_id !== taskId);
+      if (state32.selectedTaskId === taskId) {
+        state32.selectedTaskId = state32.tasks[0]?.task_id || null;
       }
       applyQueueState({
-        ...state33.queue,
-        waiting: state33.queue.waiting.filter((item) => item.task_id !== taskId),
+        ...state32.queue,
+        waiting: state32.queue.waiting.filter((item) => item.task_id !== taskId),
         summary: {
-          ...state33.queue.summary || {},
-          waiting_count: Math.max(0, Number(state33.queue.summary?.waiting_count || 0) - 1)
+          ...state32.queue.summary || {},
+          waiting_count: Math.max(0, Number(state32.queue.summary?.waiting_count || 0) - 1)
         }
       });
       await refreshQueue();
-      await bridge40.methods.refreshTasks();
-      bridge40.methods.renderPreview();
-      bridge40.methods.setStatus("\u961F\u5217\u4EFB\u52A1\u5DF2\u5220\u9664", "ok");
+      await bridge39.methods.refreshTasks();
+      bridge39.methods.renderPreview();
+      bridge39.methods.setStatus("\u961F\u5217\u4EFB\u52A1\u5DF2\u5220\u9664", "ok");
     } catch (error) {
-      bridge40.methods.setStatus(errorMessage5(error, "\u5220\u9664\u961F\u5217\u4EFB\u52A1\u5931\u8D25"), "error");
+      bridge39.methods.setStatus(errorMessage5(error, "\u5220\u9664\u961F\u5217\u4EFB\u52A1\u5931\u8D25"), "error");
     }
   }
   function cancelRunningTask(button, taskId) {
-    const bridge40 = getLegacyBridge();
+    const bridge39 = getLegacyBridge();
     if (!taskId) return;
-    const task = bridge40.state.queue.running.find((item) => item.task_id === taskId);
+    const task = bridge39.state.queue.running.find((item) => item.task_id === taskId);
     const title = task ? queueItemTitleText(task) : taskId;
-    bridge40.methods.openConfirmPopover(button, {
+    bridge39.methods.openConfirmPopover(button, {
       title: "\u53D6\u6D88\u8FD0\u884C\u4EFB\u52A1\uFF1F",
       message: "\u5F53\u524D\u4EFB\u52A1\u4F1A\u505C\u6B62\uFF0C\u5386\u53F2\u8BB0\u5F55\u4F1A\u4FDD\u7559\u3002",
       detail: title,
@@ -12242,31 +11972,31 @@ ${galleryText}`;
     });
   }
   async function performCancelRunningTask(taskId) {
-    const bridge40 = getLegacyBridge();
-    const state33 = bridge40.state;
+    const bridge39 = getLegacyBridge();
+    const state32 = bridge39.state;
     invalidateQueueRequests();
     try {
       const response = await fetch(`/api/queue/${encodeURIComponent(taskId)}`, { method: "DELETE" });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.detail || "\u53D6\u6D88\u4EFB\u52A1\u5931\u8D25");
       applyQueueState({
-        ...state33.queue,
-        running: state33.queue.running.filter((item) => item.task_id !== taskId),
+        ...state32.queue,
+        running: state32.queue.running.filter((item) => item.task_id !== taskId),
         summary: {
-          ...state33.queue.summary || {},
-          running_count: Math.max(0, Number(state33.queue.summary?.running_count || 0) - 1)
+          ...state32.queue.summary || {},
+          running_count: Math.max(0, Number(state32.queue.summary?.running_count || 0) - 1)
         }
       });
       await refreshQueue();
-      await bridge40.methods.refreshTasks();
-      bridge40.methods.renderPreview();
-      bridge40.methods.setStatus("\u4EFB\u52A1\u5DF2\u53D6\u6D88", "ok");
+      await bridge39.methods.refreshTasks();
+      bridge39.methods.renderPreview();
+      bridge39.methods.setStatus("\u4EFB\u52A1\u5DF2\u53D6\u6D88", "ok");
     } catch (error) {
-      bridge40.methods.setStatus(errorMessage5(error, "\u53D6\u6D88\u4EFB\u52A1\u5931\u8D25"), "error");
+      bridge39.methods.setStatus(errorMessage5(error, "\u53D6\u6D88\u4EFB\u52A1\u5931\u8D25"), "error");
     }
   }
   async function reorderQueue(taskIds) {
-    const bridge40 = getLegacyBridge();
+    const bridge39 = getLegacyBridge();
     invalidateQueueRequests();
     try {
       const response = await fetch(`/api/queue/reorder`, {
@@ -12277,9 +12007,9 @@ ${galleryText}`;
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.detail || "\u961F\u5217\u6392\u5E8F\u5931\u8D25");
       applyQueueState(data);
-      await bridge40.methods.refreshTasks();
+      await bridge39.methods.refreshTasks();
     } catch (error) {
-      bridge40.methods.setStatus(errorMessage5(error, "\u961F\u5217\u6392\u5E8F\u5931\u8D25"), "error");
+      bridge39.methods.setStatus(errorMessage5(error, "\u961F\u5217\u6392\u5E8F\u5931\u8D25"), "error");
       await refreshQueue();
     }
   }
@@ -12304,10 +12034,10 @@ ${galleryText}`;
   function handleQueueDrop(event) {
     event.preventDefault();
     event.stopPropagation();
-    const state33 = getState();
-    const draggedId = state33.queueDragTaskId;
+    const state32 = getState();
+    const draggedId = state32.queueDragTaskId;
     if (!draggedId) return;
-    const ids = (state33.queue.waiting || []).map((task) => task.task_id);
+    const ids = (state32.queue.waiting || []).map((task) => task.task_id);
     const nextIds = ids.filter((id) => id !== draggedId);
     const targetItem = eventTargetElement(event)?.closest("[data-queue-task-id]");
     const targetId = targetItem instanceof HTMLElement ? targetItem.dataset.queueTaskId : void 0;
@@ -12331,7 +12061,7 @@ ${galleryText}`;
     getState().queueDragTaskId = null;
   }
   function applyQueueTasks(queue) {
-    const bridge40 = getLegacyBridge();
+    const bridge39 = getLegacyBridge();
     const tasks = [
       ...Array.isArray(queue?.waiting) ? queue.waiting : [],
       ...Array.isArray(queue?.running) ? queue.running : []
@@ -12339,34 +12069,34 @@ ${galleryText}`;
     const queueTaskIds = new Set(tasks.map((task) => String(task.task_id)));
     if (!tasks.length) {
       if (selectedTaskNeedsQueueReconcile(queueTaskIds)) {
-        void bridge40.methods.refreshTasks();
+        void bridge39.methods.refreshTasks();
       }
       return;
     }
     let changed = false;
     tasks.forEach((task) => {
-      const previousTask = bridge40.state.tasks.find((item) => String(item.task_id) === String(task.task_id));
-      bridge40.methods.notifyTaskUpdate?.(previousTask, task);
-      changed = bridge40.methods.updateTaskInState(task) || changed;
-      if (String(task.task_id) === String(bridge40.state.selectedTaskId) && bridge40.methods.taskHasViewableUpdate(task)) {
-        void bridge40.methods.markTaskViewed(task.task_id);
+      const previousTask = bridge39.state.tasks.find((item) => String(item.task_id) === String(task.task_id));
+      bridge39.methods.notifyTaskUpdate?.(previousTask, task);
+      changed = bridge39.methods.updateTaskInState(task) || changed;
+      if (String(task.task_id) === String(bridge39.state.selectedTaskId) && bridge39.methods.taskHasViewableUpdate(task)) {
+        void bridge39.methods.markTaskViewed(task.task_id);
       }
     });
     if (!changed) return;
-    bridge40.methods.cleanupSessionSelections();
-    bridge40.methods.renderTasks();
-    bridge40.methods.renderArchiveButton();
-    bridge40.methods.renderArchiveModal();
-    bridge40.methods.renderPreview();
+    bridge39.methods.cleanupSessionSelections();
+    bridge39.methods.renderTasks();
+    bridge39.methods.renderArchiveButton();
+    bridge39.methods.renderArchiveModal();
+    bridge39.methods.renderPreview();
     if (selectedTaskNeedsQueueReconcile(queueTaskIds)) {
-      void bridge40.methods.refreshTasks();
+      void bridge39.methods.refreshTasks();
     }
   }
   function selectedTaskNeedsQueueReconcile(queueTaskIds) {
-    const bridge40 = getLegacyBridge();
-    const selectedTaskId = String(bridge40.state.selectedTaskId || "");
+    const bridge39 = getLegacyBridge();
+    const selectedTaskId = String(bridge39.state.selectedTaskId || "");
     if (!selectedTaskId || queueTaskIds.has(selectedTaskId)) return false;
-    const selectedTask = bridge40.state.tasks.find((task) => String(task.task_id) === selectedTaskId);
+    const selectedTask = bridge39.state.tasks.find((task) => String(task.task_id) === selectedTaskId);
     if (!selectedTask || selectedTask.local_pending) return false;
     const status = String(selectedTask.status || "");
     return ["submitting", "queued", "running"].includes(status);
@@ -12382,9 +12112,9 @@ ${galleryText}`;
   }
 
   // codex_image/webui/frontend/src/task-list-queue-controls.ts
-  var bridge33 = getLegacyBridge();
-  var state27 = bridge33.state;
-  var els36 = bridge33.els;
+  var bridge32 = getLegacyBridge();
+  var state26 = bridge32.state;
+  var els35 = bridge32.els;
   var taskListQueueControlsInitialized = false;
   var taskListQueueControlsBound = false;
   function eventTargetElement2(event) {
@@ -12398,7 +12128,7 @@ ${galleryText}`;
     event.stopPropagation();
   }
   function taskListQueueControlRoots() {
-    return [els36.taskActiveList, els36.taskList].filter((root) => root instanceof HTMLElement);
+    return [els35.taskActiveList, els35.taskList].filter((root) => root instanceof HTMLElement);
   }
   function bindTaskListQueueControls() {
     if (taskListQueueControlsBound) return;
@@ -12458,15 +12188,15 @@ ${galleryText}`;
     handleQueueDragStart(event);
   }
   function handleTaskListQueueDragOver(event) {
-    if (!state27.queueDragTaskId || !waitingDropTarget(event)) return;
+    if (!state26.queueDragTaskId || !waitingDropTarget(event)) return;
     handleQueueDragOver(event);
   }
   function handleTaskListQueueDrop(event) {
-    if (!state27.queueDragTaskId || !waitingDropTarget(event)) return;
+    if (!state26.queueDragTaskId || !waitingDropTarget(event)) return;
     handleQueueDrop(event);
   }
   function handleTaskListQueueDragEnd(event) {
-    if (!state27.queueDragTaskId) return;
+    if (!state26.queueDragTaskId) return;
     handleQueueDragEnd(event);
     taskListQueueControlRoots().forEach((root) => {
       root.querySelectorAll(".queue-dragging").forEach((element2) => {
@@ -12489,59 +12219,59 @@ ${galleryText}`;
   }
 
   // codex_image/webui/frontend/src/task-context-menu.ts
-  var bridge34 = getLegacyBridge();
-  var state28 = bridge34.state;
-  var els37 = bridge34.els;
+  var bridge33 = getLegacyBridge();
+  var state27 = bridge33.state;
+  var els36 = bridge33.els;
   var taskContextMenuInitialized = false;
   var taskContextMenuEventsBound = false;
   var taskContextMenuEl = null;
   var taskListMutationObserver = null;
-  function legacyMethod37(name, ...args) {
+  function legacyMethod36(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy bridge method " + name + " is not available");
     }
     return method(...args);
   }
-  function escapeHtml17(...args) {
-    return legacyMethod37("escapeHtml", ...args);
+  function escapeHtml16(...args) {
+    return legacyMethod36("escapeHtml", ...args);
   }
-  function setStatus19(...args) {
-    return legacyMethod37("setStatus", ...args);
+  function setStatus18(...args) {
+    return legacyMethod36("setStatus", ...args);
   }
   function closePromptPopover6(...args) {
-    return legacyMethod37("closePromptPopover", ...args);
+    return legacyMethod36("closePromptPopover", ...args);
   }
   function selectTask(...args) {
-    return legacyMethod37("selectTask", ...args);
+    return legacyMethod36("selectTask", ...args);
   }
   function applyTaskToForm2(...args) {
-    return legacyMethod37("applyTaskToForm", ...args);
+    return legacyMethod36("applyTaskToForm", ...args);
   }
   function archiveTask3(...args) {
-    return legacyMethod37("archiveTask", ...args);
+    return legacyMethod36("archiveTask", ...args);
   }
   function openTaskDeleteConfirm4(...args) {
-    return legacyMethod37("openTaskDeleteConfirm", ...args);
+    return legacyMethod36("openTaskDeleteConfirm", ...args);
   }
   function bindTaskContextMenuEvents() {
     if (taskContextMenuEventsBound) return;
     taskContextMenuEventsBound = true;
-    els37.taskList.addEventListener("contextmenu", handleTaskListContextMenu);
-    els37.taskList.addEventListener("keydown", handleTaskListContextMenuKeydown);
+    els36.taskList.addEventListener("contextmenu", handleTaskListContextMenu);
+    els36.taskList.addEventListener("keydown", handleTaskListContextMenuKeydown);
     document.addEventListener("click", handleTaskContextDocumentClick, true);
     document.addEventListener("keydown", handleTaskContextDocumentKeydown);
     document.addEventListener("scroll", closeTaskContextMenu, true);
     window.addEventListener("resize", closeTaskContextMenu);
     if ("MutationObserver" in window) {
       taskListMutationObserver = new MutationObserver(closeTaskContextMenu);
-      taskListMutationObserver.observe(els37.taskList, { childList: true });
+      taskListMutationObserver.observe(els36.taskList, { childList: true });
     }
   }
   function handleTaskListContextMenu(event) {
     const target = eventTargetElement3(event);
     const card = target?.closest(".task-card[data-task-id]");
-    if (!card || !els37.taskList.contains(card)) return;
+    if (!card || !els36.taskList.contains(card)) return;
     event.preventDefault();
     event.stopPropagation();
     openTaskContextMenu(card, event.clientX, event.clientY);
@@ -12550,7 +12280,7 @@ ${galleryText}`;
     if (event.key !== "ContextMenu" && !(event.shiftKey && event.key === "F10")) return;
     const target = eventTargetElement3(event);
     const card = target?.closest(".task-card[data-task-id]");
-    if (!card || !els37.taskList.contains(card)) return;
+    if (!card || !els36.taskList.contains(card)) return;
     event.preventDefault();
     const rect = card.getBoundingClientRect();
     openTaskContextMenu(card, rect.left + 18, rect.top + 18);
@@ -12614,7 +12344,7 @@ ${galleryText}`;
   function taskContextButton(action, label, disabled = false, danger = false) {
     const disabledAttr = disabled ? " disabled" : "";
     const dangerClass = danger ? " danger" : "";
-    return `<button class="task-context-menu-button${dangerClass}" type="button" role="menuitem" data-task-context-action="${action}"${disabledAttr}>${escapeHtml17(label)}</button>`;
+    return `<button class="task-context-menu-button${dangerClass}" type="button" role="menuitem" data-task-context-action="${action}"${disabledAttr}>${escapeHtml16(label)}</button>`;
   }
   function bindTaskContextMenuActionEvents(menu) {
     menu.querySelectorAll("[data-task-context-action]").forEach((button) => {
@@ -12645,20 +12375,20 @@ ${galleryText}`;
         await selectTask(taskId);
       } else if (action === "restore") {
         applyTaskToForm2(task);
-        setStatus19("\u5DF2\u6062\u590D\u4EFB\u52A1\u53C2\u6570", "ok");
+        setStatus18("\u5DF2\u6062\u590D\u4EFB\u52A1\u53C2\u6570", "ok");
       } else if (action === "copy-id") {
         await copyText(taskId);
-        setStatus19("\u4EFB\u52A1 ID \u5DF2\u590D\u5236", "ok");
+        setStatus18("\u4EFB\u52A1 ID \u5DF2\u590D\u5236", "ok");
       } else if (action === "copy-prompt") {
         await copyText(taskPromptText(task));
-        setStatus19("\u63D0\u793A\u8BCD\u5DF2\u590D\u5236", "ok");
+        setStatus18("\u63D0\u793A\u8BCD\u5DF2\u590D\u5236", "ok");
       } else if (action === "reveal-output") {
         await revealTaskOutputDirectory(taskId);
       } else if (action === "archive") {
         await archiveTask3(taskId);
       }
     } catch (error) {
-      setStatus19(errorMessage6(error, "\u4EFB\u52A1\u64CD\u4F5C\u5931\u8D25"), "error");
+      setStatus18(errorMessage6(error, "\u4EFB\u52A1\u64CD\u4F5C\u5931\u8D25"), "error");
     }
   }
   async function revealTaskOutputDirectory(taskId) {
@@ -12668,7 +12398,7 @@ ${galleryText}`;
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(data.detail || "\u6253\u5F00\u8F93\u51FA\u76EE\u5F55\u5931\u8D25");
-    setStatus19("\u5DF2\u6253\u5F00\u8F93\u51FA\u76EE\u5F55", "ok");
+    setStatus18("\u5DF2\u6253\u5F00\u8F93\u51FA\u76EE\u5F55", "ok");
   }
   async function copyText(text) {
     if (navigator.clipboard?.writeText) {
@@ -12686,7 +12416,7 @@ ${galleryText}`;
     input.remove();
   }
   function taskById(taskId) {
-    return state28.tasks.find((item) => String(item.task_id) === String(taskId));
+    return state27.tasks.find((item) => String(item.task_id) === String(taskId));
   }
   function taskPromptText(task) {
     return String(task?.prompt || task?.prompt_for_model || "").trim();
@@ -12767,18 +12497,18 @@ ${galleryText}`;
     return !getLegacyBridge().state.taskNotificationSeenKeys.has(taskNotificationSeenKey(nextTask, status));
   }
   function openTaskNotificationCenter() {
-    const state33 = getLegacyBridge().state;
-    state33.taskNotificationCenterOpen = true;
-    state33.taskNotifications = state33.taskNotifications.map((notification) => ({
+    const state32 = getLegacyBridge().state;
+    state32.taskNotificationCenterOpen = true;
+    state32.taskNotifications = state32.taskNotifications.map((notification) => ({
       ...notification,
       unread: false
     }));
     renderTaskNotifications();
   }
   function closeTaskNotificationCenter() {
-    const state33 = getLegacyBridge().state;
-    if (!state33.taskNotificationCenterOpen) return;
-    state33.taskNotificationCenterOpen = false;
+    const state32 = getLegacyBridge().state;
+    if (!state32.taskNotificationCenterOpen) return;
+    state32.taskNotificationCenterOpen = false;
     renderTaskNotifications();
   }
   function toggleTaskNotificationCenter() {
@@ -12789,74 +12519,74 @@ ${galleryText}`;
     openTaskNotificationCenter();
   }
   function renderTaskNotifications() {
-    const bridge40 = getLegacyBridge();
-    const state33 = bridge40.state;
-    const els43 = bridge40.els;
-    const unreadCount = state33.taskNotifications.filter((notification) => notification.unread).length;
-    state33.taskNotificationUnreadCount = unreadCount;
+    const bridge39 = getLegacyBridge();
+    const state32 = bridge39.state;
+    const els42 = bridge39.els;
+    const unreadCount = state32.taskNotifications.filter((notification) => notification.unread).length;
+    state32.taskNotificationUnreadCount = unreadCount;
     const unreadLabel = unreadCount > 0 ? `\u4EFB\u52A1\u901A\u77E5\uFF0C${unreadCount} \u6761\u672A\u8BFB` : "\u4EFB\u52A1\u901A\u77E5";
-    if (els43.taskNotificationBadge) {
-      els43.taskNotificationBadge.textContent = "";
-      els43.taskNotificationBadge.setAttribute("aria-hidden", "true");
-      els43.taskNotificationBadge.classList.toggle("hidden", unreadCount === 0);
+    if (els42.taskNotificationBadge) {
+      els42.taskNotificationBadge.textContent = "";
+      els42.taskNotificationBadge.setAttribute("aria-hidden", "true");
+      els42.taskNotificationBadge.classList.toggle("hidden", unreadCount === 0);
     }
-    if (els43.taskNotificationButton) {
-      els43.taskNotificationButton.classList.toggle("has-unread", unreadCount > 0);
-      els43.taskNotificationButton.setAttribute("aria-label", unreadLabel);
-      els43.taskNotificationButton.title = unreadLabel;
-      els43.taskNotificationButton.setAttribute("aria-expanded", state33.taskNotificationCenterOpen ? "true" : "false");
+    if (els42.taskNotificationButton) {
+      els42.taskNotificationButton.classList.toggle("has-unread", unreadCount > 0);
+      els42.taskNotificationButton.setAttribute("aria-label", unreadLabel);
+      els42.taskNotificationButton.title = unreadLabel;
+      els42.taskNotificationButton.setAttribute("aria-expanded", state32.taskNotificationCenterOpen ? "true" : "false");
     }
-    if (els43.taskNotificationUnreadSummary) {
-      els43.taskNotificationUnreadSummary.textContent = `${unreadCount} \u672A\u8BFB`;
-      els43.taskNotificationUnreadSummary.classList.toggle("hidden", unreadCount === 0);
+    if (els42.taskNotificationUnreadSummary) {
+      els42.taskNotificationUnreadSummary.textContent = `${unreadCount} \u672A\u8BFB`;
+      els42.taskNotificationUnreadSummary.classList.toggle("hidden", unreadCount === 0);
     }
-    if (els43.taskNotificationCenter) {
-      els43.taskNotificationCenter.classList.toggle("hidden", !state33.taskNotificationCenterOpen);
-      els43.taskNotificationCenter.setAttribute("aria-hidden", state33.taskNotificationCenterOpen ? "false" : "true");
+    if (els42.taskNotificationCenter) {
+      els42.taskNotificationCenter.classList.toggle("hidden", !state32.taskNotificationCenterOpen);
+      els42.taskNotificationCenter.setAttribute("aria-hidden", state32.taskNotificationCenterOpen ? "false" : "true");
     }
-    if (!els43.taskNotificationList) return;
-    if (!state33.taskNotifications.length) {
-      els43.taskNotificationList.innerHTML = `<div class="task-notification-empty">\u6682\u65E0\u4EFB\u52A1\u901A\u77E5</div>`;
+    if (!els42.taskNotificationList) return;
+    if (!state32.taskNotifications.length) {
+      els42.taskNotificationList.innerHTML = `<div class="task-notification-empty">\u6682\u65E0\u4EFB\u52A1\u901A\u77E5</div>`;
       return;
     }
-    els43.taskNotificationList.innerHTML = state33.taskNotifications.map((notification) => taskNotificationItemHtml(notification)).join("");
+    els42.taskNotificationList.innerHTML = state32.taskNotifications.map((notification) => taskNotificationItemHtml(notification)).join("");
   }
   async function requestSystemNotificationPermission() {
     if (typeof Notification === "undefined") {
-      setStatus20("\u5F53\u524D\u6D4F\u89C8\u5668\u4E0D\u652F\u6301\u7CFB\u7EDF\u901A\u77E5", "error");
+      setStatus19("\u5F53\u524D\u6D4F\u89C8\u5668\u4E0D\u652F\u6301\u7CFB\u7EDF\u901A\u77E5", "error");
       return false;
     }
     if (Notification.permission === "granted") return true;
     if (Notification.permission === "denied") {
-      setStatus20("\u7CFB\u7EDF\u901A\u77E5\u5DF2\u88AB\u6D4F\u89C8\u5668\u963B\u6B62\uFF0C\u9700\u8981\u5728\u6D4F\u89C8\u5668\u8BBE\u7F6E\u91CC\u5F00\u542F", "error");
+      setStatus19("\u7CFB\u7EDF\u901A\u77E5\u5DF2\u88AB\u6D4F\u89C8\u5668\u963B\u6B62\uFF0C\u9700\u8981\u5728\u6D4F\u89C8\u5668\u8BBE\u7F6E\u91CC\u5F00\u542F", "error");
       return false;
     }
     const permission = await Notification.requestPermission();
     if (permission !== "granted") {
-      setStatus20("\u7CFB\u7EDF\u901A\u77E5\u672A\u5F00\u542F", "error");
+      setStatus19("\u7CFB\u7EDF\u901A\u77E5\u672A\u5F00\u542F", "error");
       return false;
     }
-    setStatus20("\u7CFB\u7EDF\u901A\u77E5\u5DF2\u5F00\u542F", "ok");
+    setStatus19("\u7CFB\u7EDF\u901A\u77E5\u5DF2\u5F00\u542F", "ok");
     return true;
   }
   function bindTaskNotificationEvents() {
-    const els43 = getLegacyBridge().els;
-    els43.taskNotificationButton?.addEventListener("click", (event) => {
+    const els42 = getLegacyBridge().els;
+    els42.taskNotificationButton?.addEventListener("click", (event) => {
       event.stopPropagation();
       toggleTaskNotificationCenter();
     });
-    els43.taskNotificationClearButton?.addEventListener("click", (event) => {
+    els42.taskNotificationClearButton?.addEventListener("click", (event) => {
       event.stopPropagation();
       clearTaskNotifications();
     });
-    els43.taskNotificationList?.addEventListener("click", (event) => {
+    els42.taskNotificationList?.addEventListener("click", (event) => {
       const item = eventTargetElement4(event)?.closest("[data-task-notification-id]");
       if (!(item instanceof HTMLElement)) return;
       const notification = notificationById(item.dataset.taskNotificationId);
       if (notification) void openNotificationTask(notification);
     });
-    els43.taskNotificationInApp?.addEventListener("change", handleTaskNotificationInAppChange);
-    els43.taskNotificationSystem?.addEventListener("change", (event) => {
+    els42.taskNotificationInApp?.addEventListener("change", handleTaskNotificationInAppChange);
+    els42.taskNotificationSystem?.addEventListener("change", (event) => {
       void handleTaskNotificationSystemChange(event);
     });
     document.addEventListener("click", handleTaskNotificationDocumentClick);
@@ -12865,9 +12595,9 @@ ${galleryText}`;
   function handleTaskNotificationInAppChange(event) {
     const input = event.currentTarget;
     if (!(input instanceof HTMLInputElement)) return;
-    const state33 = getLegacyBridge().state;
-    state33.taskNotificationSettings = {
-      ...state33.taskNotificationSettings,
+    const state32 = getLegacyBridge().state;
+    state32.taskNotificationSettings = {
+      ...state32.taskNotificationSettings,
       inApp: input.checked
     };
     persistTaskNotificationSettings();
@@ -12875,40 +12605,40 @@ ${galleryText}`;
   async function handleTaskNotificationSystemChange(event) {
     const input = event.currentTarget;
     if (!(input instanceof HTMLInputElement)) return;
-    const state33 = getLegacyBridge().state;
+    const state32 = getLegacyBridge().state;
     if (!input.checked) {
-      state33.taskNotificationSettings = { ...state33.taskNotificationSettings, system: false };
+      state32.taskNotificationSettings = { ...state32.taskNotificationSettings, system: false };
       persistTaskNotificationSettings();
       return;
     }
     const granted = await requestSystemNotificationPermission();
-    state33.taskNotificationSettings = { ...state33.taskNotificationSettings, system: granted };
+    state32.taskNotificationSettings = { ...state32.taskNotificationSettings, system: granted };
     input.checked = granted;
     persistTaskNotificationSettings();
   }
   function handleTaskNotificationDocumentClick(event) {
     const target = event.target;
-    const els43 = getLegacyBridge().els;
+    const els42 = getLegacyBridge().els;
     if (!(target instanceof Node)) return;
-    if (els43.taskNotificationCenter?.contains(target) || els43.taskNotificationButton?.contains(target)) return;
+    if (els42.taskNotificationCenter?.contains(target) || els42.taskNotificationButton?.contains(target)) return;
     closeTaskNotificationCenter();
   }
   function handleTaskNotificationKeydown(event) {
     if (event.key === "Escape") closeTaskNotificationCenter();
   }
   function addTaskNotification(notification) {
-    const state33 = getLegacyBridge().state;
-    state33.taskNotifications = [notification, ...state33.taskNotifications].slice(0, MAX_TASK_NOTIFICATIONS);
+    const state32 = getLegacyBridge().state;
+    state32.taskNotifications = [notification, ...state32.taskNotifications].slice(0, MAX_TASK_NOTIFICATIONS);
     renderTaskNotifications();
   }
   function clearTaskNotifications() {
-    const state33 = getLegacyBridge().state;
-    state33.taskNotifications = [];
+    const state32 = getLegacyBridge().state;
+    state32.taskNotifications = [];
     renderTaskNotifications();
   }
   function showTaskNotificationToast(notification) {
-    const bridge40 = getLegacyBridge();
-    const region = bridge40.els.taskNotificationToastRegion;
+    const bridge39 = getLegacyBridge();
+    const region = bridge39.els.taskNotificationToastRegion;
     if (!region) return;
     const toast = document.createElement("button");
     toast.type = "button";
@@ -12922,9 +12652,9 @@ ${galleryText}`;
     region.prepend(toast);
     const timerId = window.setTimeout(() => {
       toast.remove();
-      bridge40.state.taskNotificationToastTimerIds = bridge40.state.taskNotificationToastTimerIds.filter((id) => id !== timerId);
+      bridge39.state.taskNotificationToastTimerIds = bridge39.state.taskNotificationToastTimerIds.filter((id) => id !== timerId);
     }, TASK_NOTIFICATION_TOAST_MS);
-    bridge40.state.taskNotificationToastTimerIds.push(timerId);
+    bridge39.state.taskNotificationToastTimerIds.push(timerId);
   }
   function sendSystemTaskNotification(notification) {
     const settings = getLegacyBridge().state.taskNotificationSettings;
@@ -12939,26 +12669,26 @@ ${galleryText}`;
     };
   }
   async function openNotificationTask(notification) {
-    const bridge40 = getLegacyBridge();
-    const task = bridge40.state.tasks.find((item) => String(item.task_id) === String(notification.task_id));
+    const bridge39 = getLegacyBridge();
+    const task = bridge39.state.tasks.find((item) => String(item.task_id) === String(notification.task_id));
     markTaskNotificationRead(notification.id);
     closeTaskNotificationCenter();
     if (!task) {
-      setStatus20("\u4EFB\u52A1\u4E0D\u5B58\u5728\u6216\u5DF2\u5220\u9664", "error");
+      setStatus19("\u4EFB\u52A1\u4E0D\u5B58\u5728\u6216\u5DF2\u5220\u9664", "error");
       return;
     }
     window.focus();
     try {
-      const selectTask3 = bridge40.methods.selectTask;
+      const selectTask3 = bridge39.methods.selectTask;
       if (typeof selectTask3 !== "function") throw new Error("selectTask is unavailable");
       await selectTask3(task.task_id);
     } catch {
-      setStatus20("\u4EFB\u52A1\u4E0D\u5B58\u5728\u6216\u5DF2\u5220\u9664", "error");
+      setStatus19("\u4EFB\u52A1\u4E0D\u5B58\u5728\u6216\u5DF2\u5220\u9664", "error");
     }
   }
   function markTaskNotificationRead(notificationId) {
-    const state33 = getLegacyBridge().state;
-    state33.taskNotifications = state33.taskNotifications.map((notification) => notification.id === notificationId ? { ...notification, unread: false } : notification);
+    const state32 = getLegacyBridge().state;
+    state32.taskNotifications = state32.taskNotifications.map((notification) => notification.id === notificationId ? { ...notification, unread: false } : notification);
     renderTaskNotifications();
   }
   function notificationById(notificationId) {
@@ -12993,8 +12723,8 @@ ${galleryText}`;
     return [countText + failureText, prompt].filter(Boolean).join(" \xB7 ");
   }
   function firstTaskThumbnailUrl(task) {
-    const bridge40 = getLegacyBridge();
-    const urls = bridge40.methods.taskThumbnailUrls?.(task);
+    const bridge39 = getLegacyBridge();
+    const urls = bridge39.methods.taskThumbnailUrls?.(task);
     if (Array.isArray(urls) && urls[0]) return String(urls[0]);
     if (Array.isArray(task.thumbnail_urls) && task.thumbnail_urls[0]) return String(task.thumbnail_urls[0]);
     const output = Array.isArray(task.outputs) ? task.outputs.find((record) => record?.status === "completed") : null;
@@ -13011,17 +12741,17 @@ ${galleryText}`;
   }
   function taskNotificationItemHtml(notification) {
     const unreadClass = notification.unread ? " unread" : "";
-    return `<button class="task-notification-item${unreadClass}" type="button" data-task-notification-id="${escapeHtml18(notification.id)}">
+    return `<button class="task-notification-item${unreadClass}" type="button" data-task-notification-id="${escapeHtml17(notification.id)}">
     ${taskNotificationInnerHtml(notification)}
   </button>`;
   }
   function taskNotificationInnerHtml(notification) {
-    const thumbnail = notification.thumbnail_url ? `<img class="task-notification-thumb" src="${escapeHtml18(notification.thumbnail_url)}" alt="">` : `<span class="task-notification-thumb task-notification-thumb-placeholder" aria-hidden="true">${escapeHtml18(statusGlyph(notification.status))}</span>`;
+    const thumbnail = notification.thumbnail_url ? `<img class="task-notification-thumb" src="${escapeHtml17(notification.thumbnail_url)}" alt="">` : `<span class="task-notification-thumb task-notification-thumb-placeholder" aria-hidden="true">${escapeHtml17(statusGlyph(notification.status))}</span>`;
     return `${thumbnail}
     <span class="task-notification-body">
-      <span class="task-notification-title">${escapeHtml18(notification.title)}</span>
-      <span class="task-notification-message">${escapeHtml18(notification.message)}</span>
-      <span class="task-notification-time">${escapeHtml18(formatNotificationTime(notification.created_at))}</span>
+      <span class="task-notification-title">${escapeHtml17(notification.title)}</span>
+      <span class="task-notification-message">${escapeHtml17(notification.message)}</span>
+      <span class="task-notification-time">${escapeHtml17(formatNotificationTime(notification.created_at))}</span>
     </span>`;
   }
   function statusGlyph(status) {
@@ -13043,26 +12773,26 @@ ${galleryText}`;
     return `${task.task_id}:${status}:${revision}`;
   }
   function rememberTaskNotification(task, status) {
-    const state33 = getLegacyBridge().state;
-    state33.taskNotificationSeenKeys.add(taskNotificationSeenKey(task, status));
-    while (state33.taskNotificationSeenKeys.size > MAX_SEEN_TASK_NOTIFICATION_KEYS) {
-      const firstKey = state33.taskNotificationSeenKeys.values().next().value;
+    const state32 = getLegacyBridge().state;
+    state32.taskNotificationSeenKeys.add(taskNotificationSeenKey(task, status));
+    while (state32.taskNotificationSeenKeys.size > MAX_SEEN_TASK_NOTIFICATION_KEYS) {
+      const firstKey = state32.taskNotificationSeenKeys.values().next().value;
       if (typeof firstKey !== "string") break;
-      state33.taskNotificationSeenKeys.delete(firstKey);
+      state32.taskNotificationSeenKeys.delete(firstKey);
     }
     persistTaskNotificationSeenKeys();
   }
   function restoreTaskNotificationSettings() {
-    const state33 = getLegacyBridge().state;
-    state33.taskNotificationSettings = defaultTaskNotificationSettings();
+    const state32 = getLegacyBridge().state;
+    state32.taskNotificationSettings = defaultTaskNotificationSettings();
     try {
       const stored = JSON.parse(localStorage.getItem(TASK_NOTIFICATION_SETTINGS_KEY) || "{}");
-      state33.taskNotificationSettings = {
+      state32.taskNotificationSettings = {
         inApp: stored.inApp !== false,
         system: stored.system === true && typeof Notification !== "undefined" && Notification.permission === "granted"
       };
     } catch {
-      state33.taskNotificationSettings = defaultTaskNotificationSettings();
+      state32.taskNotificationSettings = defaultTaskNotificationSettings();
     }
     persistTaskNotificationSettings();
     syncTaskNotificationSettingsInputs();
@@ -13078,22 +12808,22 @@ ${galleryText}`;
     syncTaskNotificationSettingsInputs();
   }
   function syncTaskNotificationSettingsInputs() {
-    const bridge40 = getLegacyBridge();
-    const settings = bridge40.state.taskNotificationSettings;
-    if (bridge40.els.taskNotificationInApp instanceof HTMLInputElement) {
-      bridge40.els.taskNotificationInApp.checked = settings.inApp;
+    const bridge39 = getLegacyBridge();
+    const settings = bridge39.state.taskNotificationSettings;
+    if (bridge39.els.taskNotificationInApp instanceof HTMLInputElement) {
+      bridge39.els.taskNotificationInApp.checked = settings.inApp;
     }
-    if (bridge40.els.taskNotificationSystem instanceof HTMLInputElement) {
-      bridge40.els.taskNotificationSystem.checked = settings.system;
+    if (bridge39.els.taskNotificationSystem instanceof HTMLInputElement) {
+      bridge39.els.taskNotificationSystem.checked = settings.system;
     }
   }
   function restoreTaskNotificationSeenKeys() {
-    const state33 = getLegacyBridge().state;
+    const state32 = getLegacyBridge().state;
     try {
       const stored = JSON.parse(localStorage.getItem(TASK_NOTIFICATION_SEEN_KEY) || "[]");
-      state33.taskNotificationSeenKeys = new Set(Array.isArray(stored) ? stored.filter((key) => typeof key === "string") : []);
+      state32.taskNotificationSeenKeys = new Set(Array.isArray(stored) ? stored.filter((key) => typeof key === "string") : []);
     } catch {
-      state33.taskNotificationSeenKeys = /* @__PURE__ */ new Set();
+      state32.taskNotificationSeenKeys = /* @__PURE__ */ new Set();
     }
   }
   function persistTaskNotificationSeenKeys() {
@@ -13124,10 +12854,10 @@ ${galleryText}`;
     if (!text) return "";
     return text.length > 48 ? `${text.slice(0, 48)}...` : text;
   }
-  function escapeHtml18(value) {
+  function escapeHtml17(value) {
     return getLegacyBridge().methods.escapeHtml(value);
   }
-  function setStatus20(message, type) {
+  function setStatus19(message, type) {
     getLegacyBridge().methods.setStatus(message, type);
   }
   function eventTargetElement4(event) {
@@ -13189,15 +12919,15 @@ ${galleryText}`;
       "21:9": [3808, 1632]
     }
   };
-  function legacyMethod38(name, ...args) {
+  function legacyMethod37(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy bridge method " + name + " is not available");
     }
     return method(...args);
   }
-  function escapeHtml19(...args) {
-    return legacyMethod38("escapeHtml", ...args);
+  function escapeHtml18(...args) {
+    return legacyMethod37("escapeHtml", ...args);
   }
   function taskRatio2(task) {
     const dimensions = taskSizeDimensions(task);
@@ -13487,13 +13217,13 @@ ${galleryText}`;
   function compressedTaskImageState(states) {
     if (states.includes("failed")) return "failed";
     if (states.includes("running")) return "running";
-    if (states.length && states.every((state33) => state33 === "completed")) return "completed";
+    if (states.length && states.every((state32) => state32 === "completed")) return "completed";
     if (states.includes("queued")) return "queued";
     return "waiting";
   }
   function taskImageStatusCounts2(states) {
-    return states.reduce((counts, state33) => {
-      counts[state33] = (counts[state33] || 0) + 1;
+    return states.reduce((counts, state32) => {
+      counts[state32] = (counts[state32] || 0) + 1;
       return counts;
     }, { completed: 0, failed: 0, running: 0, queued: 0, waiting: 0 });
   }
@@ -13520,7 +13250,7 @@ ${galleryText}`;
   function taskRetryReasonText(task) {
     const message = String(task?.last_error || task?.error || "").toLowerCase();
     if (message.includes("usage limit") || message.includes("quota") || message.includes("rate limit")) {
-      return "\u8D26\u53F7\u989D\u5EA6\u53D7\u9650";
+      return "\u7528\u91CF\u53D7\u9650";
     }
     if (message.includes("incompleteread") || message.includes("timeout") || message.includes("network")) {
       return "\u8FDE\u63A5\u4E2D\u65AD";
@@ -13556,6 +13286,7 @@ ${galleryText}`;
   function taskHasNonRetryableError(task) {
     const message = String(task?.error || task?.last_error || "").toLowerCase();
     if (!message) return false;
+    if (message.includes("usage limit") || message.includes("quota") || message.includes("rate limit")) return true;
     if (!message.includes("http 400")) return false;
     return [
       "invalid_request_error",
@@ -13637,7 +13368,7 @@ ${galleryText}`;
     return formatDurationParts2(totalMilliseconds).text;
   }
   function elapsedWheelMarkup(char) {
-    const safeChar = escapeHtml19(char);
+    const safeChar = escapeHtml18(char);
     if (/^\d$/.test(char)) {
       const digitStrip = "0123456789".split("").map((digit) => `<span>${digit}</span>`).join("");
       return `<span class="elapsed-wheel" aria-hidden="true" data-elapsed-char="${safeChar}" data-elapsed-char-value="${safeChar}" style="--digit-offset: ${safeChar};"><span class="elapsed-wheel-strip">${digitStrip}</span></span>`;
@@ -13654,7 +13385,7 @@ ${galleryText}`;
   function elapsedTimerSpan(kind, startValue) {
     const elapsedMs = elapsedMillisecondsSince2(startValue);
     const elapsed = formatDurationTenths2(elapsedMs);
-    return `<span class="elapsed-timer" aria-label="${elapsed}" data-preview-elapsed="${escapeHtml19(kind)}" data-preview-start="${escapeHtml19(startValue || "")}">${elapsedTimerMarkup2(elapsedMs)}</span>`;
+    return `<span class="elapsed-timer" aria-label="${elapsed}" data-preview-elapsed="${escapeHtml18(kind)}" data-preview-start="${escapeHtml18(startValue || "")}">${elapsedTimerMarkup2(elapsedMs)}</span>`;
   }
   function taskGeneratedCount(task, fallback = 0) {
     const visibleCompleted = taskVisibleCompletedCount(task);
@@ -13739,79 +13470,79 @@ ${galleryText}`;
   }
 
   // codex_image/webui/frontend/src/task-preview.ts
-  var bridge35 = getLegacyBridge();
-  var state29 = bridge35.state;
-  var els38 = bridge35.els;
+  var bridge34 = getLegacyBridge();
+  var state28 = bridge34.state;
+  var els37 = bridge34.els;
   var previewGridEventsBound = false;
   var pendingPreviewRenderToken = 0;
-  function legacyMethod39(name, ...args) {
+  function legacyMethod38(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy bridge method " + name + " is not available");
     }
     return method(...args);
   }
-  function escapeHtml20(...args) {
-    return legacyMethod39("escapeHtml", ...args);
+  function escapeHtml19(...args) {
+    return legacyMethod38("escapeHtml", ...args);
   }
   function isTaskArchived4(...args) {
-    return legacyMethod39("isTaskArchived", ...args);
+    return legacyMethod38("isTaskArchived", ...args);
   }
   function updatePreviewElapsedDisplay2(...args) {
-    return legacyMethod39("updatePreviewElapsedDisplay", ...args);
+    return legacyMethod38("updatePreviewElapsedDisplay", ...args);
   }
   function closePromptPopover7(...args) {
-    return legacyMethod39("closePromptPopover", ...args);
+    return legacyMethod38("closePromptPopover", ...args);
   }
   function currentSize2(...args) {
-    return legacyMethod39("currentSize", ...args);
+    return legacyMethod38("currentSize", ...args);
   }
   function syncActiveLightboxUrls2(...args) {
-    return legacyMethod39("syncActiveLightboxUrls", ...args);
+    return legacyMethod38("syncActiveLightboxUrls", ...args);
   }
   function collectReferenceOutput2(...args) {
-    return legacyMethod39("collectReferenceOutput", ...args);
+    return legacyMethod38("collectReferenceOutput", ...args);
   }
   function openPromptPopover(...args) {
-    return legacyMethod39("openPromptPopover", ...args);
+    return legacyMethod38("openPromptPopover", ...args);
   }
   function retryFailedTask2(...args) {
-    return legacyMethod39("retryFailedTask", ...args);
+    return legacyMethod38("retryFailedTask", ...args);
   }
   function acceptTaskSuccesses2(...args) {
-    return legacyMethod39("acceptTaskSuccesses", ...args);
+    return legacyMethod38("acceptTaskSuccesses", ...args);
   }
   function openConfirmPopover6(...args) {
-    return legacyMethod39("openConfirmPopover", ...args);
+    return legacyMethod38("openConfirmPopover", ...args);
   }
-  function setStatus21(...args) {
-    return legacyMethod39("setStatus", ...args);
+  function setStatus20(...args) {
+    return legacyMethod38("setStatus", ...args);
   }
   function updateTaskInState3(...args) {
-    return legacyMethod39("updateTaskInState", ...args);
+    return legacyMethod38("updateTaskInState", ...args);
   }
   function renderTasks7(...args) {
-    return legacyMethod39("renderTasks", ...args);
+    return legacyMethod38("renderTasks", ...args);
   }
   function taskApiProviderId2(...args) {
-    return legacyMethod39("taskApiProviderId", ...args);
+    return legacyMethod38("taskApiProviderId", ...args);
   }
   function taskApiProviderLabel2(...args) {
-    return legacyMethod39("taskApiProviderLabel", ...args);
+    return legacyMethod38("taskApiProviderLabel", ...args);
   }
-  var taskOutputUrls3 = (...args) => legacyMethod39("taskOutputUrls", ...args);
-  var taskSelectedOutputIndexes2 = (...args) => legacyMethod39("taskSelectedOutputIndexes", ...args);
-  var taskOutputSelected2 = (...args) => legacyMethod39("taskOutputSelected", ...args);
-  var positiveInt2 = (...args) => legacyMethod39("positiveInt", ...args);
-  var taskFailureMessage3 = (...args) => legacyMethod39("taskFailureMessage", ...args);
-  var canRetryFailedTask3 = (...args) => legacyMethod39("canRetryFailedTask", ...args);
-  var canAcceptTaskSuccesses3 = (...args) => legacyMethod39("canAcceptTaskSuccesses", ...args);
-  var taskRetryStateText4 = (...args) => legacyMethod39("taskRetryStateText", ...args);
-  var elapsedTimerSpan2 = (...args) => legacyMethod39("elapsedTimerSpan", ...args);
-  var taskGeneratedCount2 = (...args) => legacyMethod39("taskGeneratedCount", ...args);
-  var taskTotalCount2 = (...args) => legacyMethod39("taskTotalCount", ...args);
-  var taskOutputIndex2 = (...args) => legacyMethod39("taskOutputIndex", ...args);
-  var taskProgressStartValue3 = (...args) => legacyMethod39("taskProgressStartValue", ...args);
+  var taskOutputUrls3 = (...args) => legacyMethod38("taskOutputUrls", ...args);
+  var taskSelectedOutputIndexes2 = (...args) => legacyMethod38("taskSelectedOutputIndexes", ...args);
+  var taskOutputSelected2 = (...args) => legacyMethod38("taskOutputSelected", ...args);
+  var positiveInt2 = (...args) => legacyMethod38("positiveInt", ...args);
+  var taskFailureMessage3 = (...args) => legacyMethod38("taskFailureMessage", ...args);
+  var canRetryFailedTask3 = (...args) => legacyMethod38("canRetryFailedTask", ...args);
+  var canAcceptTaskSuccesses3 = (...args) => legacyMethod38("canAcceptTaskSuccesses", ...args);
+  var taskRetryStateText4 = (...args) => legacyMethod38("taskRetryStateText", ...args);
+  var elapsedTimerSpan2 = (...args) => legacyMethod38("elapsedTimerSpan", ...args);
+  var taskGeneratedCount2 = (...args) => legacyMethod38("taskGeneratedCount", ...args);
+  var taskTotalCount2 = (...args) => legacyMethod38("taskTotalCount", ...args);
+  var taskOutputIndex2 = (...args) => legacyMethod38("taskOutputIndex", ...args);
+  var taskProgressStartValue3 = (...args) => legacyMethod38("taskProgressStartValue", ...args);
   function taskRequestPreviewPayload(task) {
     if (!task?.request) return null;
     const request = { ...task.request };
@@ -13825,17 +13556,29 @@ ${galleryText}`;
     }
     return request;
   }
+  function queueContainsTask(items, taskId) {
+    if (!taskId || !Array.isArray(items)) return false;
+    return items.some((item) => String(item?.task_id || "") === taskId);
+  }
+  function taskPreviewStatus(task) {
+    const status = String(task?.status || "");
+    const taskId = String(task?.task_id || "");
+    if (queueContainsTask(state28.queue.running, taskId)) return "running";
+    if (queueContainsTask(state28.queue.waiting, taskId)) return status === "submitting" ? "submitting" : "queued";
+    return status;
+  }
   function renderPreview5(task = null) {
-    const selectedTask = state29.tasks.find((item) => String(item.task_id) === String(state29.selectedTaskId));
+    const selectedTask = state28.tasks.find((item) => String(item.task_id) === String(state28.selectedTaskId));
     const visibleSelectedTask = selectedTask && !isTaskArchived4(selectedTask.task_id) ? selectedTask : null;
-    const selected = task || visibleSelectedTask || state29.tasks.find((item) => !isTaskArchived4(item.task_id)) || selectedTask || state29.tasks[0];
+    const selected = task || visibleSelectedTask || state28.tasks.find((item) => !isTaskArchived4(item.task_id)) || selectedTask || state28.tasks[0];
+    const status = taskPreviewStatus(selected);
     updatePreviewDownloadActions(selected);
     const nextPreviewKey = previewStructureKey(selected);
-    if (state29.previewRenderKey === nextPreviewKey) {
+    if (state28.previewRenderKey === nextPreviewKey) {
       return updatePreviewElapsedDisplay2();
     }
-    state29.previewRenderKey = nextPreviewKey;
-    if (selected?.status === "running") {
+    state28.previewRenderKey = nextPreviewKey;
+    if (status === "running") {
       if (taskOutputUrls3(selected).length) {
         renderOutputPreview(selected, { running: true });
         return;
@@ -13845,8 +13588,8 @@ ${galleryText}`;
       renderRunningPreview(selected);
       return;
     }
-    if (selected?.status === "submitting" || selected?.status === "queued") {
-      if (selected.status === "queued" && taskOutputUrls3(selected).length) {
+    if (status === "submitting" || status === "queued") {
+      if (status === "queued" && taskOutputUrls3(selected).length) {
         renderOutputPreview(selected, { waiting: true });
         return;
       }
@@ -13863,9 +13606,9 @@ ${galleryText}`;
       closePromptPopover7();
       cancelDeferredPreviewRender();
       clearPreviewGridLayout();
-      els38.previewGrid.innerHTML = `
+      els37.previewGrid.innerHTML = `
       <div class="empty-preview error-preview">
-        <p>${escapeHtml20(taskFailureMessage3(selected) || "\u4EFB\u52A1\u5931\u8D25")}</p>
+        <p>${escapeHtml19(taskFailureMessage3(selected) || "\u4EFB\u52A1\u5931\u8D25")}</p>
         ${retryFailureSummaryButton(selected)}
       </div>
     `;
@@ -13877,7 +13620,7 @@ ${galleryText}`;
       closePromptPopover7();
       cancelDeferredPreviewRender();
       clearPreviewGridLayout();
-      els38.previewGrid.innerHTML = `<div class="empty-preview">\u6682\u65E0\u56FE\u7247</div>`;
+      els37.previewGrid.innerHTML = `<div class="empty-preview">\u6682\u65E0\u56FE\u7247</div>`;
       return;
     }
     renderOutputPreview(selected);
@@ -13885,7 +13628,7 @@ ${galleryText}`;
   function previewStructureKey(task) {
     if (!task) return "empty:none";
     const taskId = String(task.task_id || "");
-    const status = String(task.status || "");
+    const status = taskPreviewStatus(task);
     const outputUrls = taskOutputUrls3(task).join("|");
     const selectedIndexes = taskSelectedOutputIndexes2(task).join(",");
     const size = task.params?.size || task.output_size || currentSize2();
@@ -13931,7 +13674,7 @@ ${galleryText}`;
     return `
     <div class="running-failure-notice" data-preview-running-failure role="status">
       <strong>\u7B2C ${failure.index} \u5F20\u5931\u8D25</strong>
-      <p>${escapeHtml20(failure.error)}</p>
+      <p>${escapeHtml19(failure.error)}</p>
     </div>
   `;
   }
@@ -13972,8 +13715,8 @@ ${galleryText}`;
   }
   function commitOutputPreviewRender(task, { running = false, failure = false, waiting = false, outputUrls, totalCount, itemCount, preservePreviousImages = true, imageAlreadyLoaded = false }) {
     applyPreviewGridLayout(totalCount, itemCount);
-    state29.previewTask = task || null;
-    state29.previewOutputUrls = outputUrls.slice();
+    state28.previewTask = task || null;
+    state28.previewOutputUrls = outputUrls.slice();
     bindPreviewGridEvents();
     reconcilePreviewOutputCards(task, outputUrls, totalCount, { preservePreviousImages, imageAlreadyLoaded });
     reconcilePreviewStatusCard(task, { running, failure, waiting }, outputUrls.length);
@@ -13981,24 +13724,24 @@ ${galleryText}`;
     window.requestAnimationFrame(syncPreviewImageOrientation);
   }
   function reconcilePreviewOutputCards(task, outputUrls, totalCount, { preservePreviousImages = true, imageAlreadyLoaded = false } = {}) {
-    if (!els38.previewGrid) return;
+    if (!els37.previewGrid) return;
     const desiredKeys = new Set(outputUrls.map((url, index) => previewOutputCardKey(task, url, index)));
     removeStalePreviewNodes(desiredKeys);
     outputUrls.forEach((url, index) => {
       const key = previewOutputCardKey(task, url, index);
       const card = ensurePreviewOutputCard(key);
-      if (els38.previewGrid.children[index] !== card) {
-        els38.previewGrid.insertBefore(card, els38.previewGrid.children[index] || null);
+      if (els37.previewGrid.children[index] !== card) {
+        els37.previewGrid.insertBefore(card, els37.previewGrid.children[index] || null);
       }
       updatePreviewOutputCard(card, task, url, index, totalCount, { preservePreviousImage: preservePreviousImages, imageAlreadyLoaded });
     });
   }
   function currentPreviewOutputCardCount() {
-    if (!els38.previewGrid) return 0;
-    return els38.previewGrid.querySelectorAll(".preview-card[data-preview-card-key]").length;
+    if (!els37.previewGrid) return 0;
+    return els37.previewGrid.querySelectorAll(".preview-card[data-preview-card-key]").length;
   }
   function removeStalePreviewNodes(desiredKeys) {
-    [...els38.previewGrid.children].forEach((child) => {
+    [...els37.previewGrid.children].forEach((child) => {
       if (!(child instanceof HTMLElement)) return;
       const key = child.dataset.previewCardKey;
       if (key) {
@@ -14013,7 +13756,7 @@ ${galleryText}`;
     return `slot-${taskOutputIndex2(task, url, index) || index + 1}`;
   }
   function ensurePreviewOutputCard(key) {
-    const existing = [...els38.previewGrid.querySelectorAll(".preview-card[data-preview-card-key]")].find((card2) => {
+    const existing = [...els37.previewGrid.querySelectorAll(".preview-card[data-preview-card-key]")].find((card2) => {
       return card2 instanceof HTMLElement && card2.dataset.previewCardKey === key;
     });
     if (existing instanceof HTMLElement) return existing;
@@ -14168,7 +13911,7 @@ ${galleryText}`;
     });
   }
   function reconcilePreviewStatusCard(task, flags, visibleOutputCount) {
-    const existing = els38.previewGrid.querySelector("[data-preview-status-card]");
+    const existing = els37.previewGrid.querySelector("[data-preview-status-card]");
     const html = flags.running ? runningProgressCard(task, visibleOutputCount) : flags.waiting ? waitingProgressCard(task, visibleOutputCount) : flags.failure ? failureSummaryCard(task, visibleOutputCount) : "";
     if (!html) {
       existing?.remove();
@@ -14182,13 +13925,13 @@ ${galleryText}`;
     if (existing) {
       existing.replaceWith(next);
     } else {
-      els38.previewGrid.append(next);
+      els37.previewGrid.append(next);
     }
   }
   function bindPreviewGridEvents() {
-    if (previewGridEventsBound || !els38.previewGrid) return;
+    if (previewGridEventsBound || !els37.previewGrid) return;
     previewGridEventsBound = true;
-    els38.previewGrid.addEventListener("click", handlePreviewGridClick);
+    els37.previewGrid.addEventListener("click", handlePreviewGridClick);
   }
   function handlePreviewGridClick(event) {
     const target = event.target instanceof Element ? event.target : null;
@@ -14208,7 +13951,7 @@ ${galleryText}`;
     if (selectButton) {
       event.stopPropagation();
       const outputIndex = positiveInt2(selectButton.dataset.previewSelectOutputIndex);
-      const taskId = selectButton.dataset.previewSelectTaskId || state29.previewTask?.task_id || "";
+      const taskId = selectButton.dataset.previewSelectTaskId || state28.previewTask?.task_id || "";
       if (!taskId || outputIndex === null) return;
       const selected = selectButton.getAttribute("aria-pressed") !== "true";
       void updateTaskOutputSelection(taskId, outputIndex, selected);
@@ -14223,7 +13966,7 @@ ${galleryText}`;
     if (collectButton) {
       collectReferenceOutput2(collectButton.dataset.collectInputUrl, {
         name: collectButton.dataset.collectOutputName || "",
-        sourceTaskId: state29.previewTask?.task_id || "",
+        sourceTaskId: state28.previewTask?.task_id || "",
         outputIndex: positiveInt2(collectButton.dataset.collectOutputIndex) || null
       });
       return;
@@ -14232,12 +13975,12 @@ ${galleryText}`;
     if (promptButton) {
       event.stopPropagation();
       const index = Number.parseInt(promptButton.dataset.promptPopoverIndex || "0", 10);
-      openPromptPopover(promptButton, promptPopoverData(state29.previewTask, index));
+      openPromptPopover(promptButton, promptPopoverData(state28.previewTask, index));
       return;
     }
     const image = target.closest("[data-lightbox-url]");
     if (!image) return;
-    const images = [...els38.previewGrid.querySelectorAll("[data-lightbox-url]")];
+    const images = [...els37.previewGrid.querySelectorAll("[data-lightbox-url]")];
     const urls = images.map((item) => item.dataset.lightboxUrl || item.currentSrc || item.src).filter((url) => Boolean(url));
     const currentUrl = image.dataset.lightboxUrl || image.currentSrc || image.src;
     if (!currentUrl) return;
@@ -14249,16 +13992,16 @@ ${galleryText}`;
   function updatePreviewDownloadActions(task) {
     updatePreviewSelectionActions(task);
     const outputUrls = taskOutputUrls3(task);
-    if (!els38.downloadAllButton) return;
+    if (!els37.downloadAllButton) return;
     if (!task?.task_id || outputUrls.length < 2) {
-      els38.downloadAllButton.classList.add("hidden");
-      els38.downloadAllButton.removeAttribute("href");
-      els38.downloadAllButton.removeAttribute("download");
+      els37.downloadAllButton.classList.add("hidden");
+      els37.downloadAllButton.removeAttribute("href");
+      els37.downloadAllButton.removeAttribute("download");
       return;
     }
-    els38.downloadAllButton.href = taskOutputZipUrl(task);
-    els38.downloadAllButton.download = `${task.task_id}-images.zip`;
-    els38.downloadAllButton.classList.remove("hidden");
+    els37.downloadAllButton.href = taskOutputZipUrl(task);
+    els37.downloadAllButton.download = `${task.task_id}-images.zip`;
+    els37.downloadAllButton.classList.remove("hidden");
   }
   function updatePreviewSelectionActions(task) {
     const outputUrls = taskOutputUrls3(task);
@@ -14266,28 +14009,28 @@ ${galleryText}`;
     const selectedCount = selectedUrls.length;
     const totalCount = outputUrls.length;
     const hasSelection = Boolean(task?.task_id && selectedCount > 0 && totalCount > 1);
-    els38.previewSelectionActions?.classList.toggle("hidden", !hasSelection);
-    if (els38.previewSelectionCount) {
-      els38.previewSelectionCount.textContent = selectedCount ? `\u5DF2\u9009 ${selectedCount}/${totalCount}` : "\u5DF2\u9009 0";
+    els37.previewSelectionActions?.classList.toggle("hidden", !hasSelection);
+    if (els37.previewSelectionCount) {
+      els37.previewSelectionCount.textContent = selectedCount ? `\u5DF2\u9009 ${selectedCount}/${totalCount}` : "\u5DF2\u9009 0";
     }
-    if (els38.downloadSelectedButton) {
+    if (els37.downloadSelectedButton) {
       if (!hasSelection) {
-        els38.downloadSelectedButton.classList.add("hidden");
-        els38.downloadSelectedButton.removeAttribute("href");
-        els38.downloadSelectedButton.removeAttribute("download");
+        els37.downloadSelectedButton.classList.add("hidden");
+        els37.downloadSelectedButton.removeAttribute("href");
+        els37.downloadSelectedButton.removeAttribute("download");
       } else {
-        els38.downloadSelectedButton.href = taskSelectedOutputDownloadUrl(task);
-        els38.downloadSelectedButton.download = taskSelectedOutputDownloadName(task);
-        els38.downloadSelectedButton.classList.remove("hidden");
+        els37.downloadSelectedButton.href = taskSelectedOutputDownloadUrl(task);
+        els37.downloadSelectedButton.download = taskSelectedOutputDownloadName(task);
+        els37.downloadSelectedButton.classList.remove("hidden");
       }
     }
-    if (els38.deleteUnselectedOutputsButton) {
+    if (els37.deleteUnselectedOutputsButton) {
       const canDeleteUnselected = hasSelection && selectedCount < totalCount;
-      els38.deleteUnselectedOutputsButton.classList.toggle("hidden", !canDeleteUnselected);
+      els37.deleteUnselectedOutputsButton.classList.toggle("hidden", !canDeleteUnselected);
       if (canDeleteUnselected) {
-        els38.deleteUnselectedOutputsButton.dataset.deleteUnselectedTaskId = String(task.task_id || "");
+        els37.deleteUnselectedOutputsButton.dataset.deleteUnselectedTaskId = String(task.task_id || "");
       } else {
-        delete els38.deleteUnselectedOutputsButton.dataset.deleteUnselectedTaskId;
+        delete els37.deleteUnselectedOutputsButton.dataset.deleteUnselectedTaskId;
       }
     }
   }
@@ -14327,19 +14070,19 @@ ${galleryText}`;
       const updatedTask = data.task;
       updateTaskInState3(updatedTask);
       renderPreview5(updatedTask);
-      setStatus21(selected ? "\u5DF2\u52A0\u5165\u7CBE\u9009" : "\u5DF2\u53D6\u6D88\u7CBE\u9009", "ok");
+      setStatus20(selected ? "\u5DF2\u52A0\u5165\u7CBE\u9009" : "\u5DF2\u53D6\u6D88\u7CBE\u9009", "ok");
     } catch (error) {
-      setStatus21(error instanceof Error ? error.message : "\u7CBE\u9009\u72B6\u6001\u66F4\u65B0\u5931\u8D25", "error");
+      setStatus20(error instanceof Error ? error.message : "\u7CBE\u9009\u72B6\u6001\u66F4\u65B0\u5931\u8D25", "error");
     }
   }
   function openDeleteUnselectedOutputsConfirm(button) {
-    const taskId = button.dataset.deleteUnselectedTaskId || state29.previewTask?.task_id || state29.selectedTaskId || "";
-    const task = state29.tasks.find((item) => String(item.task_id) === String(taskId)) || state29.previewTask;
+    const taskId = button.dataset.deleteUnselectedTaskId || state28.previewTask?.task_id || state28.selectedTaskId || "";
+    const task = state28.tasks.find((item) => String(item.task_id) === String(taskId)) || state28.previewTask;
     const selectedCount = taskSelectedOutputUrls(task).length;
     const totalCount = taskOutputUrls3(task).length;
     const deleteCount = Math.max(0, totalCount - selectedCount);
     if (!task?.task_id || selectedCount <= 0 || deleteCount <= 0) {
-      setStatus21("\u6CA1\u6709\u53EF\u5220\u9664\u7684\u672A\u7CBE\u9009\u56FE\u7247", "error");
+      setStatus20("\u6CA1\u6709\u53EF\u5220\u9664\u7684\u672A\u7CBE\u9009\u56FE\u7247", "error");
       return;
     }
     openConfirmPopover6(button, {
@@ -14363,12 +14106,12 @@ ${galleryText}`;
       if (!response.ok) throw new Error(data.detail || "\u5220\u9664\u672A\u7CBE\u9009\u5931\u8D25");
       const updatedTask = data.task;
       updateTaskInState3(updatedTask);
-      state29.selectedTaskId = updatedTask.task_id;
+      state28.selectedTaskId = updatedTask.task_id;
       renderTasks7();
       renderPreview5(updatedTask);
-      setStatus21("\u672A\u7CBE\u9009\u56FE\u7247\u5DF2\u5220\u9664", "ok");
+      setStatus20("\u672A\u7CBE\u9009\u56FE\u7247\u5DF2\u5220\u9664", "ok");
     } catch (error) {
-      setStatus21(error instanceof Error ? error.message : "\u5220\u9664\u672A\u7CBE\u9009\u5931\u8D25", "error");
+      setStatus20(error instanceof Error ? error.message : "\u5220\u9664\u672A\u7CBE\u9009\u5931\u8D25", "error");
     }
   }
   function outputDownloadFilename(task, url, index) {
@@ -14393,36 +14136,36 @@ ${galleryText}`;
     return String(value || "image").replace(/[^\w.-]+/g, "-") || "image";
   }
   function clearPreviewGridLayout() {
-    if (!els38.previewGrid) return;
-    els38.previewGrid.classList.remove("multi-output");
-    [...els38.previewGrid.classList].forEach((className) => {
+    if (!els37.previewGrid) return;
+    els37.previewGrid.classList.remove("multi-output");
+    [...els37.previewGrid.classList].forEach((className) => {
       if (className.startsWith("preview-count-") || className.startsWith("preview-orientation-")) {
-        els38.previewGrid.classList.remove(className);
+        els37.previewGrid.classList.remove(className);
       }
     });
   }
   function applyPreviewGridLayout(outputCount, itemCount) {
     const previousOrientationClass = currentPreviewOrientationClass();
     clearPreviewGridLayout();
-    if (!els38.previewGrid) return;
-    els38.previewGrid.classList.toggle("multi-output", itemCount > 1);
-    els38.previewGrid.classList.add(`preview-count-${outputCount}`);
-    els38.previewGrid.classList.add(previousOrientationClass || "preview-orientation-unknown");
+    if (!els37.previewGrid) return;
+    els37.previewGrid.classList.toggle("multi-output", itemCount > 1);
+    els37.previewGrid.classList.add(`preview-count-${outputCount}`);
+    els37.previewGrid.classList.add(previousOrientationClass || "preview-orientation-unknown");
   }
   function currentPreviewOrientationClass() {
-    if (!els38.previewGrid) return "";
-    return [...els38.previewGrid.classList].find((className) => className.startsWith("preview-orientation-")) || "";
+    if (!els37.previewGrid) return "";
+    return [...els37.previewGrid.classList].find((className) => className.startsWith("preview-orientation-")) || "";
   }
   function syncPreviewImageOrientation() {
-    if (!els38.previewGrid) return;
-    const images = [...els38.previewGrid.querySelectorAll("[data-lightbox-url]")];
+    if (!els37.previewGrid) return;
+    const images = [...els37.previewGrid.querySelectorAll("[data-lightbox-url]")];
     const loadedImages = images.filter((image) => image.naturalWidth > 0 && image.naturalHeight > 0);
     if (!loadedImages.length) return;
     const portraitCount = loadedImages.filter((image) => image.naturalHeight > image.naturalWidth).length;
     const landscapeCount = loadedImages.filter((image) => image.naturalWidth > image.naturalHeight).length;
     const orientation = portraitCount > landscapeCount ? "portrait" : landscapeCount > portraitCount ? "landscape" : "square";
-    els38.previewGrid.classList.remove("preview-orientation-unknown", "preview-orientation-portrait", "preview-orientation-landscape", "preview-orientation-square");
-    els38.previewGrid.classList.add(`preview-orientation-${orientation}`);
+    els37.previewGrid.classList.remove("preview-orientation-unknown", "preview-orientation-portrait", "preview-orientation-landscape", "preview-orientation-square");
+    els37.previewGrid.classList.add(`preview-orientation-${orientation}`);
   }
   function promptPopoverData(task, index) {
     const originalPrompt = task.prompt || task.prompt_for_model || "";
@@ -14434,9 +14177,9 @@ ${galleryText}`;
     const elapsed = elapsedTimerSpan2("running", taskProgressStartValue3(task));
     const generated = taskGeneratedCount2(task, visibleOutputCount);
     const total = taskTotalCount2(task);
-    const size = escapeHtml20(task.params?.size || currentSize2());
+    const size = escapeHtml19(task.params?.size || currentSize2());
     const retryState = taskRetryStateText4(task);
-    const retryStateHtml = retryState ? `<p data-preview-retry-state>${escapeHtml20(retryState)}</p>` : "";
+    const retryStateHtml = retryState ? `<p data-preview-retry-state>${escapeHtml19(retryState)}</p>` : "";
     const failureNotice = runningFailureNotice(task);
     return `
     <div class="running-progress-card">
@@ -14457,10 +14200,10 @@ ${galleryText}`;
     const elapsed = elapsedTimerSpan2("waiting", elapsedFrom);
     const generated = taskGeneratedCount2(task, visibleOutputCount);
     const total = taskTotalCount2(task);
-    const size = escapeHtml20(task.params?.size || currentSize2());
-    const retryReason = task.last_error ? `<p>\u4E0A\u6B21\u9519\u8BEF\uFF1A${escapeHtml20(task.last_error)}</p>` : "";
+    const size = escapeHtml19(task.params?.size || currentSize2());
+    const retryReason = task.last_error ? `<p>\u4E0A\u6B21\u9519\u8BEF\uFF1A${escapeHtml19(task.last_error)}</p>` : "";
     const retryState = taskRetryStateText4(task);
-    const retryStateHtml = retryState ? `<p data-preview-retry-state>${escapeHtml20(retryState)}</p>` : "";
+    const retryStateHtml = retryState ? `<p data-preview-retry-state>${escapeHtml19(retryState)}</p>` : "";
     return `
     <div class="running-progress-card waiting-progress-card">
       <div class="waiting-spinner" aria-hidden="true"></div>
@@ -14480,9 +14223,9 @@ ${galleryText}`;
     const failed = Number.parseInt(task?.failed_count ?? "", 10);
     const failedCount = Number.isNaN(failed) ? Math.max(0, taskTotalCount2(task) - generated) : failed;
     const total = taskTotalCount2(task);
-    const message = escapeHtml20(taskFailureMessage3(task) || "\u90E8\u5206\u56FE\u7247\u751F\u6210\u5931\u8D25");
+    const message = escapeHtml19(taskFailureMessage3(task) || "\u90E8\u5206\u56FE\u7247\u751F\u6210\u5931\u8D25");
     const retryState = taskRetryStateText4(task);
-    const retryStateHtml = retryState ? `<p data-preview-retry-state>${escapeHtml20(retryState)}</p>` : "";
+    const retryStateHtml = retryState ? `<p data-preview-retry-state>${escapeHtml19(retryState)}</p>` : "";
     return `
     <div class="failure-summary-card">
       <strong>${task.status === "partial_failed" ? "\u90E8\u5206\u56FE\u7247\u751F\u6210\u5931\u8D25" : "\u4EFB\u52A1\u5931\u8D25"}</strong>
@@ -14494,7 +14237,7 @@ ${galleryText}`;
   `;
   }
   function retryFailureSummaryButton(task) {
-    const taskId = escapeHtml20(task.task_id || "");
+    const taskId = escapeHtml19(task.task_id || "");
     const actions = [];
     if (canRetryFailedTask3(task)) {
       actions.push(`<button class="ghost-button text-sm" type="button" data-preview-retry-failed-task-id="${taskId}">\u4EC5\u91CD\u8BD5\u5931\u8D25\u56FE\u7247</button>`);
@@ -14512,12 +14255,12 @@ ${galleryText}`;
   function renderRunningPreview(task) {
     clearPreviewGridLayout();
     const elapsed = elapsedTimerSpan2("running", taskProgressStartValue3(task));
-    const size = escapeHtml20(task.params?.size || currentSize2());
+    const size = escapeHtml19(task.params?.size || currentSize2());
     const modeLabel = task.mode === "edit" ? "\u7F16\u8F91" : "\u751F\u6210";
     const retryState = taskRetryStateText4(task);
-    const retryStateHtml = retryState ? `<p data-preview-retry-state>${escapeHtml20(retryState)}</p>` : "";
+    const retryStateHtml = retryState ? `<p data-preview-retry-state>${escapeHtml19(retryState)}</p>` : "";
     const failureNotice = runningFailureNotice(task);
-    els38.previewGrid.innerHTML = `
+    els37.previewGrid.innerHTML = `
     <div class="waiting-preview">
       <div class="waiting-spinner" aria-hidden="true"></div>
       <div>
@@ -14536,13 +14279,13 @@ ${galleryText}`;
     const submitting = task.status === "submitting";
     const elapsedFrom = task.started_at || task.queued_at || task.created_at;
     const elapsed = elapsedTimerSpan2("waiting", elapsedFrom);
-    const size = escapeHtml20(task.params?.size || currentSize2());
+    const size = escapeHtml19(task.params?.size || currentSize2());
     const title = submitting ? "\u63D0\u4EA4\u4EFB\u52A1\u4E2D" : "\u4EFB\u52A1\u6392\u961F\u4E2D";
     const detail = submitting ? "\u6B63\u5728\u4FDD\u5B58\u8F93\u5165\u5E76\u5199\u5165\u961F\u5217\uFF0C\u5B8C\u6210\u540E\u4F1A\u81EA\u52A8\u8FDB\u5165\u751F\u6210\u6D41\u7A0B\u3002" : "\u4EFB\u52A1\u5DF2\u8FDB\u5165\u961F\u5217\uFF0C\u7B49\u5F85\u53EF\u7528\u901A\u9053\u63A5\u624B\u3002";
-    const retryReason = !submitting && task.last_error ? `<p>\u4E0A\u6B21\u9519\u8BEF\uFF1A${escapeHtml20(task.last_error)}</p>` : "";
+    const retryReason = !submitting && task.last_error ? `<p>\u4E0A\u6B21\u9519\u8BEF\uFF1A${escapeHtml19(task.last_error)}</p>` : "";
     const retryState = taskRetryStateText4(task);
-    const retryStateHtml = retryState ? `<p data-preview-retry-state>${escapeHtml20(retryState)}</p>` : "";
-    els38.previewGrid.innerHTML = `
+    const retryStateHtml = retryState ? `<p data-preview-retry-state>${escapeHtml19(retryState)}</p>` : "";
+    els37.previewGrid.innerHTML = `
     <div class="waiting-preview">
       <div class="waiting-spinner" aria-hidden="true"></div>
       <div>
@@ -14558,8 +14301,8 @@ ${galleryText}`;
   `;
   }
   function initTaskPreviewFeature() {
-    els38.deleteUnselectedOutputsButton?.addEventListener("click", () => {
-      openDeleteUnselectedOutputsConfirm(els38.deleteUnselectedOutputsButton);
+    els37.deleteUnselectedOutputsButton?.addEventListener("click", () => {
+      openDeleteUnselectedOutputsConfirm(els37.deleteUnselectedOutputsButton);
     });
     Object.assign(getLegacyBridge().methods, {
       taskRequestPreviewPayload,
@@ -14584,47 +14327,47 @@ ${galleryText}`;
   }
 
   // codex_image/webui/frontend/src/tasks.ts
-  var bridge36 = getLegacyBridge();
-  var state30 = bridge36.state;
-  var els39 = bridge36.els;
-  function legacyMethod40(name, ...args) {
+  var bridge35 = getLegacyBridge();
+  var state29 = bridge35.state;
+  var els38 = bridge35.els;
+  function legacyMethod39(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy bridge method " + name + " is not available");
     }
     return method(...args);
   }
-  var updateTaskInState4 = (...args) => legacyMethod40("updateTaskInState", ...args);
-  var cleanupSessionSelections2 = (...args) => legacyMethod40("cleanupSessionSelections", ...args);
-  var renderTasks8 = (...args) => legacyMethod40("renderTasks", ...args);
-  var renderArchiveButton4 = (...args) => legacyMethod40("renderArchiveButton", ...args);
-  var renderArchiveModal4 = (...args) => legacyMethod40("renderArchiveModal", ...args);
-  var renderPreview6 = (...args) => legacyMethod40("renderPreview", ...args);
-  var migrateLegacyArchivedTasks2 = (...args) => legacyMethod40("migrateLegacyArchivedTasks", ...args);
-  var revokeTaskUploadPreviewUrls3 = (...args) => legacyMethod40("revokeTaskUploadPreviewUrls", ...args);
-  var taskHasViewableUpdate2 = (...args) => legacyMethod40("taskHasViewableUpdate", ...args);
-  var markTaskViewed2 = (...args) => legacyMethod40("markTaskViewed", ...args);
+  var updateTaskInState4 = (...args) => legacyMethod39("updateTaskInState", ...args);
+  var cleanupSessionSelections2 = (...args) => legacyMethod39("cleanupSessionSelections", ...args);
+  var renderTasks8 = (...args) => legacyMethod39("renderTasks", ...args);
+  var renderArchiveButton4 = (...args) => legacyMethod39("renderArchiveButton", ...args);
+  var renderArchiveModal4 = (...args) => legacyMethod39("renderArchiveModal", ...args);
+  var renderPreview6 = (...args) => legacyMethod39("renderPreview", ...args);
+  var migrateLegacyArchivedTasks2 = (...args) => legacyMethod39("migrateLegacyArchivedTasks", ...args);
+  var revokeTaskUploadPreviewUrls3 = (...args) => legacyMethod39("revokeTaskUploadPreviewUrls", ...args);
+  var taskHasViewableUpdate2 = (...args) => legacyMethod39("taskHasViewableUpdate", ...args);
+  var markTaskViewed2 = (...args) => legacyMethod39("markTaskViewed", ...args);
   async function refreshTasks({ migrateLegacyArchives = false } = {}) {
-    const requestSeq = ++state30.tasksRequestSeq;
+    const requestSeq = ++state29.tasksRequestSeq;
     const response = await fetch("/api/tasks");
     const data = await response.json();
-    if (requestSeq !== state30.tasksRequestSeq) return;
+    if (requestSeq !== state29.tasksRequestSeq) return;
     await applyTasksSnapshot(data.tasks || [], { migrateLegacyArchives, requestSeq });
   }
-  async function applyTasksSnapshot(tasks, { migrateLegacyArchives = false, requestSeq = state30.tasksRequestSeq } = {}) {
-    const previousLocalPendingTasks = state30.tasks.filter((task) => task?.local_pending);
-    const pendingTask = state30.pendingTaskId ? state30.tasks.find((task) => task.task_id === state30.pendingTaskId) : null;
-    state30.tasks = Array.isArray(tasks) ? tasks : [];
-    if (pendingTask?.local_pending && !state30.tasks.some((task) => task.task_id === pendingTask.task_id)) {
-      state30.tasks.unshift(pendingTask);
+  async function applyTasksSnapshot(tasks, { migrateLegacyArchives = false, requestSeq = state29.tasksRequestSeq } = {}) {
+    const previousLocalPendingTasks = state29.tasks.filter((task) => task?.local_pending);
+    const pendingTask = state29.pendingTaskId ? state29.tasks.find((task) => task.task_id === state29.pendingTaskId) : null;
+    state29.tasks = Array.isArray(tasks) ? tasks : [];
+    if (pendingTask?.local_pending && !state29.tasks.some((task) => task.task_id === pendingTask.task_id)) {
+      state29.tasks.unshift(pendingTask);
     }
-    const retainedTasks = new Set(state30.tasks);
+    const retainedTasks = new Set(state29.tasks);
     previousLocalPendingTasks.forEach((task) => {
       if (!retainedTasks.has(task)) revokeTaskUploadPreviewUrls3(task);
     });
     if (migrateLegacyArchives) {
       await migrateLegacyArchivedTasks2();
-      if (requestSeq !== state30.tasksRequestSeq) return;
+      if (requestSeq !== state29.tasksRequestSeq) return;
     }
     cleanupSessionSelections2();
     renderTasks8();
@@ -14634,7 +14377,7 @@ ${galleryText}`;
   }
   function applyTaskUpdate(task) {
     if (!updateTaskInState4(task)) return;
-    if (String(task.task_id) === String(state30.selectedTaskId) && taskHasViewableUpdate2(task)) {
+    if (String(task.task_id) === String(state29.selectedTaskId) && taskHasViewableUpdate2(task)) {
       void markTaskViewed2(task.task_id);
     }
     cleanupSessionSelections2();
@@ -14652,70 +14395,70 @@ ${galleryText}`;
   }
 
   // codex_image/webui/frontend/src/task-selection.ts
-  var bridge37 = getLegacyBridge();
-  var state31 = bridge37.state;
-  var els40 = bridge37.els;
+  var bridge36 = getLegacyBridge();
+  var state30 = bridge36.state;
+  var els39 = bridge36.els;
   var taskSelectionInitialized = false;
-  function legacyMethod41(name, ...args) {
+  function legacyMethod40(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy method " + name + " is not initialized");
     }
     return method(...args);
   }
-  function setStatus22(message, type) {
-    legacyMethod41("setStatus", message, type);
+  function setStatus21(message, type) {
+    legacyMethod40("setStatus", message, type);
   }
   function closePromptPopover8() {
-    legacyMethod41("closePromptPopover");
+    legacyMethod40("closePromptPopover");
   }
   function markTaskViewed3(taskId) {
-    return legacyMethod41("markTaskViewed", taskId);
+    return legacyMethod40("markTaskViewed", taskId);
   }
   function applyTaskToForm3(task) {
-    legacyMethod41("applyTaskToForm", task);
+    legacyMethod40("applyTaskToForm", task);
   }
   function updateTaskSelectionVisuals3(taskId) {
-    legacyMethod41("updateTaskSelectionVisuals", taskId);
+    legacyMethod40("updateTaskSelectionVisuals", taskId);
   }
   function renderPreview7(task) {
-    legacyMethod41("renderPreview", task);
+    legacyMethod40("renderPreview", task);
   }
   function taskFailureMessage4(task) {
-    return legacyMethod41("taskFailureMessage", task);
+    return legacyMethod40("taskFailureMessage", task);
   }
   function taskRequestPreviewPayload2(task) {
-    return legacyMethod41("taskRequestPreviewPayload", task);
+    return legacyMethod40("taskRequestPreviewPayload", task);
   }
   function revokeUploadPreviewUrls2(sources) {
-    legacyMethod41("revokeUploadPreviewUrls", sources);
+    legacyMethod40("revokeUploadPreviewUrls", sources);
   }
   function renderImageStrip6() {
-    legacyMethod41("renderImageStrip");
+    legacyMethod40("renderImageStrip");
   }
   function updateRequestPreview12() {
-    legacyMethod41("updateRequestPreview");
+    legacyMethod40("updateRequestPreview");
   }
   function taskInputUrls2(task) {
-    return legacyMethod41("taskInputUrls", task);
+    return legacyMethod40("taskInputUrls", task);
   }
   function uploadSource2(file) {
-    return legacyMethod41("uploadSource", file);
+    return legacyMethod40("uploadSource", file);
   }
   function gallerySource4(item) {
-    return legacyMethod41("gallerySource", item);
+    return legacyMethod40("gallerySource", item);
   }
   function assetSource2(item) {
-    return legacyMethod41("assetSource", item);
+    return legacyMethod40("assetSource", item);
   }
   function selectedTaskInputRestoreCurrent(taskId, restoreSeq) {
     if (restoreSeq == null) return true;
-    return state31.taskInputRestoreSeq === restoreSeq && String(state31.selectedTaskId) === String(taskId);
+    return state30.taskInputRestoreSeq === restoreSeq && String(state30.selectedTaskId) === String(taskId);
   }
   function applySelectedTaskRequestPreview(task) {
     const requestPayload = taskRequestPreviewPayload2(task);
-    if (requestPayload && els40.requestJson) {
-      els40.requestJson.textContent = JSON.stringify(requestPayload, null, 2);
+    if (requestPayload && els39.requestJson) {
+      els39.requestJson.textContent = JSON.stringify(requestPayload, null, 2);
     }
   }
   function applyTaskInputRestoreSources(sources, taskId, restoreSeq) {
@@ -14723,8 +14466,8 @@ ${galleryText}`;
       revokeUploadPreviewUrls2(sources);
       return false;
     }
-    revokeUploadPreviewUrls2(state31.images);
-    state31.images = sources.filter(Boolean);
+    revokeUploadPreviewUrls2(state30.images);
+    state30.images = sources.filter(Boolean);
     renderImageStrip6();
     updateRequestPreview12();
     return true;
@@ -14734,9 +14477,9 @@ ${galleryText}`;
     updateTaskSelectionVisuals3(taskId);
     renderPreview7(task);
     if (task.status === "failed") {
-      setStatus22(taskFailureMessage4(task) || "\u4EFB\u52A1\u5931\u8D25", "error");
+      setStatus21(taskFailureMessage4(task) || "\u4EFB\u52A1\u5931\u8D25", "error");
     } else if (task.status !== "running") {
-      setStatus22(`\u5DF2\u8F7D\u5165\u4EFB\u52A1 ${taskId}`, "ok");
+      setStatus21(`\u5DF2\u8F7D\u5165\u4EFB\u52A1 ${taskId}`, "ok");
     }
   }
   function isLegacyOutputInputUrl2(url) {
@@ -14778,7 +14521,7 @@ ${galleryText}`;
       let uploadInputIndex = 0;
       const uploadSources = task.input_sources.filter((source) => source?.kind === "upload" && source.image_url);
       if (uploadSources.length && selectedTaskInputRestoreCurrent(taskId, restoreSeq)) {
-        setStatus22("\u6B63\u5728\u8F7D\u5165\u5386\u53F2\u8F93\u5165\u56FE...", "");
+        setStatus21("\u6B63\u5728\u8F7D\u5165\u5386\u53F2\u8F93\u5165\u56FE...", "");
       }
       try {
         for (const [index, source] of task.input_sources.entries()) {
@@ -14814,7 +14557,7 @@ ${galleryText}`;
       return applyTaskInputRestoreSources(gallerySources, taskId, restoreSeq);
     }
     if (selectedTaskInputRestoreCurrent(taskId, restoreSeq)) {
-      setStatus22("\u6B63\u5728\u8F7D\u5165\u5386\u53F2\u8F93\u5165\u56FE...", "");
+      setStatus21("\u6B63\u5728\u8F7D\u5165\u5386\u53F2\u8F93\u5165\u56FE...", "");
     }
     const inputNames = Array.isArray(task.input_files) ? task.input_files : [];
     const files = [];
@@ -14840,10 +14583,10 @@ ${galleryText}`;
   }
   async function selectTask2(taskId) {
     closePromptPopover8();
-    state31.selectedTaskId = taskId;
-    const task = state31.tasks.find((item) => String(item.task_id) === String(taskId));
+    state30.selectedTaskId = taskId;
+    const task = state30.tasks.find((item) => String(item.task_id) === String(taskId));
     if (!task) return;
-    const restoreSeq = ++state31.taskInputRestoreSeq;
+    const restoreSeq = ++state30.taskInputRestoreSeq;
     void markTaskViewed3(taskId);
     applyTaskToForm3(task);
     renderSelectedTask(task, taskId);
@@ -14851,10 +14594,10 @@ ${galleryText}`;
       await restoreTaskInputs(task, { taskId, restoreSeq });
     } catch (error) {
       if (!selectedTaskInputRestoreCurrent(taskId, restoreSeq)) return;
-      revokeUploadPreviewUrls2(state31.images);
-      state31.images = [];
+      revokeUploadPreviewUrls2(state30.images);
+      state30.images = [];
       renderImageStrip6();
-      setStatus22(error.message, "error");
+      setStatus21(error.message, "error");
       return;
     }
     if (!selectedTaskInputRestoreCurrent(taskId, restoreSeq)) return;
@@ -14870,8 +14613,8 @@ ${galleryText}`;
   }
 
   // codex_image/webui/frontend/src/overlay-popovers.ts
-  var bridge38 = getLegacyBridge();
-  var els41 = bridge38.els;
+  var bridge37 = getLegacyBridge();
+  var els40 = bridge37.els;
   var overlayPopoversInitialized = false;
   var overlayPopoverEventsBound = false;
   var confirmPopoverEl = null;
@@ -14884,63 +14627,60 @@ ${galleryText}`;
     optimizedPrompt: "",
     copyTimerId: null
   };
-  function legacyMethod42(name, ...args) {
+  function legacyMethod41(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy method " + name + " is not initialized");
     }
     return method(...args);
   }
-  function escapeHtml21(value) {
-    return legacyMethod42("escapeHtml", value);
+  function escapeHtml20(value) {
+    return legacyMethod41("escapeHtml", value);
   }
   function closeGalleryEditPopover4() {
-    legacyMethod42("closeGalleryEditPopover");
+    legacyMethod41("closeGalleryEditPopover");
   }
   function handlePromptDocumentClick2(event) {
-    legacyMethod42("handlePromptDocumentClick", event);
+    legacyMethod41("handlePromptDocumentClick", event);
   }
   function handleGalleryDocumentClick2(event) {
-    legacyMethod42("handleGalleryDocumentClick", event);
+    legacyMethod41("handleGalleryDocumentClick", event);
   }
   function closeCompressionPopover2() {
-    legacyMethod42("closeCompressionPopover");
+    legacyMethod41("closeCompressionPopover");
   }
   function handleImageEditorHistoryShortcut2(event) {
-    return legacyMethod42("handleImageEditorHistoryShortcut", event);
+    return legacyMethod41("handleImageEditorHistoryShortcut", event);
   }
   function hideMentionSuggest4() {
-    legacyMethod42("hideMentionSuggest");
+    legacyMethod41("hideMentionSuggest");
   }
   function hideColorSuggest5() {
-    legacyMethod42("hideColorSuggest");
+    legacyMethod41("hideColorSuggest");
   }
   function hidePromptSnippetSuggest4() {
-    legacyMethod42("hidePromptSnippetSuggest");
+    legacyMethod41("hidePromptSnippetSuggest");
   }
   function hidePromptSnippetSelectionButton4() {
-    legacyMethod42("hidePromptSnippetSelectionButton");
+    legacyMethod41("hidePromptSnippetSelectionButton");
   }
   function closePromptSnippetPopover4() {
-    legacyMethod42("closePromptSnippetPopover");
+    legacyMethod41("closePromptSnippetPopover");
   }
   function closeArchiveModal3() {
-    legacyMethod42("closeArchiveModal");
+    legacyMethod41("closeArchiveModal");
   }
   function closeImageEditor2() {
-    legacyMethod42("closeImageEditor");
+    legacyMethod41("closeImageEditor");
   }
   function closeGallery3() {
-    legacyMethod42("closeGallery");
+    legacyMethod41("closeGallery");
   }
   function closeApiSettingsModal2() {
-    legacyMethod42("closeApiSettingsModal");
-  }
-  function closeAccountQuotaDrawer2() {
-    legacyMethod42("closeAccountQuotaDrawer");
+    legacyMethod41("closeApiSettingsModal");
   }
   function closePromptTemplateDrawer2() {
-    legacyMethod42("closePromptTemplateDrawer");
+    legacyMethod41("closePromptTemplateDrawer");
   }
   function bindOverlayPopoverEvents() {
     if (overlayPopoverEventsBound) return;
@@ -14968,16 +14708,16 @@ ${galleryText}`;
     closeGalleryEditPopover4();
     confirmPopoverState.anchor = anchor;
     confirmPopoverState.onConfirm = typeof options.onConfirm === "function" ? options.onConfirm : null;
-    const message = options.message ? `<p class="confirm-popover-message">${escapeHtml21(options.message)}</p>` : "";
-    const detail = options.detail ? `<div class="confirm-popover-detail">${escapeHtml21(options.detail)}</div>` : "";
+    const message = options.message ? `<p class="confirm-popover-message">${escapeHtml20(options.message)}</p>` : "";
+    const detail = options.detail ? `<div class="confirm-popover-detail">${escapeHtml20(options.detail)}</div>` : "";
     const confirmText = options.confirmText || "\u786E\u8BA4";
     popover.innerHTML = `
-    <div class="confirm-popover-title">${escapeHtml21(options.title || "\u786E\u8BA4\u64CD\u4F5C\uFF1F")}</div>
+    <div class="confirm-popover-title">${escapeHtml20(options.title || "\u786E\u8BA4\u64CD\u4F5C\uFF1F")}</div>
     ${message}
     ${detail}
     <div class="confirm-popover-actions">
       <button class="ghost-button text-sm" type="button" data-confirm-popover-cancel>\u53D6\u6D88</button>
-      <button class="ghost-button text-sm danger-button confirm-popover-confirm" type="button" data-confirm-popover-confirm>${escapeHtml21(confirmText)}</button>
+      <button class="ghost-button text-sm danger-button confirm-popover-confirm" type="button" data-confirm-popover-confirm>${escapeHtml20(confirmText)}</button>
     </div>
   `;
     popover.querySelector("[data-confirm-popover-cancel]")?.addEventListener("click", closeConfirmPopover4);
@@ -15021,10 +14761,10 @@ ${galleryText}`;
     return `
     <section class="prompt-popover-section${toneClass}">
       <div class="prompt-popover-section-head">
-        <div class="prompt-popover-label">${escapeHtml21(label)}</div>
-        <span class="prompt-popover-meta">${escapeHtml21(meta || promptLengthLabel(text))}</span>
+        <div class="prompt-popover-label">${escapeHtml20(label)}</div>
+        <span class="prompt-popover-meta">${escapeHtml20(meta || promptLengthLabel(text))}</span>
       </div>
-      <pre class="prompt-popover-text">${escapeHtml21(text || "\u65E0")}</pre>
+      <pre class="prompt-popover-text">${escapeHtml20(text || "\u65E0")}</pre>
     </section>
   `;
   }
@@ -15034,7 +14774,7 @@ ${galleryText}`;
     return `
     <details class="prompt-popover-submitted">
       <summary>\u67E5\u770B\u5B9E\u9645\u63D0\u4EA4\u63D0\u793A\u8BCD</summary>
-      <pre class="prompt-popover-submitted-text">${escapeHtml21(submittedPrompt)}</pre>
+      <pre class="prompt-popover-submitted-text">${escapeHtml20(submittedPrompt)}</pre>
     </details>
   `;
   }
@@ -15058,7 +14798,7 @@ ${galleryText}`;
     <div class="prompt-popover-header">
       <div>
         <strong>\u63D0\u793A\u8BCD\u5BF9\u6BD4</strong>
-        <span class="prompt-popover-summary">\u539F\u59CB ${escapeHtml21(promptLengthLabel(originalPrompt))} \xB7 \u4F18\u5316 ${escapeHtml21(optimizedPrompt ? promptLengthLabel(optimizedPrompt) : "\u672A\u8FD4\u56DE")}</span>
+        <span class="prompt-popover-summary">\u539F\u59CB ${escapeHtml20(promptLengthLabel(originalPrompt))} \xB7 \u4F18\u5316 ${escapeHtml20(optimizedPrompt ? promptLengthLabel(optimizedPrompt) : "\u672A\u8FD4\u56DE")}</span>
       </div>
       <button class="prompt-popover-close" type="button" aria-label="\u5173\u95ED\u63D0\u793A\u8BCD">\xD7</button>
     </div>
@@ -15142,8 +14882,8 @@ ${galleryText}`;
         closeConfirmPopover4();
       }
     }
-    if (!els41.compressionPopover || els41.compressionPopover.classList.contains("hidden")) return;
-    if (els41.compressionPopover.contains(target) || els41.outputFormatField?.contains(target)) return;
+    if (!els40.compressionPopover || els40.compressionPopover.classList.contains("hidden")) return;
+    if (els40.compressionPopover.contains(target) || els40.outputFormatField?.contains(target)) return;
     closeCompressionPopover2();
   }
   function handleDocumentKeydown(event) {
@@ -15162,7 +14902,6 @@ ${galleryText}`;
       closeImageEditor2();
       closeGallery3();
       closeApiSettingsModal2();
-      closeAccountQuotaDrawer2();
       closePromptTemplateDrawer2();
     }
   }
@@ -15194,13 +14933,13 @@ ${galleryText}`;
   var SIDEBAR_WIDTH_STORAGE_KEY = "codex-image-sidebar-width";
   var SIDEBAR_MIN_WIDTH = 280;
   var SIDEBAR_MAX_WIDTH = 520;
-  var bridge39 = getLegacyBridge();
-  var state32 = bridge39.state;
-  var els42 = bridge39.els;
+  var bridge38 = getLegacyBridge();
+  var state31 = bridge38.state;
+  var els41 = bridge38.els;
   var shellUiInitialized = false;
   var shellUiEventsBound = false;
   var previewPanelHeightFrameId = null;
-  function legacyMethod43(name, ...args) {
+  function legacyMethod42(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy method " + name + " is not initialized");
@@ -15208,98 +14947,98 @@ ${galleryText}`;
     return method(...args);
   }
   function formatTaskStatus4(task) {
-    return legacyMethod43("formatTaskStatus", task);
+    return legacyMethod42("formatTaskStatus", task);
   }
   function closePromptPopover10() {
-    legacyMethod43("closePromptPopover");
+    legacyMethod42("closePromptPopover");
   }
   function closePromptSnippetPopover5() {
-    legacyMethod43("closePromptSnippetPopover");
+    legacyMethod42("closePromptSnippetPopover");
   }
   function closeArchiveModal4() {
-    legacyMethod43("closeArchiveModal");
+    legacyMethod42("closeArchiveModal");
   }
   function closeGallery4() {
-    legacyMethod43("closeGallery");
+    legacyMethod42("closeGallery");
   }
   function closeImageEditor3() {
-    legacyMethod43("closeImageEditor");
+    legacyMethod42("closeImageEditor");
   }
   function revokeUploadPreviewUrls3(sources) {
-    legacyMethod43("revokeUploadPreviewUrls", sources);
+    legacyMethod42("revokeUploadPreviewUrls", sources);
   }
   function finishBatchMarqueeSelection2() {
-    legacyMethod43("finishBatchMarqueeSelection");
+    legacyMethod42("finishBatchMarqueeSelection");
   }
   function setPromptText3(value) {
-    legacyMethod43("setPromptText", value);
+    legacyMethod42("setPromptText", value);
   }
   function setMode6(mode) {
-    legacyMethod43("setMode", mode);
+    legacyMethod42("setMode", mode);
   }
   function updateSizeFromPreset2() {
-    legacyMethod43("updateSizeFromPreset");
+    legacyMethod42("updateSizeFromPreset");
   }
   function updatePromptCount7() {
-    legacyMethod43("updatePromptCount");
+    legacyMethod42("updatePromptCount");
   }
   function updateQuantity3() {
-    legacyMethod43("updateQuantity");
+    legacyMethod42("updateQuantity");
   }
   function updateCompression3() {
-    legacyMethod43("updateCompression");
+    legacyMethod42("updateCompression");
   }
   function renderImageStrip7() {
-    legacyMethod43("renderImageStrip");
+    legacyMethod42("renderImageStrip");
   }
   function renderTasks9() {
-    legacyMethod43("renderTasks");
+    legacyMethod42("renderTasks");
   }
   function renderPreview8() {
-    legacyMethod43("renderPreview");
+    legacyMethod42("renderPreview");
   }
   function updateRequestPreview13() {
-    legacyMethod43("updateRequestPreview");
+    legacyMethod42("updateRequestPreview");
   }
   function bindShellUiEvents() {
     if (shellUiEventsBound) return;
     shellUiEventsBound = true;
-    els42.themeSwitcher?.addEventListener("click", (event) => {
+    els41.themeSwitcher?.addEventListener("click", (event) => {
       const button = event.target.closest("[data-theme-option]");
       if (!button) return;
       applyThemePreference(button.dataset.themeOption || "system");
     });
-    state32.themeSystemQuery = window.matchMedia?.("(prefers-color-scheme: dark)");
-    state32.themeSystemQuery?.addEventListener?.("change", handleThemeSystemChange);
-    if (els42.copyJsonButton) {
-      els42.copyJsonButton.addEventListener("click", copyJson);
+    state31.themeSystemQuery = window.matchMedia?.("(prefers-color-scheme: dark)");
+    state31.themeSystemQuery?.addEventListener?.("change", handleThemeSystemChange);
+    if (els41.copyJsonButton) {
+      els41.copyJsonButton.addEventListener("click", copyJson);
     }
-    els42.newTaskButton?.addEventListener("click", resetForm);
-    els42.sidebarResizeHandle?.addEventListener("pointerdown", startSidebarResize);
-    els42.sidebarResizeHandle?.addEventListener("keydown", handleSidebarResizeKeydown);
+    els41.newTaskButton?.addEventListener("click", resetForm);
+    els41.sidebarResizeHandle?.addEventListener("pointerdown", startSidebarResize);
+    els41.sidebarResizeHandle?.addEventListener("keydown", handleSidebarResizeKeydown);
   }
   function normalizeThemePreference(value) {
     return THEME_OPTIONS.has(value) ? value : "system";
   }
-  function resolveEffectiveTheme(preference = state32.themePreference) {
+  function resolveEffectiveTheme(preference = state31.themePreference) {
     if (preference === "dark" || preference === "light") return preference;
     return window.matchMedia?.("(prefers-color-scheme: dark)")?.matches ? "dark" : "light";
   }
   function updateThemeSwitcher() {
-    els42.themeSwitcher?.querySelectorAll("[data-theme-option]").forEach((button) => {
-      const active = button.dataset.themeOption === state32.themePreference;
+    els41.themeSwitcher?.querySelectorAll("[data-theme-option]").forEach((button) => {
+      const active = button.dataset.themeOption === state31.themePreference;
       button.classList.toggle("active", active);
       button.setAttribute("aria-pressed", active ? "true" : "false");
     });
   }
   function applyThemePreference(preference, { persist = true } = {}) {
-    state32.themePreference = normalizeThemePreference(preference);
-    const effectiveTheme = resolveEffectiveTheme(state32.themePreference);
+    state31.themePreference = normalizeThemePreference(preference);
+    const effectiveTheme = resolveEffectiveTheme(state31.themePreference);
     document.documentElement.dataset.theme = effectiveTheme;
-    document.documentElement.dataset.themePreference = state32.themePreference;
+    document.documentElement.dataset.themePreference = state31.themePreference;
     if (persist) {
       try {
-        localStorage.setItem(THEME_STORAGE_KEY, state32.themePreference);
+        localStorage.setItem(THEME_STORAGE_KEY, state31.themePreference);
       } catch {
       }
     }
@@ -15315,7 +15054,7 @@ ${galleryText}`;
     applyThemePreference(saved, { persist: false });
   }
   function handleThemeSystemChange() {
-    if (state32.themePreference === "system") {
+    if (state31.themePreference === "system") {
       applyThemePreference("system", { persist: false });
     }
   }
@@ -15350,43 +15089,43 @@ ${galleryText}`;
     schedulePreviewPanelHeightSync();
   }
   function startSidebarResize(event) {
-    if (!els42.sidebar || event.button !== 0) return;
+    if (!els41.sidebar || event.button !== 0) return;
     event.preventDefault();
-    const currentWidth = els42.sidebar.getBoundingClientRect().width || SIDEBAR_MIN_WIDTH;
-    state32.sidebarResize = {
+    const currentWidth = els41.sidebar.getBoundingClientRect().width || SIDEBAR_MIN_WIDTH;
+    state31.sidebarResize = {
       pointerId: event.pointerId,
       startX: event.clientX,
       startWidth: currentWidth
     };
-    els42.sidebar.classList.add("resizing");
+    els41.sidebar.classList.add("resizing");
     document.body.classList.add("sidebar-resizing");
-    els42.sidebarResizeHandle?.setPointerCapture?.(event.pointerId);
+    els41.sidebarResizeHandle?.setPointerCapture?.(event.pointerId);
     window.addEventListener("pointermove", updateSidebarResize);
     window.addEventListener("pointerup", finishSidebarResize);
     window.addEventListener("pointercancel", finishSidebarResize);
   }
   function updateSidebarResize(event) {
-    const resize = state32.sidebarResize;
+    const resize = state31.sidebarResize;
     if (!resize || event.pointerId !== resize.pointerId) return;
     applySidebarWidth(resize.startWidth + event.clientX - resize.startX, { persist: false });
   }
   function finishSidebarResize(event) {
-    const resize = state32.sidebarResize;
+    const resize = state31.sidebarResize;
     if (!resize || event.pointerId !== resize.pointerId) return;
-    const currentWidth = els42.sidebar?.getBoundingClientRect().width || resize.startWidth;
+    const currentWidth = els41.sidebar?.getBoundingClientRect().width || resize.startWidth;
     applySidebarWidth(currentWidth, { persist: true });
-    state32.sidebarResize = null;
-    els42.sidebar?.classList.remove("resizing");
+    state31.sidebarResize = null;
+    els41.sidebar?.classList.remove("resizing");
     document.body.classList.remove("sidebar-resizing");
-    els42.sidebarResizeHandle?.releasePointerCapture?.(event.pointerId);
+    els41.sidebarResizeHandle?.releasePointerCapture?.(event.pointerId);
     window.removeEventListener("pointermove", updateSidebarResize);
     window.removeEventListener("pointerup", finishSidebarResize);
     window.removeEventListener("pointercancel", finishSidebarResize);
   }
   function handleSidebarResizeKeydown(event) {
-    if (!els42.sidebar) return;
+    if (!els41.sidebar) return;
     const step = event.shiftKey ? 32 : 16;
-    const currentWidth = els42.sidebar.getBoundingClientRect().width || SIDEBAR_MIN_WIDTH;
+    const currentWidth = els41.sidebar.getBoundingClientRect().width || SIDEBAR_MIN_WIDTH;
     if (event.key === "ArrowLeft") {
       event.preventDefault();
       applySidebarWidth(currentWidth - step);
@@ -15402,12 +15141,12 @@ ${galleryText}`;
     }
   }
   function setupPreviewPanelHeightSync() {
-    if (!els42.controlsCol || !els42.previewCol || !els42.previewPanel) return;
+    if (!els41.controlsCol || !els41.previewCol || !els41.previewPanel) return;
     window.addEventListener("resize", schedulePreviewPanelHeightSync);
     if (window.ResizeObserver) {
       const observer = new ResizeObserver(schedulePreviewPanelHeightSync);
-      observer.observe(els42.controlsCol);
-      els42.controlsCol.querySelectorAll(":scope > .panel").forEach((panel) => observer.observe(panel));
+      observer.observe(els41.controlsCol);
+      els41.controlsCol.querySelectorAll(":scope > .panel").forEach((panel) => observer.observe(panel));
     }
     schedulePreviewPanelHeightSync();
   }
@@ -15421,24 +15160,24 @@ ${galleryText}`;
     });
   }
   function syncPreviewPanelHeight() {
-    if (!els42.controlsCol || !els42.previewCol || !els42.previewPanel) return;
+    if (!els41.controlsCol || !els41.previewCol || !els41.previewPanel) return;
     if (window.matchMedia("(max-width: 1024px)").matches) {
-      els42.previewCol.style.removeProperty("--controls-col-height");
-      els42.previewPanel.style.removeProperty("--controls-col-height");
+      els41.previewCol.style.removeProperty("--controls-col-height");
+      els41.previewPanel.style.removeProperty("--controls-col-height");
       return;
     }
-    const panels = [...els42.controlsCol.querySelectorAll(":scope > .panel")];
+    const panels = [...els41.controlsCol.querySelectorAll(":scope > .panel")];
     if (!panels.length) return;
     const firstPanelRect = panels[0].getBoundingClientRect();
     const lastPanelRect = panels[panels.length - 1].getBoundingClientRect();
     const height = Math.max(260, Math.ceil(lastPanelRect.bottom - firstPanelRect.top));
-    els42.previewCol.style.setProperty("--controls-col-height", `${height}px`);
-    els42.previewPanel.style.setProperty("--controls-col-height", `${height}px`);
+    els41.previewCol.style.setProperty("--controls-col-height", `${height}px`);
+    els41.previewPanel.style.setProperty("--controls-col-height", `${height}px`);
   }
   function updateDocumentTitle2() {
-    const summary = state32.queue.summary || {};
-    const waitingCount = Number(summary.waiting_count ?? state32.queue.waiting.length ?? 0);
-    const runningCount = Number(summary.running_count ?? state32.queue.running.length ?? 0);
+    const summary = state31.queue.summary || {};
+    const waitingCount = Number(summary.waiting_count ?? state31.queue.waiting.length ?? 0);
+    const runningCount = Number(summary.running_count ?? state31.queue.running.length ?? 0);
     const total = waitingCount + runningCount;
     let status = "";
     if (runningCount > 0) {
@@ -15446,15 +15185,15 @@ ${galleryText}`;
     } else if (waitingCount > 0) {
       status = `\u6392\u961F\u4E2D \xB7 \u7B49\u5F85 ${waitingCount}`;
     } else {
-      const selected = state32.tasks.find((item) => String(item.task_id) === String(state32.selectedTaskId));
+      const selected = state31.tasks.find((item) => String(item.task_id) === String(state31.selectedTaskId));
       status = selected ? formatTaskStatus4(selected) : "";
     }
     document.title = status ? `${status} \xB7 ${getLegacyBridge().constants.defaultDocumentTitle}` : getLegacyBridge().constants.defaultDocumentTitle;
   }
-  function setStatus23(message, type) {
-    if (!els42.statusText) return;
-    els42.statusText.textContent = message;
-    els42.statusText.className = `status-text ${type || ""}`;
+  function setStatus22(message, type) {
+    if (!els41.statusText) return;
+    els41.statusText.textContent = message;
+    els41.statusText.className = `status-text ${type || ""}`;
   }
   function resetForm() {
     closePromptPopover10();
@@ -15462,26 +15201,26 @@ ${galleryText}`;
     closeArchiveModal4();
     closeGallery4();
     closeImageEditor3();
-    state32.selectedTaskId = null;
-    state32.mode = "generate";
-    revokeUploadPreviewUrls3(state32.images);
-    state32.images = [];
-    state32.batchMode = false;
-    state32.batchSelectedTaskIds = [];
+    state31.selectedTaskId = null;
+    state31.mode = "generate";
+    revokeUploadPreviewUrls3(state31.images);
+    state31.images = [];
+    state31.batchMode = false;
+    state31.batchSelectedTaskIds = [];
     finishBatchMarqueeSelection2();
     setPromptText3("");
-    if (els42.customSizeToggle) els42.customSizeToggle.checked = false;
-    if (els42.nInput) els42.nInput.value = "1";
-    if (els42.resolution) els42.resolution.value = "standard";
-    if (els42.ratio) els42.ratio.value = "1:1";
-    if (els42.orientation) els42.orientation.value = "square";
-    els42.size.value = "1024x1024";
-    els42.quality.value = "auto";
-    els42.outputFormat.value = "png";
-    els42.moderation.value = "auto";
-    els42.compression.value = "80";
-    if (els42.promptFidelity) els42.promptFidelity.value = "strict";
-    [els42.nInput, els42.resolution, els42.ratio, els42.orientation, els42.quality, els42.outputFormat, els42.moderation, els42.promptFidelity].forEach((sel) => {
+    if (els41.customSizeToggle) els41.customSizeToggle.checked = false;
+    if (els41.nInput) els41.nInput.value = "1";
+    if (els41.resolution) els41.resolution.value = "standard";
+    if (els41.ratio) els41.ratio.value = "1:1";
+    if (els41.orientation) els41.orientation.value = "square";
+    els41.size.value = "1024x1024";
+    els41.quality.value = "auto";
+    els41.outputFormat.value = "png";
+    els41.moderation.value = "auto";
+    els41.compression.value = "80";
+    if (els41.promptFidelity) els41.promptFidelity.value = "strict";
+    [els41.nInput, els41.resolution, els41.ratio, els41.orientation, els41.quality, els41.outputFormat, els41.moderation, els41.promptFidelity].forEach((sel) => {
       if (sel) sel.dispatchEvent(new Event("change"));
     });
     setMode6("generate");
@@ -15493,12 +15232,12 @@ ${galleryText}`;
     renderTasks9();
     renderPreview8();
     updateRequestPreview13();
-    setStatus23("\u7B49\u5F85\u4EFB\u52A1", "");
+    setStatus22("\u7B49\u5F85\u4EFB\u52A1", "");
   }
   async function copyJson() {
-    if (!els42.requestJson) return;
-    await navigator.clipboard.writeText(els42.requestJson.textContent);
-    setStatus23("JSON \u5DF2\u590D\u5236", "ok");
+    if (!els41.requestJson) return;
+    await navigator.clipboard.writeText(els41.requestJson.textContent);
+    setStatus22("JSON \u5DF2\u590D\u5236", "ok");
   }
   function initShellUiFeature() {
     if (shellUiInitialized) return;
@@ -15523,7 +15262,7 @@ ${galleryText}`;
       schedulePreviewPanelHeightSync,
       syncPreviewPanelHeight,
       updateDocumentTitle: updateDocumentTitle2,
-      setStatus: setStatus23,
+      setStatus: setStatus22,
       resetForm,
       copyJson
     });
@@ -15542,7 +15281,7 @@ ${galleryText}`;
     urls: [],
     index: 0
   };
-  function legacyMethod44(name, ...args) {
+  function legacyMethod43(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
       throw new Error("Legacy bridge method " + name + " is not available");
@@ -15704,8 +15443,8 @@ ${galleryText}`;
   }
   async function addToInput(url) {
     try {
-      const file = await legacyMethod44("imageFileFromUrl", url, "preview-" + Date.now());
-      legacyMethod44("addImageFiles", [file]);
+      const file = await legacyMethod43("imageFileFromUrl", url, "preview-" + Date.now());
+      legacyMethod43("addImageFiles", [file]);
     } catch (error) {
       console.error("Failed to add image to input", error);
     }
@@ -15814,7 +15553,6 @@ ${galleryText}`;
   initGalleryItemActionsFeature();
   initGalleryFeature();
   initApiSettingsFeature();
-  initAccountQuotaFeature();
   initStorageSettingsFeature();
   initColorPaletteFeature();
   initPromptColorsFeature();

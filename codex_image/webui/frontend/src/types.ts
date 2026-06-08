@@ -1,7 +1,7 @@
 export type TaskStatus = "submitting" | "queued" | "running" | "completed" | "failed" | "partial_failed" | "cancelled";
 export type TaskMode = "generate" | "edit";
 export type OutputStatus = "running" | "completed" | "failed";
-export type AuthSource = "auto" | "cockpit" | "codex" | "api";
+export type AuthSource = "codex" | "api";
 export type ApiMode = "images" | "responses";
 
 export interface TaskOutputRecord {

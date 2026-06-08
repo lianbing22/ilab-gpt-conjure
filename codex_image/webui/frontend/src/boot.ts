@@ -31,7 +31,6 @@ export function bootWebUI(state: WebUIState, els: WebUIElements, methods: Legacy
   call(methods, "refreshHealth");
   call(methods, "refreshGallery");
   call(methods, "refreshRecentAssets");
-  call(methods, "refreshAccountQuota", false);
   const realtimeStarted = window.startRealtimeUpdates?.({ migrateLegacyArchives: true });
   if (realtimeStarted) {
     void window.refreshQueue?.();

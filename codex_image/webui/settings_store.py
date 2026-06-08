@@ -1,15 +1,12 @@
 from __future__ import annotations
 
 import json
-import os
 import re
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit, urlunsplit
 
-from codex_image.auth import AuthState
 from codex_image.client import DEFAULT_IMAGE_MODEL, DEFAULT_OPENAI_API_BASE_URL
-from codex_image.cockpit_auth import CockpitAuthProvider
 
 from .color_settings import (
     DEFAULT_COLOR_FAVORITES,
@@ -91,19 +88,11 @@ from .schemas import (
     DEFAULT_WEBUI_OUTPUT_ROOT,
     DEFAULT_WEBUI_SOURCE_DATA_ROOT,
 )
-
-AUTH_SOURCES = {"auto", "cockpit", "codex", "api"}
+from .startup_auth import AUTH_SOURCES, detect_startup_auth_source
 
 
 def _default_auth_source() -> str:
-    source = os.getenv("CODEX_IMAGE_AUTH_SOURCE", "auto").strip().lower()
-    return source if source in AUTH_SOURCES else "auto"
-
-
-def _cockpit_provider() -> CockpitAuthProvider | None:
-    root = os.getenv("CODEX_IMAGE_COCKPIT_HOME")
-    provider = CockpitAuthProvider(root=Path(root) if root else None)
-    return provider if provider.has_auth() else None
+    return detect_startup_auth_source()
 
 
 class WebUISettings:
@@ -449,26 +438,3 @@ class ApiSettings:
         if not model:
             raise ValueError("Image model cannot be empty")
         return model
-
-
-class FixedAuthProvider:
-    def __init__(self, state: AuthState) -> None:
-        self.state = state
-
-    def next_auth_state(self) -> AuthState:
-        return self.state
-
-    def next_auth_state_after_unauthorized(self, current_state: AuthState) -> AuthState | None:
-        provider = _cockpit_provider()
-        if provider is None:
-            return None
-        try:
-            refreshed = provider.auth_state_for_account_file_id(str(self.state.raw["_cockpit_account_file_id"]))
-        except (FileNotFoundError, ValueError, KeyError):
-            return None
-        if refreshed.access_token != current_state.access_token:
-            return refreshed
-        return None
-
-    def available_count(self) -> int:
-        return 1

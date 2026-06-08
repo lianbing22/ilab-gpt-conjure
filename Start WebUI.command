@@ -59,6 +59,8 @@ wait_for_webui() {
 
 echo "Starting iLab GPT CONJURE at ${URL}"
 mkdir -p output
+AUTH_SETTINGS_PATH="${PROJECT_DIR}/output/webui-auth-settings.json"
+"$PYTHON_BIN" -m codex_image.webui.startup_auth --settings-path "$AUTH_SETTINGS_PATH" >/dev/null
 LOG_FILE="${PROJECT_DIR}/output/webui-server.log"
 echo "Writing server log to ${LOG_FILE}"
 if webui_is_ready; then

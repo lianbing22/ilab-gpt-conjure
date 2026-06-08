@@ -41,7 +41,6 @@ function closeArchiveModal() { legacyMethod("closeArchiveModal"); }
 function closeImageEditor() { legacyMethod("closeImageEditor"); }
 function closeGallery() { legacyMethod("closeGallery"); }
 function closeApiSettingsModal() { legacyMethod("closeApiSettingsModal"); }
-function closeAccountQuotaDrawer() { legacyMethod("closeAccountQuotaDrawer"); }
 function closePromptTemplateDrawer() { legacyMethod("closePromptTemplateDrawer"); }
 
 function bindOverlayPopoverEvents() {
@@ -286,7 +285,6 @@ function handleDocumentKeydown(event) {
     closeImageEditor();
     closeGallery();
     closeApiSettingsModal();
-    closeAccountQuotaDrawer();
     closePromptTemplateDrawer();
   }
 }

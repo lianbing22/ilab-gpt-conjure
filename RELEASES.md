@@ -35,18 +35,3 @@ xattr -dr com.apple.quarantine /path/to/ilab-gpt-conjure_macos_portable_x64
 
 一键包内的 `data/` 目录会保存本地设置、公用图库、输入图、输出图、任务数据库和日志。
 不要把这些本地数据、API key 或 OAuth 文件提交到 Git。
-
-## Portable Packages
-
-Current release: [v0.1.3](https://github.com/kadevin/ilab-gpt-conjure/releases/tag/v0.1.3)
-
-| Platform | Device | Download | SHA256 |
-| --- | --- | --- | --- |
-| Windows x64 | Windows 10/11 x64 | [ilab-gpt-conjure_windows_portable_x64_0.1.3.zip](https://github.com/kadevin/ilab-gpt-conjure/releases/download/v0.1.3/ilab-gpt-conjure_windows_portable_x64_0.1.3.zip) | [sha256](https://github.com/kadevin/ilab-gpt-conjure/releases/download/v0.1.3/ilab-gpt-conjure_windows_portable_x64_0.1.3.zip.sha256.txt) |
-| macOS Apple Silicon | M1/M2/M3/M4 | [ilab-gpt-conjure_macos_portable_arm64_0.1.3.zip](https://github.com/kadevin/ilab-gpt-conjure/releases/download/v0.1.3/ilab-gpt-conjure_macos_portable_arm64_0.1.3.zip) | [sha256](https://github.com/kadevin/ilab-gpt-conjure/releases/download/v0.1.3/ilab-gpt-conjure_macos_portable_arm64_0.1.3.zip.sha256.txt) |
-| macOS Intel | Intel x64 | [ilab-gpt-conjure_macos_portable_x64_0.1.3.zip](https://github.com/kadevin/ilab-gpt-conjure/releases/download/v0.1.3/ilab-gpt-conjure_macos_portable_x64_0.1.3.zip) | [sha256](https://github.com/kadevin/ilab-gpt-conjure/releases/download/v0.1.3/ilab-gpt-conjure_macos_portable_x64_0.1.3.zip.sha256.txt) |
-
-macOS packages are unsigned portable zips, not signed `.app` bundles or notarized
-DMGs. The launcher tries to remove quarantine attributes from its own extracted
-folder before starting bundled Python. Use Open from the context menu, or remove
-quarantine from the extracted folder if macOS still blocks the launcher.

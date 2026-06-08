@@ -34,8 +34,8 @@
 
 iLab GPT Conjure 是面向 GPT-image-2 的 AI 图片生成 WebUI 工作台，同时
 提供 CLI 便于本地自动化。它支持 Codex Responses 与 OpenAI 兼容 API 两种
-接入方式，并内置公用图库、多类型 chip 快捷引用、提示词模板、多任务并发，
-以及面向本机 OAuth 工作流的多账号轮询。
+接入方式，并内置公用图库、多类型 chip 快捷引用、提示词模板、多任务并发
+和本地队列管理。
 
 公开版推荐优先使用 OpenAI-compatible API 模式，通过你配置的供应商使用
 Images API 或 Responses API 形态。
@@ -49,7 +49,7 @@ Images API 或 Responses API 形态。
 - 多任务并发、本地队列状态、历史记录、缩略图和结果归档。
 - 单任务多图输出、部分失败处理和失败重试。
 - 公用图库、最近参考图、颜色 chip、提示词片段 chip 和提示词模板。
-- 高级本机 OAuth 工作流支持多账号轮询。
+- 高级本机 OAuth 工作流支持个人本地 Codex 使用，并明确提示接口风险。
 - API 供应商配置，支持 Base URL、API Key、图像模型、调用方式和并发上限。
 - CLI 支持生成、参考图、图像编辑、mask 和 dry-run。
 

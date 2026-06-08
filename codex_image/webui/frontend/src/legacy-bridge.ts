@@ -14,7 +14,6 @@ export interface LegacyMethods {
   notifyTaskUpdate(previousTask: WebUITask | null | undefined, nextTask: WebUITask | null | undefined): void;
   refreshTasks(options?: { migrateLegacyArchives?: boolean }): Promise<void>;
   updateDocumentTitle(): void;
-  closeAccountQuotaDrawer(): void;
   updateTaskInState(task: WebUITask | null | undefined): boolean;
   taskHasViewableUpdate(task: WebUITask | null | undefined): boolean;
   markTaskViewed(taskId: string): Promise<void> | void;

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 from typing import Any
-from urllib.parse import unquote
 
 from fastapi import Body, FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import Response
@@ -14,8 +13,7 @@ from codex_image.webui.settings_store import (
     _color_palette_css,
     _parse_color_palette_import,
 )
-
-AUTH_SOURCES = {"auto", "cockpit", "codex", "api"}
+from codex_image.webui.startup_auth import AUTH_SOURCES
 
 
 def register_settings_routes(app: FastAPI, ctx: WebUIContext) -> None:
@@ -243,42 +241,13 @@ def register_settings_routes(app: FastAPI, ctx: WebUIContext) -> None:
     def update_auth(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
         source = str(payload.get("source") or "").strip().lower()
         if source not in AUTH_SOURCES:
-            raise HTTPException(status_code=400, detail="source must be auto, cockpit, codex, or api")
+            raise HTTPException(status_code=400, detail="source must be codex or api")
         ctx.auth_settings.write_source(source)
         channels = h["queue_channels_for_source"](source)
         if ctx.queue_manager is not None:
             ctx.queue_manager.channels = channels
             ctx.queue_manager.max_attempts = h["queue_max_attempts_for_channels"](channels)
         return h["auth_status"](source)
-
-    @app.get("/api/accounts")
-    def get_accounts(refresh: bool = False) -> dict[str, Any]:
-        return h["account_quota_response"](refresh=refresh)
-
-    @app.post("/api/accounts/refresh")
-    def refresh_accounts() -> dict[str, Any]:
-        return h["account_quota_response"](refresh=True)
-
-    @app.patch("/api/accounts/{account_key}")
-    def update_account_queue_enabled(account_key: str, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
-        clean_key = unquote(str(account_key or "")).strip()
-        if not clean_key.startswith("cockpit:"):
-            raise HTTPException(status_code=400, detail="Only Cockpit accounts can be manually disabled")
-        if "manual_disabled" not in payload:
-            raise HTTPException(status_code=400, detail="manual_disabled is required")
-        descriptor = next(
-            (item for item in h["account_quota_descriptors_for_source"](ctx.auth_settings.read_source()) if item.account_key == clean_key),
-            None,
-        )
-        if descriptor is None:
-            raise HTTPException(status_code=404, detail="Cockpit account not found")
-        ctx.account_quota_cache.set_manual_disabled(
-            clean_key,
-            bool(payload.get("manual_disabled")),
-            auth_source=descriptor.auth_source,
-            account_id=descriptor.account_id,
-        )
-        return h["account_quota_response"](refresh=False)
 
     @app.get("/api/api-settings")
     def get_api_settings() -> dict[str, Any]:

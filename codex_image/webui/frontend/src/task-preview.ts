@@ -59,17 +59,31 @@ function taskRequestPreviewPayload(task: any) {
   return request;
 }
 
+function queueContainsTask(items: any[] | undefined, taskId: string) {
+  if (!taskId || !Array.isArray(items)) return false;
+  return items.some((item: any) => String(item?.task_id || "") === taskId);
+}
+
+function taskPreviewStatus(task: any) {
+  const status = String(task?.status || "");
+  const taskId = String(task?.task_id || "");
+  if (queueContainsTask(state.queue.running, taskId)) return "running";
+  if (queueContainsTask(state.queue.waiting, taskId)) return status === "submitting" ? "submitting" : "queued";
+  return status;
+}
+
 function renderPreview(task: any = null) {
   const selectedTask = state.tasks.find((item: any) => String(item.task_id) === String(state.selectedTaskId));
   const visibleSelectedTask = selectedTask && !isTaskArchived(selectedTask.task_id) ? selectedTask : null;
   const selected = task || visibleSelectedTask || state.tasks.find((item: any) => !isTaskArchived(item.task_id)) || selectedTask || state.tasks[0];
+  const status = taskPreviewStatus(selected);
   updatePreviewDownloadActions(selected);
   const nextPreviewKey = previewStructureKey(selected);
   if (state.previewRenderKey === nextPreviewKey) {
     return updatePreviewElapsedDisplay();
   }
   state.previewRenderKey = nextPreviewKey;
-  if (selected?.status === "running") {
+  if (status === "running") {
     if (taskOutputUrls(selected).length) {
       renderOutputPreview(selected, { running: true });
       return;
@@ -79,8 +93,8 @@ function renderPreview(task: any = null) {
     renderRunningPreview(selected);
     return;
   }
-  if (selected?.status === "submitting" || selected?.status === "queued") {
-    if (selected.status === "queued" && taskOutputUrls(selected).length) {
+  if (status === "submitting" || status === "queued") {
+    if (status === "queued" && taskOutputUrls(selected).length) {
       renderOutputPreview(selected, { waiting: true });
       return;
     }
@@ -121,7 +135,7 @@ function renderPreview(task: any = null) {
 function previewStructureKey(task: any) {
   if (!task) return "empty:none";
   const taskId = String(task.task_id || "");
-  const status = String(task.status || "");
+  const status = taskPreviewStatus(task);
   const outputUrls = taskOutputUrls(task).join("|");
   const selectedIndexes = taskSelectedOutputIndexes(task).join(",");
   const size = task.params?.size || task.output_size || currentSize();

@@ -93,7 +93,6 @@ export function createDefaultState(): WebUIState {
   galleryGridTransitionSeq: 0,
   galleryGridTransitionTimerId: null,
   queue: { waiting: [], running: [], summary: { waiting_count: 0, running_count: 0, channel_count: 0 } },
-  accountQuota: { items: [], summary: {} },
   queueRenderKey: null,
   queueRequestSeq: 0,
   queueDispatchSyncTimerId: null,

@@ -55,7 +55,7 @@ class WebUIStaticBuildTests(WebUIStaticTestCase):
         self.assertIn("../frontend/src/auth-source.ts", sources)
         self.assertIn("../frontend/src/api-provider-settings.ts", sources)
         self.assertIn("../frontend/src/api-mode-settings.ts", sources)
-        self.assertIn("../frontend/src/account-quota.ts", sources)
+        self.assertNotIn("../frontend/src/account-quota.ts", sources)
         self.assertIn("../frontend/src/storage-settings.ts", sources)
         self.assertIn("../frontend/src/color-palette.ts", sources)
         self.assertIn("../frontend/src/form-controls.ts", sources)

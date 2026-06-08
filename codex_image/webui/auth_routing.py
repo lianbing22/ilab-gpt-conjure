@@ -1,23 +1,19 @@
 from __future__ import annotations
 
 import json
-import os
-from pathlib import Path
 from typing import Any
 
-from codex_image.account_quota import AccountQuotaDescriptor
-from codex_image.auth import AuthState, load_auth_state
+from codex_image.auth import load_auth_state
 from codex_image.client import CodexImageClient, OpenAIImagesImageClient, OpenAIResponsesImageClient
-from codex_image.cockpit_auth import CockpitAuthProvider
 
 from . import executor as _executor
 from .queue import QueueChannel
 from .schemas import DEFAULT_WEBUI_API_SETTINGS_PATH
 from .settings_store import ApiSettings
+from .startup_auth import AUTH_SOURCES, detect_startup_auth_source
 from .storage import TaskStorage
 from .task_metadata import _apply_api_images_concurrency_metadata
 
-AUTH_SOURCES = {"auto", "cockpit", "codex", "api"}
 API_MODES = {"images", "responses"}
 DEFAULT_API_MODE = "images"
 DEFAULT_API_PROVIDER_ID = "default"
@@ -176,18 +172,11 @@ def _update_stored_request_api_provider(storage: TaskStorage, task_id: str, para
 
 
 def _client_for_auth_source(source: str, *, api_settings: ApiSettings | None = None) -> Any:
-    normalized = source if source in AUTH_SOURCES else "auto"
+    normalized = source if source in AUTH_SOURCES else _default_auth_source()
     if normalized == "api":
         settings = (api_settings or ApiSettings(DEFAULT_WEBUI_API_SETTINGS_PATH)).read()
         provider = (api_settings or ApiSettings(DEFAULT_WEBUI_API_SETTINGS_PATH)).provider_settings(str(settings.get("active_provider_id") or ""))
         return _api_client_from_settings(provider, api_mode=str(provider.get("api_mode") or DEFAULT_API_MODE))
-    provider = _cockpit_provider()
-    if normalized == "cockpit":
-        if provider is None:
-            raise RuntimeError("Cockpit Codex auth is not available")
-        return CodexImageClient(auth_provider=provider)
-    if normalized == "auto" and provider is not None:
-        return CodexImageClient(auth_provider=provider)
     return CodexImageClient(load_auth_state())
 
 
@@ -204,101 +193,29 @@ def _queue_channels_for_source(source: str, *, api_settings: ApiSettings | None 
             QueueChannel(channel_id=f"api:default:{index}", auth_source="api", account_id=None)
             for index in range(1, _api_queue_channel_count(api_settings) + 1)
         ]
-    provider = _cockpit_provider()
-    if source in {"auto", "cockpit"} and provider is not None and provider.available_count() > 0:
-        return [
-            QueueChannel(
-                channel_id=f"cockpit:{state.raw['_cockpit_account_file_id']}",
-                auth_source="cockpit",
-                account_id=state.raw["_cockpit_account_file_id"],
-            )
-            for state in provider.list_auth_states()
-        ]
     return [QueueChannel(channel_id="codex:local", auth_source="codex", account_id=None)]
 
 
-def _account_quota_descriptors_for_source(source: str) -> list[AccountQuotaDescriptor]:
-    provider = _cockpit_provider()
-    if source in {"auto", "cockpit"} and provider is not None and provider.available_count() > 0:
-        return [
-            AccountQuotaDescriptor(
-                account_key=f"cockpit:{state.raw['_cockpit_account_file_id']}",
-                auth_source="cockpit",
-                account_id=str(state.raw["_cockpit_account_file_id"]),
-                label=_account_label_from_auth_state(state, fallback=f"Cockpit {state.raw['_cockpit_account_file_id']}"),
-                auth_state=state,
-            )
-            for state in provider.list_auth_states()
-        ]
-    if source == "cockpit":
-        return []
-    try:
-        state = load_auth_state()
-    except Exception:
-        return []
-    return [
-        AccountQuotaDescriptor(
-            account_key="codex:local",
-            auth_source="codex",
-            account_id=None,
-            label=_account_label_from_auth_state(state, fallback="Codex 本机"),
-            auth_state=state,
-        )
-    ]
-
-
-def _account_label_from_auth_state(state: AuthState, *, fallback: str) -> str:
-    raw = state.raw if isinstance(state.raw, dict) else {}
-    candidates = [
-        raw.get("email"),
-        raw.get("account_email"),
-        raw.get("user_email"),
-        state.account_id,
-        fallback,
-    ]
-    for candidate in candidates:
-        text = str(candidate or "").strip()
-        if text:
-            return text
-    return fallback
-
-
 def _auth_status(source: str, *, api_settings: ApiSettings | None = None) -> dict[str, Any]:
-    selected = source if source in AUTH_SOURCES else "auto"
-    provider = _cockpit_provider()
-    cockpit_count = provider.available_count() if provider is not None else 0
+    selected = source if source in AUTH_SOURCES else _default_auth_source()
     codex_available = _codex_auth_available()
     api_public = (api_settings or ApiSettings(DEFAULT_WEBUI_API_SETTINGS_PATH)).public_settings()
     api_available = bool(api_public["base_url"] and api_public["api_key_set"])
 
     effective_source = ""
     auth_available = False
-    if selected == "cockpit":
-        effective_source = "cockpit" if provider is not None else ""
-        auth_available = provider is not None
-    elif selected == "codex":
+    if selected == "codex":
         effective_source = "codex" if codex_available else ""
         auth_available = codex_available
     elif selected == "api":
         effective_source = "api" if api_available else ""
         auth_available = api_available
-    else:
-        if provider is not None:
-            effective_source = "cockpit"
-            auth_available = True
-        elif codex_available:
-            effective_source = "codex"
-            auth_available = True
 
     return {
         "selected_source": selected,
         "effective_source": effective_source,
         "auth_available": auth_available,
         "sources": {
-            "cockpit": {
-                "available": provider is not None,
-                "account_count": cockpit_count,
-            },
             "codex": {
                 "available": codex_available,
             },
@@ -319,11 +236,4 @@ def _codex_auth_available() -> bool:
 
 
 def _default_auth_source() -> str:
-    source = os.getenv("CODEX_IMAGE_AUTH_SOURCE", "auto").strip().lower()
-    return source if source in AUTH_SOURCES else "auto"
-
-
-def _cockpit_provider() -> CockpitAuthProvider | None:
-    root = os.getenv("CODEX_IMAGE_COCKPIT_HOME")
-    provider = CockpitAuthProvider(root=Path(root) if root else None)
-    return provider if provider.has_auth() else None
+    return detect_startup_auth_source()

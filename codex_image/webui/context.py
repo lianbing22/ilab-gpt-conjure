@@ -6,16 +6,12 @@ from typing import Any, Callable
 
 from fastapi import FastAPI
 
-from codex_image.account_quota import AccountQuotaCache
-from codex_image.auth import AuthState
-
 from .queue import QueueManager
 from .settings_store import ApiSettings, AuthSettings, ColorPaletteSettings, PromptSnippetSettings, PromptTemplateSettings, WebUISettings
 from .storage import GalleryStorage, QueueStorage, ReferenceAssetStorage, SQLiteQueueStorage, TaskStorage
 
 ClientFactory = Callable[[], Any]
 AuthChecker = Callable[[], bool]
-QuotaFetcher = Callable[[AuthState], dict[str, Any]]
 
 
 @dataclass
@@ -31,10 +27,8 @@ class WebUIContext:
     color_settings: ColorPaletteSettings
     prompt_snippet_settings: PromptSnippetSettings
     prompt_template_settings: PromptTemplateSettings
-    account_quota_cache: AccountQuotaCache
     client_factory: ClientFactory
     auth_checker: AuthChecker
-    account_quota_fetcher: QuotaFetcher
     input_root: Path
     output_root: Path
     gallery_root: Path
@@ -63,7 +57,6 @@ class WebUIContext:
         self.app.state.auth_settings = self.auth_settings
         self.app.state.api_settings = self.api_settings
         self.app.state.prompt_template_settings = self.prompt_template_settings
-        self.app.state.account_quota_cache = self.account_quota_cache
         self.app.state.client_factory = self.client_factory
         self.app.state.auth_checker = self.auth_checker
         self.app.state.active_task_ids = self.active_task_ids

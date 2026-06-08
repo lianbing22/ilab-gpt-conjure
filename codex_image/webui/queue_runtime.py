@@ -14,7 +14,6 @@ from .auth_routing import (
     DEFAULT_API_PROVIDER_ID,
     _api_client_from_settings,
     _backend_for_queue_channel,
-    _cockpit_provider,
     _normalize_api_images_concurrency,
     _normalize_api_mode,
     _queue_channels_for_source,
@@ -27,9 +26,7 @@ from .executor import (
     _task_cancel_requested,
 )
 from .queue import NonRetryableTaskError, QueueChannel, QueueManager
-from .settings_store import FixedAuthProvider
 from .storage import utc_now
-from .task_metadata import _safe_nonnegative_int
 
 
 @dataclass(frozen=True)
@@ -103,53 +100,12 @@ def _ensure_queue_worker_running(app_instance: FastAPI) -> None:
 
 
 def _queue_channel_available(ctx: WebUIContext, channel: QueueChannel) -> bool:
-    if channel.auth_source == "api":
-        return True
-    return ctx.account_quota_cache.is_channel_usable(channel.channel_id)
-
-
-def _record_local_quota_usage(ctx: WebUIContext, channel: QueueChannel, task_id: str, before_generated_count: int) -> None:
-    if channel.auth_source == "api":
-        return
-    try:
-        current_metadata = ctx.storage.read_metadata(task_id)
-    except Exception:
-        return
-    after_generated_count = _safe_nonnegative_int(current_metadata.get("generated_count"))
-    delta = max(0, after_generated_count - before_generated_count)
-    if delta <= 0:
-        return
-    ctx.account_quota_cache.decrement_remaining(
-        channel.channel_id,
-        delta,
-        auth_source=channel.auth_source,
-        account_id=channel.account_id,
-    )
-
-
-def _has_local_quota_retry_alternative(ctx: WebUIContext, channel: QueueChannel) -> bool:
-    current_identity = (channel.auth_source, channel.account_id)
-    manager = ctx.queue_manager
-    channels = getattr(manager, "channels", [])
-    for candidate in channels:
-        if candidate.auth_source == "api":
-            continue
-        if (candidate.auth_source, candidate.account_id) == current_identity:
-            continue
-        if _queue_channel_available(ctx, candidate):
-            return True
-    return False
+    return True
 
 
 def _client_for_queue_channel(ctx: WebUIContext, channel: QueueChannel, metadata: dict[str, Any] | None = None, *, client_factory_overridden: bool = False) -> Any:
     if client_factory_overridden:
         return ctx.client_factory()
-    if channel.auth_source == "cockpit" and channel.account_id:
-        provider = _cockpit_provider()
-        if provider is None:
-            raise RuntimeError("Cockpit Codex auth is not available")
-        state = provider.auth_state_for_account_file_id(channel.account_id)
-        return CodexImageClient(auth_provider=FixedAuthProvider(state))
     if channel.auth_source == "api":
         settings_payload = ctx.api_settings.read()
         params = metadata.get("params") if isinstance(metadata, dict) and isinstance(metadata.get("params"), dict) else {}
@@ -200,10 +156,8 @@ async def execute_task(
     current_task = asyncio.current_task()
     if current_task is not None:
         ctx.running_worker_tasks[task_id] = current_task
-    before_generated_count = 0
     try:
         metadata = ctx.storage.read_metadata(task_id)
-        before_generated_count = _safe_nonnegative_int(metadata.get("generated_count"))
         attempt_started_at = utc_now()
         metadata["status"] = "running"
         metadata["started_at"] = metadata.get("started_at") or attempt_started_at
@@ -225,7 +179,6 @@ async def execute_task(
             batch_delay_seconds=batch_delay_seconds,
             request_context=(lambda params: _api_provider_request_context(ctx, params)) if channel.auth_source == "api" else None,
         )
-        _record_local_quota_usage(ctx, channel, task_id, before_generated_count)
     except asyncio.CancelledError:
         try:
             if _task_cancel_requested(ctx.storage, task_id):
@@ -234,19 +187,10 @@ async def execute_task(
             pass
         raise
     except Exception as exc:
-        _record_local_quota_usage(ctx, channel, task_id, before_generated_count)
         usage_limit_error = _is_usage_limit_error(exc)
         local_usage_limit_error = channel.auth_source != "api" and usage_limit_error
-        if local_usage_limit_error:
-            ctx.account_quota_cache.mark_limited(
-                channel.channel_id,
-                auth_source=channel.auth_source,
-                account_id=channel.account_id,
-                error=str(exc),
-            )
         metadata = ctx.storage.read_metadata(task_id)
-        local_usage_limit_has_no_alternative = local_usage_limit_error and not _has_local_quota_retry_alternative(ctx, channel)
-        non_retryable = _is_non_retryable_error(exc) or local_usage_limit_has_no_alternative
+        non_retryable = _is_non_retryable_error(exc) or local_usage_limit_error
         metadata["status"] = "failed" if is_final_attempt or non_retryable else "queued"
         metadata["updated_at"] = utc_now()
         metadata["last_error"] = str(exc)

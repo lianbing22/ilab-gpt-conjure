@@ -701,7 +701,6 @@ class WebUIStaticTestCase(unittest.TestCase):
                 "gallery-item-actions.ts",
                 "gallery.ts",
                 "api-settings.ts",
-                "account-quota.ts",
                 "storage-settings.ts",
                 "color-palette.ts",
                 "task-list-controls.ts",
@@ -822,9 +821,6 @@ class WebUIStaticTestCase(unittest.TestCase):
 
     def _api_settings_source(self) -> str:
         return Path("codex_image/webui/frontend/src/api-settings.ts").read_text(encoding="utf-8")
-
-    def _account_quota_source(self) -> str:
-        return Path("codex_image/webui/frontend/src/account-quota.ts").read_text(encoding="utf-8")
 
     def _storage_settings_source(self) -> str:
         return Path("codex_image/webui/frontend/src/storage-settings.ts").read_text(encoding="utf-8")

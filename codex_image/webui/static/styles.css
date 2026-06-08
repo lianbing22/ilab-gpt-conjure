@@ -1495,16 +1495,6 @@ body.sidebar-resizing {
   display: none;
 }
 
-.account-quota-button {
-  order: 3;
-  min-width: 90px;
-}
-
-.account-quota-button.reserved-hidden {
-  visibility: hidden;
-  pointer-events: none;
-}
-
 .task-notification-button {
   position: relative;
   width: var(--top-nav-control-height);
@@ -1731,6 +1721,25 @@ body.sidebar-resizing {
   color: var(--primary-foreground);
 }
 
+.github-link {
+  width: var(--top-nav-control-height);
+  padding: 0;
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+.github-link:hover,
+.github-link:focus-visible {
+  color: var(--primary-strong);
+  outline: none;
+}
+
+.github-link-icon {
+  width: 17px;
+  height: 17px;
+  display: block;
+}
+
 .auth-source-switcher {
   order: 1;
   flex: 0 1 auto;
@@ -1786,9 +1795,35 @@ body.sidebar-resizing {
 }
 
 .auth-source-settings-icon {
-  width: 12px;
-  height: 12px;
+  width: 15px;
+  height: 15px;
   opacity: 0.78;
+}
+
+.auth-source-settings-button {
+  flex: 0 0 auto;
+  width: var(--top-nav-control-height);
+  height: var(--top-nav-control-height);
+  min-height: var(--top-nav-control-height);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--line) 76%, transparent);
+  border-radius: var(--top-nav-control-radius);
+  background: color-mix(in srgb, var(--surface-soft) 72%, transparent);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.auth-source-settings-button:hover,
+.auth-source-settings-button:focus-visible {
+  border-color: rgba(69, 123, 102, 0.45);
+  background: var(--primary-light);
+  color: var(--primary-strong);
+  box-shadow: 0 3px 10px rgba(40, 116, 85, 0.1);
+  outline: none;
 }
 
 .api-provider-quick {
@@ -6374,213 +6409,6 @@ body.lightbox-open {
 
 .queue-running-list {
   min-height: 0;
-}
-
-.account-quota-drawer {
-  gap: 14px;
-}
-
-.account-quota-toolbar {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.account-quota-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-height: 48px;
-  overflow-y: auto;
-}
-
-.account-quota-card {
-  display: grid;
-  gap: 10px;
-  padding: 14px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--surface-soft);
-}
-
-.account-quota-card.ok {
-  border-color: color-mix(in srgb, var(--primary) 28%, var(--line));
-  background: var(--success-soft);
-}
-
-.account-quota-card.limited,
-.account-quota-card.error {
-  border-color: color-mix(in srgb, var(--danger) 35%, var(--line));
-  background: var(--danger-soft);
-}
-
-.account-quota-card.disabled {
-  border-color: color-mix(in srgb, var(--muted) 35%, var(--line));
-  background: color-mix(in srgb, var(--surface-soft) 84%, var(--muted) 16%);
-}
-
-.account-quota-card-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.account-quota-limit-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  min-height: 34px;
-}
-
-.account-quota-toggle {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  flex: 0 0 auto;
-  width: 48px;
-  height: 28px;
-  padding: 2px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--muted) 18%, var(--surface));
-  cursor: pointer;
-  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.account-quota-toggle::after {
-  content: "";
-  position: relative;
-  z-index: 1;
-  width: 22px;
-  height: 22px;
-  border-radius: 999px;
-  background: var(--surface);
-  box-shadow: 0 1px 4px rgba(31, 48, 42, 0.22);
-  transform: translateX(0);
-  transition: transform 0.2s ease, background-color 0.2s ease;
-}
-
-.account-quota-switch-track {
-  position: absolute;
-  inset: 2px;
-  border-radius: inherit;
-  pointer-events: none;
-}
-
-.account-quota-toggle.active {
-  border-color: color-mix(in srgb, var(--primary) 34%, var(--line));
-  background: color-mix(in srgb, var(--primary) 54%, var(--surface));
-}
-
-.account-quota-toggle.active::after {
-  background: #fff;
-  transform: translateX(20px);
-}
-
-.account-quota-toggle:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--primary) 48%, transparent);
-  outline-offset: 2px;
-}
-
-.account-quota-toggle:disabled {
-  cursor: progress;
-  opacity: 0.65;
-}
-
-.account-quota-name {
-  color: var(--text);
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.25;
-  word-break: break-word;
-}
-
-.account-quota-meta,
-.account-quota-reset,
-.account-quota-error {
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.35;
-  word-break: break-word;
-}
-
-.account-quota-limit-title {
-  color: var(--text-secondary);
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.account-quota-limits {
-  display: grid;
-  gap: 10px;
-}
-
-.account-quota-limit-row {
-  display: grid;
-  gap: 5px;
-}
-
-.account-quota-limit-label {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  color: var(--text-secondary);
-  font-size: 12px;
-}
-
-.account-quota-limit-label strong {
-  color: var(--text);
-  font-size: 13px;
-}
-
-.account-quota-limit-bar {
-  height: 7px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--muted) 16%, var(--surface));
-  overflow: hidden;
-}
-
-.account-quota-limit-bar span {
-  display: block;
-  width: var(--quota-percent);
-  height: 100%;
-  border-radius: inherit;
-  background: var(--primary);
-}
-
-.account-quota-status {
-  flex: 0 0 auto;
-  padding: 4px 8px;
-  border-radius: 999px;
-  background: rgba(69, 123, 102, 0.12);
-  color: var(--primary-strong);
-  font-size: 11px;
-  line-height: 1;
-}
-
-.account-quota-card.limited .account-quota-status,
-.account-quota-card.error .account-quota-status {
-  background: rgba(191, 79, 63, 0.1);
-  color: var(--danger);
-}
-
-.account-quota-card.disabled .account-quota-status {
-  background: color-mix(in srgb, var(--muted) 16%, transparent);
-  color: var(--muted);
-}
-
-.account-quota-count {
-  color: var(--text);
-  font-size: 30px;
-  line-height: 1;
-  font-weight: 760;
-  letter-spacing: 0;
-}
-
-.account-quota-error {
-  color: var(--danger);
 }
 
 .queue-waiting-list {

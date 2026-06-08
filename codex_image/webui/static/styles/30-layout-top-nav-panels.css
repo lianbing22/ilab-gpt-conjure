@@ -81,16 +81,6 @@
   display: none;
 }
 
-.account-quota-button {
-  order: 3;
-  min-width: 90px;
-}
-
-.account-quota-button.reserved-hidden {
-  visibility: hidden;
-  pointer-events: none;
-}
-
 .task-notification-button {
   position: relative;
   width: var(--top-nav-control-height);
@@ -317,6 +307,25 @@
   color: var(--primary-foreground);
 }
 
+.github-link {
+  width: var(--top-nav-control-height);
+  padding: 0;
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+.github-link:hover,
+.github-link:focus-visible {
+  color: var(--primary-strong);
+  outline: none;
+}
+
+.github-link-icon {
+  width: 17px;
+  height: 17px;
+  display: block;
+}
+
 .auth-source-switcher {
   order: 1;
   flex: 0 1 auto;
@@ -372,9 +381,35 @@
 }
 
 .auth-source-settings-icon {
-  width: 12px;
-  height: 12px;
+  width: 15px;
+  height: 15px;
   opacity: 0.78;
+}
+
+.auth-source-settings-button {
+  flex: 0 0 auto;
+  width: var(--top-nav-control-height);
+  height: var(--top-nav-control-height);
+  min-height: var(--top-nav-control-height);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--line) 76%, transparent);
+  border-radius: var(--top-nav-control-radius);
+  background: color-mix(in srgb, var(--surface-soft) 72%, transparent);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.auth-source-settings-button:hover,
+.auth-source-settings-button:focus-visible {
+  border-color: rgba(69, 123, 102, 0.45);
+  background: var(--primary-light);
+  color: var(--primary-strong);
+  box-shadow: 0 3px 10px rgba(40, 116, 85, 0.1);
+  outline: none;
 }
 
 .api-provider-quick {

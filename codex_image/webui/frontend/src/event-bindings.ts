@@ -23,7 +23,7 @@ function isRunTaskShortcut(event: KeyboardEvent): boolean {
 
 function hasOpenShortcutBlockingLayer(): boolean {
   return Boolean(document.querySelector(
-    "#promptTemplateDrawer.open, #galleryDrawer.open, #accountQuotaDrawer.open, .modal-overlay:not(.hidden), .prompt-popover:not(.hidden), .confirm-popover:not(.hidden), .compression-popover:not(.hidden), .task-notification-center:not(.hidden)"
+    "#promptTemplateDrawer.open, #galleryDrawer.open, .modal-overlay:not(.hidden), .prompt-popover:not(.hidden), .confirm-popover:not(.hidden), .compression-popover:not(.hidden), .task-notification-center:not(.hidden)"
   ));
 }
 
@@ -55,17 +55,6 @@ export function bindWebUIEvents(state: WebUIState, els: WebUIElements, methods: 
     if (event.target === els.addToGalleryModal) call(methods, "closeAddToGallery");
   });
   els.saveToGalleryButton?.addEventListener("click", () => call(methods, "saveUploadToGallery"));
-  els.accountQuotaButton?.addEventListener("click", () => call(methods, "openAccountQuotaDrawer"));
-  els.accountQuotaDrawerClose?.addEventListener("click", () => call(methods, "closeAccountQuotaDrawer"));
-  els.accountQuotaDrawerBackdrop?.addEventListener("click", () => call(methods, "closeAccountQuotaDrawer"));
-  els.accountQuotaRefresh?.addEventListener("click", () => call(methods, "refreshAccountQuota", true));
-  els.accountQuotaList?.addEventListener("click", (event: Event) => {
-    const button = (event.target as Element | null)?.closest("[data-account-manual-disabled-key]") as HTMLElement | null;
-    if (!button) return;
-    const accountKey = button.dataset.accountManualDisabledKey || "";
-    const nextDisabled = button.dataset.accountManualDisabledValue !== "true";
-    call(methods, "toggleAccountQueueEnabled", accountKey, nextDisabled, button);
-  });
   els.settingsButton?.addEventListener("click", () => call(methods, "openSettingsModal"));
   els.settingsModalClose?.addEventListener("click", () => call(methods, "closeSettingsModal"));
   els.settingsModal?.addEventListener("click", (event: Event) => {
@@ -73,7 +62,7 @@ export function bindWebUIEvents(state: WebUIState, els: WebUIElements, methods: 
   });
   els.saveSettingsButton?.addEventListener("click", () => call(methods, "saveSettings"));
   els.authSourceGroup?.addEventListener("click", (event: Event) => call(methods, "handleAuthSourceClick", event));
-  els.authSourceGroup?.addEventListener("dblclick", (event: Event) => call(methods, "handleAuthSourceDoubleClick", event));
+  els.apiSourceSettingsButton?.addEventListener("click", () => call(methods, "openApiSettingsModal"));
   els.apiDirectSettingsButton?.addEventListener("click", () => call(methods, "openApiSettingsModal"));
   els.apiSettingsModalClose?.addEventListener("click", () => call(methods, "closeApiSettingsModal"));
   els.apiSettingsModal?.addEventListener("click", (event: Event) => {

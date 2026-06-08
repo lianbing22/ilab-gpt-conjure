@@ -37,6 +37,8 @@ class PortablePackagingTests(unittest.TestCase):
 
         launcher_text = launcher.read_text(encoding="utf-8")
         self.assertIn(r"python\python.exe", launcher_text)
+        self.assertIn("codex_image.webui.startup_auth", launcher_text)
+        self.assertIn("webui-auth-settings.json", launcher_text)
         self.assertIn("SSL_CERT_FILE", launcher_text)
         self.assertIn("REQUESTS_CA_BUNDLE", launcher_text)
         self.assertIn(r"python\Lib\site-packages\certifi\cacert.pem", launcher_text)
@@ -79,6 +81,8 @@ class PortablePackagingTests(unittest.TestCase):
         launcher_text = launcher.read_text(encoding="utf-8")
         self.assertIn('export PATH="/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"', launcher_text)
         self.assertIn("Python.framework/Versions/3.11/bin/python3", launcher_text)
+        self.assertIn("codex_image.webui.startup_auth", launcher_text)
+        self.assertIn("webui-auth-settings.json", launcher_text)
         self.assertIn("PYTHON_FRAMEWORK=", launcher_text)
         self.assertIn("clear_macos_quarantine", launcher_text)
         self.assertIn("com.apple.quarantine", launcher_text)
@@ -104,6 +108,18 @@ class PortablePackagingTests(unittest.TestCase):
         self.assertIn("tries to\nremove quarantine", readme_text)
         self.assertIn("xattr -dr com.apple.quarantine", readme_text)
         self.assertIn("OpenAI-compatible API", readme_text)
+
+    def test_root_launchers_initialize_auth_settings(self) -> None:
+        mac_launcher = Path("Start WebUI.command")
+        debug_launcher = Path("Start WebUI Debug.command")
+        windows_launcher = Path("Start WebUI.bat")
+
+        for path in (mac_launcher, debug_launcher, windows_launcher):
+            self.assertTrue(path.exists(), f"{path} should exist")
+            text = path.read_text(encoding="utf-8")
+            self.assertIn("codex_image.webui.startup_auth", text)
+            self.assertIn("output", text)
+            self.assertIn("webui-auth-settings.json", text)
 
     def test_portable_release_workflow_runs_after_ci_success(self) -> None:
         workflow = Path(".github/workflows/release-portable.yml")
@@ -134,6 +150,7 @@ class PortablePackagingTests(unittest.TestCase):
         self.assertNotIn("- Windows x64：`ilab-gpt-conjure_windows_portable_x64_${release_version}.zip`", text)
         self.assertNotIn("<version>", text)
         self.assertNotIn("Portable packages for iLab GPT Conjure.", text)
+        self.assertIn("gh release edit", text)
         self.assertIn("gh release upload", text)
 
 

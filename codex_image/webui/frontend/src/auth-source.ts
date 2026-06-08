@@ -15,11 +15,9 @@ function legacyMethod(name: string, ...args: any[]): any {
 
 function setStatus(message: any, type?: any): void { legacyMethod("setStatus", message, type); }
 function updateRequestPreview(): void { legacyMethod("updateRequestPreview"); }
-function refreshAccountQuota(refresh?: any): Promise<void> { return legacyMethod("refreshAccountQuota", refresh); }
 function currentApiMode(): string { return legacyMethod("currentApiMode"); }
 function currentApiProviderLabel(): string { return legacyMethod("currentApiProviderLabel"); }
 function apiModeLabel(mode: any): string { return legacyMethod("apiModeLabel", mode); }
-function openApiSettingsModal(): void { legacyMethod("openApiSettingsModal"); }
 
 export async function refreshHealth(): Promise<void> {
   try {
@@ -63,7 +61,6 @@ export async function setAuthSource(source: any): Promise<void> {
     els.apiStatus.className = `status-dot ${state.authAvailable ? "ok" : "error"}`;
     els.runButton.disabled = !state.authAvailable;
     setStatus(authSourceDetailText(data), state.authAvailable ? "ok" : "error");
-    await refreshAccountQuota(false);
     updateRequestPreview();
   } catch (error: any) {
     state.pendingAuthSource = null;
@@ -77,21 +74,11 @@ export function handleAuthSourceClick(event: any): void {
   const button = event.target.closest?.("[data-auth-source]");
   if (!button) return;
   const source = button.dataset.authSource;
-  if (source === "api" && currentAuthSource() === "api") {
-    openApiSettingsModal();
-    return;
-  }
   setAuthSource(source);
 }
 
-export function handleAuthSourceDoubleClick(event: any): void {
-  const button = event.target.closest?.("[data-auth-source]");
-  if (!button || button.dataset.authSource !== "api") return;
-  openApiSettingsModal();
-}
-
 export function renderAuthSource(auth: any): void {
-  const selected = state.pendingAuthSource || auth?.selected_source || "auto";
+  const selected = state.pendingAuthSource || auth?.selected_source || "codex";
   applyAuthSourceSelection(selected);
   if (els.authSourceDetail) {
     const text = auth ? authSourceDetailText(auth) : "授权检查中";
@@ -101,20 +88,12 @@ export function renderAuthSource(auth: any): void {
 }
 
 export function applyAuthSourceSelection(source: any): void {
-  const selected = source || "auto";
+  const selected = source || "codex";
   els.authSourceGroup?.querySelectorAll("[data-auth-source]").forEach((button: any) => {
     const active = button.dataset.authSource === selected;
     button.classList.toggle("active", active);
     button.setAttribute("aria-pressed", active ? "true" : "false");
   });
-  els.accountQuotaButton?.classList.toggle("reserved-hidden", selected === "api");
-  els.accountQuotaButton?.setAttribute("aria-hidden", selected === "api" ? "true" : "false");
-  if (selected === "api") {
-    els.accountQuotaButton?.setAttribute("aria-expanded", "false");
-    els.accountQuotaButton?.setAttribute("tabindex", "-1");
-  } else {
-    els.accountQuotaButton?.removeAttribute("tabindex");
-  }
   els.apiProviderQuick?.classList.add("hidden");
   updateModeSpecificSettings(selected);
 }
@@ -122,42 +101,29 @@ export function applyAuthSourceSelection(source: any): void {
 export function authSourceDetailText(auth: any): string {
   if (!auth) return "授权检查中";
   const selected = sourceLabel(auth.selected_source);
-  const effective = sourceLabel(auth.effective_source);
-  const cockpitCount = auth.sources?.cockpit?.account_count || 0;
   const effectiveApi = auth.effective_source === "api";
   if (!auth.auth_available) {
     if (auth.selected_source === "api" || effectiveApi) {
-      const provider = currentApiProviderLabel();
-      return `${selected}${provider ? ` · ${provider}` : ""} 不可用`;
+      return `${selected} 不可用`;
     }
     return `${selected} 不可用`;
-  }
-  if (auth.selected_source === "auto") {
-    if (effectiveApi) {
-      const provider = currentApiProviderLabel();
-      const mode = apiModeLabel(currentApiMode());
-      return `自动 → ${effective}${provider ? ` · ${provider}` : ""} · ${mode}`;
-    }
-    return `自动 → ${effective}${auth.effective_source === "cockpit" ? ` · ${cockpitCount}个账号` : ""}`;
   }
   if (effectiveApi) {
     const provider = currentApiProviderLabel();
     const mode = apiModeLabel(currentApiMode());
-    return `${effective}${provider ? ` · ${provider}` : ""} · ${mode}`;
+    return `API · ${provider} · ${mode}`;
   }
-  return `${effective}${auth.effective_source === "cockpit" ? ` · ${cockpitCount}个账号` : ""}`;
+  return "Codex";
 }
 
 export function sourceLabel(source: any): string {
-  if (source === "cockpit") return "Cockpit多账号";
-  if (source === "codex") return "Codex本机";
+  if (source === "codex") return "Codex";
   if (source === "api") return "API";
-  if (source === "auto") return "自动";
   return "未生效";
 }
 
 export function currentAuthSource(): string {
-  return state.pendingAuthSource || state.authStatus?.selected_source || "auto";
+  return state.pendingAuthSource || state.authStatus?.selected_source || "codex";
 }
 
 export function isDirectApiMode(authSource: any = currentAuthSource()): boolean {

@@ -229,12 +229,12 @@ class WebUIRefactorContractTests(unittest.TestCase):
             "_queue_worker_loop",
             "_ensure_queue_worker_running",
             "_queue_channel_available",
-            "_record_local_quota_usage",
-            "_has_local_quota_retry_alternative",
             "_client_for_queue_channel",
             "execute_task",
         ):
             self.assertTrue(callable(getattr(queue_runtime, name)))
+        self.assertFalse(hasattr(queue_runtime, "_record_local_quota_usage"))
+        self.assertFalse(hasattr(queue_runtime, "_has_local_quota_retry_alternative"))
 
         probe = subprocess.run(
             [
@@ -338,9 +338,6 @@ class WebUIRefactorContractTests(unittest.TestCase):
                 ("/api/prompt-template-categories/{category_id}", "DELETE"),
                 ("/api/auth", "GET"),
                 ("/api/auth", "PATCH"),
-                ("/api/accounts", "GET"),
-                ("/api/accounts/refresh", "POST"),
-                ("/api/accounts/{account_key}", "PATCH"),
                 ("/api/api-settings", "GET"),
                 ("/api/api-settings", "PATCH"),
                 ("/api/tasks", "GET"),
@@ -390,7 +387,7 @@ class WebUIRefactorContractTests(unittest.TestCase):
             self.assertTrue(hasattr(app.state, "queue_manager"))
             self.assertTrue(hasattr(app.state, "api_settings"))
             self.assertTrue(hasattr(app.state, "auth_settings"))
-            self.assertTrue(hasattr(app.state, "account_quota_cache"))
+            self.assertFalse(hasattr(app.state, "account_quota_cache"))
             self.assertTrue(hasattr(app.state, "active_task_ids"))
             self.assertTrue(hasattr(app.state, "running_worker_tasks"))
             self.assertIs(app.state.ctx.storage, app.state.storage)

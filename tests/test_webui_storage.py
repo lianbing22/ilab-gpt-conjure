@@ -284,13 +284,13 @@ class WebUIStorageTests(unittest.TestCase):
 
             storage.enqueue("task-a")
             storage.enqueue("task-b")
-            storage.set_running("cockpit:acct-1", "task-c", auth_source="cockpit", account_id="acct-1")
+            storage.set_running("api:slot-1", "task-c", auth_source="api", account_id=None)
 
             reloaded = QueueStorage(path).read_state()
 
         self.assertEqual(reloaded["waiting"], ["task-a", "task-b"])
-        self.assertEqual(reloaded["running"]["cockpit:acct-1"]["task_id"], "task-c")
-        self.assertEqual(reloaded["running"]["cockpit:acct-1"]["account_id"], "acct-1")
+        self.assertEqual(reloaded["running"]["api:slot-1"]["task_id"], "task-c")
+        self.assertIsNone(reloaded["running"]["api:slot-1"]["account_id"])
 
     def test_queue_storage_promotes_reorders_and_removes_waiting_tasks(self) -> None:
         from codex_image.webui.storage import QueueStorage

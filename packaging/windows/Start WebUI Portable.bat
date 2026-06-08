@@ -26,11 +26,14 @@ if not exist "%DATA_DIR%" mkdir "%DATA_DIR%"
 if not exist "%DATA_DIR%\logs" mkdir "%DATA_DIR%\logs"
 
 set "ILAB_CONJURE_DATA_DIR=%DATA_DIR%"
+set "PYTHONPATH=%APP_DIR%;%APP_DIR%\.deps"
 set "CERTIFI_CA_BUNDLE=%BUNDLE_DIR%python\Lib\site-packages\certifi\cacert.pem"
 if exist "%CERTIFI_CA_BUNDLE%" (
   set "SSL_CERT_FILE=%CERTIFI_CA_BUNDLE%"
   set "REQUESTS_CA_BUNDLE=%CERTIFI_CA_BUNDLE%"
 )
+set "AUTH_SETTINGS_PATH=%DATA_DIR%\webui-auth-settings.json"
+"%PYTHON_BIN%" -m codex_image.webui.startup_auth --settings-path "%AUTH_SETTINGS_PATH%" >nul
 set "LOG_FILE=%DATA_DIR%\logs\webui-server.log"
 
 cd /d "%APP_DIR%"

@@ -546,7 +546,6 @@ class WebUIQueueTests(unittest.TestCase):
                 asyncio.run(app.state.queue_manager.run_available_once())
             asyncio.run(app.state.queue_manager.run_available_once())
             task = client.get(f"/api/tasks/{task_id}").json()["task"]
-            quota = app.state.account_quota_cache.get("codex:local")
             queue_state = app.state.queue_storage.read_state()
 
         self.assertEqual(len(fake.generate_calls), 1)
@@ -554,167 +553,6 @@ class WebUIQueueTests(unittest.TestCase):
         self.assertIn("usage limit", task["last_error"])
         self.assertEqual(queue_state["waiting"], [])
         self.assertEqual(queue_state["running"], {})
-        self.assertEqual(quota["status"], "limited")
-        self.assertEqual(quota["remaining"], 0)
-    def test_queue_worker_marks_limited_account_and_manual_retry_uses_next_channel(self) -> None:
-        from codex_image.webui.app import create_app
-        from codex_image.webui.queue import QueueChannel
-
-        fake = QuotaLimitedOnceImageClient()
-        with tempfile.TemporaryDirectory() as tmp:
-            app = create_app(
-                output_root=Path(tmp),
-                client_factory=lambda: fake,
-                auth_checker=lambda: True,
-                batch_delay_seconds=0,
-                auto_start_queue=False,
-            )
-            app.state.queue_manager.channels = [
-                QueueChannel(channel_id="cockpit:acct-a", auth_source="cockpit", account_id="acct-a"),
-                QueueChannel(channel_id="cockpit:acct-b", auth_source="cockpit", account_id="acct-b"),
-            ]
-            app.state.queue_manager.max_attempts = 2
-            client = TestClient(app)
-            created = client.post("/api/generate", data={"prompt": "quota route", "size": "1024x1024", "quality": "low"})
-            task_id = created.json()["task"]["task_id"]
-
-            with self.assertRaisesRegex(RuntimeError, "usage limit"):
-                asyncio.run(app.state.queue_manager.run_available_once())
-            failed = client.get(f"/api/tasks/{task_id}").json()["task"]
-            limited_record = app.state.account_quota_cache.get("cockpit:acct-a")
-            stopped_queue = app.state.queue_storage.read_state()
-            retry_response = client.post(f"/api/tasks/{task_id}/retry-failed")
-            queued = retry_response.json()["task"]
-            retry_queue = app.state.queue_storage.read_state()
-            asyncio.run(app.state.queue_manager.run_available_once())
-            task = client.get(f"/api/tasks/{task_id}").json()["task"]
-
-        self.assertEqual(len(fake.generate_calls), 2)
-        self.assertEqual(failed["status"], "failed")
-        self.assertEqual(stopped_queue["waiting"], [])
-        self.assertEqual(limited_record["status"], "limited")
-        self.assertEqual(limited_record["remaining"], 0)
-        self.assertEqual(retry_response.status_code, 200)
-        self.assertEqual(queued["status"], "queued")
-        self.assertEqual(retry_queue["waiting"], [task_id])
-        self.assertEqual(task["status"], "completed")
-        self.assertEqual(task["assigned_account_id"], "acct-b")
-    def test_queue_worker_decrements_cached_account_quota_after_success(self) -> None:
-        from codex_image.webui.app import create_app
-        from codex_image.webui.queue import QueueChannel
-
-        fake = FakeImageClient()
-        with tempfile.TemporaryDirectory() as tmp:
-            app = create_app(
-                output_root=Path(tmp),
-                client_factory=lambda: fake,
-                auth_checker=lambda: True,
-                batch_delay_seconds=0,
-                auto_start_queue=False,
-            )
-            app.state.queue_manager.channels = [
-                QueueChannel(channel_id="cockpit:acct-a", auth_source="cockpit", account_id="acct-a"),
-            ]
-            app.state.queue_manager.max_attempts = 2
-            app.state.account_quota_cache.set(
-                {
-                    "account_key": "cockpit:acct-a",
-                    "auth_source": "cockpit",
-                    "account_id": "acct-a",
-                    "label": "Account A",
-                    "status": "ok",
-                    "remaining": 120,
-                    "remote_remaining": 120,
-                    "local_spent_since_refresh": 0,
-                    "quota_known": True,
-                    "last_refreshed_at": "2026-05-12T00:00:00+00:00",
-                }
-            )
-            client = TestClient(app)
-            created = client.post("/api/generate", data={"prompt": "quota decrement", "size": "1024x1024", "quality": "low", "n": "2"})
-            task_id = created.json()["task"]["task_id"]
-
-            asyncio.run(app.state.queue_manager.run_available_once())
-            task = client.get(f"/api/tasks/{task_id}").json()["task"]
-            quota = app.state.account_quota_cache.get("cockpit:acct-a")
-
-        self.assertEqual(task["status"], "completed")
-        self.assertEqual(quota["remaining"], 118)
-        self.assertEqual(quota["remote_remaining"], 120)
-        self.assertEqual(quota["local_spent_since_refresh"], 2)
-    def test_queue_worker_skips_manually_disabled_cockpit_account(self) -> None:
-        from codex_image.webui.app import create_app
-        from codex_image.webui.queue import QueueChannel
-
-        fake = FakeImageClient()
-        with tempfile.TemporaryDirectory() as tmp:
-            app = create_app(
-                output_root=Path(tmp),
-                client_factory=lambda: fake,
-                auth_checker=lambda: True,
-                batch_delay_seconds=0,
-                auto_start_queue=False,
-            )
-            app.state.queue_manager.channels = [
-                QueueChannel(channel_id="cockpit:acct-a", auth_source="cockpit", account_id="acct-a"),
-                QueueChannel(channel_id="cockpit:acct-b", auth_source="cockpit", account_id="acct-b"),
-            ]
-            app.state.queue_manager.max_attempts = 2
-            app.state.account_quota_cache.set_manual_disabled(
-                "cockpit:acct-a",
-                True,
-                auth_source="cockpit",
-                account_id="acct-a",
-            )
-            client = TestClient(app)
-            created = client.post("/api/generate", data={"prompt": "skip disabled", "size": "1024x1024", "quality": "low"})
-            task_id = created.json()["task"]["task_id"]
-
-            asyncio.run(app.state.queue_manager.run_available_once())
-            task = client.get(f"/api/tasks/{task_id}").json()["task"]
-
-        self.assertEqual(task["status"], "completed")
-        self.assertEqual(task["assigned_account_id"], "acct-b")
-        self.assertEqual(len(fake.generate_calls), 1)
-    def test_queue_worker_leaves_task_waiting_when_all_cockpit_accounts_disabled(self) -> None:
-        from codex_image.webui.app import create_app
-        from codex_image.webui.queue import QueueChannel
-
-        fake = FakeImageClient()
-        with tempfile.TemporaryDirectory() as tmp:
-            app = create_app(
-                output_root=Path(tmp),
-                client_factory=lambda: fake,
-                auth_checker=lambda: True,
-                batch_delay_seconds=0,
-                auto_start_queue=False,
-            )
-            app.state.queue_manager.channels = [
-                QueueChannel(channel_id="cockpit:acct-a", auth_source="cockpit", account_id="acct-a"),
-                QueueChannel(channel_id="cockpit:acct-b", auth_source="cockpit", account_id="acct-b"),
-            ]
-            app.state.queue_manager.max_attempts = 2
-            for account_id in ("acct-a", "acct-b"):
-                app.state.account_quota_cache.set_manual_disabled(
-                    f"cockpit:{account_id}",
-                    True,
-                    auth_source="cockpit",
-                    account_id=account_id,
-                )
-            client = TestClient(app)
-            created = client.post("/api/generate", data={"prompt": "all disabled", "size": "1024x1024", "quality": "low"})
-            task_id = created.json()["task"]["task_id"]
-
-            asyncio.run(app.state.queue_manager.run_available_once())
-            task = client.get(f"/api/tasks/{task_id}").json()["task"]
-            queue = client.get("/api/queue").json()
-            queue_state = app.state.queue_storage.read_state()
-
-        self.assertEqual(task["status"], "queued")
-        self.assertEqual(queue["summary"]["usable_channel_count"], 0)
-        self.assertEqual(queue_state["waiting"], [task_id])
-        self.assertEqual(queue_state["running"], {})
-        self.assertEqual(fake.generate_calls, [])
     def test_queue_worker_does_not_requeue_non_retryable_invalid_request(self) -> None:
         from codex_image.webui.app import create_app
 
@@ -966,8 +804,8 @@ class WebUIQueueTests(unittest.TestCase):
             manager = QueueManager(
                 queue_storage=queue_storage,
                 channels=[
-                    QueueChannel(channel_id="cockpit:acct-a", auth_source="cockpit", account_id="acct-a"),
-                    QueueChannel(channel_id="cockpit:acct-b", auth_source="cockpit", account_id="acct-b"),
+                    QueueChannel(channel_id="api:slot-a", auth_source="api", account_id=None),
+                    QueueChannel(channel_id="api:slot-b", auth_source="api", account_id=None),
                 ],
                 execute_task=executor,
             )
@@ -976,7 +814,7 @@ class WebUIQueueTests(unittest.TestCase):
 
             state = queue_storage.read_state()
 
-        self.assertEqual(executor.started, [("task-a", "cockpit:acct-a"), ("task-b", "cockpit:acct-b")])
+        self.assertEqual(executor.started, [("task-a", "api:slot-a"), ("task-b", "api:slot-b")])
         self.assertEqual(state["waiting"], [])
         self.assertEqual(state["running"], {})
     def test_queue_manager_channel_worker_can_start_while_another_channel_is_busy(self) -> None:
@@ -987,8 +825,8 @@ class WebUIQueueTests(unittest.TestCase):
             queue_storage = QueueStorage(Path(tmp) / "queue.json")
             queue_storage.enqueue("task-a")
             queue_storage.enqueue("task-b")
-            channel_a = QueueChannel(channel_id="cockpit:acct-a", auth_source="cockpit", account_id="acct-a")
-            channel_b = QueueChannel(channel_id="cockpit:acct-b", auth_source="cockpit", account_id="acct-b")
+            channel_a = QueueChannel(channel_id="api:slot-a", auth_source="api", account_id=None)
+            channel_b = QueueChannel(channel_id="api:slot-b", auth_source="api", account_id=None)
             executor = BlockingFirstQueueTestExecutor()
             manager = QueueManager(
                 queue_storage=queue_storage,
@@ -1011,10 +849,10 @@ class WebUIQueueTests(unittest.TestCase):
             state_while_first_runs = asyncio.run(run_workers())
             final_state = queue_storage.read_state()
 
-        self.assertEqual(executor.started, [("task-a", "cockpit:acct-a"), ("task-b", "cockpit:acct-b")])
+        self.assertEqual(executor.started, [("task-a", "api:slot-a"), ("task-b", "api:slot-b")])
         self.assertEqual(executor.completed, ["task-b", "task-a"])
         self.assertEqual(state_while_first_runs["waiting"], [])
-        self.assertEqual(list(state_while_first_runs["running"]), ["cockpit:acct-a"])
+        self.assertEqual(list(state_while_first_runs["running"]), ["api:slot-a"])
         self.assertEqual(final_state["running"], {})
     def test_queue_manager_requeues_failed_task_once_on_next_channel(self) -> None:
         from codex_image.webui.queue import QueueChannel, QueueManager
@@ -1028,8 +866,8 @@ class WebUIQueueTests(unittest.TestCase):
             manager = QueueManager(
                 queue_storage=queue_storage,
                 channels=[
-                    QueueChannel(channel_id="cockpit:acct-a", auth_source="cockpit", account_id="acct-a"),
-                    QueueChannel(channel_id="cockpit:acct-b", auth_source="cockpit", account_id="acct-b"),
+                    QueueChannel(channel_id="api:slot-a", auth_source="api", account_id=None),
+                    QueueChannel(channel_id="api:slot-b", auth_source="api", account_id=None),
                 ],
                 execute_task=executor,
                 max_attempts=2,
@@ -1041,7 +879,7 @@ class WebUIQueueTests(unittest.TestCase):
 
             state = queue_storage.read_state()
 
-        self.assertEqual(executor.started, [("task-a", "cockpit:acct-a"), ("task-a", "cockpit:acct-b")])
+        self.assertEqual(executor.started, [("task-a", "api:slot-a"), ("task-a", "api:slot-b")])
         self.assertEqual(state["running"], {})
     def test_queue_manager_skips_unavailable_channel_when_alternative_exists(self) -> None:
         from codex_image.webui.queue import QueueChannel, QueueManager
@@ -1051,19 +889,19 @@ class WebUIQueueTests(unittest.TestCase):
             queue_storage = QueueStorage(Path(tmp) / "queue.json")
             queue_storage.enqueue("task-a")
             executor = QueueTestExecutor()
-            channel_a = QueueChannel(channel_id="cockpit:acct-a", auth_source="cockpit", account_id="acct-a")
-            channel_b = QueueChannel(channel_id="cockpit:acct-b", auth_source="cockpit", account_id="acct-b")
+            channel_a = QueueChannel(channel_id="api:slot-a", auth_source="api", account_id=None)
+            channel_b = QueueChannel(channel_id="api:slot-b", auth_source="api", account_id=None)
             manager = QueueManager(
                 queue_storage=queue_storage,
                 channels=[channel_a, channel_b],
                 execute_task=executor,
-                channel_available=lambda channel: channel.channel_id != "cockpit:acct-a",
+                channel_available=lambda channel: channel.channel_id != "api:slot-a",
             )
 
             asyncio.run(manager.run_available_once())
             state = queue_storage.read_state()
 
-        self.assertEqual(executor.started, [("task-a", "cockpit:acct-b")])
+        self.assertEqual(executor.started, [("task-a", "api:slot-b")])
         self.assertEqual(state["waiting"], [])
         self.assertEqual(state["running"], {})
     def test_queue_manager_leaves_task_waiting_when_all_channels_unavailable(self) -> None:
@@ -1076,7 +914,7 @@ class WebUIQueueTests(unittest.TestCase):
             executor = QueueTestExecutor()
             manager = QueueManager(
                 queue_storage=queue_storage,
-                channels=[QueueChannel(channel_id="cockpit:acct-a", auth_source="cockpit", account_id="acct-a")],
+                channels=[QueueChannel(channel_id="api:slot-a", auth_source="api", account_id=None)],
                 execute_task=executor,
                 channel_available=lambda channel: False,
             )
@@ -1123,8 +961,8 @@ class WebUIQueueTests(unittest.TestCase):
             manager = QueueManager(
                 queue_storage=queue_storage,
                 channels=[
-                    QueueChannel(channel_id="cockpit:acct-a", auth_source="cockpit", account_id="acct-a"),
-                    QueueChannel(channel_id="cockpit:acct-b", auth_source="cockpit", account_id="acct-b"),
+                    QueueChannel(channel_id="api:slot-a", auth_source="api", account_id=None),
+                    QueueChannel(channel_id="api:slot-b", auth_source="api", account_id=None),
                 ],
                 execute_task=executor,
                 max_attempts=2,
@@ -1152,8 +990,8 @@ class WebUIQueueTests(unittest.TestCase):
             manager = QueueManager(
                 queue_storage=queue_storage,
                 channels=[
-                    QueueChannel(channel_id="cockpit:acct-a", auth_source="cockpit", account_id="acct-a"),
-                    QueueChannel(channel_id="cockpit:acct-b", auth_source="cockpit", account_id="acct-b"),
+                    QueueChannel(channel_id="api:slot-a", auth_source="api", account_id=None),
+                    QueueChannel(channel_id="api:slot-b", auth_source="api", account_id=None),
                 ],
                 execute_task=executor,
             )
@@ -1175,7 +1013,7 @@ class WebUIQueueTests(unittest.TestCase):
             queue_storage.enqueue("task-a")
             manager = QueueManager(
                 queue_storage=queue_storage,
-                channels=[QueueChannel(channel_id="cockpit:acct-a", auth_source="cockpit", account_id="acct-a")],
+                channels=[QueueChannel(channel_id="api:slot-a", auth_source="api", account_id=None)],
                 execute_task=CancelQueueTestExecutor(),
             )
 
@@ -1216,11 +1054,11 @@ class WebUIQueueTests(unittest.TestCase):
                         "version": 1,
                         "waiting": [],
                         "running": {
-                            "cockpit:acct-a": {
+                            "api:slot-a": {
                                 "task_id": task_id,
                                 "started_at": "2026-05-01T00:00:02+00:00",
-                                "auth_source": "cockpit",
-                                "account_id": "acct-a",
+                                "auth_source": "api",
+                                "account_id": None,
                             }
                         },
                         "updated_at": "2026-05-01T00:00:00+00:00",

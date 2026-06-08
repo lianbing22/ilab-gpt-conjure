@@ -7,21 +7,12 @@ import mimetypes
 import zipfile
 from pathlib import Path
 from typing import Any, Callable
-from urllib.parse import quote, unquote, urlsplit
+from urllib.parse import quote, urlsplit
 
 from fastapi import Body, FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
-from codex_image.account_quota import (
-    AccountQuotaCache,
-    build_account_quota_record,
-    fetch_account_quota,
-    merge_descriptor_with_cached_record,
-    public_account_summary,
-    quota_from_auth_state_snapshot,
-)
-from codex_image.auth import AuthState
 from codex_image.client import (
     DEFAULT_IMAGE_MODEL,
     DEFAULT_MAIN_MODEL,
@@ -48,8 +39,6 @@ from .auth_routing import (
     DEFAULT_API_MODE,
     MAX_API_IMAGES_CONCURRENCY,
     MIN_API_IMAGES_CONCURRENCY,
-    _account_label_from_auth_state,
-    _account_quota_descriptors_for_source,
     _api_queue_channel_count,
     _apply_retry_api_provider,
     _auth_status,
@@ -70,12 +59,10 @@ from .auth_routing import (
 from .queue_runtime import (
     _client_for_queue_channel,
     _ensure_queue_worker_running,
-    _has_local_quota_retry_alternative,
     _queue_channel_available,
     _queue_channel_worker_loop,
     _queue_max_attempts_for_channels,
     _queue_worker_loop,
-    _record_local_quota_usage,
     execute_task,
     install_queue_runtime,
     queue_lifespan,
@@ -211,7 +198,6 @@ def create_app(
     queue_path: Path | str | None = None,
     auto_start_queue: bool = True,
     auto_retry: bool = False,
-    account_quota_fetcher: Callable[[AuthState], dict[str, Any]] | None = None,
 ) -> FastAPI:
     settings = WebUISettings(Path(webui_settings_path))
     configured_paths = settings.read_paths()
@@ -243,8 +229,6 @@ def create_app(
     color_settings = ColorPaletteSettings(Path(color_settings_path))
     prompt_snippet_settings = PromptSnippetSettings(Path(prompt_snippets_path))
     prompt_template_settings = PromptTemplateSettings(Path(prompt_templates_path))
-    account_quota_cache = AccountQuotaCache(source_data_path / "account-quota-cache.json")
-    fetch_quota = account_quota_fetcher or fetch_account_quota
     static_path = Path(static_dir) if static_dir is not None else Path(__file__).parent / "static"
     make_client = client_factory or (lambda: _client_for_auth_source(auth_settings.read_source(), api_settings=api_settings))
     check_auth = auth_checker or (lambda: bool(_auth_status(auth_settings.read_source(), api_settings=api_settings)["auth_available"]))
@@ -262,10 +246,8 @@ def create_app(
         color_settings=color_settings,
         prompt_snippet_settings=prompt_snippet_settings,
         prompt_template_settings=prompt_template_settings,
-        account_quota_cache=account_quota_cache,
         client_factory=make_client,
         auth_checker=check_auth,
-        account_quota_fetcher=fetch_quota,
         input_root=input_path,
         output_root=output_path,
         gallery_root=gallery_path,
@@ -274,52 +256,6 @@ def create_app(
         auto_start_queue=auto_start_queue,
     )
     ctx.install_on_app_state()
-
-    def _account_quota_response(*, refresh: bool = False) -> dict[str, Any]:
-        source = auth_settings.read_source()
-        if source == "api":
-            return {
-                "selected_source": source,
-                "items": [],
-                "summary": {"count": 0, "ok_count": 0, "limited_count": 0, "unknown_count": 0, "remaining": None},
-                "message": "API 模式不使用本地 ChatGPT 账号额度",
-        }
-
-        items: list[dict[str, Any]] = []
-        descriptors = _account_quota_descriptors_for_source(source)
-        for descriptor in descriptors:
-            cached = account_quota_cache.get(descriptor.account_key)
-            snapshot_quota = (
-                quota_from_auth_state_snapshot(descriptor.auth_state)
-                if descriptor.auth_source == "cockpit" and descriptor.auth_state is not None
-                else None
-            )
-            if refresh and descriptor.auth_state is not None:
-                try:
-                    quota = fetch_quota(descriptor.auth_state)
-                except Exception as exc:
-                    if snapshot_quota is not None:
-                        record = build_account_quota_record(descriptor, snapshot_quota, cached=cached)
-                    else:
-                        record = build_account_quota_record(descriptor, None, cached=cached, refresh_error=str(exc))
-                else:
-                    record = build_account_quota_record(descriptor, quota, cached=cached)
-                account_quota_cache.set(record)
-            elif snapshot_quota is not None:
-                record = build_account_quota_record(descriptor, snapshot_quota, cached=cached)
-                account_quota_cache.set(record)
-            else:
-                record = merge_descriptor_with_cached_record(descriptor, cached)
-            items.append(record)
-        summary = public_account_summary(items)
-        summary["usable_channel_count"] = sum(1 for descriptor in descriptors if account_quota_cache.is_channel_usable(descriptor.account_key))
-
-        return {
-            "selected_source": source,
-            "items": items,
-            "summary": summary,
-            "message": "",
-        }
 
     queue_runtime = install_queue_runtime(
         ctx,
@@ -343,8 +279,6 @@ def create_app(
 
     ctx.route_helpers.update(
         {
-            "account_quota_response": _account_quota_response,
-            "account_quota_descriptors_for_source": _account_quota_descriptors_for_source,
             "ensure_queue_worker_running": queue_runtime.ensure_queue_worker_running,
             "queue_channel_available": queue_runtime.queue_channel_available,
             "auth_status": lambda source: _auth_status(source, api_settings=api_settings),

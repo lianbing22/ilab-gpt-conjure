@@ -426,7 +426,7 @@ function canAcceptTaskSuccesses(task: any) {
 function taskRetryReasonText(task: any) {
   const message = String(task?.last_error || task?.error || "").toLowerCase();
   if (message.includes("usage limit") || message.includes("quota") || message.includes("rate limit")) {
-    return "账号额度受限";
+    return "用量受限";
   }
   if (message.includes("incompleteread") || message.includes("timeout") || message.includes("network")) {
     return "连接中断";
@@ -464,6 +464,7 @@ function taskRetryStateText(task: any) {
 function taskHasNonRetryableError(task: any) {
   const message = String(task?.error || task?.last_error || "").toLowerCase();
   if (!message) return false;
+  if (message.includes("usage limit") || message.includes("quota") || message.includes("rate limit")) return true;
   if (!message.includes("http 400")) return false;
   return [
     "invalid_request_error",

@@ -21,7 +21,7 @@
         document.documentElement.dataset.themePreference = preference;
       })();
     </script>
-    <link rel="stylesheet" href="/static/styles.css?v=runtime-237" />
+    <link rel="stylesheet" href="/static/styles.css?v=runtime-238" />
   </head>
   <body>
     <div class="layout-container">
@@ -150,10 +150,6 @@
         <!-- Top Navigation -->
         <header class="top-nav">
           <div class="nav-actions">
-            <button id="accountQuotaButton" class="queue-button account-quota-button" type="button" aria-controls="accountQuotaDrawer" aria-expanded="false">
-              <span>额度</span>
-              <span id="accountQuotaBadge" class="queue-badge hidden">0</span>
-            </button>
             <button id="queueButton" class="queue-button queue-status-chip" type="button" aria-label="队列状态：暂无排队" title="跳转到进行中任务">
               <span id="queueStatusText">暂无排队</span>
             </button>
@@ -169,20 +165,23 @@
               <button class="theme-option" data-theme-option="light" type="button" aria-pressed="false">浅色</button>
               <button class="theme-option" data-theme-option="dark" type="button" aria-pressed="false">深色</button>
             </div>
+            <a id="githubLink" class="queue-button github-link" href="https://github.com/kadevin/ilab-gpt-conjure" target="_blank" rel="noreferrer" aria-label="GitHub" title="GitHub">
+              <svg class="github-link-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path fill="currentColor" d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.1c-3.4.7-4.1-1.5-4.1-1.5-.5-1.4-1.3-1.8-1.3-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.3 11.3 0 0 1 6 0C16.8 4.7 17.8 5 17.8 5c.6 1.6.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.8c0 .3.2.7.8.6A12 12 0 0 0 12 .5Z"/>
+              </svg>
+            </a>
             <div class="auth-source-switcher" aria-label="授权来源">
               <div id="authSourceDetail" class="auth-source-detail">授权检查中</div>
               <div id="authSourceGroup" class="auth-source-group">
-                <button class="auth-source-button active" data-auth-source="auto" type="button">自动</button>
-                <button class="auth-source-button" data-auth-source="cockpit" type="button">Cockpit多账号</button>
-                <button class="auth-source-button" data-auth-source="codex" type="button">Codex本机</button>
-                <button class="auth-source-button auth-source-api-button" data-auth-source="api" type="button" aria-label="API，已选中时再次点击或双击打开 API 设置" title="已选中时再次点击或双击打开 API 设置">
-                  <span>API</span>
-                  <svg class="auth-source-settings-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                    <path d="M12 8.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7Z" fill="none" stroke="currentColor" stroke-width="1.8"/>
-                    <path d="M19.4 13.4a7.8 7.8 0 0 0 .1-1.4 7.8 7.8 0 0 0-.1-1.4l2-1.5-2-3.4-2.4 1a8 8 0 0 0-2.4-1.4L14.3 3h-4.6l-.4 2.3A8 8 0 0 0 6.9 6.7l-2.4-1-2 3.4 2 1.5a7.8 7.8 0 0 0-.1 1.4 7.8 7.8 0 0 0 .1 1.4l-2 1.5 2 3.4 2.4-1a8 8 0 0 0 2.4 1.4l.4 2.3h4.6l.4-2.3a8 8 0 0 0 2.4-1.4l2.4 1 2-3.4-2.1-1.5Z" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="1.8"/>
-                  </svg>
-                </button>
+                <button class="auth-source-button active" data-auth-source="codex" type="button">Codex</button>
+                <button class="auth-source-button auth-source-api-button" data-auth-source="api" type="button">API</button>
               </div>
+              <button id="apiSourceSettingsButton" class="auth-source-settings-button" type="button" aria-label="API 设置" title="API 设置">
+                <svg class="auth-source-settings-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M12 8.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7Z" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                  <path d="M19.4 13.4a7.8 7.8 0 0 0 .1-1.4 7.8 7.8 0 0 0-.1-1.4l2-1.5-2-3.4-2.4 1a8 8 0 0 0-2.4-1.4L14.3 3h-4.6l-.4 2.3A8 8 0 0 0 6.9 6.7l-2.4-1-2 3.4 2 1.5a7.8 7.8 0 0 0-.1 1.4 7.8 7.8 0 0 0 .1 1.4l-2 1.5 2 3.4 2.4-1a8 8 0 0 0 2.4 1.4l.4 2.3h4.6l.4-2.3a8 8 0 0 0 2.4-1.4l2.4 1 2-3.4-2.1-1.5Z" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="1.8"/>
+                </svg>
+              </button>
               <select id="apiProviderQuick" class="api-provider-quick hidden" aria-label="API 供应商"></select>
             </div>
           </div>
@@ -630,25 +629,6 @@
       </div>
     </div>
 
-    <div id="accountQuotaDrawer" class="queue-drawer account-quota-drawer" aria-hidden="true">
-      <div class="queue-drawer-header">
-        <div>
-          <h2>账号额度</h2>
-          <p id="accountQuotaSummary">暂无额度缓存</p>
-        </div>
-        <button id="accountQuotaDrawerClose" class="ghost-button drawer-close-button" type="button" aria-label="关闭账号额度面板" title="关闭">
-          <svg class="drawer-close-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M7 7L17 17M17 7L7 17" />
-          </svg>
-        </button>
-      </div>
-      <div class="account-quota-toolbar">
-        <button id="accountQuotaRefresh" class="ghost-button text-sm" type="button">刷新额度</button>
-      </div>
-      <div id="accountQuotaList" class="account-quota-list"></div>
-    </div>
-    <div id="accountQuotaDrawerBackdrop" class="queue-drawer-backdrop hidden"></div>
-
     <div id="promptTemplateDrawer" class="resource-sheet prompt-template-drawer" aria-hidden="true">
       <div class="resource-sheet-header prompt-template-drawer-header">
         <div>
@@ -974,7 +954,7 @@
     </div>
 
     <div id="taskNotificationToastRegion" class="task-notification-toast-region" aria-live="polite"></div>
-  <script src="/static/app.js?v=runtime-237"></script>
+  <script src="/static/app.js?v=runtime-238"></script>
     <script>
       (() => {
         document.querySelectorAll(".radio-group").forEach((group) => {

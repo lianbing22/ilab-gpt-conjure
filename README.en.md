@@ -35,8 +35,7 @@
 iLab GPT Conjure is an AI image generation WebUI workbench for GPT-image-2, with
 a companion CLI for local automation. It supports both Codex Responses and
 OpenAI-compatible API access, and includes shared gallery references, multi-type
-quick chips, prompt templates, concurrent tasks, and multi-account rotation for
-local OAuth workflows.
+quick chips, prompt templates, concurrent tasks, and local queue management.
 
 The recommended public integration path is OpenAI-compatible API mode, using
 the Images API or Responses API shape provided by your configured provider.
@@ -53,7 +52,8 @@ Download portable packages from [Downloads / Releases](RELEASES.md).
   archive.
 - Shared gallery references, recent reference images, color chips, prompt
   snippet chips, and reusable prompt templates.
-- Multi-account rotation for advanced local OAuth workflows.
+- Advanced local OAuth mode for personal Codex workflows, with clear risk
+  warnings and no account-usage probing.
 - API provider profiles with configurable base URL, API key, image model, API
   mode, and concurrency.
 - CLI support for generation, image references, image edits, masks, and dry runs.

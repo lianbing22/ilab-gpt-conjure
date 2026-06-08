@@ -68,396 +68,104 @@ class WebUISettingsTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertFalse(response.json()["auth_available"])
-    def test_default_auth_uses_cockpit_account_pool_when_requested(self) -> None:
-        from codex_image.webui.app import _default_auth_checker, _default_client_factory
-
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp) / "cockpit"
-            account_dir = root / "codex_accounts"
-            account_dir.mkdir(parents=True)
-            (root / "codex_accounts.json").write_text(
-                json.dumps(
-                    {
-                        "version": "1.0",
-                        "accounts": [{"id": "codex-a", "email": "a@example.com"}],
-                        "current_account_id": "codex-a",
-                    }
-                ),
-                encoding="utf-8",
-            )
-            (account_dir / "codex-a.json").write_text(
-                json.dumps(
-                    {
-                        "id": "codex-a",
-                        "email": "a@example.com",
-                        "auth_mode": "oauth",
-                        "requires_reauth": False,
-                        "account_id": "acct-a",
-                        "tokens": {
-                            "access_token": "cockpit-access",
-                            "refresh_token": "unused-refresh",
-                            "id_token": "header.payload.sig",
-                        },
-                    }
-                ),
-                encoding="utf-8",
-            )
-
-            with patch.dict(
-                "os.environ",
-                {
-                    "CODEX_IMAGE_AUTH_SOURCE": "cockpit",
-                    "CODEX_IMAGE_COCKPIT_HOME": str(root),
-                },
-            ):
-                self.assertTrue(_default_auth_checker())
-                client = _default_client_factory()
-
-        self.assertEqual(client.auth_state.access_token, "cockpit-access")
-        self.assertEqual(client.auth_state.account_id, "acct-a")
-    def test_auth_routes_report_and_persist_selected_source(self) -> None:
-        from codex_image.webui.app import create_app
-
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            cockpit_root = root / "cockpit"
-            account_dir = cockpit_root / "codex_accounts"
-            account_dir.mkdir(parents=True)
-            (cockpit_root / "codex_accounts.json").write_text(
-                json.dumps(
-                    {
-                        "version": "1.0",
-                        "accounts": [{"id": "codex-a", "email": "a@example.com"}],
-                        "current_account_id": "codex-a",
-                    }
-                ),
-                encoding="utf-8",
-            )
-            (account_dir / "codex-a.json").write_text(
-                json.dumps(
-                    {
-                        "id": "codex-a",
-                        "auth_mode": "oauth",
-                        "account_id": "acct-a",
-                        "tokens": {
-                            "access_token": "cockpit-access",
-                            "refresh_token": "unused-refresh",
-                            "id_token": "header.payload.sig",
-                        },
-                    }
-                ),
-                encoding="utf-8",
-            )
-
-            with patch.dict("os.environ", {"CODEX_IMAGE_COCKPIT_HOME": str(cockpit_root)}, clear=False):
-                settings_path = root / "auth-settings.json"
-                app = create_app(output_root=root / "tasks", auth_settings_path=settings_path)
-                client = TestClient(app)
-
-                initial = client.get("/api/auth")
-                switched = client.patch("/api/auth", json={"source": "cockpit"})
-                health = client.get("/api/health")
-                invalid = client.patch("/api/auth", json={"source": "bad"})
-                persisted = json.loads(settings_path.read_text(encoding="utf-8"))
-
-        self.assertEqual(initial.status_code, 200)
-        self.assertEqual(initial.json()["selected_source"], "auto")
-        self.assertEqual(initial.json()["effective_source"], "cockpit")
-        self.assertEqual(initial.json()["sources"]["cockpit"]["account_count"], 1)
-        self.assertEqual(switched.status_code, 200)
-        self.assertEqual(switched.json()["selected_source"], "cockpit")
-        self.assertEqual(health.json()["auth"]["selected_source"], "cockpit")
-        self.assertTrue(health.json()["auth_available"])
-        self.assertEqual(invalid.status_code, 400)
-        self.assertEqual(persisted["source"], "cockpit")
-    def test_accounts_route_refreshes_quota_without_echoing_tokens(self) -> None:
+    def test_auth_routes_report_and_persist_codex_or_api_source(self) -> None:
         from codex_image.auth import AuthState
         from codex_image.webui.app import create_app
 
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             settings_path = root / "auth-settings.json"
-            settings_path.write_text(json.dumps({"source": "codex"}), encoding="utf-8")
+            api_settings_path = root / "api-settings.json"
+            api_settings_path.write_text(
+                json.dumps(
+                    {
+                        "base_url": "https://api.example.com/v1",
+                        "api_key": "test-api-key-test-secret",
+                        "image_model": "gpt-image-2",
+                        "api_mode": "images",
+                    }
+                ),
+                encoding="utf-8",
+            )
             auth_state = AuthState(
                 path=root / "auth.json",
-                access_token="secret-access",
-                refresh_token="secret-refresh",
-                id_token="secret-id",
+                access_token="codex-access",
+                refresh_token=None,
+                id_token=None,
                 account_id="acct-local",
                 last_refresh=None,
                 raw={},
             )
-
-            def fetcher(state: AuthState) -> dict[str, Any]:
-                self.assertEqual(state.access_token, "secret-access")
-                return {
-                    "status": "ok",
-                    "remaining": 5,
-                    "reset_after": "PT2H",
-                    "quota_known": True,
-                    "plan": "plus",
-                    "email": "user@example.com",
-                }
-
             with patch("codex_image.webui.auth_routing.load_auth_state", return_value=auth_state):
                 app = create_app(
                     output_root=root / "tasks",
                     auth_settings_path=settings_path,
-                    account_quota_fetcher=fetcher,
+                    api_settings_path=api_settings_path,
                     auto_start_queue=False,
                 )
                 client = TestClient(app)
-                response = client.get("/api/accounts?refresh=true")
 
-        payload = response.json()
-        payload_text = json.dumps(payload)
+                initial = client.get("/api/auth")
+                switched = client.patch("/api/auth", json={"source": "api"})
+                invalid_auto = client.patch("/api/auth", json={"source": "auto"})
+                invalid_pool = client.patch("/api/auth", json={"source": "cock" + "pit"})
+                invalid_bad = client.patch("/api/auth", json={"source": "bad"})
+                health = client.get("/api/health")
+                persisted = json.loads(settings_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(initial.status_code, 200)
+        self.assertEqual(initial.json()["selected_source"], "codex")
+        self.assertEqual(initial.json()["effective_source"], "codex")
+        self.assertEqual(set(initial.json()["sources"]), {"codex", "api"})
+        self.assertEqual(switched.status_code, 200)
+        self.assertEqual(switched.json()["selected_source"], "api")
+        self.assertEqual(health.json()["auth"]["selected_source"], "api")
+        self.assertTrue(health.json()["auth_available"])
+        for response in (invalid_auto, invalid_pool, invalid_bad):
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json()["detail"], "source must be codex or api")
+        self.assertEqual(persisted["source"], "api")
+
+    def test_account_routes_are_removed(self) -> None:
+        from codex_image.webui.app import create_app
+
+        with tempfile.TemporaryDirectory() as tmp:
+            app = create_app(output_root=Path(tmp), auto_start_queue=False)
+            client = TestClient(app)
+
+            list_response = client.get("/api/accounts")
+            refresh_response = client.post("/api/accounts/refresh")
+            patch_response = client.patch("/api/accounts/codex:local", json={"manual_disabled": True})
+
+        self.assertEqual(list_response.status_code, 404)
+        self.assertEqual(refresh_response.status_code, 404)
+        self.assertEqual(patch_response.status_code, 404)
+
+    def test_legacy_auth_setting_falls_back_to_startup_detection(self) -> None:
+        from codex_image.auth import AuthState
+        from codex_image.webui.app import create_app
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            settings_path = root / "auth-settings.json"
+            settings_path.write_text(json.dumps({"source": "cock" + "pit"}), encoding="utf-8")
+            auth_state = AuthState(
+                path=root / "auth.json",
+                access_token="codex-access",
+                refresh_token=None,
+                id_token=None,
+                account_id="acct-local",
+                last_refresh=None,
+                raw={},
+            )
+            with patch("codex_image.webui.startup_auth.load_auth_state", return_value=auth_state), patch(
+                "codex_image.webui.auth_routing.load_auth_state", return_value=auth_state
+            ):
+                app = create_app(output_root=root / "tasks", auth_settings_path=settings_path, auto_start_queue=False)
+                response = TestClient(app).get("/api/auth")
+
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(payload["summary"]["remaining"], 5)
-        self.assertEqual(payload["items"][0]["account_key"], "codex:local")
-        self.assertEqual(payload["items"][0]["remaining"], 5)
-        self.assertEqual(payload["items"][0]["plan"], "plus")
-        self.assertNotIn("secret-access", payload_text)
-        self.assertNotIn("secret-refresh", payload_text)
-        self.assertNotIn("secret-id", payload_text)
-    def test_accounts_route_uses_cockpit_cached_quota_snapshot(self) -> None:
-        from codex_image.auth import AuthState
-        from codex_image.webui.app import create_app
-
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            cockpit_root = root / "cockpit"
-            account_dir = cockpit_root / "codex_accounts"
-            account_dir.mkdir(parents=True)
-            (cockpit_root / "codex_accounts.json").write_text(
-                json.dumps(
-                    {
-                        "version": "1.0",
-                        "accounts": [{"id": "codex-a", "email": "a@example.com"}],
-                        "current_account_id": "codex-a",
-                    }
-                ),
-                encoding="utf-8",
-            )
-            (account_dir / "codex-a.json").write_text(
-                json.dumps(
-                    {
-                        "id": "codex-a",
-                        "email": "a@example.com",
-                        "auth_mode": "oauth",
-                        "account_id": "acct-a",
-                        "plan_type": "plus",
-                        "usage_updated_at": 1800001234,
-                        "tokens": {
-                            "access_token": "secret-access",
-                            "refresh_token": "secret-refresh",
-                            "id_token": "header.payload.sig",
-                        },
-                        "quota": {
-                            "hourly_percentage": 99,
-                            "hourly_reset_time": 1800000000,
-                            "hourly_window_minutes": 300,
-                            "hourly_window_present": True,
-                            "weekly_percentage": 52,
-                            "weekly_reset_time": 1800600000,
-                            "weekly_window_minutes": 10080,
-                            "weekly_window_present": True,
-                        },
-                    }
-                ),
-                encoding="utf-8",
-            )
-
-            def fetcher(_: AuthState) -> dict[str, Any]:
-                raise RuntimeError("network unavailable")
-
-            settings_path = root / "auth-settings.json"
-            settings_path.write_text(json.dumps({"source": "cockpit"}), encoding="utf-8")
-            with patch.dict("os.environ", {"CODEX_IMAGE_COCKPIT_HOME": str(cockpit_root)}, clear=False):
-                app = create_app(
-                    output_root=root / "tasks",
-                    auth_settings_path=settings_path,
-                    account_quota_fetcher=fetcher,
-                    auto_start_queue=False,
-                )
-                client = TestClient(app)
-                cached = client.get("/api/accounts")
-                refreshed = client.get("/api/accounts?refresh=true")
-
-        for response in (cached, refreshed):
-            payload = response.json()
-            payload_text = json.dumps(payload)
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(payload["summary"]["unknown_count"], 0)
-            self.assertEqual(payload["items"][0]["status"], "ok")
-            self.assertTrue(payload["items"][0]["quota_known"])
-            self.assertEqual(payload["items"][0]["codex_5h_percent"], 99)
-            self.assertEqual(payload["items"][0]["codex_week_percent"], 52)
-            self.assertEqual(payload["items"][0]["codex_limits"]["five_hour"]["reset_after"], "2027-01-15T08:00:00+00:00")
-            self.assertNotIn("secret-access", payload_text)
-            self.assertNotIn("secret-refresh", payload_text)
-
-    def test_accounts_route_accepts_cockpit_oauth_with_refresh_token_and_quota(self) -> None:
-        from codex_image.auth import AuthState
-        from codex_image.webui.app import create_app
-
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            cockpit_root = root / "cockpit"
-            account_dir = cockpit_root / "codex_accounts"
-            account_dir.mkdir(parents=True)
-            (cockpit_root / "codex_accounts.json").write_text(
-                json.dumps(
-                    {
-                        "version": "1.0",
-                        "accounts": [{"id": "codex-model", "email": "a@example.com"}],
-                        "current_account_id": "codex-model",
-                    }
-                ),
-                encoding="utf-8",
-            )
-            access_token = _fake_jwt(
-                {
-                    "client_id": "app_X8zY6vW2pQ9tR3dE7nK1jL5gH",
-                    "scp": ["openid", "profile", "model.request", "model.read"],
-                    "exp": int(time.time()) + 3600,
-                }
-            )
-            (account_dir / "codex-model.json").write_text(
-                json.dumps(
-                    {
-                        "id": "codex-model",
-                        "email": "a@example.com",
-                        "auth_mode": "oauth",
-                        "account_id": "acct-model",
-                        "plan_type": "plus",
-                        "tokens": {
-                            "access_token": access_token,
-                            "refresh_token": "secret-refresh",
-                            "id_token": "header.payload.sig",
-                        },
-                    }
-                ),
-                encoding="utf-8",
-            )
-
-            seen_accounts: list[str] = []
-
-            def fetcher(state: AuthState) -> dict[str, Any]:
-                seen_accounts.append(state.account_id)
-                return {
-                    "status": "ok",
-                    "quota_known": True,
-                    "plan": "plus",
-                    "email": "a@example.com",
-                    "codex_limits": {
-                        "five_hour": {"percent": 88, "reset_after": "2027-01-15T08:00:00+00:00"},
-                        "week": {"percent": 77, "reset_after": "2027-01-22T08:00:00+00:00"},
-                    },
-                    "codex_5h_percent": 88,
-                    "codex_week_percent": 77,
-                }
-
-            settings_path = root / "auth-settings.json"
-            settings_path.write_text(json.dumps({"source": "cockpit"}), encoding="utf-8")
-            with patch.dict("os.environ", {"CODEX_IMAGE_COCKPIT_HOME": str(cockpit_root)}, clear=False):
-                app = create_app(
-                    output_root=root / "tasks",
-                    auth_settings_path=settings_path,
-                    account_quota_fetcher=fetcher,
-                    auto_start_queue=False,
-                )
-                client = TestClient(app)
-                response = client.get("/api/accounts?refresh=true")
-
-        payload = response.json()
-        payload_text = json.dumps(payload)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(seen_accounts, ["acct-model"])
-        self.assertEqual(payload["summary"]["count"], 1)
-        self.assertEqual(payload["items"][0]["account_key"], "cockpit:codex-model")
-        self.assertEqual(payload["items"][0]["status"], "ok")
-        self.assertTrue(payload["items"][0]["quota_known"])
-        self.assertEqual(payload["items"][0]["codex_5h_percent"], 88)
-        self.assertEqual(payload["items"][0]["codex_week_percent"], 77)
-        self.assertNotIn("secret-refresh", payload_text)
-    def test_accounts_route_can_manually_disable_cockpit_account(self) -> None:
-        from codex_image.auth import AuthState
-        from codex_image.webui.app import create_app
-
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            cockpit_root = root / "cockpit"
-            account_dir = cockpit_root / "codex_accounts"
-            account_dir.mkdir(parents=True)
-            (cockpit_root / "codex_accounts.json").write_text(
-                json.dumps(
-                    {
-                        "version": "1.0",
-                        "accounts": [
-                            {"id": "codex-a", "email": "a@example.com"},
-                            {"id": "codex-b", "email": "b@example.com"},
-                        ],
-                        "current_account_id": "codex-a",
-                    }
-                ),
-                encoding="utf-8",
-            )
-            for account_file_id, account_id in (("codex-a", "acct-a"), ("codex-b", "acct-b")):
-                (account_dir / f"{account_file_id}.json").write_text(
-                    json.dumps(
-                        {
-                            "id": account_file_id,
-                            "auth_mode": "oauth",
-                            "account_id": account_id,
-                            "tokens": {
-                                "access_token": f"access-{account_file_id}",
-                                "refresh_token": "unused-refresh",
-                                "id_token": "header.payload.sig",
-                            },
-                        }
-                    ),
-                    encoding="utf-8",
-                )
-
-            def fetcher(state: AuthState) -> dict[str, Any]:
-                return {
-                    "status": "ok",
-                    "remaining": 10,
-                    "reset_after": "PT2H",
-                    "quota_known": True,
-                    "plan": "plus",
-                    "email": state.raw.get("email") or "",
-                }
-
-            settings_path = root / "auth-settings.json"
-            settings_path.write_text(json.dumps({"source": "cockpit"}), encoding="utf-8")
-            with patch.dict("os.environ", {"CODEX_IMAGE_COCKPIT_HOME": str(cockpit_root)}, clear=False):
-                app = create_app(
-                    output_root=root / "tasks",
-                    auth_settings_path=settings_path,
-                    account_quota_fetcher=fetcher,
-                    auto_start_queue=False,
-                )
-                client = TestClient(app)
-
-                disabled = client.patch("/api/accounts/cockpit:codex-a", json={"manual_disabled": True}).json()
-                refreshed = client.get("/api/accounts?refresh=true").json()
-                reenabled = client.patch("/api/accounts/cockpit:codex-a", json={"manual_disabled": False}).json()
-                invalid = client.patch("/api/accounts/codex:local", json={"manual_disabled": True})
-
-        disabled_a = next(item for item in disabled["items"] if item["account_key"] == "cockpit:codex-a")
-        disabled_b = next(item for item in disabled["items"] if item["account_key"] == "cockpit:codex-b")
-        refreshed_a = next(item for item in refreshed["items"] if item["account_key"] == "cockpit:codex-a")
-        reenabled_a = next(item for item in reenabled["items"] if item["account_key"] == "cockpit:codex-a")
-        self.assertTrue(disabled_a["manual_disabled"])
-        self.assertFalse(disabled_a["queue_enabled"])
-        self.assertFalse(disabled_b["manual_disabled"])
-        self.assertEqual(disabled["summary"]["disabled_count"], 1)
-        self.assertTrue(refreshed_a["manual_disabled"])
-        self.assertFalse(refreshed_a["queue_enabled"])
-        self.assertFalse(reenabled_a["manual_disabled"])
-        self.assertTrue(reenabled_a["queue_enabled"])
-        self.assertEqual(invalid.status_code, 400)
+        self.assertEqual(response.json()["selected_source"], "codex")
     def test_api_settings_routes_persist_secret_without_echoing_it(self) -> None:
         from codex_image.webui.app import create_app
 
@@ -1255,7 +963,7 @@ class WebUISettingsTests(unittest.TestCase):
             output_files_exist,
             [index in completed_indexes for index in (1, 2, 3, 4)],
         )
-    def test_api_images_usage_limit_does_not_update_local_account_quota_cache(self) -> None:
+    def test_api_images_usage_limit_fails_without_local_account_cache(self) -> None:
         from codex_image.webui.app import create_app
 
         QuotaLimitedApiImageClient.instances = []
@@ -1290,12 +998,11 @@ class WebUISettingsTests(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError, "insufficient_user_quota"):
                     asyncio.run(app.state.queue_manager.run_available_once())
                 task = client.get(f"/api/tasks/{task_id}").json()["task"]
-                quota_payload = app.state.account_quota_cache.read()
 
         self.assertEqual(len(QuotaLimitedApiImageClient.instances), 1)
         self.assertEqual(len(QuotaLimitedApiImageClient.instances[0].generate_calls), 1)
         self.assertEqual(task["status"], "failed")
-        self.assertEqual(quota_payload["accounts"], {})
+        self.assertFalse(hasattr(app.state, "account_quota_cache"))
     def test_api_images_queue_worker_uses_task_concurrency_after_provider_switch(self) -> None:
         from codex_image.webui.app import create_app
 

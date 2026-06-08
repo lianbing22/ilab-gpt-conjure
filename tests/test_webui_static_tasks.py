@@ -823,7 +823,6 @@ class WebUIStaticTaskTests(WebUIStaticTestCase):
         self.assertIn('import { initImageStripFeature } from "./image-strip"', main_source)
         self.assertIn('import { initGalleryFeature } from "./gallery"', main_source)
         self.assertIn('import { initApiSettingsFeature } from "./api-settings"', main_source)
-        self.assertIn('import { initAccountQuotaFeature } from "./account-quota"', main_source)
         self.assertIn('import { initStorageSettingsFeature } from "./storage-settings"', main_source)
         self.assertIn('import { initPromptFeature } from "./prompt"', main_source)
         self.assertIn('import { initTaskListControlsFeature } from "./task-list-controls"', main_source)
@@ -835,7 +834,6 @@ class WebUIStaticTaskTests(WebUIStaticTestCase):
         self.assertIn("initImageStripFeature()", main_source)
         self.assertIn("initGalleryFeature()", main_source)
         self.assertIn("initApiSettingsFeature()", main_source)
-        self.assertIn("initAccountQuotaFeature()", main_source)
         self.assertIn("initStorageSettingsFeature()", main_source)
         self.assertIn("initPromptFeature()", main_source)
         self.assertIn("initTaskListControlsFeature()", main_source)
@@ -847,8 +845,7 @@ class WebUIStaticTaskTests(WebUIStaticTestCase):
         self.assertLess(main_source.index('import { initImageEditorFeature } from "./image-editor"'), main_source.index('import { initImageStripFeature } from "./image-strip"'))
         self.assertLess(main_source.index('import { initImageStripFeature } from "./image-strip"'), main_source.index('import { initGalleryFeature } from "./gallery"'))
         self.assertLess(main_source.index('import { initGalleryFeature } from "./gallery"'), main_source.index('import { initApiSettingsFeature } from "./api-settings"'))
-        self.assertLess(main_source.index('import { initApiSettingsFeature } from "./api-settings"'), main_source.index('import { initAccountQuotaFeature } from "./account-quota"'))
-        self.assertLess(main_source.index('import { initAccountQuotaFeature } from "./account-quota"'), main_source.index('import { initStorageSettingsFeature } from "./storage-settings"'))
+        self.assertLess(main_source.index('import { initApiSettingsFeature } from "./api-settings"'), main_source.index('import { initStorageSettingsFeature } from "./storage-settings"'))
         self.assertLess(main_source.index('import { initStorageSettingsFeature } from "./storage-settings"'), main_source.index('import { initPromptFeature } from "./prompt"'))
         self.assertLess(main_source.index('import { initPromptFeature } from "./prompt"'), main_source.index('import { initTaskListControlsFeature } from "./task-list-controls"'))
         self.assertLess(main_source.index('import { initTaskListControlsFeature } from "./task-list-controls"'), main_source.index('import { initTaskFeature } from "./tasks"'))
@@ -856,8 +853,7 @@ class WebUIStaticTaskTests(WebUIStaticTestCase):
         self.assertLess(main_source.index("initImageEditorFeature()"), main_source.index("initImageStripFeature()"))
         self.assertLess(main_source.index("initImageStripFeature()"), main_source.index("initGalleryFeature()"))
         self.assertLess(main_source.index("initGalleryFeature()"), main_source.index("initApiSettingsFeature()"))
-        self.assertLess(main_source.index("initApiSettingsFeature()"), main_source.index("initAccountQuotaFeature()"))
-        self.assertLess(main_source.index("initAccountQuotaFeature()"), main_source.index("initStorageSettingsFeature()"))
+        self.assertLess(main_source.index("initApiSettingsFeature()"), main_source.index("initStorageSettingsFeature()"))
         self.assertLess(main_source.index("initStorageSettingsFeature()"), main_source.index("initPromptFeature()"))
         self.assertLess(main_source.index("initPromptFeature()"), main_source.index("initTaskListControlsFeature()"))
         self.assertLess(main_source.index("initTaskListControlsFeature()"), main_source.index("initTaskFeature()"))
@@ -1119,17 +1115,28 @@ class WebUIStaticTaskTests(WebUIStaticTestCase):
             self.assertIn('call(methods, "runTask")', source)
             self.assertIn('document.addEventListener("keydown", (event) => handleRunTaskShortcut(event, els, methods));', source)
     def test_submit_and_queued_tasks_show_waiting_preview(self) -> None:
+        source = self._task_preview_source()
         script = self._frontend_script_source()
 
         self.assertIn('status: "submitting"', script)
         self.assertIn('if (task.status === "submitting") return "提交中";', script)
-        self.assertIn('selected?.status === "submitting" || selected?.status === "queued"', script)
-        self.assertIn("renderWaitingPreview(selected)", script)
+        self.assertIn('if (status === "submitting" || status === "queued")', source)
+        self.assertIn("renderWaitingPreview(selected)", source)
         self.assertIn('startRunFeedback(pendingTask, "提交中")', script)
         self.assertIn("function renderWaitingPreview", script)
         self.assertIn("提交任务中", script)
         self.assertIn("任务排队中", script)
         self.assertNotIn('els.runButton.textContent = "提交中...";', script)
+    def test_preview_uses_queue_membership_for_running_state(self) -> None:
+        source = self._task_preview_source()
+
+        self.assertIn("function taskPreviewStatus(", source)
+        self.assertIn("state.queue.running", source)
+        self.assertIn("state.queue.waiting", source)
+        self.assertIn("const status = taskPreviewStatus(selected)", source)
+        self.assertIn("const status = taskPreviewStatus(task)", source)
+        self.assertIn('if (status === "running")', source)
+        self.assertIn('if (status === "submitting" || status === "queued")', source)
     def test_submit_task_has_timeout_instead_of_infinite_submitting_state(self) -> None:
         script = self._frontend_script_source()
 
@@ -1377,7 +1384,7 @@ class WebUIStaticTaskTests(WebUIStaticTestCase):
                   retry_requested_at: "2026-05-22T13:30:00Z"
                 });
                 const queuedRetry = taskRetryStateText({ status: "queued", attempts: 1, max_attempts: 2, last_error: "temporary server failure" });
-                const quotaRetry = taskRetryStateText({ status: "queued", attempts: 1, max_attempts: 2, last_error: "Codex usage limit reached" });
+                const usageLimitFailure = taskRetryStateText({ status: "failed", attempts: 1, max_attempts: 2, last_error: "Codex usage limit reached" });
                 const failedManualRetry = taskRetryStateText({ status: "failed", attempts: 1, max_attempts: 2, last_error: "temporary server failure" });
                 if (firstRun !== "") {
                   throw new Error(`expected first run to have no retry label, got ${firstRun}`);
@@ -1394,8 +1401,8 @@ class WebUIStaticTaskTests(WebUIStaticTestCase):
                 if (queuedRetry !== "上次失败，等待重试（第 2/2 次尝试）") {
                   throw new Error(`expected queued retry label, got ${queuedRetry}`);
                 }
-                if (quotaRetry !== "账号额度受限，等待重试（第 2/2 次尝试）") {
-                  throw new Error(`expected quota retry label, got ${quotaRetry}`);
+                if (usageLimitFailure !== "第 1/2 次，不可重试") {
+                  throw new Error(`expected non-retryable usage limit label, got ${usageLimitFailure}`);
                 }
                 if (failedManualRetry !== "已停止，可手动重试失败图片") {
                   throw new Error(`expected manual retry label, got ${failedManualRetry}`);

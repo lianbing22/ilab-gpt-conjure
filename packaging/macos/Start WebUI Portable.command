@@ -70,6 +70,8 @@ if [ -f "$CERTIFI_CA_BUNDLE" ]; then
   export REQUESTS_CA_BUNDLE="$CERTIFI_CA_BUNDLE"
 fi
 LOG_FILE="${DATA_DIR}/logs/webui-server.log"
+AUTH_SETTINGS_PATH="${DATA_DIR}/webui-auth-settings.json"
+"$PYTHON_BIN" -m codex_image.webui.startup_auth --settings-path "$AUTH_SETTINGS_PATH" >/dev/null
 
 cd "$APP_DIR"
 

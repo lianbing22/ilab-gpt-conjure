@@ -184,9 +184,8 @@ jobs:
           RELEASE_TAG: ${{ needs.resolve-release.outputs.tag }}
         run: |
           set -euo pipefail
-          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            release_version="${RELEASE_TAG#v}"
-            cat > release-notes.md <<EOF
+          release_version="${RELEASE_TAG#v}"
+          cat > release-notes.md <<EOF
           ## 发布说明
 
           此版本包含 iLab GPT Conjure 对应 tag 的源码和免安装一键包。
@@ -199,7 +198,10 @@ jobs:
 
           macOS 包是未签名的 portable zip。启动脚本会尝试在启动前移除当前解压目录内的 quarantine 标记。如果 macOS 仍然拦截启动脚本，可以右键或 Control-click 启动脚本，选择 Open；也可以对解压目录执行 xattr -dr com.apple.quarantine。
           EOF
+          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
             gh release create "$RELEASE_TAG" --title "$RELEASE_TAG" --notes-file release-notes.md
+          else
+            gh release edit "$RELEASE_TAG" --title "$RELEASE_TAG" --notes-file release-notes.md
           fi
           mapfile -d '' assets < <(find dist-assets -type f \( -name "*.zip" -o -name "*.sha256.txt" \) -print0)
           if [[ "${#assets[@]}" -eq 0 ]]; then
