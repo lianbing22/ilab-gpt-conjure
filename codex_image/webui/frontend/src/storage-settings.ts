@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { getLegacyBridge } from "./state";
 import { LOCALE_CHANGE_EVENT, translate } from "./i18n";
+import { closeSystemSettingsModal, openSystemSettingsModal } from "./system-settings";
 
 const bridge = getLegacyBridge();
 const els = bridge.els;
@@ -41,13 +42,11 @@ function openSettingsModal() {
   closePromptPopover();
   refreshSettings();
   if (els.settingsStatus) els.settingsStatus.textContent = translate("settings.status");
-  els.settingsModal?.classList.remove("hidden");
-  els.settingsModal?.setAttribute("aria-hidden", "false");
+  openSystemSettingsModal("storage");
 }
 
 function closeSettingsModal() {
-  els.settingsModal?.classList.add("hidden");
-  els.settingsModal?.setAttribute("aria-hidden", "true");
+  closeSystemSettingsModal();
 }
 
 async function saveSettings() {
@@ -83,7 +82,7 @@ export function initStorageSettingsFeature() {
   if (storageSettingsFeatureInitialized) return;
   storageSettingsFeatureInitialized = true;
   document.addEventListener(LOCALE_CHANGE_EVENT, () => {
-    if (!els.settingsModal?.classList.contains("hidden") && els.settingsStatus) {
+    if (!els.systemSettingsModal?.classList.contains("hidden") && !els.systemSettingsStoragePanel?.hidden && els.settingsStatus) {
       els.settingsStatus.textContent = translate("settings.status");
     }
   });

@@ -54,6 +54,27 @@ cleanup() {
   rm -rf "$TEMP_ROOT" 2>/dev/null || true
 }
 
+assert_replace_item_name() {
+  case "$1" in
+    /*|..|../*|*/../*|*/..)
+      return 1
+      ;;
+  esac
+  return 0
+}
+
+assert_in_bundle() {
+  "$PYTHON_BIN" - "$BUNDLE_DIR" "$1" <<'PY'
+import os
+import sys
+
+root = os.path.realpath(sys.argv[1])
+target = os.path.realpath(sys.argv[2])
+if target != root and not target.startswith(root + os.sep):
+    raise SystemExit(1)
+PY
+}
+
 restore_backup() {
   if [[ ! -d "$BACKUP_DIR" ]]; then
     return 0
@@ -61,8 +82,11 @@ restore_backup() {
   echo "Restoring previous files from ${BACKUP_DIR}"
   local item backup_item target_item
   for item in "${REPLACE_ITEMS[@]}"; do
+    assert_replace_item_name "$item" || continue
     backup_item="${BACKUP_DIR}/${item}"
     target_item="${BUNDLE_DIR}/${item}"
+    assert_in_bundle "$backup_item" || continue
+    assert_in_bundle "$target_item" || continue
     if [[ ! -e "$backup_item" ]]; then
       continue
     fi
@@ -193,6 +217,9 @@ else
   echo "Current version: unknown"
 fi
 echo "Latest version:  ${RELEASE_TAG}"
+echo "Release asset:   ${ZIP_NAME}"
+echo "SHA256 file:     ${HASH_NAME}"
+echo "Download URL:    ${ZIP_URL}"
 echo ""
 echo "Close the WebUI server window before updating."
 read -r "?Press Enter to continue..."
@@ -235,22 +262,27 @@ mkdir -p "$BACKUP_DIR"
 
 step "Backing up current app files"
 for item in "${REPLACE_ITEMS[@]}"; do
+  assert_replace_item_name "$item" || fail_update "Refusing unsafe replace item: ${item}"
   current_item="${BUNDLE_DIR}/${item}"
   backup_item="${BACKUP_DIR}/${item}"
   if [[ ! -e "$current_item" ]]; then
     continue
   fi
+  assert_in_bundle "$current_item" || fail_update "Refusing to modify path outside bundle: ${current_item}"
+  assert_in_bundle "$backup_item" || fail_update "Refusing to modify path outside bundle: ${backup_item}"
   mkdir -p "$(dirname "$backup_item")"
   mv "$current_item" "$backup_item" || fail_update "Could not back up ${item}."
 done
 
 step "Installing updated app files"
 for item in "${REPLACE_ITEMS[@]}"; do
+  assert_replace_item_name "$item" || fail_update "Refusing unsafe replace item: ${item}"
   source_item="${NEW_ROOT}/${item}"
   target_item="${BUNDLE_DIR}/${item}"
   if [[ ! -e "$source_item" ]]; then
     continue
   fi
+  assert_in_bundle "$target_item" || fail_update "Refusing to modify path outside bundle: ${target_item}"
   mkdir -p "$(dirname "$target_item")"
   cp -R "$source_item" "$target_item" || fail_update "Could not install ${item}."
 done

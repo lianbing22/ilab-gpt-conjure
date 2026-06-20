@@ -376,6 +376,79 @@ class WebUISettingsTests(unittest.TestCase):
         self.assertEqual(persisted["providers"][1]["images_concurrency"], 2)
         self.assertNotIn("test-api-key-legacy-secret", response_text)
         self.assertNotIn("test-api-key-vendor-b-secret", response_text)
+
+    def test_api_settings_can_copy_provider_key_by_source_id_without_exposing_secret(self) -> None:
+        from codex_image.webui.app import create_app
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            api_settings_path = root / "api-settings.json"
+            app = create_app(
+                output_root=root / "tasks",
+                auth_settings_path=root / "auth-settings.json",
+                api_settings_path=api_settings_path,
+                auto_start_queue=False,
+            )
+            client = TestClient(app)
+
+            original = client.patch(
+                "/api/api-settings",
+                json={
+                    "active_provider_id": "vendor-a",
+                    "providers": [
+                        {
+                            "id": "vendor-a",
+                            "name": "Vendor A",
+                            "base_url": "https://vendor-a.example.com/v1",
+                            "api_key": "test-api-key-copy-secret",
+                            "image_model": "vendor-a-image",
+                            "api_mode": "images",
+                            "images_concurrency": 4,
+                        }
+                    ],
+                },
+            )
+            copied = client.patch(
+                "/api/api-settings",
+                json={
+                    "active_provider_id": "vendor-a-copy",
+                    "providers": [
+                        {
+                            "id": "vendor-a",
+                            "name": "Vendor A",
+                            "base_url": "https://vendor-a.example.com/v1",
+                            "image_model": "vendor-a-image",
+                            "api_mode": "images",
+                            "images_concurrency": 4,
+                        },
+                        {
+                            "id": "vendor-a-copy",
+                            "name": "Vendor A Copy",
+                            "base_url": "https://vendor-a.example.com/v1",
+                            "image_model": "vendor-a-alt-model",
+                            "api_mode": "images",
+                            "images_concurrency": 4,
+                            "api_key_source_provider_id": "vendor-a",
+                        },
+                    ],
+                },
+            )
+            reported = client.get("/api/api-settings").json()["settings"]
+            persisted = json.loads(api_settings_path.read_text(encoding="utf-8"))
+
+        response_text = json.dumps({"original": original.json(), "copied": copied.json(), "reported": reported}, ensure_ascii=False)
+        self.assertEqual(original.status_code, 200)
+        self.assertEqual(copied.status_code, 200)
+        self.assertEqual(reported["active_provider_id"], "vendor-a-copy")
+        self.assertEqual(reported["providers"][1]["image_model"], "vendor-a-alt-model")
+        self.assertTrue(reported["providers"][0]["api_key_set"])
+        self.assertTrue(reported["providers"][1]["api_key_set"])
+        self.assertNotIn("api_key_source_provider_id", reported["providers"][1])
+        self.assertEqual(persisted["providers"][0]["api_key"], "test-api-key-copy-secret")
+        self.assertEqual(persisted["providers"][1]["api_key"], "test-api-key-copy-secret")
+        self.assertNotIn("api_key_source_provider_id", persisted["providers"][1])
+        self.assertNotIn("test-api-key-copy-secret", response_text)
+
     def test_api_settings_allows_provider_concurrency_above_single_task_output_limit(self) -> None:
         from codex_image.webui.app import create_app
 

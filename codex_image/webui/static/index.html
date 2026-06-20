@@ -36,7 +36,7 @@
         document.documentElement.dataset.locale = locale;
       })();
     </script>
-    <link rel="stylesheet" href="/static/styles.css?v=runtime-329" />
+    <link rel="stylesheet" href="/static/styles.css?v=runtime-346" />
   </head>
   <body>
     <div class="layout-container">
@@ -145,7 +145,6 @@
           <div id="statusText" class="status-text" aria-live="polite" data-i18n="status.waiting">等待任务</div>
           <div class="footer-actions">
             <button id="batchManageButton" class="ghost-button icon-button" type="button" data-i18n="footer.batch">批量管理</button>
-            <button id="settingsButton" class="ghost-button icon-button" type="button" data-i18n="footer.storage">存储设置</button>
           </div>
           <div class="api-status-bar">
             <div id="apiStatus" class="status-dot"></div>
@@ -209,7 +208,7 @@
                 <button class="auth-source-button active" data-auth-source="codex" type="button">Codex</button>
                 <button class="auth-source-button auth-source-api-button" data-auth-source="api" type="button">API</button>
               </div>
-              <button id="apiSourceSettingsButton" class="auth-source-settings-button" type="button" aria-label="API 设置" title="API 设置" data-i18n-attr="aria-label:api.settings;title:api.settings">
+              <button id="apiSourceSettingsButton" class="auth-source-settings-button" type="button" aria-label="系统设置" title="系统设置" data-i18n-attr="aria-label:systemSettings.title;title:systemSettings.title">
                 <svg class="auth-source-settings-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                   <path d="M12 8.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7Z" fill="none" stroke="currentColor" stroke-width="1.8"/>
                   <path d="M19.4 13.4a7.8 7.8 0 0 0 .1-1.4 7.8 7.8 0 0 0-.1-1.4l2-1.5-2-3.4-2.4 1a8 8 0 0 0-2.4-1.4L14.3 3h-4.6l-.4 2.3A8 8 0 0 0 6.9 6.7l-2.4-1-2 3.4 2 1.5a7.8 7.8 0 0 0-.1 1.4 7.8 7.8 0 0 0 .1 1.4l-2 1.5 2 3.4 2.4-1a8 8 0 0 0 2.4 1.4l.4 2.3h4.6l.4-2.3a8 8 0 0 0 2.4-1.4l2.4 1 2-3.4-2.1-1.5Z" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="1.8"/>
@@ -417,7 +416,7 @@
                               <path d="M12 8.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7Z" fill="none" stroke="currentColor" stroke-width="1.8"/>
                               <path d="M19.4 13.4a7.8 7.8 0 0 0 .1-1.4 7.8 7.8 0 0 0-.1-1.4l2-1.5-2-3.4-2.4 1a8 8 0 0 0-2.4-1.4L14.3 3h-4.6l-.4 2.3A8 8 0 0 0 6.9 6.7l-2.4-1-2 3.4 2 1.5a7.8 7.8 0 0 0-.1 1.4 7.8 7.8 0 0 0 .1 1.4l-2 1.5 2 3.4 2.4-1a8 8 0 0 0 2.4 1.4l.4 2.3h4.6l.4-2.3a8 8 0 0 0 2.4-1.4l2.4 1 2-3.4-2.1-1.5Z" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="1.8"/>
                             </svg>
-                            <span data-i18n="api.settings">API 设置</span>
+                            <span data-i18n="api.settings">系统设置</span>
                           </button>
                         </div>
                       </div>
@@ -731,54 +730,178 @@
       </div>
     </div>
 
-    <div id="settingsModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-hidden="true" aria-label="存储设置" data-i18n-attr="aria-label:settings.title">
-      <div class="modal-panel settings-modal-panel">
+    <div id="systemSettingsModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-hidden="true" aria-label="系统设置" data-i18n-attr="aria-label:systemSettings.title">
+      <div class="modal-panel system-settings-modal-panel">
         <div class="modal-heading">
           <div>
-            <h2 data-i18n="settings.title">存储设置</h2>
-            <p id="settingsStatus" data-i18n="settings.status">保存后重启 WebUI 生效</p>
+            <h2 data-i18n="systemSettings.title">系统设置</h2>
           </div>
-          <button id="settingsModalClose" class="ghost-button drawer-close-button" type="button" aria-label="关闭存储设置面板" title="关闭" data-i18n-attr="aria-label:close.settings;title:action.close">
+          <button id="systemSettingsModalClose" class="ghost-button drawer-close-button" type="button" aria-label="关闭系统设置面板" title="关闭" data-i18n-attr="aria-label:close.systemSettings;title:action.close">
             <svg class="drawer-close-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <path d="M7 7L17 17M17 7L7 17" />
             </svg>
           </button>
         </div>
-        <div class="settings-path-grid">
-          <label class="field">
-            <span data-i18n="settings.inputRoot">输入目录</span>
-            <input id="settingsInputRoot" class="control" type="text" autocomplete="off" />
-          </label>
-          <label class="field">
-            <span data-i18n="settings.outputRoot">输出目录</span>
-            <input id="settingsOutputRoot" class="control" type="text" autocomplete="off" />
-          </label>
-          <label class="field">
-            <span data-i18n="settings.galleryRoot">公用图库目录</span>
-            <input id="settingsGalleryRoot" class="control" type="text" autocomplete="off" />
-          </label>
-          <label class="field">
-            <span data-i18n="settings.sourceDataRoot">源数据目录</span>
-            <input id="settingsSourceDataRoot" class="control" type="text" autocomplete="off" />
-          </label>
+        <div id="systemSettingsTabs" class="system-settings-tabs" role="tablist" aria-label="系统设置选项" data-i18n-attr="aria-label:systemSettings.tabsLabel">
+          <button id="systemSettingsApiTab" class="system-settings-tab active" type="button" role="tab" aria-selected="true" aria-controls="systemSettingsApiPanel" data-system-settings-tab="api" data-i18n="systemSettings.apiTab">API 设置</button>
+          <button id="systemSettingsCodexTab" class="system-settings-tab" type="button" role="tab" aria-selected="false" aria-controls="systemSettingsCodexPanel" data-system-settings-tab="codex" data-i18n="systemSettings.codexTab">Codex 通道</button>
+          <button id="systemSettingsStorageTab" class="system-settings-tab" type="button" role="tab" aria-selected="false" aria-controls="systemSettingsStoragePanel" data-system-settings-tab="storage" data-i18n="systemSettings.storageTab">存储与通知</button>
         </div>
-        <div class="notification-options-panel" aria-label="任务通知设置">
-          <div class="notification-options-copy">
-            <strong data-i18n="notifications.title">任务通知</strong>
-            <span data-i18n="settings.notificationsCopy">任务完成或失败时提醒，系统通知需手动开启。</span>
+        <section id="systemSettingsApiPanel" class="system-settings-section" role="tabpanel" aria-labelledby="systemSettingsApiTab">
+          <div class="api-provider-section">
+            <div class="api-provider-section-header">
+              <div class="api-provider-section-title">
+                <span data-i18n="apiSettings.providers">API 供应商</span>
+                <span id="apiProviderCount" class="api-provider-count">0 个</span>
+              </div>
+              <button id="sortApiProvidersButton" class="ghost-button text-sm api-provider-sort-toggle hidden" type="button" data-i18n="apiSettings.sortProviders">排序</button>
+            </div>
+            <div class="api-provider-choice-grid">
+              <div id="apiProviderList" class="api-provider-list" role="listbox" aria-label="API 供应商" data-i18n-attr="aria-label:apiSettings.providers"></div>
+              <button id="addApiProviderButton" class="api-provider-add-card" type="button" data-i18n="apiSettings.newProviderAction">新建供应商</button>
+            </div>
+            <select id="apiProvider" class="hidden" aria-hidden="true"></select>
+            <div id="apiProviderDetail" class="api-provider-detail-panel">
+              <dl class="api-provider-detail-grid">
+                <div>
+                  <dt>Base URL</dt>
+                  <dd id="apiProviderDetailBaseUrl">https://api.openai.com/v1</dd>
+                </div>
+                <div>
+                  <dt>API Key</dt>
+                  <dd id="apiProviderDetailKey" data-i18n="apiSettings.keyNotSet">未设置 API Key</dd>
+                </div>
+                <div>
+                  <dt data-i18n="apiSettings.mode">调用方式</dt>
+                  <dd id="apiProviderDetailMode">Image</dd>
+                </div>
+                <div>
+                  <dt data-i18n="apiSettings.concurrencyShort">并发</dt>
+                  <dd id="apiProviderDetailConcurrency">4</dd>
+                </div>
+              </dl>
+              <div class="api-provider-detail-actions">
+                <button id="editApiProviderButton" class="ghost-button" type="button" data-i18n="action.edit">编辑</button>
+                <button id="copyApiProviderButton" class="ghost-button" type="button" data-i18n="apiSettings.copyProvider">复制</button>
+                <button id="deleteApiProviderButton" class="ghost-button danger-button" type="button" data-i18n="action.delete">删除</button>
+              </div>
+            </div>
           </div>
-          <label class="notification-option-row">
-            <span data-i18n="settings.inAppNotification">站内通知</span>
-            <input id="taskNotificationInApp" type="checkbox" checked />
-          </label>
-          <label class="notification-option-row">
-            <span data-i18n="settings.systemNotification">系统通知</span>
-            <input id="taskNotificationSystem" type="checkbox" />
-          </label>
-        </div>
-        <div class="settings-modal-actions">
-          <button id="saveSettingsButton" class="run-button" type="button" data-i18n="settings.save">保存设置</button>
-        </div>
+          <div id="apiProviderEditor" class="api-provider-editor hidden" aria-hidden="true">
+            <div class="api-provider-editor-heading">
+              <span id="apiProviderEditorTitle" data-i18n="apiSettings.editProvider">编辑供应商</span>
+              <span data-i18n="apiSettings.editHint">点击保存前不会写入后端，取消可放弃本次编辑。</span>
+            </div>
+            <div class="api-settings-grid compact-api-settings-grid">
+              <label class="field api-provider-name-field">
+                <span data-i18n="apiSettings.providerName">供应商名称</span>
+                <input id="apiProviderName" class="control" type="text" autocomplete="off" placeholder="OpenAI" />
+              </label>
+              <div class="field api-mode-field">
+                <span data-i18n="apiSettings.mode">调用方式</span>
+                <div class="radio-group" id="apiModeGroup">
+                  <button class="radio-btn active" data-val="images" type="button" data-i18n="apiSettings.images">直连 Image API</button>
+                  <button class="radio-btn" data-val="responses" type="button" data-i18n="apiSettings.responses">Responses API</button>
+                </div>
+                <select id="apiMode" class="hidden">
+                  <option value="images" selected data-i18n="apiSettings.images">直连 Image API</option>
+                  <option value="responses" data-i18n="apiSettings.responses">Responses API</option>
+                </select>
+              </div>
+              <label class="field api-base-url-field">
+                <span>Base URL</span>
+                <input id="apiBaseUrl" class="control" type="url" autocomplete="off" placeholder="https://api.openai.com/v1" />
+              </label>
+              <label class="field api-key-field">
+                <span>API Key</span>
+                <input id="apiKey" class="control" type="password" autocomplete="off" placeholder="sk-..." />
+              </label>
+              <label class="field api-image-model-field">
+                <span data-i18n="apiSettings.imageModel">图像工具模型</span>
+                <input id="apiImageModel" class="control" type="text" autocomplete="off" value="gpt-image-2" />
+              </label>
+              <label class="field api-concurrency-field">
+                <span data-i18n="apiSettings.concurrency">Provider 总并发上限</span>
+                <input id="apiImagesConcurrency" class="control" type="number" min="1" max="32" step="1" value="4" />
+              </label>
+            </div>
+            <div class="api-provider-editor-actions">
+              <button id="cancelApiProviderEditButton" class="ghost-button" type="button" data-i18n="apiSettings.cancelEdit">取消编辑</button>
+              <button id="saveApiProviderEditButton" class="run-button" type="button" data-i18n="apiSettings.saveProvider">保存供应商</button>
+            </div>
+          </div>
+          <div id="apiSettingsActions" class="settings-modal-actions">
+            <p id="apiSettingsStatus" class="api-settings-feedback settings-action-status" aria-live="polite"></p>
+            <button id="saveApiSettingsButton" class="run-button" type="button" data-i18n="apiSettings.saveSelection">保存当前选择</button>
+          </div>
+        </section>
+        <section id="systemSettingsCodexPanel" class="system-settings-section" role="tabpanel" aria-labelledby="systemSettingsCodexTab" hidden aria-hidden="true">
+          <div class="codex-settings-layout">
+            <div class="field codex-channel-control">
+              <span data-i18n="apiSettings.codexMode">Codex 通道</span>
+              <div class="radio-group" id="codexModeGroup">
+                <button class="radio-btn active" data-val="images" type="button" data-i18n="apiSettings.codexImages">Image</button>
+                <button class="radio-btn" data-val="responses" type="button" data-i18n="apiSettings.codexResponses">Responses</button>
+              </div>
+              <select id="codexMode" class="hidden">
+                <option value="images" selected data-i18n="apiSettings.codexImages">Image</option>
+                <option value="responses" data-i18n="apiSettings.codexResponses">Responses</option>
+              </select>
+            </div>
+            <div class="codex-channel-notes" aria-label="Codex 通道说明" data-i18n-attr="aria-label:codexSettings.notesLabel">
+              <div class="codex-channel-note">
+                <strong data-i18n="codexSettings.imagesTitle">Image</strong>
+                <span data-i18n="codexSettings.imagesCopy">默认通道，直接传递尺寸、质量和编辑参数。</span>
+              </div>
+              <div class="codex-channel-note">
+                <strong data-i18n="codexSettings.responsesTitle">Responses</strong>
+                <span data-i18n="codexSettings.responsesCopy">兼容通道，需要联网搜索工具流时使用。</span>
+              </div>
+            </div>
+          </div>
+          <div class="settings-modal-actions">
+            <p id="codexSettingsStatus" class="api-settings-feedback settings-action-status" aria-live="polite"></p>
+            <button id="saveCodexSettingsButton" class="run-button" type="button" data-i18n="codexSettings.save">保存 Codex 通道</button>
+          </div>
+        </section>
+        <section id="systemSettingsStoragePanel" class="system-settings-section" role="tabpanel" aria-labelledby="systemSettingsStorageTab" hidden aria-hidden="true">
+          <div class="settings-path-grid">
+            <label class="field">
+              <span data-i18n="settings.inputRoot">输入目录</span>
+              <input id="settingsInputRoot" class="control" type="text" autocomplete="off" />
+            </label>
+            <label class="field">
+              <span data-i18n="settings.outputRoot">输出目录</span>
+              <input id="settingsOutputRoot" class="control" type="text" autocomplete="off" />
+            </label>
+            <label class="field">
+              <span data-i18n="settings.galleryRoot">公用图库目录</span>
+              <input id="settingsGalleryRoot" class="control" type="text" autocomplete="off" />
+            </label>
+            <label class="field">
+              <span data-i18n="settings.sourceDataRoot">源数据目录</span>
+              <input id="settingsSourceDataRoot" class="control" type="text" autocomplete="off" />
+            </label>
+          </div>
+          <div class="notification-options-panel" aria-label="任务通知设置">
+            <div class="notification-options-copy">
+              <strong data-i18n="notifications.title">任务通知</strong>
+              <span data-i18n="settings.notificationsCopy">任务完成或失败时提醒，系统通知需手动开启。</span>
+            </div>
+            <label class="notification-option-row">
+              <span data-i18n="settings.inAppNotification">站内通知</span>
+              <input id="taskNotificationInApp" type="checkbox" checked />
+            </label>
+            <label class="notification-option-row">
+              <span data-i18n="settings.systemNotification">系统通知</span>
+              <input id="taskNotificationSystem" type="checkbox" />
+            </label>
+          </div>
+          <div class="settings-modal-actions">
+            <p id="settingsStatus" class="settings-action-status" data-i18n="settings.status" aria-live="polite">保存后重启 WebUI 生效</p>
+            <button id="saveSettingsButton" class="run-button" type="button" data-i18n="settings.save">保存设置</button>
+          </div>
+        </section>
       </div>
     </div>
 
@@ -812,77 +935,6 @@
         <div class="version-modal-actions">
           <a id="versionReleaseLink" class="ghost-button text-sm" href="https://github.com/kadevin/ilab-gpt-conjure/releases" target="_blank" rel="noreferrer" data-i18n="version.release">查看发布页</a>
           <button id="versionUpdateButton" class="run-button" type="button" disabled data-i18n="version.openUpdater">启动更新器</button>
-        </div>
-      </div>
-    </div>
-
-    <div id="apiSettingsModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-hidden="true" aria-label="API 设置" data-i18n-attr="aria-label:apiSettings.title">
-      <div class="modal-panel api-settings-modal-panel">
-        <div class="modal-heading">
-          <div>
-            <h2 data-i18n="apiSettings.title">API 设置</h2>
-            <p id="apiSettingsStatus" class="api-settings-feedback" data-i18n="apiSettings.status">保存后立即用于 API 模式</p>
-          </div>
-          <button id="apiSettingsModalClose" class="ghost-button drawer-close-button" type="button" aria-label="关闭 API 设置面板" title="关闭" data-i18n-attr="aria-label:close.apiSettings;title:action.close">
-            <svg class="drawer-close-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M7 7L17 17M17 7L7 17" />
-            </svg>
-          </button>
-        </div>
-        <div class="api-settings-grid">
-          <div class="field full-width">
-            <span data-i18n="apiSettings.codexMode">Codex 通道</span>
-            <div class="radio-group" id="codexModeGroup">
-              <button class="radio-btn active" data-val="images" type="button" data-i18n="apiSettings.codexImages">Image</button>
-              <button class="radio-btn" data-val="responses" type="button" data-i18n="apiSettings.codexResponses">Responses</button>
-            </div>
-            <select id="codexMode" class="hidden">
-              <option value="images" selected data-i18n="apiSettings.codexImages">Image</option>
-              <option value="responses" data-i18n="apiSettings.codexResponses">Responses</option>
-            </select>
-          </div>
-          <label class="field full-width">
-            <span data-i18n="apiSettings.provider">供应商</span>
-            <div class="api-provider-toolbar">
-              <select id="apiProvider" class="control"></select>
-              <button id="addApiProviderButton" class="ghost-button text-sm" type="button" data-i18n="action.new">新增</button>
-              <button id="deleteApiProviderButton" class="ghost-button text-sm danger-button" type="button" data-i18n="action.delete">删除</button>
-            </div>
-          </label>
-          <label class="field full-width">
-            <span data-i18n="apiSettings.providerName">供应商名称</span>
-            <input id="apiProviderName" class="control" type="text" autocomplete="off" placeholder="OpenAI" />
-          </label>
-          <div class="field full-width">
-            <span data-i18n="apiSettings.mode">调用方式</span>
-            <div class="radio-group" id="apiModeGroup">
-              <button class="radio-btn active" data-val="images" type="button" data-i18n="apiSettings.images">直连 Image API</button>
-              <button class="radio-btn" data-val="responses" type="button" data-i18n="apiSettings.responses">Responses API</button>
-            </div>
-            <select id="apiMode" class="hidden">
-              <option value="images" selected data-i18n="apiSettings.images">直连 Image API</option>
-              <option value="responses" data-i18n="apiSettings.responses">Responses API</option>
-            </select>
-          </div>
-          <label class="field">
-            <span>Base URL</span>
-            <input id="apiBaseUrl" class="control" type="url" autocomplete="off" placeholder="https://api.openai.com/v1" />
-          </label>
-          <label class="field">
-            <span>API Key</span>
-            <input id="apiKey" class="control" type="password" autocomplete="off" placeholder="sk-..." />
-          </label>
-          <label class="field">
-            <span data-i18n="apiSettings.imageModel">图像工具模型</span>
-            <input id="apiImageModel" class="control" type="text" autocomplete="off" value="gpt-image-2" />
-          </label>
-          <label class="field">
-            <span data-i18n="apiSettings.concurrency">Provider 总并发上限</span>
-            <input id="apiImagesConcurrency" class="control" type="number" min="1" max="32" step="1" value="4" />
-          </label>
-        </div>
-        <div class="settings-modal-actions">
-          <button id="saveApiSettingsButton" class="run-button" type="button" data-i18n="apiSettings.save">保存 API 设置</button>
         </div>
       </div>
     </div>
@@ -1047,7 +1099,7 @@
     </div>
 
     <div id="taskNotificationToastRegion" class="task-notification-toast-region" aria-live="polite"></div>
-  <script src="/static/app.js?v=runtime-329"></script>
+  <script src="/static/app.js?v=runtime-346"></script>
     <script>
       (() => {
         document.querySelectorAll(".radio-group").forEach((group) => {

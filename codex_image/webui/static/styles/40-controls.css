@@ -478,6 +478,7 @@ svg.button-icon {
 
 .segmented-indicator-host .radio-btn,
 .segmented-indicator-host .auth-source-button,
+.segmented-indicator-host .system-settings-tab,
 .segmented-indicator-host .history-view-button,
 .segmented-indicator-host .history-sort-button {
   position: relative;

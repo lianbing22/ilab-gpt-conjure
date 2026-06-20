@@ -1,7 +1,7 @@
 <h1 align="center">iLab GPT Conjure</h1>
 
 <p align="center">
-  <sub>GPT-image-2 WebUI workbench · Codex Responses / OpenAI-compatible API · Gallery, templates, history, and concurrent tasks.</sub>
+  <sub>GPT-image-2 WebUI workbench · Codex Image / OpenAI-compatible API · Gallery, templates, history, and concurrent tasks.</sub>
 </p>
 
 <p align="center">
@@ -33,10 +33,11 @@
 ## Overview
 
 iLab GPT Conjure is an AI image generation WebUI workbench for GPT-image-2, with
-a companion CLI for local automation. It supports both Codex Responses and
-OpenAI-compatible API access, and includes shared gallery references, multi-type
-quick chips, prompt templates, concurrent tasks, a paged history library, and
-local queue management.
+a companion CLI for local automation. It supports the default Codex Image
+channel, a Codex Responses compatibility channel, and OpenAI-compatible API
+access, and includes shared gallery references, multi-type quick chips, prompt
+templates, concurrent tasks, a paged history library, and local queue
+management.
 
 The recommended public integration path is OpenAI-compatible API mode, using
 the Images API or Responses API shape provided by your configured provider.
@@ -47,20 +48,24 @@ Download portable packages from [Downloads / Releases](RELEASES.md).
 
 - GPT-image-2 text-to-image, reference-image generation, and image editing
   workflows.
-- Codex Responses and OpenAI-compatible API access, with the API path
-  recommended for public or shared use.
+- Codex Image, Codex Responses, and OpenAI-compatible API access, with the API
+  path recommended for public or shared use.
 - Concurrent task execution, local queue state, paged history library,
   thumbnails, and result archive.
 - Independent `/history` page with SQLite-backed pagination, search, filters,
   grid/list views, and lazy detail loading.
-- Optional web search for Codex and API Responses image generation, plus prompt
-  and task ID search across recent and historical tasks.
+- Optional web search for Codex Responses and API Responses image generation,
+  plus prompt and task ID search across recent and historical tasks.
 - Shared gallery references, recent reference images, color chips, prompt
   snippet chips, and reusable prompt templates.
 - Chinese / English WebUI localization with a top-bar language switch and a
   browser-local language preference.
-- Portable packages include one-click update scripts. Startup scripts can check
-  the latest GitHub Release and only print an update reminder.
+- Centered System Settings with API Settings, Codex Channel, and Storage &
+  Notifications tabs.
+- API provider cards for fast selection, read-only details by default, explicit
+  editing, provider copy, delete confirmation, and multi-provider sorting.
+- Portable startup launchers stay local-only; update scripts are run manually,
+  verify SHA256, preserve `data/`, and keep replaced files under `.backup/`.
 - Advanced local OAuth mode for personal Codex workflows, with clear risk
   warnings and no account-usage probing.
 - API provider profiles with configurable base URL, API key, image model, API
@@ -78,8 +83,10 @@ with a base URL, API key, model name, and API mode.
 ### Advanced local mode: Codex / ChatGPT OAuth
 
 This project can optionally reuse a local Codex / ChatGPT OAuth session to call
-an internal ChatGPT backend endpoint. This mode is provided for local personal
-workflows only.
+internal ChatGPT backend endpoints. Codex mode defaults to the direct Image
+channel for generation and editing, and the System Settings Codex Channel tab
+can switch it to the Responses compatibility channel. This mode is provided for
+local personal workflows only.
 
 It is not an officially recommended OpenAI API integration path. The endpoint
 may change without notice, may stop working, and may be subject to account,
@@ -133,7 +140,7 @@ http://127.0.0.1:8787/
 ## Portable packages
 
 Download the current portable packages from [Downloads / Releases](RELEASES.md),
-or open [GitHub Release v0.5.0](https://github.com/kadevin/ilab-gpt-conjure/releases/tag/v0.5.0)
+or open [GitHub Release v0.5.1](https://github.com/kadevin/ilab-gpt-conjure/releases/tag/v0.5.1)
 directly.
 
 These packages are intended for users who want a ComfyUI-style unzip-and-run
@@ -151,11 +158,11 @@ gallery files, inputs, outputs, task databases, and logs.
 
 To update an extracted portable package, close the WebUI server window and run
 `Update WebUI Portable.bat` on Windows or `Update WebUI Portable.command` on
-macOS. The startup launcher may briefly check the latest GitHub Release and
-show a reminder from the WebUI version entry when a newer version exists, but it never updates
-automatically. The updater downloads the latest matching GitHub Release asset,
-verifies its SHA256 file, preserves `data/`, and saves replaced files under
-`.backup/`.
+macOS. Startup launchers do not contact GitHub or update files automatically.
+The updater downloads the latest matching GitHub Release asset, prints the
+selected asset and SHA256 file before making changes, verifies its SHA256 file,
+preserves `data/`, only replaces package-managed files inside the portable
+folder, and saves replaced files under `.backup/`.
 
 Choose `macos_portable_arm64` for Apple Silicon Macs and
 `macos_portable_x64` for Intel Macs.
@@ -186,18 +193,20 @@ be run manually with `ref` and `release_tag`.
 
 ## WebUI usage
 
-1. Choose an authentication source from the top bar. Use `API` for the
-   recommended OpenAI-compatible mode, or the advanced local OAuth mode only for
-   a personal local workflow.
-2. Add reference images by upload, drag-and-drop, paste, recent uploads, or the
+1. Choose an authentication source from the top bar. `Codex` uses the default
+   Image channel when local OAuth is available, and `API` is the recommended
+   OpenAI-compatible mode for stable or shared use.
+2. Open System Settings to manage API provider cards, Codex Image/Responses
+   mode, storage paths, and notification preferences.
+3. Add reference images by upload, drag-and-drop, paste, recent uploads, or the
    public gallery.
-3. Write the prompt directly, insert gallery/color/snippet chips when useful,
+4. Write the prompt directly, insert gallery/color/snippet chips when useful,
    and choose the prompt mode: original, fidelity, or creative.
-4. Set image count, size, orientation, quality, output format, and compression.
+5. Set image count, size, orientation, quality, output format, and compression.
    Selected aspect ratios are also appended to the model prompt as an explicit
-   instruction, for example `将宽高比设为 16:9`, so Codex or API Responses proxies
-   that ignore size parameters can still receive the intended ratio.
-5. Start generation, track running and queued tasks in the left task list, then
+   instruction, for example `将宽高比设为 16:9`, so Responses-channel or API
+   proxies that ignore size parameters can still receive the intended ratio.
+6. Start generation, track running and queued tasks in the left task list, then
    review, select, retry, download, or archive results from the preview area.
 
 ## Public gallery
@@ -245,7 +254,7 @@ overwrites the visible prompt text. Templates are not injected as hidden prompts
 ## CLI
 
 ```bash
-.venv/bin/python -m codex_image --prompt "A clean product photo of a ceramic mug" --out output/mug.png
+.venv/bin/python -m codex_image generate --prompt "A clean product photo of a ceramic mug" --out output/mug.png
 ```
 
 Use `--help` for all CLI options.

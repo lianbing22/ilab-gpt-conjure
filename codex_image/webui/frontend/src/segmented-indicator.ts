@@ -1,6 +1,13 @@
-const HOST_SELECTORS = [".radio-group:not(.ratio-group)", "#authSourceGroup", "#languageSwitcher", ".history-view-toggle", ".history-sort-toggle"];
+const HOST_SELECTORS = [
+  ".radio-group:not(.ratio-group)",
+  "#authSourceGroup",
+  "#languageSwitcher",
+  "#systemSettingsTabs",
+  ".history-view-toggle",
+  ".history-sort-toggle",
+];
 const HOST_SELECTOR = HOST_SELECTORS.join(", ");
-const BUTTON_SELECTOR = ".radio-btn, .auth-source-button, .language-option, .history-view-button, .history-sort-button";
+const BUTTON_SELECTOR = ".radio-btn, .auth-source-button, .language-option, .system-settings-tab, .history-view-button, .history-sort-button";
 const INDICATOR_CLASS = "segmented-indicator";
 const HOST_CLASS = "segmented-indicator-host";
 
@@ -10,7 +17,7 @@ let segmentedIndicatorsInitialized = false;
 let resizeObserver: ResizeObserver | null = null;
 
 function activeSegment(host: HTMLElement): HTMLElement | null {
-  return host.querySelector<HTMLElement>(".radio-btn.active, .auth-source-button.active, .language-option.active, .history-view-button.active, .history-sort-button.active");
+  return host.querySelector<HTMLElement>(".radio-btn.active, .auth-source-button.active, .language-option.active, .system-settings-tab.active, .history-view-button.active, .history-sort-button.active");
 }
 
 function ensureIndicator(host: HTMLElement): HTMLElement {
@@ -75,7 +82,7 @@ function initHost(host: HTMLElement): void {
   scheduleIndicatorUpdate(host);
 }
 
-function updateAllIndicators(): void {
+export function refreshSegmentedIndicators(): void {
   document.querySelectorAll<HTMLElement>(HOST_SELECTOR).forEach(scheduleIndicatorUpdate);
 }
 
@@ -83,6 +90,6 @@ export function initSegmentedIndicatorFeature(): void {
   if (segmentedIndicatorsInitialized) return;
   segmentedIndicatorsInitialized = true;
   document.querySelectorAll<HTMLElement>(HOST_SELECTOR).forEach(initHost);
-  window.addEventListener("resize", updateAllIndicators, { passive: true });
-  (document as any).fonts?.ready?.then(updateAllIndicators).catch(() => {});
+  window.addEventListener("resize", refreshSegmentedIndicators, { passive: true });
+  (document as any).fonts?.ready?.then(refreshSegmentedIndicators).catch(() => {});
 }

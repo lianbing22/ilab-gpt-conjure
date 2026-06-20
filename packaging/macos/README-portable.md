@@ -12,13 +12,13 @@ without installing Python separately.
    `~/Applications/ilab-gpt-conjure`.
 3. Double-click `Start WebUI Portable.command`.
 4. Open `http://127.0.0.1:8787/` if the browser does not open automatically.
-5. Configure an OpenAI-compatible API provider in the WebUI before generating
-   images, unless you intentionally use the advanced local OAuth mode.
+5. Choose `Codex` if this machine has a local Codex / ChatGPT OAuth session, or
+   configure an OpenAI-compatible API provider in the WebUI for the recommended
+   stable integration path.
 
-On startup, the launcher may briefly check the latest GitHub Release. If a newer
-version is available, the WebUI version entry shows a reminder and can start
-`Update WebUI Portable.command`; it never updates automatically. Set
-`ILAB_SKIP_VERSION_CHECK=1` before launching to skip this check.
+The startup launcher only starts the local WebUI server and opens the browser.
+It does not contact GitHub or update files automatically. To check for and apply
+updates, run `Update WebUI Portable.command` manually.
 
 This is an unsigned portable zip. It is not a signed `.app`, not notarized, and
 does not require an Apple Developer account to build. The launcher tries to
@@ -53,17 +53,21 @@ Do not put API keys, OAuth tokens, private prompts, input images, outputs, task
 databases, or logs into GitHub issues or public repositories.
 
 OpenAI-compatible API mode is the recommended stable integration path. The
-optional Codex / ChatGPT OAuth mode is for personal local workflows only and is
-not an officially recommended OpenAI API integration path.
+optional Codex / ChatGPT OAuth mode defaults to the Codex Image channel for
+personal local workflows only; it can be switched to the Responses compatibility
+channel in API settings, but it is not an officially recommended OpenAI API
+integration path.
 
 ## Upgrading
 
 Close the WebUI server window, then double-click `Update WebUI Portable.command`.
-The updater downloads the latest portable package for your Mac architecture from
-GitHub Releases, verifies its SHA256 file, replaces the app and bundled Python
-files, preserves the existing `data/` directory, and clears quarantine
-attributes on the updated folder. A backup of replaced files is saved under
-`.backup/`.
+The updater prints the current version, latest version, selected release asset,
+SHA256 file, and download URL before making changes. It downloads the latest
+portable package for your Mac architecture from GitHub Releases, verifies its
+SHA256 file, replaces only the package-managed app and bundled Python files
+inside this portable folder, preserves the existing `data/` directory, and
+clears quarantine attributes on the updated folder. A backup of replaced files
+is saved under `.backup/`.
 
 Do not move `data/` out of the package unless you are intentionally migrating
 settings, gallery assets, history, outputs, and local task databases. For a

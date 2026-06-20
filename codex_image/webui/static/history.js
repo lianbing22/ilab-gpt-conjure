@@ -41,6 +41,7 @@
       "action.archive": "\u5F52\u6863",
       "action.delete": "\u5220\u9664",
       "action.cancel": "\u53D6\u6D88",
+      "action.edit": "\u7F16\u8F91",
       "action.clear": "\u6E05\u7A7A",
       "action.paste": "\u7C98\u8D34",
       "action.find": "\u67E5\u627E",
@@ -296,7 +297,7 @@
       "auth.switchFailed": "\u6388\u6743\u6765\u6E90\u5207\u6362\u5931\u8D25",
       "auth.sourceUnavailable": "{source} \u4E0D\u53EF\u7528",
       "auth.notActive": "\u672A\u751F\u6548",
-      "api.settings": "API \u8BBE\u7F6E",
+      "api.settings": "\u7CFB\u7EDF\u8BBE\u7F6E",
       "api.provider": "API \u4F9B\u5E94\u5546",
       "imageInput.title": "\u56FE\u50CF\u8F93\u5165",
       "imageInput.uploadAria": "\u70B9\u51FB\u3001\u62D6\u5165\u6216\u7C98\u8D34\u56FE\u7247",
@@ -727,19 +728,56 @@
       "settings.savedRestart": "\u5DF2\u4FDD\u5B58\uFF0C\u91CD\u542F WebUI \u540E\u751F\u6548",
       "settings.saved": "\u5DF2\u4FDD\u5B58",
       "settings.savedRestartStatus": "\u8BBE\u7F6E\u5DF2\u4FDD\u5B58\uFF0C\u91CD\u542F WebUI \u540E\u751F\u6548",
+      "systemSettings.title": "\u7CFB\u7EDF\u8BBE\u7F6E",
+      "systemSettings.tabsLabel": "\u7CFB\u7EDF\u8BBE\u7F6E\u9009\u9879",
+      "systemSettings.apiTab": "API \u8BBE\u7F6E",
+      "systemSettings.codexTab": "Codex \u901A\u9053",
+      "systemSettings.storageTab": "\u5B58\u50A8\u4E0E\u901A\u77E5",
       "apiSettings.title": "API \u8BBE\u7F6E",
-      "apiSettings.status": "\u4FDD\u5B58\u540E\u7ACB\u5373\u7528\u4E8E Codex \u548C API \u6A21\u5F0F",
+      "apiSettings.status": "\u4FDD\u5B58\u540E\u7ACB\u5373\u7528\u4E8E API \u6A21\u5F0F",
       "apiSettings.codexMode": "Codex \u901A\u9053",
       "apiSettings.codexImages": "Image",
       "apiSettings.codexResponses": "Responses",
+      "apiSettings.providers": "API \u4F9B\u5E94\u5546",
+      "apiSettings.providerCount": "{count} \u4E2A\u4F9B\u5E94\u5546",
       "apiSettings.provider": "\u4F9B\u5E94\u5546",
       "apiSettings.providerName": "\u4F9B\u5E94\u5546\u540D\u79F0",
+      "apiSettings.newProviderAction": "\u65B0\u5EFA\u4F9B\u5E94\u5546",
+      "apiSettings.copyProvider": "\u590D\u5236",
+      "apiSettings.copyProviderName": "{name} \u526F\u672C",
+      "apiSettings.copyProviderStatus": "\u5DF2\u590D\u5236\u914D\u7F6E\u548C\u5DF2\u4FDD\u5B58 Key\uFF0C\u53EF\u4FEE\u6539\u540D\u79F0\u3001\u6A21\u578B\u6216\u66FF\u6362 Key \u540E\u4FDD\u5B58",
+      "apiSettings.copyProviderWithoutKeyStatus": "\u5DF2\u590D\u5236\u914D\u7F6E\uFF0C\u53EF\u4FEE\u6539\u540D\u79F0\u3001\u6A21\u578B\u6216\u586B\u5199 API Key \u540E\u4FDD\u5B58",
+      "apiSettings.sortProviders": "\u6392\u5E8F",
+      "apiSettings.finishSortProviders": "\u5B8C\u6210",
+      "apiSettings.sortProviderModeStatus": "\u6B63\u5728\u6392\u5E8F\u4F9B\u5E94\u5546",
+      "apiSettings.sortProviderStatus": "\u4F9B\u5E94\u5546\u6392\u5E8F\u5DF2\u8C03\u6574\uFF0C\u8BF7\u4FDD\u5B58\u5F53\u524D\u9009\u62E9\u540C\u6B65\u5230\u540E\u7AEF",
+      "apiSettings.moveProviderUp": "\u4E0A\u79FB",
+      "apiSettings.moveProviderDown": "\u4E0B\u79FB",
+      "apiSettings.moveProviderUpAria": "\u4E0A\u79FB {provider}",
+      "apiSettings.moveProviderDownAria": "\u4E0B\u79FB {provider}",
       "apiSettings.mode": "\u8C03\u7528\u65B9\u5F0F",
       "apiSettings.images": "\u76F4\u8FDE Image API",
       "apiSettings.responses": "Responses API",
       "apiSettings.modeImagesShort": "\u76F4\u8FDE",
       "apiSettings.imageModel": "\u56FE\u50CF\u5DE5\u5177\u6A21\u578B",
       "apiSettings.concurrency": "Provider \u603B\u5E76\u53D1\u4E0A\u9650",
+      "apiSettings.concurrencyShort": "\u5E76\u53D1",
+      "apiSettings.concurrencyValue": "\u5E76\u53D1 {concurrency}",
+      "apiSettings.keySaved": "\u5DF2\u4FDD\u5B58 API Key",
+      "apiSettings.keyNotSet": "\u672A\u8BBE\u7F6E API Key",
+      "apiSettings.editProvider": "\u7F16\u8F91\u4F9B\u5E94\u5546",
+      "apiSettings.newProviderTitle": "\u65B0\u589E\u4F9B\u5E94\u5546",
+      "apiSettings.editHint": "\u70B9\u51FB\u4FDD\u5B58\u4F9B\u5E94\u5546\u540E\u5199\u5165\u540E\u7AEF\uFF0C\u53D6\u6D88\u53EF\u653E\u5F03\u672C\u6B21\u7F16\u8F91\u3002",
+      "apiSettings.finishEditFirst": "\u8BF7\u5148\u4FDD\u5B58\u6216\u53D6\u6D88\u5F53\u524D\u4F9B\u5E94\u5546\u7F16\u8F91",
+      "apiSettings.newDraftStatus": "\u6B63\u5728\u65B0\u589E\u4F9B\u5E94\u5546\uFF0C\u4FDD\u5B58\u4F9B\u5E94\u5546\u540E\u751F\u6548",
+      "apiSettings.editDraftStatus": "\u6B63\u5728\u7F16\u8F91\u4F9B\u5E94\u5546\uFF0C\u4FDD\u5B58\u4F9B\u5E94\u5546\u540E\u751F\u6548",
+      "apiSettings.cancelEdit": "\u53D6\u6D88\u7F16\u8F91",
+      "apiSettings.saveProvider": "\u4FDD\u5B58\u4F9B\u5E94\u5546",
+      "apiSettings.saveSelection": "\u4FDD\u5B58\u5F53\u524D\u9009\u62E9",
+      "apiSettings.deleteProviderTitle": "\u5220\u9664\u4F9B\u5E94\u5546\uFF1F",
+      "apiSettings.deleteProviderMessage": "\u786E\u5B9A\u5220\u9664\u300C{provider}\u300D\uFF1F",
+      "apiSettings.deleteProviderDetail": "\u4F1A\u4ECE\u5F53\u524D\u4F9B\u5E94\u5546\u5217\u8868\u79FB\u9664\uFF1B\u5982\u9700\u540C\u6B65\u5230\u540E\u7AEF\uFF0C\u8BF7\u4FDD\u5B58\u5F53\u524D\u9009\u62E9\u3002",
+      "apiSettings.deleteProviderStatus": "\u5DF2\u5220\u9664\u4F9B\u5E94\u5546\uFF0C\u8BF7\u4FDD\u5B58\u5F53\u524D\u9009\u62E9\u540C\u6B65\u5230\u540E\u7AEF",
       "apiSettings.save": "\u4FDD\u5B58 API \u8BBE\u7F6E",
       "apiSettings.loadFailed": "API \u8BBE\u7F6E\u8BFB\u53D6\u5931\u8D25",
       "apiSettings.savedKeyPlaceholder": "\u540E\u7AEF\u5DF2\u4FDD\u5B58 API Key\uFF0C\u8F93\u5165\u65B0 key \u53EF\u8986\u76D6",
@@ -751,6 +789,14 @@
       "apiSettings.savedShort": "\u5DF2\u4FDD\u5B58",
       "apiSettings.savedStatus": "API \u8BBE\u7F6E\u5DF2\u4FDD\u5B58",
       "apiSettings.saveFailedShort": "\u4FDD\u5B58\u5931\u8D25",
+      "codexSettings.title": "Codex \u901A\u9053",
+      "codexSettings.status": "\u9009\u62E9 Codex \u672C\u673A\u767B\u5F55\u6001\u4F7F\u7528\u7684\u751F\u6210\u901A\u9053",
+      "codexSettings.notesLabel": "Codex \u901A\u9053\u8BF4\u660E",
+      "codexSettings.imagesTitle": "Image",
+      "codexSettings.imagesCopy": "\u9ED8\u8BA4\u901A\u9053\uFF0C\u76F4\u63A5\u4F20\u9012\u5C3A\u5BF8\u3001\u8D28\u91CF\u548C\u7F16\u8F91\u53C2\u6570\u3002",
+      "codexSettings.responsesTitle": "Responses",
+      "codexSettings.responsesCopy": "\u517C\u5BB9\u901A\u9053\uFF0C\u9700\u8981\u8054\u7F51\u641C\u7D22\u5DE5\u5177\u6D41\u65F6\u4F7F\u7528\u3002",
+      "codexSettings.save": "\u4FDD\u5B58 Codex \u901A\u9053",
       "imageEditor.title": "\u7F16\u8F91\u8F93\u5165\u56FE\u7247",
       "imageEditor.promptHint": "\u56FE\u4E2D\u7684\u624B\u7ED8\u7BAD\u5934\u548C\u6807\u8BB0\u4EC5\u7528\u4E8E\u6307\u793A\u7F16\u8F91\u8981\u6C42\uFF0C\u4E0D\u8981\u4FDD\u7559\u5728\u6700\u7EC8\u753B\u9762\u4E2D\u3002",
       "imageEditor.inputFallback": "\u8F93\u5165\u56FE\u7247",
@@ -818,6 +864,7 @@
       "close.archive": "\u5173\u95ED\u4F1A\u8BDD\u5F52\u6863\u9762\u677F",
       "close.settings": "\u5173\u95ED\u5B58\u50A8\u8BBE\u7F6E\u9762\u677F",
       "close.apiSettings": "\u5173\u95ED API \u8BBE\u7F6E\u9762\u677F",
+      "close.systemSettings": "\u5173\u95ED\u7CFB\u7EDF\u8BBE\u7F6E\u9762\u677F",
       "close.imageEditor": "\u5173\u95ED\u7F16\u8F91\u8F93\u5165\u56FE\u7247\u9762\u677F",
       "close.gallery": "\u5173\u95ED\u516C\u7528\u56FE\u5E93\u9762\u677F",
       "close.addGallery": "\u5173\u95ED\u6DFB\u52A0\u5230\u56FE\u5E93\u9762\u677F",
@@ -850,6 +897,7 @@
       "action.archive": "Archive",
       "action.delete": "Delete",
       "action.cancel": "Cancel",
+      "action.edit": "Edit",
       "action.clear": "Clear",
       "action.paste": "Paste",
       "action.find": "Find",
@@ -1105,7 +1153,7 @@
       "auth.switchFailed": "Failed to switch auth source",
       "auth.sourceUnavailable": "{source} unavailable",
       "auth.notActive": "Not active",
-      "api.settings": "API Settings",
+      "api.settings": "System Settings",
       "api.provider": "API provider",
       "imageInput.title": "Images",
       "imageInput.uploadAria": "Click, drop, or paste images",
@@ -1536,19 +1584,56 @@
       "settings.savedRestart": "Saved. Restart WebUI to apply.",
       "settings.saved": "Saved",
       "settings.savedRestartStatus": "Settings saved. Restart WebUI to apply.",
+      "systemSettings.title": "System Settings",
+      "systemSettings.tabsLabel": "System settings sections",
+      "systemSettings.apiTab": "API Settings",
+      "systemSettings.codexTab": "Codex Channel",
+      "systemSettings.storageTab": "Storage & Notifications",
       "apiSettings.title": "API Settings",
-      "apiSettings.status": "Saved settings apply immediately in Codex and API mode",
+      "apiSettings.status": "Saved settings apply immediately in API mode",
       "apiSettings.codexMode": "Codex channel",
       "apiSettings.codexImages": "Image",
       "apiSettings.codexResponses": "Responses",
+      "apiSettings.providers": "API providers",
+      "apiSettings.providerCount": "{count} providers",
       "apiSettings.provider": "Provider",
       "apiSettings.providerName": "Provider name",
+      "apiSettings.newProviderAction": "New provider",
+      "apiSettings.copyProvider": "Copy",
+      "apiSettings.copyProviderName": "{name} Copy",
+      "apiSettings.copyProviderStatus": "Provider copied with its saved key. Edit the name, model, or replace the key before saving.",
+      "apiSettings.copyProviderWithoutKeyStatus": "Provider copied. Edit the name, model, or add an API key before saving.",
+      "apiSettings.sortProviders": "Sort",
+      "apiSettings.finishSortProviders": "Done",
+      "apiSettings.sortProviderModeStatus": "Sorting providers",
+      "apiSettings.sortProviderStatus": "Provider order changed. Save current selection to sync it.",
+      "apiSettings.moveProviderUp": "Up",
+      "apiSettings.moveProviderDown": "Down",
+      "apiSettings.moveProviderUpAria": "Move {provider} up",
+      "apiSettings.moveProviderDownAria": "Move {provider} down",
       "apiSettings.mode": "Request mode",
       "apiSettings.images": "Direct Image API",
       "apiSettings.responses": "Responses API",
       "apiSettings.modeImagesShort": "Direct",
       "apiSettings.imageModel": "Image model",
       "apiSettings.concurrency": "Provider concurrency limit",
+      "apiSettings.concurrencyShort": "Concurrency",
+      "apiSettings.concurrencyValue": "concurrency {concurrency}",
+      "apiSettings.keySaved": "API key saved",
+      "apiSettings.keyNotSet": "API key not set",
+      "apiSettings.editProvider": "Edit provider",
+      "apiSettings.newProviderTitle": "New provider",
+      "apiSettings.editHint": "Save provider writes this edit to the backend. Cancel discards it.",
+      "apiSettings.finishEditFirst": "Save or cancel the current provider edit first",
+      "apiSettings.newDraftStatus": "Creating provider. Save provider to apply.",
+      "apiSettings.editDraftStatus": "Editing provider. Save provider to apply.",
+      "apiSettings.cancelEdit": "Cancel edit",
+      "apiSettings.saveProvider": "Save provider",
+      "apiSettings.saveSelection": "Save selection",
+      "apiSettings.deleteProviderTitle": "Delete provider?",
+      "apiSettings.deleteProviderMessage": 'Delete "{provider}"?',
+      "apiSettings.deleteProviderDetail": "This removes it from the provider list. Save the current selection to sync it to the backend.",
+      "apiSettings.deleteProviderStatus": "Provider deleted. Save the current selection to sync it to the backend.",
       "apiSettings.save": "Save API settings",
       "apiSettings.loadFailed": "Failed to load API settings",
       "apiSettings.savedKeyPlaceholder": "API key is saved on the backend. Enter a new key to replace it.",
@@ -1560,6 +1645,14 @@
       "apiSettings.savedShort": "Saved",
       "apiSettings.savedStatus": "API settings saved",
       "apiSettings.saveFailedShort": "Save failed",
+      "codexSettings.title": "Codex Channel",
+      "codexSettings.status": "Choose the generation channel for the local Codex sign-in",
+      "codexSettings.notesLabel": "Codex channel notes",
+      "codexSettings.imagesTitle": "Image",
+      "codexSettings.imagesCopy": "Default channel for passing size, quality, and edit parameters directly.",
+      "codexSettings.responsesTitle": "Responses",
+      "codexSettings.responsesCopy": "Compatibility channel for workflows that need web search tools.",
+      "codexSettings.save": "Save Codex channel",
       "imageEditor.title": "Edit Input Image",
       "imageEditor.promptHint": "Hand-drawn arrows and marks in the image are only instructions. Do not keep them in the final image.",
       "imageEditor.inputFallback": "Input image",
@@ -1627,6 +1720,7 @@
       "close.archive": "Close archive panel",
       "close.settings": "Close storage settings panel",
       "close.apiSettings": "Close API settings panel",
+      "close.systemSettings": "Close system settings panel",
       "close.imageEditor": "Close image editor panel",
       "close.gallery": "Close gallery panel",
       "close.addGallery": "Close add to gallery panel",
@@ -2140,9 +2234,16 @@
   }
 
   // codex_image/webui/frontend/src/segmented-indicator.ts
-  var HOST_SELECTORS = [".radio-group:not(.ratio-group)", "#authSourceGroup", "#languageSwitcher", ".history-view-toggle", ".history-sort-toggle"];
+  var HOST_SELECTORS = [
+    ".radio-group:not(.ratio-group)",
+    "#authSourceGroup",
+    "#languageSwitcher",
+    "#systemSettingsTabs",
+    ".history-view-toggle",
+    ".history-sort-toggle"
+  ];
   var HOST_SELECTOR = HOST_SELECTORS.join(", ");
-  var BUTTON_SELECTOR = ".radio-btn, .auth-source-button, .language-option, .history-view-button, .history-sort-button";
+  var BUTTON_SELECTOR = ".radio-btn, .auth-source-button, .language-option, .system-settings-tab, .history-view-button, .history-sort-button";
   var INDICATOR_CLASS = "segmented-indicator";
   var HOST_CLASS = "segmented-indicator-host";
   var initializedHosts = /* @__PURE__ */ new WeakSet();
@@ -2150,7 +2251,7 @@
   var segmentedIndicatorsInitialized = false;
   var resizeObserver = null;
   function activeSegment(host) {
-    return host.querySelector(".radio-btn.active, .auth-source-button.active, .language-option.active, .history-view-button.active, .history-sort-button.active");
+    return host.querySelector(".radio-btn.active, .auth-source-button.active, .language-option.active, .system-settings-tab.active, .history-view-button.active, .history-sort-button.active");
   }
   function ensureIndicator(host) {
     const existing = Array.from(host.children).find((child) => child.classList.contains(INDICATOR_CLASS));
@@ -2206,15 +2307,15 @@
     }
     scheduleIndicatorUpdate(host);
   }
-  function updateAllIndicators() {
+  function refreshSegmentedIndicators() {
     document.querySelectorAll(HOST_SELECTOR).forEach(scheduleIndicatorUpdate);
   }
   function initSegmentedIndicatorFeature() {
     if (segmentedIndicatorsInitialized) return;
     segmentedIndicatorsInitialized = true;
     document.querySelectorAll(HOST_SELECTOR).forEach(initHost);
-    window.addEventListener("resize", updateAllIndicators, { passive: true });
-    document.fonts?.ready?.then(updateAllIndicators).catch(() => {
+    window.addEventListener("resize", refreshSegmentedIndicators, { passive: true });
+    document.fonts?.ready?.then(refreshSegmentedIndicators).catch(() => {
     });
   }
 

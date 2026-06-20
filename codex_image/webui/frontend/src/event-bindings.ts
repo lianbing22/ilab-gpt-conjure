@@ -55,39 +55,40 @@ export function bindWebUIEvents(state: WebUIState, els: WebUIElements, methods: 
     if (event.target === els.addToGalleryModal) call(methods, "closeAddToGallery");
   });
   els.saveToGalleryButton?.addEventListener("click", () => call(methods, "saveUploadToGallery"));
-  els.settingsButton?.addEventListener("click", () => call(methods, "openSettingsModal"));
-  els.settingsModalClose?.addEventListener("click", () => call(methods, "closeSettingsModal"));
-  els.settingsModal?.addEventListener("click", (event: Event) => {
-    if (event.target === els.settingsModal) call(methods, "closeSettingsModal");
+  els.systemSettingsModalClose?.addEventListener("click", () => call(methods, "closeSystemSettingsModal"));
+  els.systemSettingsModal?.addEventListener("click", (event: Event) => {
+    if (event.target === els.systemSettingsModal) call(methods, "closeSystemSettingsModal");
   });
   els.saveSettingsButton?.addEventListener("click", () => call(methods, "saveSettings"));
   els.authSourceGroup?.addEventListener("click", (event: Event) => call(methods, "handleAuthSourceClick", event));
   els.apiSourceSettingsButton?.addEventListener("click", () => call(methods, "openApiSettingsModal"));
   els.apiDirectSettingsButton?.addEventListener("click", () => call(methods, "openApiSettingsModal"));
-  els.apiSettingsModalClose?.addEventListener("click", () => call(methods, "closeApiSettingsModal"));
-  els.apiSettingsModal?.addEventListener("click", (event: Event) => {
-    if (event.target === els.apiSettingsModal) call(methods, "closeApiSettingsModal");
-  });
   els.saveApiSettingsButton?.addEventListener("click", () => call(methods, "saveApiSettings"));
+  els.saveCodexSettingsButton?.addEventListener("click", () => call(methods, "saveApiSettings"));
   els.apiProviderQuick?.addEventListener("change", () => {
-    call(methods, "readApiSettingsForm");
-    state.apiSettings.active_provider_id = els.apiProviderQuick?.value || call(methods, "currentApiProviderId");
-    call(methods, "populateApiSettingsForm");
-    call(methods, "persistApiSettings");
-    call(methods, "renderAuthSource", state.authStatus);
-    call(methods, "updateRequestPreview");
+    call(methods, "selectApiProvider", els.apiProviderQuick?.value || call(methods, "currentApiProviderId"));
   });
   els.apiProvider?.addEventListener("change", () => {
-    call(methods, "readApiSettingsForm");
-    state.apiSettings.active_provider_id = els.apiProvider?.value || call(methods, "currentApiProviderId");
-    call(methods, "populateApiSettingsForm");
-    call(methods, "persistApiSettings");
-    call(methods, "renderAuthSource", state.authStatus);
-    call(methods, "updateRequestPreview");
+    call(methods, "selectApiProvider", els.apiProvider?.value || call(methods, "currentApiProviderId"));
   });
+  els.apiProviderList?.addEventListener("click", (event: Event) => {
+    const sortButton = (event.target as HTMLElement | null)?.closest?.("[data-api-provider-sort]") as HTMLElement | null;
+    if (sortButton) {
+      call(methods, "moveApiProvider", sortButton.dataset.apiProviderId, sortButton.dataset.apiProviderSort);
+      return;
+    }
+    const button = (event.target as HTMLElement | null)?.closest?.("[data-api-provider-id]") as HTMLElement | null;
+    if (!button) return;
+    call(methods, "selectApiProvider", button.dataset.apiProviderId);
+  });
+  els.editApiProviderButton?.addEventListener("click", () => call(methods, "editApiProvider"));
+  els.copyApiProviderButton?.addEventListener("click", () => call(methods, "copyApiProvider"));
   els.addApiProviderButton?.addEventListener("click", () => call(methods, "addApiProvider"));
-  els.deleteApiProviderButton?.addEventListener("click", () => call(methods, "deleteApiProvider"));
-  [els.codexMode, els.apiProviderName, els.apiBaseUrl, els.apiKey, els.apiMode, els.apiImageModel, els.apiImagesConcurrency].filter(Boolean).forEach((element) => {
+  els.sortApiProvidersButton?.addEventListener("click", () => call(methods, "toggleApiProviderSortMode"));
+  els.deleteApiProviderButton?.addEventListener("click", () => call(methods, "confirmDeleteApiProvider", els.deleteApiProviderButton));
+  els.cancelApiProviderEditButton?.addEventListener("click", () => call(methods, "cancelApiProviderEdit"));
+  els.saveApiProviderEditButton?.addEventListener("click", () => call(methods, "saveApiProviderEdit"));
+  [els.codexMode].filter(Boolean).forEach((element) => {
     element?.addEventListener("input", () => {
       call(methods, "readApiSettingsForm");
       call(methods, "persistApiSettings");

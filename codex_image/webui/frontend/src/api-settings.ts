@@ -1,5 +1,5 @@
 import { getLegacyBridge } from "./state";
-import { LOCALE_CHANGE_EVENT, translate } from "./i18n";
+import { LOCALE_CHANGE_EVENT } from "./i18n";
 import {
   applyAuthSourceSelection,
   authSourceDetailText,
@@ -29,7 +29,10 @@ import {
   currentApiProviderId,
   currentApiProviderLabel,
   currentCodexMode,
+  confirmDeleteApiProvider,
+  copyApiProvider,
   deleteApiProvider,
+  editApiProvider,
   mergeApiProviderKeys,
   normalizeApiImagesConcurrency,
   normalizeApiProvider,
@@ -40,12 +43,17 @@ import {
   readApiSettingsForm,
   refreshApiSettings,
   restoreApiSettings,
+  cancelApiProviderEdit,
   saveApiSettings,
+  saveApiProviderEdit,
+  selectApiProvider,
   setApiSettingsFeedback,
   taskApiProviderId,
   taskApiProviderLabel,
   taskBackendLabel,
   taskBackendValue,
+  moveApiProvider,
+  toggleApiProviderSortMode,
 } from "./api-provider-settings";
 
 let apiSettingsFeatureInitialized = false;
@@ -56,8 +64,10 @@ export function initApiSettingsFeature(): void {
   document.addEventListener(LOCALE_CHANGE_EVENT, () => {
     const bridge = getLegacyBridge();
     renderAuthSource(bridge.state.authStatus);
-    if (!bridge.els.apiSettingsModal?.classList.contains("hidden")) {
-      setApiSettingsFeedback(translate("apiSettings.status"), "");
+    if (!bridge.els.systemSettingsModal?.classList.contains("hidden") && (
+      !bridge.els.systemSettingsApiPanel?.hidden || !bridge.els.systemSettingsCodexPanel?.hidden
+    )) {
+      setApiSettingsFeedback("", "");
     }
   });
   Object.assign(getLegacyBridge().methods, {
@@ -86,7 +96,15 @@ export function initApiSettingsFeature(): void {
     currentApiProviderId,
     currentApiProviderLabel,
     addApiProvider,
+    confirmDeleteApiProvider,
+    copyApiProvider,
     deleteApiProvider,
+    editApiProvider,
+    cancelApiProviderEdit,
+    saveApiProviderEdit,
+    selectApiProvider,
+    moveApiProvider,
+    toggleApiProviderSortMode,
     openApiSettingsModal,
     closeApiSettingsModal,
     currentApiImageModel,

@@ -26,6 +26,16 @@ endpoint. It is not an officially recommended OpenAI API integration path and
 may change or stop working without notice. Prefer OpenAI-compatible API mode for
 stable integrations.
 
+## Portable updater behavior
+
+Portable startup launchers only start the local WebUI server and open the local
+browser URL. They do not contact GitHub and do not update files automatically.
+
+Portable update scripts are manually run. They fetch GitHub Release metadata and
+the matching portable zip, verify the published SHA256 file, preserve local
+`data/`, only replace package-managed files inside the extracted portable
+folder, and keep backups under `.backup/`.
+
 ## Reporting issues
 
 Please report security issues privately to the maintainer instead of opening a

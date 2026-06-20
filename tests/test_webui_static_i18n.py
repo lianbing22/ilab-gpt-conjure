@@ -55,8 +55,13 @@ class WebUIStaticI18nTests(WebUIStaticTestCase):
             "prompt.run",
             "outputSettings.title",
             "preview.title",
-            "settings.title",
-            "apiSettings.title",
+            "systemSettings.title",
+            "systemSettings.codexTab",
+            "settings.status",
+            "apiSettings.providers",
+            "apiSettings.copyProvider",
+            "apiSettings.sortProviders",
+            "apiSettings.editProvider",
             "gallery.title",
         ):
             self.assertIn(f'data-i18n="{key}"', html)
@@ -114,6 +119,18 @@ class WebUIStaticI18nTests(WebUIStaticTestCase):
             "gallery.dragSort",
             "preview.addReference",
             "apiSettings.modeImagesShort",
+            "apiSettings.newProviderAction",
+            "apiSettings.copyProvider",
+            "apiSettings.copyProviderStatus",
+            "apiSettings.copyProviderWithoutKeyStatus",
+            "apiSettings.sortProviders",
+            "apiSettings.sortProviderStatus",
+            "apiSettings.saveProvider",
+            "apiSettings.saveSelection",
+            "apiSettings.cancelEdit",
+            "apiSettings.deleteProviderTitle",
+            "apiSettings.deleteProviderMessage",
+            "apiSettings.deleteProviderStatus",
             "imageInput.uploadBadge",
             "imageInput.addToGalleryShort",
             "imageInput.removeImage",
@@ -198,6 +215,10 @@ class WebUIStaticI18nTests(WebUIStaticTestCase):
         self.assertIn('translate("preview.addReference")', runtime_sources["preview"])
         self.assertIn('translate("preview.stage")', runtime_sources["preview"])
         self.assertIn('translate("apiSettings.modeImagesShort")', runtime_sources["api_settings"])
+        self.assertIn('translate("apiSettings.saveProvider")', runtime_sources["api_settings"])
+        self.assertIn('translate("apiSettings.saveSelection")', runtime_sources["api_settings"])
+        self.assertIn('translate("apiSettings.deleteProviderTitle")', runtime_sources["api_settings"])
+        self.assertIn('formatTranslation("apiSettings.deleteProviderMessage"', runtime_sources["api_settings"])
         self.assertIn('translate("settings.status")', runtime_sources["storage"])
         self.assertIn('translate("imageInput.uploadBadge")', runtime_sources["image_strip"])
         self.assertIn('translate("imageInput.addToGalleryShort")', runtime_sources["image_strip"])

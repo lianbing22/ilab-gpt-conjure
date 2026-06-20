@@ -45,39 +45,40 @@
       if (event.target === els43.addToGalleryModal) call(methods, "closeAddToGallery");
     });
     els43.saveToGalleryButton?.addEventListener("click", () => call(methods, "saveUploadToGallery"));
-    els43.settingsButton?.addEventListener("click", () => call(methods, "openSettingsModal"));
-    els43.settingsModalClose?.addEventListener("click", () => call(methods, "closeSettingsModal"));
-    els43.settingsModal?.addEventListener("click", (event) => {
-      if (event.target === els43.settingsModal) call(methods, "closeSettingsModal");
+    els43.systemSettingsModalClose?.addEventListener("click", () => call(methods, "closeSystemSettingsModal"));
+    els43.systemSettingsModal?.addEventListener("click", (event) => {
+      if (event.target === els43.systemSettingsModal) call(methods, "closeSystemSettingsModal");
     });
     els43.saveSettingsButton?.addEventListener("click", () => call(methods, "saveSettings"));
     els43.authSourceGroup?.addEventListener("click", (event) => call(methods, "handleAuthSourceClick", event));
     els43.apiSourceSettingsButton?.addEventListener("click", () => call(methods, "openApiSettingsModal"));
     els43.apiDirectSettingsButton?.addEventListener("click", () => call(methods, "openApiSettingsModal"));
-    els43.apiSettingsModalClose?.addEventListener("click", () => call(methods, "closeApiSettingsModal"));
-    els43.apiSettingsModal?.addEventListener("click", (event) => {
-      if (event.target === els43.apiSettingsModal) call(methods, "closeApiSettingsModal");
-    });
     els43.saveApiSettingsButton?.addEventListener("click", () => call(methods, "saveApiSettings"));
+    els43.saveCodexSettingsButton?.addEventListener("click", () => call(methods, "saveApiSettings"));
     els43.apiProviderQuick?.addEventListener("change", () => {
-      call(methods, "readApiSettingsForm");
-      state32.apiSettings.active_provider_id = els43.apiProviderQuick?.value || call(methods, "currentApiProviderId");
-      call(methods, "populateApiSettingsForm");
-      call(methods, "persistApiSettings");
-      call(methods, "renderAuthSource", state32.authStatus);
-      call(methods, "updateRequestPreview");
+      call(methods, "selectApiProvider", els43.apiProviderQuick?.value || call(methods, "currentApiProviderId"));
     });
     els43.apiProvider?.addEventListener("change", () => {
-      call(methods, "readApiSettingsForm");
-      state32.apiSettings.active_provider_id = els43.apiProvider?.value || call(methods, "currentApiProviderId");
-      call(methods, "populateApiSettingsForm");
-      call(methods, "persistApiSettings");
-      call(methods, "renderAuthSource", state32.authStatus);
-      call(methods, "updateRequestPreview");
+      call(methods, "selectApiProvider", els43.apiProvider?.value || call(methods, "currentApiProviderId"));
     });
+    els43.apiProviderList?.addEventListener("click", (event) => {
+      const sortButton = event.target?.closest?.("[data-api-provider-sort]");
+      if (sortButton) {
+        call(methods, "moveApiProvider", sortButton.dataset.apiProviderId, sortButton.dataset.apiProviderSort);
+        return;
+      }
+      const button = event.target?.closest?.("[data-api-provider-id]");
+      if (!button) return;
+      call(methods, "selectApiProvider", button.dataset.apiProviderId);
+    });
+    els43.editApiProviderButton?.addEventListener("click", () => call(methods, "editApiProvider"));
+    els43.copyApiProviderButton?.addEventListener("click", () => call(methods, "copyApiProvider"));
     els43.addApiProviderButton?.addEventListener("click", () => call(methods, "addApiProvider"));
-    els43.deleteApiProviderButton?.addEventListener("click", () => call(methods, "deleteApiProvider"));
-    [els43.codexMode, els43.apiProviderName, els43.apiBaseUrl, els43.apiKey, els43.apiMode, els43.apiImageModel, els43.apiImagesConcurrency].filter(Boolean).forEach((element2) => {
+    els43.sortApiProvidersButton?.addEventListener("click", () => call(methods, "toggleApiProviderSortMode"));
+    els43.deleteApiProviderButton?.addEventListener("click", () => call(methods, "confirmDeleteApiProvider", els43.deleteApiProviderButton));
+    els43.cancelApiProviderEditButton?.addEventListener("click", () => call(methods, "cancelApiProviderEdit"));
+    els43.saveApiProviderEditButton?.addEventListener("click", () => call(methods, "saveApiProviderEdit"));
+    [els43.codexMode].filter(Boolean).forEach((element2) => {
       element2?.addEventListener("input", () => {
         call(methods, "readApiSettingsForm");
         call(methods, "persistApiSettings");
@@ -184,7 +185,6 @@
       taskHistoryLibrarySlot: document.querySelector("#taskHistoryLibrarySlot"),
       archiveButton: document.querySelector("#archiveButton"),
       batchManageButton: document.querySelector("#batchManageButton"),
-      settingsButton: document.querySelector("#settingsButton"),
       batchToolbar: document.querySelector("#batchToolbar"),
       batchSelectedCount: document.querySelector("#batchSelectedCount"),
       batchArchiveButton: document.querySelector("#batchArchiveButton"),
@@ -194,30 +194,52 @@
       archiveModalClose: document.querySelector("#archiveModalClose"),
       archiveList: document.querySelector("#archiveList"),
       archiveCount: document.querySelector("#archiveCount"),
-      settingsModal: document.querySelector("#settingsModal"),
-      settingsModalClose: document.querySelector("#settingsModalClose"),
+      systemSettingsModal: document.querySelector("#systemSettingsModal"),
+      systemSettingsModalClose: document.querySelector("#systemSettingsModalClose"),
+      systemSettingsTabs: document.querySelector("#systemSettingsTabs"),
+      systemSettingsApiTab: document.querySelector("#systemSettingsApiTab"),
+      systemSettingsCodexTab: document.querySelector("#systemSettingsCodexTab"),
+      systemSettingsStorageTab: document.querySelector("#systemSettingsStorageTab"),
+      systemSettingsApiPanel: document.querySelector("#systemSettingsApiPanel"),
+      systemSettingsCodexPanel: document.querySelector("#systemSettingsCodexPanel"),
+      systemSettingsStoragePanel: document.querySelector("#systemSettingsStoragePanel"),
       settingsStatus: document.querySelector("#settingsStatus"),
       settingsInputRoot: document.querySelector("#settingsInputRoot"),
       settingsOutputRoot: document.querySelector("#settingsOutputRoot"),
       settingsGalleryRoot: document.querySelector("#settingsGalleryRoot"),
       settingsSourceDataRoot: document.querySelector("#settingsSourceDataRoot"),
       saveSettingsButton: document.querySelector("#saveSettingsButton"),
-      apiSettingsModal: document.querySelector("#apiSettingsModal"),
-      apiSettingsModalClose: document.querySelector("#apiSettingsModalClose"),
       apiSettingsStatus: document.querySelector("#apiSettingsStatus"),
+      apiSettingsActions: document.querySelector("#apiSettingsActions"),
+      codexSettingsStatus: document.querySelector("#codexSettingsStatus"),
       apiProviderQuick: document.querySelector("#apiProviderQuick"),
       codexMode: document.querySelector("#codexMode"),
       codexModeGroup: document.querySelector("#codexModeGroup"),
       apiProvider: document.querySelector("#apiProvider"),
+      apiProviderCount: document.querySelector("#apiProviderCount"),
+      apiProviderList: document.querySelector("#apiProviderList"),
+      apiProviderDetail: document.querySelector("#apiProviderDetail"),
+      apiProviderDetailBaseUrl: document.querySelector("#apiProviderDetailBaseUrl"),
+      apiProviderDetailKey: document.querySelector("#apiProviderDetailKey"),
+      apiProviderDetailMode: document.querySelector("#apiProviderDetailMode"),
+      apiProviderDetailConcurrency: document.querySelector("#apiProviderDetailConcurrency"),
+      apiProviderEditor: document.querySelector("#apiProviderEditor"),
+      apiProviderEditorTitle: document.querySelector("#apiProviderEditorTitle"),
       apiProviderName: document.querySelector("#apiProviderName"),
+      editApiProviderButton: document.querySelector("#editApiProviderButton"),
+      copyApiProviderButton: document.querySelector("#copyApiProviderButton"),
       addApiProviderButton: document.querySelector("#addApiProviderButton"),
+      sortApiProvidersButton: document.querySelector("#sortApiProvidersButton"),
       deleteApiProviderButton: document.querySelector("#deleteApiProviderButton"),
+      cancelApiProviderEditButton: document.querySelector("#cancelApiProviderEditButton"),
+      saveApiProviderEditButton: document.querySelector("#saveApiProviderEditButton"),
       apiBaseUrl: document.querySelector("#apiBaseUrl"),
       apiKey: document.querySelector("#apiKey"),
       apiMode: document.querySelector("#apiMode"),
       apiImageModel: document.querySelector("#apiImageModel"),
       apiImagesConcurrency: document.querySelector("#apiImagesConcurrency"),
       saveApiSettingsButton: document.querySelector("#saveApiSettingsButton"),
+      saveCodexSettingsButton: document.querySelector("#saveCodexSettingsButton"),
       newTaskButton: document.querySelector("#newTaskButton"),
       imageInput: document.querySelector("#imageInput"),
       imageEditorModal: document.querySelector("#imageEditorModal"),
@@ -425,6 +447,7 @@
       "action.archive": "\u5F52\u6863",
       "action.delete": "\u5220\u9664",
       "action.cancel": "\u53D6\u6D88",
+      "action.edit": "\u7F16\u8F91",
       "action.clear": "\u6E05\u7A7A",
       "action.paste": "\u7C98\u8D34",
       "action.find": "\u67E5\u627E",
@@ -680,7 +703,7 @@
       "auth.switchFailed": "\u6388\u6743\u6765\u6E90\u5207\u6362\u5931\u8D25",
       "auth.sourceUnavailable": "{source} \u4E0D\u53EF\u7528",
       "auth.notActive": "\u672A\u751F\u6548",
-      "api.settings": "API \u8BBE\u7F6E",
+      "api.settings": "\u7CFB\u7EDF\u8BBE\u7F6E",
       "api.provider": "API \u4F9B\u5E94\u5546",
       "imageInput.title": "\u56FE\u50CF\u8F93\u5165",
       "imageInput.uploadAria": "\u70B9\u51FB\u3001\u62D6\u5165\u6216\u7C98\u8D34\u56FE\u7247",
@@ -1111,19 +1134,56 @@
       "settings.savedRestart": "\u5DF2\u4FDD\u5B58\uFF0C\u91CD\u542F WebUI \u540E\u751F\u6548",
       "settings.saved": "\u5DF2\u4FDD\u5B58",
       "settings.savedRestartStatus": "\u8BBE\u7F6E\u5DF2\u4FDD\u5B58\uFF0C\u91CD\u542F WebUI \u540E\u751F\u6548",
+      "systemSettings.title": "\u7CFB\u7EDF\u8BBE\u7F6E",
+      "systemSettings.tabsLabel": "\u7CFB\u7EDF\u8BBE\u7F6E\u9009\u9879",
+      "systemSettings.apiTab": "API \u8BBE\u7F6E",
+      "systemSettings.codexTab": "Codex \u901A\u9053",
+      "systemSettings.storageTab": "\u5B58\u50A8\u4E0E\u901A\u77E5",
       "apiSettings.title": "API \u8BBE\u7F6E",
-      "apiSettings.status": "\u4FDD\u5B58\u540E\u7ACB\u5373\u7528\u4E8E Codex \u548C API \u6A21\u5F0F",
+      "apiSettings.status": "\u4FDD\u5B58\u540E\u7ACB\u5373\u7528\u4E8E API \u6A21\u5F0F",
       "apiSettings.codexMode": "Codex \u901A\u9053",
       "apiSettings.codexImages": "Image",
       "apiSettings.codexResponses": "Responses",
+      "apiSettings.providers": "API \u4F9B\u5E94\u5546",
+      "apiSettings.providerCount": "{count} \u4E2A\u4F9B\u5E94\u5546",
       "apiSettings.provider": "\u4F9B\u5E94\u5546",
       "apiSettings.providerName": "\u4F9B\u5E94\u5546\u540D\u79F0",
+      "apiSettings.newProviderAction": "\u65B0\u5EFA\u4F9B\u5E94\u5546",
+      "apiSettings.copyProvider": "\u590D\u5236",
+      "apiSettings.copyProviderName": "{name} \u526F\u672C",
+      "apiSettings.copyProviderStatus": "\u5DF2\u590D\u5236\u914D\u7F6E\u548C\u5DF2\u4FDD\u5B58 Key\uFF0C\u53EF\u4FEE\u6539\u540D\u79F0\u3001\u6A21\u578B\u6216\u66FF\u6362 Key \u540E\u4FDD\u5B58",
+      "apiSettings.copyProviderWithoutKeyStatus": "\u5DF2\u590D\u5236\u914D\u7F6E\uFF0C\u53EF\u4FEE\u6539\u540D\u79F0\u3001\u6A21\u578B\u6216\u586B\u5199 API Key \u540E\u4FDD\u5B58",
+      "apiSettings.sortProviders": "\u6392\u5E8F",
+      "apiSettings.finishSortProviders": "\u5B8C\u6210",
+      "apiSettings.sortProviderModeStatus": "\u6B63\u5728\u6392\u5E8F\u4F9B\u5E94\u5546",
+      "apiSettings.sortProviderStatus": "\u4F9B\u5E94\u5546\u6392\u5E8F\u5DF2\u8C03\u6574\uFF0C\u8BF7\u4FDD\u5B58\u5F53\u524D\u9009\u62E9\u540C\u6B65\u5230\u540E\u7AEF",
+      "apiSettings.moveProviderUp": "\u4E0A\u79FB",
+      "apiSettings.moveProviderDown": "\u4E0B\u79FB",
+      "apiSettings.moveProviderUpAria": "\u4E0A\u79FB {provider}",
+      "apiSettings.moveProviderDownAria": "\u4E0B\u79FB {provider}",
       "apiSettings.mode": "\u8C03\u7528\u65B9\u5F0F",
       "apiSettings.images": "\u76F4\u8FDE Image API",
       "apiSettings.responses": "Responses API",
       "apiSettings.modeImagesShort": "\u76F4\u8FDE",
       "apiSettings.imageModel": "\u56FE\u50CF\u5DE5\u5177\u6A21\u578B",
       "apiSettings.concurrency": "Provider \u603B\u5E76\u53D1\u4E0A\u9650",
+      "apiSettings.concurrencyShort": "\u5E76\u53D1",
+      "apiSettings.concurrencyValue": "\u5E76\u53D1 {concurrency}",
+      "apiSettings.keySaved": "\u5DF2\u4FDD\u5B58 API Key",
+      "apiSettings.keyNotSet": "\u672A\u8BBE\u7F6E API Key",
+      "apiSettings.editProvider": "\u7F16\u8F91\u4F9B\u5E94\u5546",
+      "apiSettings.newProviderTitle": "\u65B0\u589E\u4F9B\u5E94\u5546",
+      "apiSettings.editHint": "\u70B9\u51FB\u4FDD\u5B58\u4F9B\u5E94\u5546\u540E\u5199\u5165\u540E\u7AEF\uFF0C\u53D6\u6D88\u53EF\u653E\u5F03\u672C\u6B21\u7F16\u8F91\u3002",
+      "apiSettings.finishEditFirst": "\u8BF7\u5148\u4FDD\u5B58\u6216\u53D6\u6D88\u5F53\u524D\u4F9B\u5E94\u5546\u7F16\u8F91",
+      "apiSettings.newDraftStatus": "\u6B63\u5728\u65B0\u589E\u4F9B\u5E94\u5546\uFF0C\u4FDD\u5B58\u4F9B\u5E94\u5546\u540E\u751F\u6548",
+      "apiSettings.editDraftStatus": "\u6B63\u5728\u7F16\u8F91\u4F9B\u5E94\u5546\uFF0C\u4FDD\u5B58\u4F9B\u5E94\u5546\u540E\u751F\u6548",
+      "apiSettings.cancelEdit": "\u53D6\u6D88\u7F16\u8F91",
+      "apiSettings.saveProvider": "\u4FDD\u5B58\u4F9B\u5E94\u5546",
+      "apiSettings.saveSelection": "\u4FDD\u5B58\u5F53\u524D\u9009\u62E9",
+      "apiSettings.deleteProviderTitle": "\u5220\u9664\u4F9B\u5E94\u5546\uFF1F",
+      "apiSettings.deleteProviderMessage": "\u786E\u5B9A\u5220\u9664\u300C{provider}\u300D\uFF1F",
+      "apiSettings.deleteProviderDetail": "\u4F1A\u4ECE\u5F53\u524D\u4F9B\u5E94\u5546\u5217\u8868\u79FB\u9664\uFF1B\u5982\u9700\u540C\u6B65\u5230\u540E\u7AEF\uFF0C\u8BF7\u4FDD\u5B58\u5F53\u524D\u9009\u62E9\u3002",
+      "apiSettings.deleteProviderStatus": "\u5DF2\u5220\u9664\u4F9B\u5E94\u5546\uFF0C\u8BF7\u4FDD\u5B58\u5F53\u524D\u9009\u62E9\u540C\u6B65\u5230\u540E\u7AEF",
       "apiSettings.save": "\u4FDD\u5B58 API \u8BBE\u7F6E",
       "apiSettings.loadFailed": "API \u8BBE\u7F6E\u8BFB\u53D6\u5931\u8D25",
       "apiSettings.savedKeyPlaceholder": "\u540E\u7AEF\u5DF2\u4FDD\u5B58 API Key\uFF0C\u8F93\u5165\u65B0 key \u53EF\u8986\u76D6",
@@ -1135,6 +1195,14 @@
       "apiSettings.savedShort": "\u5DF2\u4FDD\u5B58",
       "apiSettings.savedStatus": "API \u8BBE\u7F6E\u5DF2\u4FDD\u5B58",
       "apiSettings.saveFailedShort": "\u4FDD\u5B58\u5931\u8D25",
+      "codexSettings.title": "Codex \u901A\u9053",
+      "codexSettings.status": "\u9009\u62E9 Codex \u672C\u673A\u767B\u5F55\u6001\u4F7F\u7528\u7684\u751F\u6210\u901A\u9053",
+      "codexSettings.notesLabel": "Codex \u901A\u9053\u8BF4\u660E",
+      "codexSettings.imagesTitle": "Image",
+      "codexSettings.imagesCopy": "\u9ED8\u8BA4\u901A\u9053\uFF0C\u76F4\u63A5\u4F20\u9012\u5C3A\u5BF8\u3001\u8D28\u91CF\u548C\u7F16\u8F91\u53C2\u6570\u3002",
+      "codexSettings.responsesTitle": "Responses",
+      "codexSettings.responsesCopy": "\u517C\u5BB9\u901A\u9053\uFF0C\u9700\u8981\u8054\u7F51\u641C\u7D22\u5DE5\u5177\u6D41\u65F6\u4F7F\u7528\u3002",
+      "codexSettings.save": "\u4FDD\u5B58 Codex \u901A\u9053",
       "imageEditor.title": "\u7F16\u8F91\u8F93\u5165\u56FE\u7247",
       "imageEditor.promptHint": "\u56FE\u4E2D\u7684\u624B\u7ED8\u7BAD\u5934\u548C\u6807\u8BB0\u4EC5\u7528\u4E8E\u6307\u793A\u7F16\u8F91\u8981\u6C42\uFF0C\u4E0D\u8981\u4FDD\u7559\u5728\u6700\u7EC8\u753B\u9762\u4E2D\u3002",
       "imageEditor.inputFallback": "\u8F93\u5165\u56FE\u7247",
@@ -1202,6 +1270,7 @@
       "close.archive": "\u5173\u95ED\u4F1A\u8BDD\u5F52\u6863\u9762\u677F",
       "close.settings": "\u5173\u95ED\u5B58\u50A8\u8BBE\u7F6E\u9762\u677F",
       "close.apiSettings": "\u5173\u95ED API \u8BBE\u7F6E\u9762\u677F",
+      "close.systemSettings": "\u5173\u95ED\u7CFB\u7EDF\u8BBE\u7F6E\u9762\u677F",
       "close.imageEditor": "\u5173\u95ED\u7F16\u8F91\u8F93\u5165\u56FE\u7247\u9762\u677F",
       "close.gallery": "\u5173\u95ED\u516C\u7528\u56FE\u5E93\u9762\u677F",
       "close.addGallery": "\u5173\u95ED\u6DFB\u52A0\u5230\u56FE\u5E93\u9762\u677F",
@@ -1234,6 +1303,7 @@
       "action.archive": "Archive",
       "action.delete": "Delete",
       "action.cancel": "Cancel",
+      "action.edit": "Edit",
       "action.clear": "Clear",
       "action.paste": "Paste",
       "action.find": "Find",
@@ -1489,7 +1559,7 @@
       "auth.switchFailed": "Failed to switch auth source",
       "auth.sourceUnavailable": "{source} unavailable",
       "auth.notActive": "Not active",
-      "api.settings": "API Settings",
+      "api.settings": "System Settings",
       "api.provider": "API provider",
       "imageInput.title": "Images",
       "imageInput.uploadAria": "Click, drop, or paste images",
@@ -1920,19 +1990,56 @@
       "settings.savedRestart": "Saved. Restart WebUI to apply.",
       "settings.saved": "Saved",
       "settings.savedRestartStatus": "Settings saved. Restart WebUI to apply.",
+      "systemSettings.title": "System Settings",
+      "systemSettings.tabsLabel": "System settings sections",
+      "systemSettings.apiTab": "API Settings",
+      "systemSettings.codexTab": "Codex Channel",
+      "systemSettings.storageTab": "Storage & Notifications",
       "apiSettings.title": "API Settings",
-      "apiSettings.status": "Saved settings apply immediately in Codex and API mode",
+      "apiSettings.status": "Saved settings apply immediately in API mode",
       "apiSettings.codexMode": "Codex channel",
       "apiSettings.codexImages": "Image",
       "apiSettings.codexResponses": "Responses",
+      "apiSettings.providers": "API providers",
+      "apiSettings.providerCount": "{count} providers",
       "apiSettings.provider": "Provider",
       "apiSettings.providerName": "Provider name",
+      "apiSettings.newProviderAction": "New provider",
+      "apiSettings.copyProvider": "Copy",
+      "apiSettings.copyProviderName": "{name} Copy",
+      "apiSettings.copyProviderStatus": "Provider copied with its saved key. Edit the name, model, or replace the key before saving.",
+      "apiSettings.copyProviderWithoutKeyStatus": "Provider copied. Edit the name, model, or add an API key before saving.",
+      "apiSettings.sortProviders": "Sort",
+      "apiSettings.finishSortProviders": "Done",
+      "apiSettings.sortProviderModeStatus": "Sorting providers",
+      "apiSettings.sortProviderStatus": "Provider order changed. Save current selection to sync it.",
+      "apiSettings.moveProviderUp": "Up",
+      "apiSettings.moveProviderDown": "Down",
+      "apiSettings.moveProviderUpAria": "Move {provider} up",
+      "apiSettings.moveProviderDownAria": "Move {provider} down",
       "apiSettings.mode": "Request mode",
       "apiSettings.images": "Direct Image API",
       "apiSettings.responses": "Responses API",
       "apiSettings.modeImagesShort": "Direct",
       "apiSettings.imageModel": "Image model",
       "apiSettings.concurrency": "Provider concurrency limit",
+      "apiSettings.concurrencyShort": "Concurrency",
+      "apiSettings.concurrencyValue": "concurrency {concurrency}",
+      "apiSettings.keySaved": "API key saved",
+      "apiSettings.keyNotSet": "API key not set",
+      "apiSettings.editProvider": "Edit provider",
+      "apiSettings.newProviderTitle": "New provider",
+      "apiSettings.editHint": "Save provider writes this edit to the backend. Cancel discards it.",
+      "apiSettings.finishEditFirst": "Save or cancel the current provider edit first",
+      "apiSettings.newDraftStatus": "Creating provider. Save provider to apply.",
+      "apiSettings.editDraftStatus": "Editing provider. Save provider to apply.",
+      "apiSettings.cancelEdit": "Cancel edit",
+      "apiSettings.saveProvider": "Save provider",
+      "apiSettings.saveSelection": "Save selection",
+      "apiSettings.deleteProviderTitle": "Delete provider?",
+      "apiSettings.deleteProviderMessage": 'Delete "{provider}"?',
+      "apiSettings.deleteProviderDetail": "This removes it from the provider list. Save the current selection to sync it to the backend.",
+      "apiSettings.deleteProviderStatus": "Provider deleted. Save the current selection to sync it to the backend.",
       "apiSettings.save": "Save API settings",
       "apiSettings.loadFailed": "Failed to load API settings",
       "apiSettings.savedKeyPlaceholder": "API key is saved on the backend. Enter a new key to replace it.",
@@ -1944,6 +2051,14 @@
       "apiSettings.savedShort": "Saved",
       "apiSettings.savedStatus": "API settings saved",
       "apiSettings.saveFailedShort": "Save failed",
+      "codexSettings.title": "Codex Channel",
+      "codexSettings.status": "Choose the generation channel for the local Codex sign-in",
+      "codexSettings.notesLabel": "Codex channel notes",
+      "codexSettings.imagesTitle": "Image",
+      "codexSettings.imagesCopy": "Default channel for passing size, quality, and edit parameters directly.",
+      "codexSettings.responsesTitle": "Responses",
+      "codexSettings.responsesCopy": "Compatibility channel for workflows that need web search tools.",
+      "codexSettings.save": "Save Codex channel",
       "imageEditor.title": "Edit Input Image",
       "imageEditor.promptHint": "Hand-drawn arrows and marks in the image are only instructions. Do not keep them in the final image.",
       "imageEditor.inputFallback": "Input image",
@@ -2011,6 +2126,7 @@
       "close.archive": "Close archive panel",
       "close.settings": "Close storage settings panel",
       "close.apiSettings": "Close API settings panel",
+      "close.systemSettings": "Close system settings panel",
       "close.imageEditor": "Close image editor panel",
       "close.gallery": "Close gallery panel",
       "close.addGallery": "Close add to gallery panel",
@@ -6344,6 +6460,243 @@ ${hint}` : hint;
     return authSource === "api" && currentApiMode2() !== "responses" || authSource === "codex" && currentCodexMode2() !== "responses";
   }
 
+  // codex_image/webui/frontend/src/segmented-indicator.ts
+  var HOST_SELECTORS = [
+    ".radio-group:not(.ratio-group)",
+    "#authSourceGroup",
+    "#languageSwitcher",
+    "#systemSettingsTabs",
+    ".history-view-toggle",
+    ".history-sort-toggle"
+  ];
+  var HOST_SELECTOR = HOST_SELECTORS.join(", ");
+  var BUTTON_SELECTOR = ".radio-btn, .auth-source-button, .language-option, .system-settings-tab, .history-view-button, .history-sort-button";
+  var INDICATOR_CLASS = "segmented-indicator";
+  var HOST_CLASS = "segmented-indicator-host";
+  var initializedHosts = /* @__PURE__ */ new WeakSet();
+  var scheduledFrames = /* @__PURE__ */ new WeakMap();
+  var segmentedIndicatorsInitialized = false;
+  var resizeObserver = null;
+  function activeSegment(host) {
+    return host.querySelector(".radio-btn.active, .auth-source-button.active, .language-option.active, .system-settings-tab.active, .history-view-button.active, .history-sort-button.active");
+  }
+  function ensureIndicator(host) {
+    const existing = Array.from(host.children).find((child) => child.classList.contains(INDICATOR_CLASS));
+    if (existing instanceof HTMLElement) return existing;
+    const indicator = document.createElement("span");
+    indicator.className = INDICATOR_CLASS;
+    indicator.setAttribute("aria-hidden", "true");
+    host.insertBefore(indicator, host.firstElementChild);
+    return indicator;
+  }
+  function updateIndicator(host) {
+    scheduledFrames.delete(host);
+    if (!host.isConnected) return;
+    const indicator = ensureIndicator(host);
+    const active = activeSegment(host);
+    if (!active) {
+      indicator.style.setProperty("--segmented-indicator-opacity", "0");
+      return;
+    }
+    const hostRect = host.getBoundingClientRect();
+    const activeRect = active.getBoundingClientRect();
+    const hostStyle = window.getComputedStyle(host);
+    const borderLeft = Number.parseFloat(hostStyle.borderLeftWidth) || 0;
+    const borderTop = Number.parseFloat(hostStyle.borderTopWidth) || 0;
+    indicator.style.setProperty("--segmented-indicator-x", `${activeRect.left - hostRect.left - borderLeft}px`);
+    indicator.style.setProperty("--segmented-indicator-y", `${activeRect.top - hostRect.top - borderTop}px`);
+    indicator.style.setProperty("--segmented-indicator-width", `${activeRect.width}px`);
+    indicator.style.setProperty("--segmented-indicator-height", `${activeRect.height}px`);
+    indicator.style.setProperty("--segmented-indicator-opacity", "1");
+  }
+  function scheduleIndicatorUpdate(host) {
+    if (scheduledFrames.has(host)) return;
+    scheduledFrames.set(host, window.requestAnimationFrame(() => updateIndicator(host)));
+  }
+  function watchButtonClassChanges(host) {
+    const observer = new MutationObserver(() => scheduleIndicatorUpdate(host));
+    host.querySelectorAll(BUTTON_SELECTOR).forEach((button) => {
+      observer.observe(button, { attributes: true, attributeFilter: ["class"] });
+    });
+  }
+  function initHost(host) {
+    if (initializedHosts.has(host)) return;
+    initializedHosts.add(host);
+    host.classList.add(HOST_CLASS);
+    ensureIndicator(host);
+    host.addEventListener("click", () => scheduleIndicatorUpdate(host));
+    watchButtonClassChanges(host);
+    if ("ResizeObserver" in window) {
+      resizeObserver || (resizeObserver = new ResizeObserver((entries) => {
+        entries.forEach((entry) => scheduleIndicatorUpdate(entry.target));
+      }));
+      resizeObserver.observe(host);
+    }
+    scheduleIndicatorUpdate(host);
+  }
+  function refreshSegmentedIndicators() {
+    document.querySelectorAll(HOST_SELECTOR).forEach(scheduleIndicatorUpdate);
+  }
+  function initSegmentedIndicatorFeature() {
+    if (segmentedIndicatorsInitialized) return;
+    segmentedIndicatorsInitialized = true;
+    document.querySelectorAll(HOST_SELECTOR).forEach(initHost);
+    window.addEventListener("resize", refreshSegmentedIndicators, { passive: true });
+    document.fonts?.ready?.then(refreshSegmentedIndicators).catch(() => {
+    });
+  }
+
+  // codex_image/webui/frontend/src/system-settings.ts
+  var systemSettingsFeatureInitialized = false;
+  var systemSettingsHeightAnimationToken = 0;
+  var systemSettingsHeightAnimationTimer;
+  var MIN_SYSTEM_SETTINGS_MODAL_EDGE = 30;
+  var VALID_TABS = /* @__PURE__ */ new Set(["api", "codex", "storage"]);
+  function normalizedTab(tab) {
+    return VALID_TABS.has(tab) ? tab : "api";
+  }
+  function maybeCall(name, ...args) {
+    const method = getLegacyBridge().methods[name];
+    if (typeof method === "function") method(...args);
+  }
+  function systemSettingsPanel() {
+    const { els: els43 } = getLegacyBridge();
+    return els43.systemSettingsModal?.querySelector(".system-settings-modal-panel") || null;
+  }
+  function shouldAnimateSystemSettingsHeight() {
+    const { els: els43 } = getLegacyBridge();
+    if (els43.systemSettingsModal?.classList.contains("hidden")) return false;
+    return !window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+  }
+  function clearSystemSettingsHeightAnimation(panel) {
+    systemSettingsHeightAnimationToken += 1;
+    if (systemSettingsHeightAnimationTimer !== void 0) {
+      window.clearTimeout(systemSettingsHeightAnimationTimer);
+      systemSettingsHeightAnimationTimer = void 0;
+    }
+    panel.classList.remove("is-height-animating");
+    panel.style.height = "";
+  }
+  function positionSystemSettingsModal() {
+    const { els: els43 } = getLegacyBridge();
+    const modal = els43.systemSettingsModal;
+    const panel = systemSettingsPanel();
+    if (!modal || !panel || modal.classList.contains("hidden")) return;
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+    const panelHeight = panel.getBoundingClientRect().height;
+    const centeredTop = Math.floor((viewportHeight - panelHeight) / 2);
+    const top = Math.max(MIN_SYSTEM_SETTINGS_MODAL_EDGE, centeredTop);
+    modal.style.setProperty("--system-settings-modal-top", `${top}px`);
+  }
+  function systemSettingsTargetHeight(panel) {
+    const style = window.getComputedStyle(panel);
+    const borderHeight = (parseFloat(style.borderTopWidth) || 0) + (parseFloat(style.borderBottomWidth) || 0);
+    const naturalHeight = Math.ceil(panel.scrollHeight + borderHeight);
+    const maxHeight = parseFloat(style.maxHeight);
+    return Number.isFinite(maxHeight) ? Math.min(naturalHeight, Math.ceil(maxHeight)) : naturalHeight;
+  }
+  function animateSystemSettingsPanelHeight(panel, beforeHeight) {
+    const afterHeight = systemSettingsTargetHeight(panel);
+    if (Math.abs(afterHeight - beforeHeight) < 1) {
+      clearSystemSettingsHeightAnimation(panel);
+      return;
+    }
+    systemSettingsHeightAnimationToken += 1;
+    const token = systemSettingsHeightAnimationToken;
+    panel.classList.add("is-height-animating");
+    panel.style.height = `${beforeHeight}px`;
+    panel.getBoundingClientRect();
+    window.requestAnimationFrame(() => {
+      if (token !== systemSettingsHeightAnimationToken) return;
+      panel.style.height = `${afterHeight}px`;
+    });
+    const cleanup = (event) => {
+      if (event && (event.target !== panel || event.propertyName !== "height")) return;
+      if (token !== systemSettingsHeightAnimationToken) return;
+      systemSettingsHeightAnimationToken += 1;
+      if (systemSettingsHeightAnimationTimer !== void 0) {
+        window.clearTimeout(systemSettingsHeightAnimationTimer);
+        systemSettingsHeightAnimationTimer = void 0;
+      }
+      panel.removeEventListener("transitionend", cleanup);
+      panel.classList.remove("is-height-animating");
+      panel.style.height = "";
+    };
+    panel.addEventListener("transitionend", cleanup);
+    systemSettingsHeightAnimationTimer = window.setTimeout(() => cleanup(), 320);
+  }
+  function setSystemSettingsTab(tab, options = {}) {
+    const selected = normalizedTab(tab);
+    const { els: els43 } = getLegacyBridge();
+    const panel = systemSettingsPanel();
+    const animateHeight = Boolean(panel && shouldAnimateSystemSettingsHeight());
+    const beforeHeight = animateHeight && panel ? panel.getBoundingClientRect().height : 0;
+    if (animateHeight && panel) clearSystemSettingsHeightAnimation(panel);
+    const buttons = Array.from(els43.systemSettingsTabs?.querySelectorAll("[data-system-settings-tab]") || []);
+    buttons.forEach((button) => {
+      const active = button.dataset.systemSettingsTab === selected;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-selected", active ? "true" : "false");
+      button.tabIndex = active ? 0 : -1;
+    });
+    [
+      ["api", els43.systemSettingsApiPanel],
+      ["codex", els43.systemSettingsCodexPanel],
+      ["storage", els43.systemSettingsStoragePanel]
+    ].forEach(([name, panel2]) => {
+      if (!panel2) return;
+      const active = name === selected;
+      panel2.hidden = !active;
+      panel2.setAttribute("aria-hidden", active ? "false" : "true");
+    });
+    if (options.refresh === false) return;
+    if (selected === "storage") maybeCall("refreshSettings");
+    if (selected === "api" || selected === "codex") {
+      maybeCall("setApiSettingsFeedback", "", "");
+      maybeCall("populateApiSettingsForm");
+      maybeCall("updateModeSpecificSettings");
+    }
+    refreshSegmentedIndicators();
+    if (animateHeight && panel) animateSystemSettingsPanelHeight(panel, beforeHeight);
+  }
+  function openSystemSettingsModal(tab = "api") {
+    const { els: els43 } = getLegacyBridge();
+    const wasHidden = els43.systemSettingsModal?.classList.contains("hidden") ?? true;
+    setSystemSettingsTab(tab);
+    els43.systemSettingsModal?.classList.remove("hidden");
+    els43.systemSettingsModal?.setAttribute("aria-hidden", "false");
+    if (wasHidden) positionSystemSettingsModal();
+    refreshSegmentedIndicators();
+  }
+  function closeSystemSettingsModal() {
+    const { els: els43 } = getLegacyBridge();
+    els43.systemSettingsModal?.classList.add("hidden");
+    els43.systemSettingsModal?.setAttribute("aria-hidden", "true");
+    els43.systemSettingsModal?.style.removeProperty("--system-settings-modal-top");
+  }
+  function handleSystemSettingsTabClick(event) {
+    const target = event.target;
+    const button = target?.closest?.("[data-system-settings-tab]");
+    if (!button) return;
+    event.preventDefault();
+    setSystemSettingsTab(button.dataset.systemSettingsTab || "api");
+  }
+  function handleSystemSettingsResize() {
+    positionSystemSettingsModal();
+  }
+  function initSystemSettingsFeature() {
+    if (systemSettingsFeatureInitialized) return;
+    systemSettingsFeatureInitialized = true;
+    const { els: els43 } = getLegacyBridge();
+    els43.systemSettingsTabs?.addEventListener("click", handleSystemSettingsTabClick);
+    window.addEventListener("resize", handleSystemSettingsResize);
+    Object.assign(getLegacyBridge().methods, {
+      setSystemSettingsTab,
+      openSystemSettingsModal,
+      closeSystemSettingsModal
+    });
+  }
+
   // codex_image/webui/frontend/src/api-provider-settings.ts
   var bridge9 = getLegacyBridge();
   var state9 = bridge9.state;
@@ -6364,6 +6717,9 @@ ${hint}` : hint;
   function closePromptPopover2() {
     legacyMethod13("closePromptPopover");
   }
+  function openConfirmPopover4(...args) {
+    legacyMethod13("openConfirmPopover", ...args);
+  }
   function normalizeApiProvider(provider = {}, index = 0) {
     const fallbackId = index === 0 ? "default" : `provider-${index + 1}`;
     const id = String(provider.id || fallbackId).trim().toLowerCase().replace(/[^a-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "") || fallbackId;
@@ -6376,7 +6732,8 @@ ${hint}` : hint;
       api_mode: provider.api_mode === "responses" ? "responses" : DEFAULT_API_MODE,
       images_concurrency: normalizeApiImagesConcurrency(provider.images_concurrency),
       api_key_set: Boolean(provider.api_key_set || provider.api_key),
-      api_key_masked: String(provider.api_key_masked || "")
+      api_key_masked: String(provider.api_key_masked || ""),
+      api_key_source_provider_id: String(provider.api_key_source_provider_id || "").trim()
     };
   }
   function normalizeApiImagesConcurrency(value) {
@@ -6386,6 +6743,202 @@ ${hint}` : hint;
   }
   function normalizeCodexMode(value) {
     return value === "responses" ? "responses" : DEFAULT_CODEX_MODE;
+  }
+  function providerById(providerId, settings = state9.apiSettings) {
+    const normalized = normalizeApiSettings(settings);
+    return normalized.providers.find((provider) => provider.id === providerId) || normalized.providers[0];
+  }
+  function providerMode(provider) {
+    return provider?.api_mode === "responses" ? "responses" : DEFAULT_API_MODE;
+  }
+  function providerHasApiKey(provider) {
+    return Boolean(provider?.api_key || provider?.api_key_set);
+  }
+  function providerKeyLabel(provider) {
+    if (!providerHasApiKey(provider)) return translate("apiSettings.keyNotSet");
+    return provider.api_key_masked || translate("apiSettings.keySaved");
+  }
+  function providerMetaLabel(provider) {
+    return [
+      apiModeLabel2(providerMode(provider)),
+      provider?.image_model || DEFAULT_API_IMAGE_MODEL,
+      formatTranslation("apiSettings.concurrencyValue", {
+        concurrency: String(normalizeApiImagesConcurrency(provider?.images_concurrency))
+      })
+    ].filter(Boolean).join(" \xB7 ");
+  }
+  function uniqueCopiedProviderId(provider) {
+    const base = String(provider?.id || provider?.name || "provider").trim().toLowerCase().replace(/[^a-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "") || "provider";
+    const existing = new Set((state9.apiSettings.providers || []).map((item) => item.id));
+    const root = `${base}-copy`;
+    if (!existing.has(root)) return root;
+    for (let index = 2; index < 1e3; index += 1) {
+      const candidate = `${root}-${index}`;
+      if (!existing.has(candidate)) return candidate;
+    }
+    return `provider-${Date.now()}`;
+  }
+  function copiedProviderName(provider) {
+    const sourceName3 = String(provider?.name || provider?.id || translate("apiSettings.newProvider")).trim();
+    const rootName = formatTranslation("apiSettings.copyProviderName", { name: sourceName3 });
+    const existing = new Set((state9.apiSettings.providers || []).map((item) => String(item.name || "").trim()));
+    if (!existing.has(rootName)) return rootName;
+    for (let index = 2; index < 1e3; index += 1) {
+      const candidate = `${rootName} ${index}`;
+      if (!existing.has(candidate)) return candidate;
+    }
+    return `${rootName} ${Date.now()}`;
+  }
+  function setElementText(element2, value) {
+    if (element2) element2.textContent = String(value ?? "");
+  }
+  function setApiProviderEditorVisible(visible) {
+    els10.apiProviderEditor?.classList.toggle("hidden", !visible);
+    els10.apiProviderEditor?.setAttribute("aria-hidden", visible ? "false" : "true");
+    els10.apiProviderDetail?.classList.toggle("hidden", visible);
+    els10.apiSettingsActions?.classList.toggle("hidden", visible);
+    els10.apiSettingsActions?.setAttribute("aria-hidden", visible ? "true" : "false");
+    if (els10.editApiProviderButton) els10.editApiProviderButton.disabled = visible;
+    if (els10.addApiProviderButton) els10.addApiProviderButton.disabled = visible;
+    if (els10.copyApiProviderButton) els10.copyApiProviderButton.disabled = visible;
+    if (els10.sortApiProvidersButton) els10.sortApiProvidersButton.disabled = visible;
+    if (els10.deleteApiProviderButton) {
+      els10.deleteApiProviderButton.disabled = visible || normalizeApiSettings(state9.apiSettings).providers.length <= 1;
+    }
+  }
+  function apiProviderEditorActive() {
+    return Boolean(state9.apiProviderEditingId && state9.apiProviderDraft);
+  }
+  function draftProviderFromForm() {
+    const draft = state9.apiProviderDraft || activeApiProvider();
+    return normalizeApiProvider({
+      ...draft,
+      name: els10.apiProviderName?.value || draft.name,
+      base_url: els10.apiBaseUrl?.value || DEFAULT_API_BASE_URL,
+      api_key: els10.apiKey?.value || "",
+      api_mode: els10.apiMode?.value || DEFAULT_API_MODE,
+      image_model: els10.apiImageModel?.value || DEFAULT_API_IMAGE_MODEL,
+      images_concurrency: normalizeApiImagesConcurrency(els10.apiImagesConcurrency?.value),
+      api_key_set: Boolean(draft.api_key_set || draft.api_key || draft.api_key_source_provider_id),
+      api_key_masked: draft.api_key_masked,
+      api_key_source_provider_id: draft.api_key_source_provider_id
+    }, 0);
+  }
+  function writeProviderForm(provider) {
+    if (els10.apiProviderName) els10.apiProviderName.value = provider.name || "";
+    if (els10.apiBaseUrl) els10.apiBaseUrl.value = provider.base_url || DEFAULT_API_BASE_URL;
+    if (els10.apiMode) {
+      els10.apiMode.value = providerMode(provider);
+      els10.apiMode.dispatchEvent(new Event("change"));
+    }
+    if (els10.apiImageModel) els10.apiImageModel.value = provider.image_model || DEFAULT_API_IMAGE_MODEL;
+    if (els10.apiImagesConcurrency) els10.apiImagesConcurrency.value = String(normalizeApiImagesConcurrency(provider.images_concurrency));
+    if (els10.apiKey) {
+      els10.apiKey.value = provider.api_key || "";
+      els10.apiKey.placeholder = provider.api_key_set && !provider.api_key ? translate("apiSettings.savedKeyPlaceholder") : "sk-...";
+    }
+  }
+  function renderApiProviderList() {
+    const settings = normalizeApiSettings(state9.apiSettings);
+    state9.apiSettings = settings;
+    const sorting = Boolean(state9.apiProviderSortMode && settings.providers.length > 1);
+    setElementText(els10.apiProviderCount, formatTranslation("apiSettings.providerCount", {
+      count: String(settings.providers.length)
+    }));
+    if (els10.sortApiProvidersButton) {
+      const canSort = settings.providers.length > 1;
+      els10.sortApiProvidersButton.classList.toggle("hidden", !canSort);
+      els10.sortApiProvidersButton.classList.toggle("active", sorting);
+      els10.sortApiProvidersButton.disabled = apiProviderEditorActive() || !canSort;
+      els10.sortApiProvidersButton.textContent = translate(sorting ? "apiSettings.finishSortProviders" : "apiSettings.sortProviders");
+      els10.sortApiProvidersButton.setAttribute("aria-pressed", sorting ? "true" : "false");
+    }
+    els10.addApiProviderButton?.classList.toggle("hidden", sorting);
+    if (!els10.apiProviderList) return;
+    els10.apiProviderList.classList.toggle("is-sorting", sorting);
+    els10.apiProviderList.setAttribute("role", sorting ? "list" : "listbox");
+    if (sorting) {
+      const rows = settings.providers.map((provider, index) => {
+        const row = document.createElement("div");
+        row.className = `api-provider-sort-row${provider.id === settings.active_provider_id ? " active" : ""}`;
+        row.dataset.apiProviderId = provider.id;
+        row.setAttribute("role", "listitem");
+        const content = document.createElement("div");
+        content.className = "api-provider-sort-content";
+        const name = document.createElement("strong");
+        name.textContent = provider.name || provider.id;
+        const meta = document.createElement("span");
+        meta.textContent = providerMetaLabel(provider);
+        content.append(name, meta);
+        const controls = document.createElement("div");
+        controls.className = "api-provider-sort-actions";
+        [
+          ["up", "apiSettings.moveProviderUp", "apiSettings.moveProviderUpAria", index <= 0],
+          ["down", "apiSettings.moveProviderDown", "apiSettings.moveProviderDownAria", index >= settings.providers.length - 1]
+        ].forEach(([direction, labelKey, ariaKey, disabled]) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "ghost-button api-provider-sort-button";
+          button.dataset.apiProviderId = provider.id;
+          button.dataset.apiProviderSort = direction;
+          button.disabled = Boolean(disabled);
+          button.textContent = translate(labelKey);
+          button.setAttribute("aria-label", formatTranslation(ariaKey, { provider: provider.name || provider.id }));
+          controls.append(button);
+        });
+        row.append(content, controls);
+        return row;
+      });
+      els10.apiProviderList.replaceChildren(...rows);
+      return;
+    }
+    const buttons = settings.providers.map((provider) => {
+      const button = document.createElement("button");
+      const active = provider.id === settings.active_provider_id;
+      button.type = "button";
+      button.className = `api-provider-choice${active ? " active" : ""}`;
+      button.dataset.apiProviderId = provider.id;
+      button.setAttribute("role", "option");
+      button.setAttribute("aria-selected", active ? "true" : "false");
+      const name = document.createElement("strong");
+      name.textContent = provider.name || provider.id;
+      const meta = document.createElement("span");
+      meta.textContent = providerMetaLabel(provider);
+      button.append(name, meta);
+      return button;
+    });
+    els10.apiProviderList.replaceChildren(...buttons);
+  }
+  function renderApiProviderDetail() {
+    const provider = activeApiProvider();
+    setElementText(els10.apiProviderDetailBaseUrl, provider.base_url || DEFAULT_API_BASE_URL);
+    setElementText(els10.apiProviderDetailKey, providerKeyLabel(provider));
+    setElementText(els10.apiProviderDetailMode, apiModeLabel2(providerMode(provider)));
+    setElementText(els10.apiProviderDetailConcurrency, normalizeApiImagesConcurrency(provider.images_concurrency));
+  }
+  function renderApiProviderEditor() {
+    const editing = apiProviderEditorActive();
+    setApiProviderEditorVisible(editing);
+    if (!editing) return;
+    const isNew = Boolean(state9.apiProviderDraftIsNew);
+    setElementText(els10.apiProviderEditorTitle, translate(isNew ? "apiSettings.newProviderTitle" : "apiSettings.editProvider"));
+    writeProviderForm(state9.apiProviderDraft);
+  }
+  function applyApiProviderDraft(settings) {
+    if (!apiProviderEditorActive()) return normalizeApiSettings(settings);
+    const draft = draftProviderFromForm();
+    const normalized = normalizeApiSettings(settings);
+    const index = normalized.providers.findIndex((provider) => provider.id === draft.id);
+    if (index >= 0) {
+      normalized.providers[index] = normalizeApiProvider({ ...normalized.providers[index], ...draft }, index);
+    } else {
+      normalized.providers.push(normalizeApiProvider(draft, normalized.providers.length));
+    }
+    normalized.active_provider_id = draft.id;
+    state9.apiProviderEditingId = null;
+    state9.apiProviderDraft = null;
+    state9.apiProviderDraftIsNew = false;
+    return normalizeApiSettings(normalized);
   }
   function normalizeApiSettings(settings = {}) {
     const rawProviders = Array.isArray(settings.providers) && settings.providers.length ? settings.providers : [{
@@ -6487,37 +7040,15 @@ ${hint}` : hint;
       });
       els10.apiProvider.value = provider.id;
     }
-    if (els10.apiProviderName) els10.apiProviderName.value = provider.name || "";
-    if (els10.apiBaseUrl) els10.apiBaseUrl.value = provider.base_url || DEFAULT_API_BASE_URL;
-    if (els10.apiMode) {
-      els10.apiMode.value = provider.api_mode || DEFAULT_API_MODE;
-      els10.apiMode.dispatchEvent(new Event("change"));
-    }
-    if (els10.apiImageModel) els10.apiImageModel.value = provider.image_model || DEFAULT_API_IMAGE_MODEL;
-    if (els10.apiImagesConcurrency) els10.apiImagesConcurrency.value = String(normalizeApiImagesConcurrency(provider.images_concurrency));
-    if (els10.apiKey) {
-      els10.apiKey.value = provider.api_key || "";
-      els10.apiKey.placeholder = provider.api_key_set && !provider.api_key ? translate("apiSettings.savedKeyPlaceholder") : "sk-...";
-    }
-    if (els10.deleteApiProviderButton) {
-      els10.deleteApiProviderButton.disabled = state9.apiSettings.providers.length <= 1;
-    }
+    renderApiProviderList();
+    renderApiProviderDetail();
+    renderApiProviderEditor();
     updateModeSpecificSettings();
   }
-  function readApiSettingsForm() {
+  function readApiSettingsForm(options = {}) {
     const settings = normalizeApiSettings(state9.apiSettings);
     settings.codex_mode = normalizeCodexMode(els10.codexMode?.value || settings.codex_mode);
-    const activeId = settings.active_provider_id;
-    settings.providers = settings.providers.map((provider) => provider.id === activeId ? normalizeApiProvider({
-      ...provider,
-      name: els10.apiProviderName?.value || provider.name,
-      base_url: els10.apiBaseUrl?.value || DEFAULT_API_BASE_URL,
-      api_key: els10.apiKey?.value || "",
-      api_mode: els10.apiMode?.value || DEFAULT_API_MODE,
-      image_model: els10.apiImageModel?.value || DEFAULT_API_IMAGE_MODEL,
-      images_concurrency: normalizeApiImagesConcurrency(els10.apiImagesConcurrency?.value)
-    }, 0) : provider);
-    state9.apiSettings = normalizeApiSettings(settings);
+    state9.apiSettings = options.applyProviderDraft ? applyApiProviderDraft(settings) : normalizeApiSettings(settings);
     return state9.apiSettings;
   }
   function currentApiProviderId() {
@@ -6528,44 +7059,167 @@ ${hint}` : hint;
     return String(provider.name || provider.id || "").trim() || provider.id;
   }
   function addApiProvider() {
-    readApiSettingsForm();
+    if (apiProviderEditorActive()) {
+      setApiSettingsFeedback(translate("apiSettings.finishEditFirst"), "error");
+      return;
+    }
+    state9.apiProviderSortMode = false;
     const id = `provider-${Date.now()}`;
-    state9.apiSettings.providers.push(normalizeApiProvider({
+    state9.apiProviderEditingId = id;
+    state9.apiProviderDraftIsNew = true;
+    state9.apiProviderDraft = normalizeApiProvider({
       id,
       name: translate("apiSettings.newProvider"),
       base_url: DEFAULT_API_BASE_URL,
       image_model: DEFAULT_API_IMAGE_MODEL,
       api_mode: DEFAULT_API_MODE,
       images_concurrency: DEFAULT_API_IMAGES_CONCURRENCY
-    }, state9.apiSettings.providers.length));
-    state9.apiSettings.active_provider_id = id;
+    }, state9.apiSettings.providers.length);
     populateApiSettingsForm();
-    persistApiSettings();
-    updateModeSpecificSettings();
-    updateRequestPreview5();
+    setApiSettingsFeedback(translate("apiSettings.newDraftStatus"), "running");
+    els10.apiProviderName?.focus();
+  }
+  function copyApiProvider() {
+    if (apiProviderEditorActive()) {
+      setApiSettingsFeedback(translate("apiSettings.finishEditFirst"), "error");
+      return;
+    }
+    state9.apiProviderSortMode = false;
+    const provider = activeApiProvider();
+    const copiesSavedKey = providerHasApiKey(provider);
+    const id = uniqueCopiedProviderId(provider);
+    state9.apiProviderEditingId = id;
+    state9.apiProviderDraftIsNew = true;
+    state9.apiProviderDraft = normalizeApiProvider({
+      ...provider,
+      id,
+      name: copiedProviderName(provider),
+      api_key: "",
+      api_key_set: copiesSavedKey,
+      api_key_masked: provider.api_key_masked || "",
+      api_key_source_provider_id: copiesSavedKey ? provider.id : ""
+    }, state9.apiSettings.providers.length);
+    populateApiSettingsForm();
+    setApiSettingsFeedback(translate(copiesSavedKey ? "apiSettings.copyProviderStatus" : "apiSettings.copyProviderWithoutKeyStatus"), "running");
+    els10.apiProviderName?.focus();
   }
   function deleteApiProvider() {
-    readApiSettingsForm();
+    if (apiProviderEditorActive()) {
+      setApiSettingsFeedback(translate("apiSettings.finishEditFirst"), "error");
+      return;
+    }
     if (state9.apiSettings.providers.length <= 1) return;
     const activeId = state9.apiSettings.active_provider_id;
     state9.apiSettings.providers = state9.apiSettings.providers.filter((provider) => provider.id !== activeId);
     state9.apiSettings.active_provider_id = state9.apiSettings.providers[0]?.id || "default";
+    if (state9.apiSettings.providers.length <= 1) state9.apiProviderSortMode = false;
     populateApiSettingsForm();
     persistApiSettings();
-    updateModeSpecificSettings();
-    updateRequestPreview5();
+    setApiSettingsFeedback(translate("apiSettings.deleteProviderStatus"), "running");
+    renderAuthSourceAfterProviderChange();
+  }
+  function confirmDeleteApiProvider(anchor = els10.deleteApiProviderButton) {
+    if (apiProviderEditorActive()) {
+      setApiSettingsFeedback(translate("apiSettings.finishEditFirst"), "error");
+      return;
+    }
+    if (state9.apiSettings.providers.length <= 1) return;
+    const provider = activeApiProvider();
+    openConfirmPopover4(anchor || els10.deleteApiProviderButton, {
+      title: translate("apiSettings.deleteProviderTitle"),
+      message: formatTranslation("apiSettings.deleteProviderMessage", {
+        provider: provider.name || provider.id
+      }),
+      detail: translate("apiSettings.deleteProviderDetail"),
+      confirmText: translate("action.delete"),
+      onConfirm: () => deleteApiProvider()
+    });
   }
   function openApiSettingsModal() {
     closePromptPopover2();
+    state9.apiProviderEditingId = null;
+    state9.apiProviderDraft = null;
+    state9.apiProviderDraftIsNew = false;
     populateApiSettingsForm();
-    setApiSettingsFeedback(translate("apiSettings.status"), "");
-    els10.apiSettingsModal?.classList.remove("hidden");
-    els10.apiSettingsModal?.setAttribute("aria-hidden", "false");
-    els10.apiBaseUrl?.focus();
+    setApiSettingsFeedback("", "");
+    openSystemSettingsModal("api");
   }
   function closeApiSettingsModal() {
-    els10.apiSettingsModal?.classList.add("hidden");
-    els10.apiSettingsModal?.setAttribute("aria-hidden", "true");
+    closeSystemSettingsModal();
+  }
+  function selectApiProvider(providerId) {
+    const id = String(providerId || "").trim();
+    if (!id) return;
+    if (apiProviderEditorActive()) {
+      setApiSettingsFeedback(translate("apiSettings.finishEditFirst"), "error");
+      return;
+    }
+    if (state9.apiProviderSortMode) return;
+    const provider = providerById(id);
+    state9.apiSettings = normalizeApiSettings({
+      ...state9.apiSettings,
+      active_provider_id: provider.id
+    });
+    populateApiSettingsForm();
+    persistApiSettings();
+    renderAuthSourceAfterProviderChange();
+  }
+  function editApiProvider() {
+    if (apiProviderEditorActive()) return;
+    state9.apiProviderSortMode = false;
+    const provider = activeApiProvider();
+    state9.apiProviderEditingId = provider.id;
+    state9.apiProviderDraftIsNew = false;
+    state9.apiProviderDraft = normalizeApiProvider({ ...provider }, 0);
+    populateApiSettingsForm();
+    setApiSettingsFeedback(translate("apiSettings.editDraftStatus"), "running");
+    els10.apiProviderName?.focus();
+  }
+  function cancelApiProviderEdit() {
+    if (!apiProviderEditorActive()) return;
+    state9.apiProviderEditingId = null;
+    state9.apiProviderDraft = null;
+    state9.apiProviderDraftIsNew = false;
+    populateApiSettingsForm();
+    setApiSettingsFeedback("", "");
+  }
+  function toggleApiProviderSortMode() {
+    if (apiProviderEditorActive()) {
+      setApiSettingsFeedback(translate("apiSettings.finishEditFirst"), "error");
+      return;
+    }
+    const settings = normalizeApiSettings(state9.apiSettings);
+    if (settings.providers.length <= 1) return;
+    state9.apiProviderSortMode = !state9.apiProviderSortMode;
+    renderApiProviderList();
+    setApiSettingsFeedback(state9.apiProviderSortMode ? translate("apiSettings.sortProviderModeStatus") : "", state9.apiProviderSortMode ? "running" : "");
+  }
+  function moveApiProvider(providerId, direction) {
+    if (!state9.apiProviderSortMode || apiProviderEditorActive()) return;
+    const settings = normalizeApiSettings(state9.apiSettings);
+    const index = settings.providers.findIndex((provider) => provider.id === providerId);
+    const offset = direction === "up" ? -1 : direction === "down" ? 1 : 0;
+    const nextIndex = index + offset;
+    if (index < 0 || nextIndex < 0 || nextIndex >= settings.providers.length) return;
+    const providers = [...settings.providers];
+    [providers[index], providers[nextIndex]] = [providers[nextIndex], providers[index]];
+    state9.apiSettings = normalizeApiSettings({
+      ...settings,
+      providers,
+      active_provider_id: settings.active_provider_id
+    });
+    persistApiSettings();
+    renderApiProviderList();
+    setApiSettingsFeedback(translate("apiSettings.sortProviderStatus"), "running");
+  }
+  async function saveApiProviderEdit() {
+    if (!apiProviderEditorActive()) return;
+    await saveApiSettings();
+  }
+  function renderAuthSourceAfterProviderChange() {
+    legacyMethod13("renderAuthSource", state9.authStatus);
+    updateModeSpecificSettings();
+    updateRequestPreview5();
   }
   function currentApiImageModel() {
     return (activeApiProvider().image_model || DEFAULT_API_IMAGE_MODEL).trim() || DEFAULT_API_IMAGE_MODEL;
@@ -6616,17 +7270,49 @@ ${hint}` : hint;
     return [backend, provider].filter(Boolean).join(" \xB7 ");
   }
   function setApiSettingsFeedback(message, type = "") {
-    if (!els10.apiSettingsStatus) return;
-    els10.apiSettingsStatus.textContent = message;
-    els10.apiSettingsStatus.className = `api-settings-feedback ${type || ""}`.trim();
+    [els10.apiSettingsStatus, els10.codexSettingsStatus].filter(Boolean).forEach((statusElement) => {
+      statusElement.textContent = message;
+      statusElement.className = `api-settings-feedback settings-action-status ${type || ""}`.trim();
+    });
+  }
+  function saveButtons() {
+    return [els10.saveApiSettingsButton, els10.saveCodexSettingsButton, els10.saveApiProviderEditButton].filter(Boolean);
+  }
+  function setSaveButtonsDisabled(disabled) {
+    saveButtons().forEach((button) => {
+      button.disabled = disabled;
+    });
+  }
+  function setSaveButtonText(stateName) {
+    const apiText = {
+      saving: translate("apiSettings.saving"),
+      saved: translate("apiSettings.savedShort"),
+      failed: translate("apiSettings.saveFailedShort"),
+      default: translate("apiSettings.saveSelection")
+    }[stateName];
+    const providerText = {
+      saving: translate("apiSettings.saving"),
+      saved: translate("apiSettings.savedShort"),
+      failed: translate("apiSettings.saveFailedShort"),
+      default: translate("apiSettings.saveProvider")
+    }[stateName];
+    const codexText = {
+      saving: translate("apiSettings.saving"),
+      saved: translate("apiSettings.savedShort"),
+      failed: translate("apiSettings.saveFailedShort"),
+      default: translate("codexSettings.save")
+    }[stateName];
+    if (els10.saveApiSettingsButton) els10.saveApiSettingsButton.textContent = apiText;
+    if (els10.saveApiProviderEditButton) els10.saveApiProviderEditButton.textContent = providerText;
+    if (els10.saveCodexSettingsButton) els10.saveCodexSettingsButton.textContent = codexText;
   }
   async function saveApiSettings() {
-    if (!els10.saveApiSettingsButton) return;
+    if (!saveButtons().length) return;
     if (state9.apiSettingsSaveTimerId) {
       window.clearTimeout(state9.apiSettingsSaveTimerId);
       state9.apiSettingsSaveTimerId = null;
     }
-    const settings = readApiSettingsForm();
+    const settings = readApiSettingsForm({ applyProviderDraft: true });
     persistApiSettings();
     const payload2 = {
       codex_mode: settings.codex_mode,
@@ -6641,11 +7327,14 @@ ${hint}` : hint;
         };
         item.images_concurrency = provider.images_concurrency;
         if (provider.api_key || !provider.api_key_set) item.api_key = provider.api_key;
+        if (!provider.api_key && provider.api_key_source_provider_id) {
+          item.api_key_source_provider_id = provider.api_key_source_provider_id;
+        }
         return item;
       })
     };
-    els10.saveApiSettingsButton.disabled = true;
-    els10.saveApiSettingsButton.textContent = translate("apiSettings.saving");
+    setSaveButtonsDisabled(true);
+    setSaveButtonText("saving");
     setApiSettingsFeedback(translate("apiSettings.savingStatus"), "running");
     try {
       const response = await fetch("/api/api-settings", {
@@ -6656,6 +7345,9 @@ ${hint}` : hint;
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || translate("apiSettings.saveFailed"));
       state9.apiSettings = mergeApiProviderKeys(data.settings || {});
+      state9.apiProviderEditingId = null;
+      state9.apiProviderDraft = null;
+      state9.apiProviderDraftIsNew = false;
       persistApiSettings();
       populateApiSettingsForm();
       setApiSettingsFeedback(formatTranslation("apiSettings.savedSummary", {
@@ -6665,9 +7357,9 @@ ${hint}` : hint;
         model: currentApiImageModel(),
         concurrency: currentApiImagesConcurrency()
       }), "ok");
-      els10.saveApiSettingsButton.textContent = translate("apiSettings.savedShort");
+      setSaveButtonText("saved");
       state9.apiSettingsSaveTimerId = window.setTimeout(() => {
-        els10.saveApiSettingsButton.textContent = translate("apiSettings.save");
+        setSaveButtonText("default");
         state9.apiSettingsSaveTimerId = null;
       }, 1600);
       setStatus8(translate("apiSettings.savedStatus"), "ok");
@@ -6675,13 +7367,13 @@ ${hint}` : hint;
       updateRequestPreview5();
     } catch (error) {
       setApiSettingsFeedback(error.message || translate("apiSettings.saveFailed"), "error");
-      els10.saveApiSettingsButton.textContent = translate("apiSettings.saveFailedShort");
+      setSaveButtonText("failed");
       setStatus8(error.message || translate("apiSettings.saveFailed"), "error");
     } finally {
-      els10.saveApiSettingsButton.disabled = false;
-      if (!state9.apiSettingsSaveTimerId && els10.saveApiSettingsButton.textContent !== translate("apiSettings.save")) {
+      setSaveButtonsDisabled(false);
+      if (!state9.apiSettingsSaveTimerId && (els10.saveApiSettingsButton?.textContent !== translate("apiSettings.saveSelection") || els10.saveApiProviderEditButton?.textContent !== translate("apiSettings.saveProvider") || els10.saveCodexSettingsButton?.textContent !== translate("codexSettings.save"))) {
         state9.apiSettingsSaveTimerId = window.setTimeout(() => {
-          els10.saveApiSettingsButton.textContent = translate("apiSettings.save");
+          setSaveButtonText("default");
           state9.apiSettingsSaveTimerId = null;
         }, 1600);
       }
@@ -6696,8 +7388,8 @@ ${hint}` : hint;
     document.addEventListener(LOCALE_CHANGE_EVENT, () => {
       const bridge39 = getLegacyBridge();
       renderAuthSource(bridge39.state.authStatus);
-      if (!bridge39.els.apiSettingsModal?.classList.contains("hidden")) {
-        setApiSettingsFeedback(translate("apiSettings.status"), "");
+      if (!bridge39.els.systemSettingsModal?.classList.contains("hidden") && (!bridge39.els.systemSettingsApiPanel?.hidden || !bridge39.els.systemSettingsCodexPanel?.hidden)) {
+        setApiSettingsFeedback("", "");
       }
     });
     Object.assign(getLegacyBridge().methods, {
@@ -6726,7 +7418,15 @@ ${hint}` : hint;
       currentApiProviderId,
       currentApiProviderLabel: currentApiProviderLabel2,
       addApiProvider,
+      confirmDeleteApiProvider,
+      copyApiProvider,
       deleteApiProvider,
+      editApiProvider,
+      cancelApiProviderEdit,
+      saveApiProviderEdit,
+      selectApiProvider,
+      moveApiProvider,
+      toggleApiProviderSortMode,
       openApiSettingsModal,
       closeApiSettingsModal,
       currentApiImageModel,
@@ -6783,12 +7483,10 @@ ${hint}` : hint;
     closePromptPopover3();
     refreshSettings();
     if (els11.settingsStatus) els11.settingsStatus.textContent = translate("settings.status");
-    els11.settingsModal?.classList.remove("hidden");
-    els11.settingsModal?.setAttribute("aria-hidden", "false");
+    openSystemSettingsModal("storage");
   }
   function closeSettingsModal() {
-    els11.settingsModal?.classList.add("hidden");
-    els11.settingsModal?.setAttribute("aria-hidden", "true");
+    closeSystemSettingsModal();
   }
   async function saveSettings() {
     if (!els11.saveSettingsButton) return;
@@ -6822,7 +7520,7 @@ ${hint}` : hint;
     if (storageSettingsFeatureInitialized) return;
     storageSettingsFeatureInitialized = true;
     document.addEventListener(LOCALE_CHANGE_EVENT, () => {
-      if (!els11.settingsModal?.classList.contains("hidden") && els11.settingsStatus) {
+      if (!els11.systemSettingsModal?.classList.contains("hidden") && !els11.systemSettingsStoragePanel?.hidden && els11.settingsStatus) {
         els11.settingsStatus.textContent = translate("settings.status");
       }
     });
@@ -13005,7 +13703,7 @@ ${galleryText}`;
   function renderPreview2(...args) {
     return legacyMethod32("renderPreview", ...args);
   }
-  function openConfirmPopover4(...args) {
+  function openConfirmPopover5(...args) {
     return legacyMethod32("openConfirmPopover", ...args);
   }
   function deleteTaskById(...args) {
@@ -13130,7 +13828,7 @@ ${galleryText}`;
       setStatus15(formatTranslation("batch.runningCannotDeleteSelected"), "error");
       return;
     }
-    openConfirmPopover4(els31.batchDeleteButton, {
+    openConfirmPopover5(els31.batchDeleteButton, {
       title: formatTranslation("batch.deleteTitle", { count: deletableTasks.length }),
       message: formatTranslation("batch.deleteMessage"),
       detail: skippedCount ? formatTranslation("batch.deleteSkippedDetail", { count: skippedCount }) : "",
@@ -13353,7 +14051,7 @@ ${galleryText}`;
   function renderPreview3(...args) {
     return legacyMethod33("renderPreview", ...args);
   }
-  function openConfirmPopover5(...args) {
+  function openConfirmPopover6(...args) {
     return legacyMethod33("openConfirmPopover", ...args);
   }
   function canRetryFailedTask(...args) {
@@ -13523,7 +14221,7 @@ ${galleryText}`;
       return;
     }
     const title = task.prompt || task.mode || taskId;
-    openConfirmPopover5(deleteButton, {
+    openConfirmPopover6(deleteButton, {
       title: translate("taskActions.deleteTitle"),
       message: translate("taskActions.deleteMessage"),
       detail: title,
@@ -16196,7 +16894,7 @@ ${galleryText}`;
   function acceptTaskSuccesses2(...args) {
     return legacyMethod38("acceptTaskSuccesses", ...args);
   }
-  function openConfirmPopover6(...args) {
+  function openConfirmPopover7(...args) {
     return legacyMethod38("openConfirmPopover", ...args);
   }
   function setStatus20(...args) {
@@ -16781,7 +17479,7 @@ ${galleryText}`;
       setStatus20(translate("preview.noUnselectedOutputs"), "error");
       return;
     }
-    openConfirmPopover6(button, {
+    openConfirmPopover7(button, {
       title: translate("preview.deleteUnselectedTitle"),
       message: translate("preview.deleteUnselectedMessage"),
       detail: formatTranslation("preview.deleteUnselectedDetail", { selected: selectedCount, deleted: deleteCount }),
@@ -17609,7 +18307,7 @@ ${galleryText}`;
     document.body.appendChild(confirmPopoverEl);
     return confirmPopoverEl;
   }
-  function openConfirmPopover7(anchor, options = {}) {
+  function openConfirmPopover8(anchor, options = {}) {
     if (!anchor) return;
     const popover = ensureConfirmPopover();
     if (!popover.classList.contains("hidden") && confirmPopoverState.anchor === anchor) {
@@ -17840,7 +18538,7 @@ ${galleryText}`;
     Object.assign(getLegacyBridge().methods, {
       bindOverlayPopoverEvents,
       ensureConfirmPopover,
-      openConfirmPopover: openConfirmPopover7,
+      openConfirmPopover: openConfirmPopover8,
       closeConfirmPopover: closeConfirmPopover4,
       positionConfirmPopover,
       promptPopoverSection,
@@ -18531,85 +19229,6 @@ ${galleryText}`;
     });
   }
 
-  // codex_image/webui/frontend/src/segmented-indicator.ts
-  var HOST_SELECTORS = [".radio-group:not(.ratio-group)", "#authSourceGroup", "#languageSwitcher", ".history-view-toggle", ".history-sort-toggle"];
-  var HOST_SELECTOR = HOST_SELECTORS.join(", ");
-  var BUTTON_SELECTOR = ".radio-btn, .auth-source-button, .language-option, .history-view-button, .history-sort-button";
-  var INDICATOR_CLASS = "segmented-indicator";
-  var HOST_CLASS = "segmented-indicator-host";
-  var initializedHosts = /* @__PURE__ */ new WeakSet();
-  var scheduledFrames = /* @__PURE__ */ new WeakMap();
-  var segmentedIndicatorsInitialized = false;
-  var resizeObserver = null;
-  function activeSegment(host) {
-    return host.querySelector(".radio-btn.active, .auth-source-button.active, .language-option.active, .history-view-button.active, .history-sort-button.active");
-  }
-  function ensureIndicator(host) {
-    const existing = Array.from(host.children).find((child) => child.classList.contains(INDICATOR_CLASS));
-    if (existing instanceof HTMLElement) return existing;
-    const indicator = document.createElement("span");
-    indicator.className = INDICATOR_CLASS;
-    indicator.setAttribute("aria-hidden", "true");
-    host.insertBefore(indicator, host.firstElementChild);
-    return indicator;
-  }
-  function updateIndicator(host) {
-    scheduledFrames.delete(host);
-    if (!host.isConnected) return;
-    const indicator = ensureIndicator(host);
-    const active = activeSegment(host);
-    if (!active) {
-      indicator.style.setProperty("--segmented-indicator-opacity", "0");
-      return;
-    }
-    const hostRect = host.getBoundingClientRect();
-    const activeRect = active.getBoundingClientRect();
-    const hostStyle = window.getComputedStyle(host);
-    const borderLeft = Number.parseFloat(hostStyle.borderLeftWidth) || 0;
-    const borderTop = Number.parseFloat(hostStyle.borderTopWidth) || 0;
-    indicator.style.setProperty("--segmented-indicator-x", `${activeRect.left - hostRect.left - borderLeft}px`);
-    indicator.style.setProperty("--segmented-indicator-y", `${activeRect.top - hostRect.top - borderTop}px`);
-    indicator.style.setProperty("--segmented-indicator-width", `${activeRect.width}px`);
-    indicator.style.setProperty("--segmented-indicator-height", `${activeRect.height}px`);
-    indicator.style.setProperty("--segmented-indicator-opacity", "1");
-  }
-  function scheduleIndicatorUpdate(host) {
-    if (scheduledFrames.has(host)) return;
-    scheduledFrames.set(host, window.requestAnimationFrame(() => updateIndicator(host)));
-  }
-  function watchButtonClassChanges(host) {
-    const observer = new MutationObserver(() => scheduleIndicatorUpdate(host));
-    host.querySelectorAll(BUTTON_SELECTOR).forEach((button) => {
-      observer.observe(button, { attributes: true, attributeFilter: ["class"] });
-    });
-  }
-  function initHost(host) {
-    if (initializedHosts.has(host)) return;
-    initializedHosts.add(host);
-    host.classList.add(HOST_CLASS);
-    ensureIndicator(host);
-    host.addEventListener("click", () => scheduleIndicatorUpdate(host));
-    watchButtonClassChanges(host);
-    if ("ResizeObserver" in window) {
-      resizeObserver || (resizeObserver = new ResizeObserver((entries) => {
-        entries.forEach((entry) => scheduleIndicatorUpdate(entry.target));
-      }));
-      resizeObserver.observe(host);
-    }
-    scheduleIndicatorUpdate(host);
-  }
-  function updateAllIndicators() {
-    document.querySelectorAll(HOST_SELECTOR).forEach(scheduleIndicatorUpdate);
-  }
-  function initSegmentedIndicatorFeature() {
-    if (segmentedIndicatorsInitialized) return;
-    segmentedIndicatorsInitialized = true;
-    document.querySelectorAll(HOST_SELECTOR).forEach(initHost);
-    window.addEventListener("resize", updateAllIndicators, { passive: true });
-    document.fonts?.ready?.then(updateAllIndicators).catch(() => {
-    });
-  }
-
   // codex_image/webui/frontend/src/main.ts
   initInputSourcesFeature();
   initImageEditorFeature();
@@ -18622,6 +19241,7 @@ ${galleryText}`;
   initGalleryFeature();
   initApiSettingsFeature();
   initStorageSettingsFeature();
+  initSystemSettingsFeature();
   initColorPaletteFeature();
   initPromptColorsFeature();
   initPromptSnippetsFeature();

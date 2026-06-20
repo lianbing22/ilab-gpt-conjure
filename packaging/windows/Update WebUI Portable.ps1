@@ -97,14 +97,46 @@ function Clear-UpdateNotice {
   }
 }
 
+function Get-NormalizedPath {
+  param([Parameter(Mandatory = $true)][string] $Path)
+  return [System.IO.Path]::GetFullPath($Path).TrimEnd([char[]] @("\", "/"))
+}
+
+function Assert-PathInsideBundle {
+  param([Parameter(Mandatory = $true)][string] $Path)
+  $BundleRoot = Get-NormalizedPath -Path $BundleDir
+  $FullPath = Get-NormalizedPath -Path $Path
+  if ($FullPath -eq $BundleRoot) {
+    return
+  }
+  $ExpectedPrefix = $BundleRoot + [System.IO.Path]::DirectorySeparatorChar
+  $AltExpectedPrefix = $BundleRoot + [System.IO.Path]::AltDirectorySeparatorChar
+  if (
+    -not $FullPath.StartsWith($ExpectedPrefix, [System.StringComparison]::OrdinalIgnoreCase) -and
+    -not $FullPath.StartsWith($AltExpectedPrefix, [System.StringComparison]::OrdinalIgnoreCase)
+  ) {
+    throw "Refusing to modify path outside bundle: $FullPath"
+  }
+}
+
+function Assert-ReplaceItemName {
+  param([Parameter(Mandatory = $true)][string] $Item)
+  if ([System.IO.Path]::IsPathRooted($Item) -or $Item -match '(^|[\\/])\.\.([\\/]|$)') {
+    throw "Refusing unsafe replace item: $Item"
+  }
+}
+
 function Restore-Backup {
   if (-not (Test-Path $BackupDir)) {
     return
   }
   Write-Host "Restoring previous files from $BackupDir"
   foreach ($Item in $ReplaceItems) {
+    Assert-ReplaceItemName -Item $Item
     $BackupItem = Join-Path $BackupDir $Item
     $TargetItem = Join-Path $BundleDir $Item
+    Assert-PathInsideBundle -Path $BackupItem
+    Assert-PathInsideBundle -Path $TargetItem
     if (-not (Test-Path $BackupItem)) {
       continue
     }
@@ -156,6 +188,9 @@ try {
     Write-Host "Current version: unknown"
   }
   Write-Host "Latest version:  $($Release.tag_name)"
+  Write-Host "Release asset:   $($ZipAsset.name)"
+  Write-Host "SHA256 file:     $($HashAsset.name)"
+  Write-Host "Download URL:    $($ZipAsset.browser_download_url)"
   Write-Host ""
   Write-Host "Close the WebUI server window before updating."
   Read-Host "Press Enter to continue"
@@ -195,11 +230,14 @@ try {
 
   Write-Step "Backing up current app files"
   foreach ($Item in $ReplaceItems) {
+    Assert-ReplaceItemName -Item $Item
     $CurrentItem = Join-Path $BundleDir $Item
     if (-not (Test-Path $CurrentItem)) {
       continue
     }
     $BackupItem = Join-Path $BackupDir $Item
+    Assert-PathInsideBundle -Path $CurrentItem
+    Assert-PathInsideBundle -Path $BackupItem
     $BackupParent = Split-Path -Parent $BackupItem
     if ($BackupParent -and -not (Test-Path $BackupParent)) {
       New-Item -ItemType Directory -Force -Path $BackupParent | Out-Null
@@ -209,11 +247,13 @@ try {
 
   Write-Step "Installing updated app files"
   foreach ($Item in $ReplaceItems) {
+    Assert-ReplaceItemName -Item $Item
     $SourceItem = Join-Path $NewRoot $Item
     if (-not (Test-Path $SourceItem)) {
       continue
     }
     $TargetItem = Join-Path $BundleDir $Item
+    Assert-PathInsideBundle -Path $TargetItem
     $TargetParent = Split-Path -Parent $TargetItem
     if ($TargetParent -and -not (Test-Path $TargetParent)) {
       New-Item -ItemType Directory -Force -Path $TargetParent | Out-Null
