@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { getLegacyBridge } from "./state";
 import { formatTranslation, LOCALE_CHANGE_EVENT, translate } from "./i18n";
+import { webAppDocumentTitle } from "./web-app-title";
 
 const THEME_STORAGE_KEY = "codex-image-theme-preference";
 const THEME_OPTIONS = new Set(["system", "light", "dark"]);
@@ -18,6 +19,7 @@ let shellUiEventsBound = false;
 let previewPanelHeightFrameId = null;
 let sidebarResizeFrameId = null;
 let sidebarResizePendingWidth = null;
+let themeTransitionLockFrameId = null;
 
 function legacyMethod(name, ...args) {
   const method = getLegacyBridge().methods[name];
@@ -97,9 +99,25 @@ function updateThemeSwitcher() {
   });
 }
 
+function lockThemeTransitions() {
+  document.documentElement.classList.add("theme-transition-lock");
+  if (themeTransitionLockFrameId !== null) {
+    cancelAnimationFrame(themeTransitionLockFrameId);
+  }
+  themeTransitionLockFrameId = requestAnimationFrame(() => {
+    themeTransitionLockFrameId = requestAnimationFrame(() => {
+      document.documentElement.classList.remove("theme-transition-lock");
+      themeTransitionLockFrameId = null;
+    });
+  });
+}
+
 function applyThemePreference(preference, { persist = true } = {}) {
   state.themePreference = normalizeThemePreference(preference);
   const effectiveTheme = resolveEffectiveTheme(state.themePreference);
+  if (document.documentElement.dataset.theme !== effectiveTheme) {
+    lockThemeTransitions();
+  }
   document.documentElement.dataset.theme = effectiveTheme;
   document.documentElement.dataset.themePreference = state.themePreference;
   if (persist) {
@@ -331,7 +349,9 @@ function updateDocumentTitle() {
     const selected = state.tasks.find((item) => String(item.task_id) === String(state.selectedTaskId));
     status = selected ? formatTaskStatus(selected) : "";
   }
-  document.title = status ? `${status} · ${getLegacyBridge().constants.defaultDocumentTitle}` : getLegacyBridge().constants.defaultDocumentTitle;
+  const defaultTitle = getLegacyBridge().constants.defaultDocumentTitle;
+  const fullTitle = status ? `${status} · ${defaultTitle}` : defaultTitle;
+  document.title = webAppDocumentTitle(status, fullTitle);
 }
 
 function setStatus(message, type) {

@@ -772,6 +772,8 @@ export const JA_DICTIONARY: TranslationDictionary = {
     "apiSettings.concurrencyValue": "同時実行性{concurrency}",
     "apiSettings.keySaved": "API Keyが保存されました",
     "apiSettings.keyNotSet": "API Keyが設定されていません",
+    "apiSettings.showApiKey": "APIキーを表示",
+    "apiSettings.hideApiKey": "APIキーを隠す",
     "apiSettings.editProvider": "プロバイダーを編集",
     "apiSettings.newProviderTitle": "新しいプロバイダー",
     "apiSettings.editHint": "「プロバイダーを保存」を押すまで、この編集はバックエンドに書き込まれません。キャンセルすると破棄されます。",

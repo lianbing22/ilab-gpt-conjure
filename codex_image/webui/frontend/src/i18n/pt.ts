@@ -772,6 +772,8 @@ export const PT_DICTIONARY: TranslationDictionary = {
     "apiSettings.concurrencyValue": "simultaneidade {concurrency}",
     "apiSettings.keySaved": "Chave API salva",
     "apiSettings.keyNotSet": "Chave API não definida",
+    "apiSettings.showApiKey": "Mostrar API Key",
+    "apiSettings.hideApiKey": "Ocultar API Key",
     "apiSettings.editProvider": "Editar provedor",
     "apiSettings.newProviderTitle": "Novo provedor",
     "apiSettings.editHint": "O provedor de salvamento grava esta edição no back-end. Cancelar descarta-o.",

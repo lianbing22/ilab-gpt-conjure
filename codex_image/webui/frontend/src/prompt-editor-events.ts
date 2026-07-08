@@ -80,6 +80,10 @@ export function syncPromptFromEditor(): void {
 }
 
 export function handlePromptEditorKeydown(event: any): void {
+  if (isPromptEditorArrowKey(event.key)) {
+    event.stopPropagation();
+    return;
+  }
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "a") {
     event.preventDefault();
     selectPromptEditorContents();
@@ -125,6 +129,10 @@ export function handlePromptEditorKeydown(event: any): void {
       if (snippet) insertPromptSnippet(snippet);
     }
   }
+}
+
+function isPromptEditorArrowKey(key: string): boolean {
+  return key === "ArrowUp" || key === "ArrowDown" || key === "ArrowLeft" || key === "ArrowRight";
 }
 
 export function handlePromptEditorClick(event: any): void {
@@ -356,7 +364,11 @@ export function setCaretToEnd(element: any): void {
 export function setCaretAfterNode(node: any): void {
   if (!node) return;
   const range = document.createRange();
-  range.setStartAfter(node);
+  if (node.nodeType === Node.TEXT_NODE) {
+    range.setStart(node, (node.textContent || "").length);
+  } else {
+    range.setStartAfter(node);
+  }
   range.collapse(true);
   const selection = window.getSelection();
   if (!selection) return;

@@ -242,6 +242,45 @@ class WebUITaskTests(unittest.TestCase):
         self.assertEqual(task["output_size"], "2336x3504")
         self.assertEqual(task["params"]["size"], "2336x3504")
 
+    def test_recent_tasks_api_preserves_requested_size_when_output_dimensions_differ(self) -> None:
+        from codex_image.webui.app import create_app
+
+        task_id = "20260705145007-1b903c99"
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            app = create_app(output_root=root, auth_checker=lambda: True, auto_start_queue=False)
+            metadata_path(root, task_id).parent.mkdir(parents=True, exist_ok=True)
+            metadata_path(root, task_id).write_text(
+                json.dumps(
+                    {
+                        "task_id": task_id,
+                        "created_at": "2026-07-05T14:50:07+00:00",
+                        "status": "completed",
+                        "prompt": "requested 9:16 but provider returned 2:3",
+                        "params": {"size": "864x1536", "ratio": "9:16", "n": 2},
+                        "output_size": "832x1248",
+                        "output_sizes": ["832x1248", "832x1248"],
+                        "outputs": [
+                            {"index": 1, "status": "completed", "size": "832x1248", "url": output_url(task_id, 1, "jpg")},
+                            {"index": 2, "status": "completed", "size": "832x1248", "url": output_url(task_id, 2, "jpg")},
+                        ],
+                        "generated_count": 2,
+                        "failed_count": 0,
+                        "total_count": 2,
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            client = TestClient(app)
+            response = client.get("/api/tasks/recent", params={"limit": 10})
+
+        self.assertEqual(response.status_code, 200)
+        task = response.json()["tasks"][0]
+        self.assertEqual(task["output_size"], "832x1248")
+        self.assertEqual(task["params"]["size"], "864x1536")
+        self.assertEqual(task["params"]["ratio"], "9:16")
+
     def test_task_outputs_zip_downloads_multiple_outputs(self) -> None:
         from codex_image.webui.app import create_app
 

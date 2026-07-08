@@ -84,3 +84,9 @@
 * {
   box-sizing: border-box;
 }
+
+:root.theme-transition-lock *,
+:root.theme-transition-lock *::before,
+:root.theme-transition-lock *::after {
+  transition: none !important;
+}

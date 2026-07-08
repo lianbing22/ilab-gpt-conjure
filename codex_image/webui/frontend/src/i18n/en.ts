@@ -782,6 +782,8 @@ export const EN_DICTIONARY: TranslationDictionary = {
     "apiSettings.concurrencyValue": "concurrency {concurrency}",
     "apiSettings.keySaved": "API key saved",
     "apiSettings.keyNotSet": "API key not set",
+    "apiSettings.showApiKey": "Show API key",
+    "apiSettings.hideApiKey": "Hide API key",
     "apiSettings.editProvider": "Edit provider",
     "apiSettings.newProviderTitle": "New provider",
     "apiSettings.editHint": "Save provider writes this edit to the backend. Cancel discards it.",

@@ -772,6 +772,8 @@ export const ES_DICTIONARY: TranslationDictionary = {
     "apiSettings.concurrencyValue": "concurrencia {concurrency}",
     "apiSettings.keySaved": "API clave guardada",
     "apiSettings.keyNotSet": "API clave no configurada",
+    "apiSettings.showApiKey": "Mostrar API Key",
+    "apiSettings.hideApiKey": "Ocultar API Key",
     "apiSettings.editProvider": "Editar proveedor",
     "apiSettings.newProviderTitle": "Nuevo proveedor",
     "apiSettings.editHint": "El proveedor de guardado escribe esta edición en el backend. Cancelar lo descarta.",

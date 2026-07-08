@@ -132,16 +132,32 @@ function promptLengthLabel(value) {
   });
 }
 
-function promptPopoverSection(label, text, meta, tone = "") {
+function promptPopoverSection(label, text, meta, tone = "", actions = "") {
   const toneClass = tone ? ` prompt-popover-section-${tone}` : "";
   return `
     <section class="prompt-popover-section${toneClass}">
       <div class="prompt-popover-section-head">
         <div class="prompt-popover-label">${escapeHtml(label)}</div>
-        <span class="prompt-popover-meta">${escapeHtml(meta || promptLengthLabel(text))}</span>
+        <div class="prompt-popover-section-tools">
+          <span class="prompt-popover-meta">${escapeHtml(meta || promptLengthLabel(text))}</span>
+          ${actions}
+        </div>
       </div>
       <pre class="prompt-popover-text">${escapeHtml(text || translate("promptPopover.empty"))}</pre>
     </section>
+  `;
+}
+
+function optimizedPromptCopyButton(optimizedPrompt) {
+  return `
+    <button
+      class="prompt-copy-button prompt-copy-inline"
+      type="button"
+      data-copy-optimized-prompt
+      aria-label="${escapeHtml(translate("promptPopover.copyOptimized"))}"
+      title="${escapeHtml(translate("promptPopover.copyOptimized"))}"
+      ${optimizedPrompt ? "" : "disabled"}
+    >${escapeHtml(translate("templates.copy"))}</button>
   `;
 }
 
@@ -191,12 +207,15 @@ function openPromptPopover(anchor, data) {
     <div class="prompt-popover-body">
       <div class="prompt-popover-compare">
         ${promptPopoverSection(translate("promptPopover.original"), originalPrompt || translate("promptPopover.empty"), promptLengthLabel(originalPrompt), "original")}
-        ${promptPopoverSection(translate("promptPopover.optimized"), optimizedPrompt || translate("promptPopover.noOptimized"), optimizedLength, optimizedPrompt ? "optimized" : "empty")}
+        ${promptPopoverSection(
+          translate("promptPopover.optimized"),
+          optimizedPrompt || translate("promptPopover.noOptimized"),
+          optimizedLength,
+          optimizedPrompt ? "optimized" : "empty",
+          optimizedPromptCopyButton(optimizedPrompt),
+        )}
       </div>
       ${submittedPromptDetails(originalPrompt, submittedPrompt)}
-    </div>
-    <div class="prompt-popover-actions">
-      <button class="prompt-copy-button" type="button" data-copy-optimized-prompt ${optimizedPrompt ? "" : "disabled"}>${escapeHtml(translate("promptPopover.copyOptimized"))}</button>
     </div>
   `;
   popover.querySelector(".prompt-popover-close")?.addEventListener("click", closePromptPopover);
@@ -209,14 +228,17 @@ function openPromptPopover(anchor, data) {
 
 function positionPromptPopover(anchor, popover) {
   const anchorRect = anchor.getBoundingClientRect();
+  const horizontalAnchorRect = promptPopoverHorizontalAnchorRect(anchor);
+  const horizontalAnchorCenter = horizontalAnchorRect.left + horizontalAnchorRect.width / 2;
   const margin = 12;
-  const width = Math.min(860, Math.max(360, window.innerWidth - margin * 2));
+  const viewportWidth = Math.max(0, window.innerWidth - margin * 2);
+  const width = Math.min(760, viewportWidth);
   popover.style.left = "0px";
   popover.style.top = "0px";
   popover.style.width = `${width}px`;
   const height = popover.offsetHeight;
   const left = clampPopoverPosition(
-    anchorRect.left + anchorRect.width / 2 - width / 2,
+    horizontalAnchorCenter - width / 2,
     margin,
     window.innerWidth - width - margin,
   );
@@ -227,6 +249,24 @@ function positionPromptPopover(anchor, popover) {
     : clampPopoverPosition(fallbackTop, margin, window.innerHeight - height - margin);
   popover.style.left = `${left}px`;
   popover.style.top = `${top}px`;
+}
+
+function promptPopoverHorizontalAnchorRect(anchor) {
+  const image = anchor.closest?.(".preview-card")?.querySelector?.("img[data-lightbox-url]");
+  if (!(image instanceof HTMLImageElement)) return anchor.getBoundingClientRect();
+  const imageRect = image.getBoundingClientRect();
+  if (!imageRect.width || !imageRect.height || !image.naturalWidth || !image.naturalHeight) return imageRect;
+  const scale = Math.min(imageRect.width / image.naturalWidth, imageRect.height / image.naturalHeight);
+  const width = image.naturalWidth * scale;
+  const height = image.naturalHeight * scale;
+  return {
+    left: imageRect.left + (imageRect.width - width) / 2,
+    top: imageRect.top + (imageRect.height - height) / 2,
+    right: imageRect.left + (imageRect.width + width) / 2,
+    bottom: imageRect.top + (imageRect.height + height) / 2,
+    width,
+    height,
+  };
 }
 
 function clampPopoverPosition(value, min, max) {
@@ -251,11 +291,13 @@ function clearPromptPopoverCopyTimer() {
 async function copyOptimizedPrompt(button) {
   const text = promptPopoverState.optimizedPrompt;
   if (!text) return;
+  const defaultLabel = button.dataset.copyLabel || button.textContent || translate("templates.copy");
+  button.dataset.copyLabel = defaultLabel;
   await navigator.clipboard.writeText(text);
   button.textContent = translate("promptPopover.copied");
   clearPromptPopoverCopyTimer();
   promptPopoverState.copyTimerId = window.setTimeout(() => {
-    button.textContent = translate("promptPopover.copyOptimized");
+    button.textContent = defaultLabel;
     promptPopoverState.copyTimerId = null;
   }, 1200);
 }
@@ -323,6 +365,7 @@ export function initOverlayPopoversFeature() {
     ensurePromptPopover,
     openPromptPopover,
     positionPromptPopover,
+    promptPopoverHorizontalAnchorRect,
     clampPopoverPosition,
     closePromptPopover,
     clearPromptPopoverCopyTimer,

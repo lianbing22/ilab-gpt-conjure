@@ -12,6 +12,9 @@ function legacyMethod(name: string, ...args: any[]): any {
 }
 
 function rangeIntersectsNode(range: any, node: any): boolean { return legacyMethod("rangeIntersectsNode", range, node); }
+function createPromptTextFragment(text: any): { fragment: DocumentFragment; lastNode: Node | null } {
+  return legacyMethod("createPromptTextFragment", text);
+}
 function setCaretAfterNode(node: any): void { legacyMethod("setCaretAfterNode", node); }
 function syncPromptAfterChipMutation(): void { legacyMethod("syncPromptAfterChipMutation"); }
 function updateMentionSuggest(): void { legacyMethod("updateMentionSuggest"); }
@@ -71,22 +74,23 @@ export function insertPlainPromptText(text: any): void {
   const normalized = normalizePromptPasteText(text);
   if (!normalized) return;
   els.promptEditor.focus();
-  const textNode = document.createTextNode(normalized);
+  const { fragment, lastNode } = createPromptTextFragment(normalized);
+  if (!lastNode) return;
   const selection = window.getSelection();
   if (!selection || !selection.rangeCount) {
-    els.promptEditor.append(textNode);
-    setCaretAfterNode(textNode);
+    els.promptEditor.append(fragment);
+    setCaretAfterNode(lastNode);
     return;
   }
   const range = selection.getRangeAt(0);
   if (!rangeIntersectsNode(range, els.promptEditor)) {
-    els.promptEditor.append(textNode);
-    setCaretAfterNode(textNode);
+    els.promptEditor.append(fragment);
+    setCaretAfterNode(lastNode);
     return;
   }
   range.deleteContents();
-  range.insertNode(textNode);
-  setCaretAfterNode(textNode);
+  range.insertNode(fragment);
+  setCaretAfterNode(lastNode);
 }
 
 export function handlePromptEditorPaste(event: any): void {

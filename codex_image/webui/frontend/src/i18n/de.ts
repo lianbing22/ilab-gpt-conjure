@@ -772,6 +772,8 @@ export const DE_DICTIONARY: TranslationDictionary = {
     "apiSettings.concurrencyValue": "Parallelität {concurrency}",
     "apiSettings.keySaved": "API Schlüssel gespeichert",
     "apiSettings.keyNotSet": "Schlüssel API nicht gesetzt",
+    "apiSettings.showApiKey": "API-Key anzeigen",
+    "apiSettings.hideApiKey": "API-Key ausblenden",
     "apiSettings.editProvider": "Anbieter bearbeiten",
     "apiSettings.newProviderTitle": "Neuer Anbieter",
     "apiSettings.editHint": "Der Speicheranbieter schreibt diese Änderung in das Backend. Abbrechen verwirft es.",

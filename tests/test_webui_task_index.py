@@ -170,6 +170,26 @@ class WebUITaskIndexTests(unittest.TestCase):
         self.assertIn("previous_cursor", previous_newest)
         self.assertEqual([task["task_id"] for task in previous_oldest["tasks"]], ["task-a"])
 
+    def test_history_search_matches_chinese_substrings_when_fts_is_enabled(self) -> None:
+        with TemporaryDirectory() as tmp:
+            index = SQLiteTaskIndex(Path(tmp) / "tasks.db")
+            index.upsert(
+                {
+                    "task_id": "detail-page-task",
+                    "created_at": "2026-07-06T08:21:59+00:00",
+                    "updated_at": "2026-07-06T08:22:30+00:00",
+                    "status": "completed",
+                    "prompt": "请根据图中详情页首图生成下一版面的细节描述图",
+                    "params": {"size": "2160x3840", "quality": "high"},
+                    "generated_count": 1,
+                    "total_count": 1,
+                }
+            )
+
+            searched = index.query_history(limit=10, q="详情")
+
+        self.assertEqual([task["task_id"] for task in searched["tasks"]], ["detail-page-task"])
+
     def test_history_summary_groups_counts_for_filters(self) -> None:
         with TemporaryDirectory() as tmp:
             index = SQLiteTaskIndex(Path(tmp) / "tasks.db")
@@ -281,3 +301,38 @@ class WebUITaskIndexTests(unittest.TestCase):
         self.assertIn({"value": "portrait", "count": 3}, summary["orientations"])
         self.assertEqual([task["task_id"] for task in portrait["tasks"]], ["known-size"])
         self.assertEqual([task["task_id"] for task in other["tasks"]], ["unknown-size"])
+
+    def test_history_index_prefers_actual_output_size_over_requested_size(self) -> None:
+        with TemporaryDirectory() as tmp:
+            index = SQLiteTaskIndex(Path(tmp) / "tasks.db")
+            index.upsert(
+                {
+                    "task_id": "actual-size",
+                    "created_at": "2026-07-05T14:50:07+00:00",
+                    "status": "completed",
+                    "prompt": "requested 9:16 but provider returned 2:3",
+                    "params": {"ratio": "9:16", "size": "864x1536", "orientation": "portrait"},
+                    "output_size": "832x1248",
+                    "output_sizes": ["832x1248"],
+                    "outputs": [{"index": 1, "status": "completed", "size": "832x1248"}],
+                    "generated_count": 1,
+                    "failed_count": 0,
+                    "total_count": 1,
+                }
+            )
+
+            summary = index.history_summary()
+            actual_size = index.query_history(limit=10, size="832x1248")
+            requested_size = index.query_history(limit=10, size="864x1536")
+            actual_ratio = index.query_history(limit=10, ratio="2:3")
+            requested_ratio = index.query_history(limit=10, ratio="9:16")
+
+        self.assertIn({"value": "832x1248", "count": 1}, summary["sizes"])
+        self.assertIn({"value": "2:3", "count": 1}, summary["ratios"])
+        self.assertEqual(actual_size["tasks"][0]["size"], "832x1248")
+        self.assertEqual(actual_size["tasks"][0]["ratio"], "2:3")
+        self.assertEqual(actual_size["tasks"][0]["orientation"], "portrait")
+        self.assertEqual([task["task_id"] for task in actual_size["tasks"]], ["actual-size"])
+        self.assertEqual([task["task_id"] for task in actual_ratio["tasks"]], ["actual-size"])
+        self.assertEqual(requested_size["tasks"], [])
+        self.assertEqual(requested_ratio["tasks"], [])

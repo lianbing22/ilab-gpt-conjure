@@ -126,14 +126,14 @@ http://127.0.0.1:8787/
 ## 应用包下载
 
 当前可用的标准包和一键包见 [下载 / Releases](RELEASES.md)，也可以直接打开
-[GitHub Release v0.5.5](https://github.com/kadevin/ilab-gpt-conjure/releases/tag/v0.5.5)。
+[GitHub Release v0.5.6](https://github.com/kadevin/ilab-gpt-conjure/releases/tag/v0.5.6)。
 
 新用户建议优先下载标准包：
 
-1. macOS：Apple Silicon 下载 `iLab-GPT-CONJURE-macos-arm64-0.5.5.dmg`，
-   Intel 下载 `iLab-GPT-CONJURE-macos-x64-0.5.5.dmg`，然后把
+1. macOS：Apple Silicon 下载 `iLab-GPT-CONJURE-macos-arm64-0.5.6.dmg`，
+   Intel 下载 `iLab-GPT-CONJURE-macos-x64-0.5.6.dmg`，然后把
    `iLab GPT CONJURE.app` 拖到 Applications。
-2. Windows：下载 `iLab-GPT-CONJURE-windows-x64_0.5.5.zip`，
+2. Windows：下载 `iLab-GPT-CONJURE-windows-x64_0.5.6.zip`，
    解压到普通用户目录，双击 `iLab GPT CONJURE.exe`。
 
 标准包的用户数据会写入 macOS 的
@@ -172,7 +172,7 @@ SHA256，只替换一键包目录内由程序管理的文件，保留本地 `dat
 Apple Silicon Mac 下载 `macos_portable_arm64`，Intel Mac 下载
 `macos_portable_x64`。
 
-0.5.5 的标准 macOS DMG 和 portable zip 都暂未签名、未 notarize。如果 macOS
+标准 macOS DMG 和 portable zip 都暂未签名、未 notarize。如果 macOS
 拦截下载后的 App，可以右键或 Control-click App，选择 Open，并在系统安全提示里
 再次确认 Open。portable zip 还可以对解压目录执行：
 

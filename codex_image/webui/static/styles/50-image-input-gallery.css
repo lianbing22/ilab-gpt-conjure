@@ -92,7 +92,7 @@
 }
 
 .image-input-actions .ghost-button,
-.gallery-manage-panel .ghost-button {
+.gallery-manage-panel .resource-manage-button {
   height: var(--image-input-action-height);
 }
 
@@ -904,19 +904,8 @@
   background: transparent;
 }
 
-.gallery-manage-panel .ghost-button {
-  flex: 0 0 auto;
-  border-color: var(--primary);
-  background: var(--primary);
-  color: var(--primary-foreground);
-  white-space: nowrap;
-}
-
-.gallery-manage-panel .ghost-button:hover,
-.gallery-manage-panel .ghost-button:focus-visible {
-  border-color: var(--primary-strong);
-  background: var(--primary-strong);
-  color: var(--primary-foreground);
+.gallery-manage-panel .resource-manage-button {
+  flex: 1 1 auto;
 }
 
 .gallery-fly-clone {

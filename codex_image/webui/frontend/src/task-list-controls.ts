@@ -42,6 +42,24 @@ function activeTaskFilterCount() {
   return taskFilterControls().filter((element: any) => Boolean(element.value)).length;
 }
 
+function taskSearchHasValue() {
+  return Boolean(String(els.taskSearch?.value || "").trim());
+}
+
+function updateTaskSearchClearButton() {
+  if (!els.taskSearchClearButton) return;
+  els.taskSearchClearButton.hidden = !taskSearchHasValue();
+}
+
+function clearTaskSearch() {
+  if (!els.taskSearch?.value) return;
+  els.taskSearch.value = "";
+  updateTaskSearchClearButton();
+  renderTasks();
+  void syncTaskSearchHistoryResults();
+  els.taskSearch.focus({ preventScroll: true });
+}
+
 function setTaskFilterPopoverOpen(open: boolean) {
   if (!els.taskFilterPopover || !els.taskFilterButton) return;
   els.taskFilterPopover.hidden = !open;
@@ -79,13 +97,6 @@ function updateTaskFilterSummary() {
   }
 }
 
-function handleTaskFilterDocumentClick(event: any) {
-  const target = event.target as Node | null;
-  const root = els.taskFilterButton?.closest(".sidebar-search") || els.taskFilterPopover;
-  if (!target || root?.contains(target)) return;
-  setTaskFilterPopoverOpen(false);
-}
-
 function handleTaskFilterKeydown(event: any) {
   if (event.key !== "Escape" || els.taskFilterPopover?.hidden) return;
   event.preventDefault();
@@ -106,9 +117,9 @@ function bindTaskListControlEvents() {
   els.batchDeleteButton?.addEventListener("click", openBatchDeleteConfirm);
   els.batchCancelButton?.addEventListener("click", () => toggleBatchMode(false));
   els.taskSearch.addEventListener("input", handleTaskSearchInput);
+  els.taskSearchClearButton?.addEventListener("click", clearTaskSearch);
   els.taskFilterButton?.addEventListener("click", toggleTaskFilterPopover);
   els.taskFilterClearButton?.addEventListener("click", () => clearTaskFilters());
-  document.addEventListener("click", handleTaskFilterDocumentClick);
   document.addEventListener("keydown", handleTaskFilterKeydown);
   taskFilterControls().forEach((element: any) => {
     element.addEventListener("change", () => {
@@ -116,11 +127,13 @@ function bindTaskListControlEvents() {
       renderTasks();
     });
   });
+  updateTaskSearchClearButton();
   updateTaskFilterSummary();
   bindTaskListEvents();
 }
 
 function handleTaskSearchInput() {
+  updateTaskSearchClearButton();
   renderTasks();
   void syncTaskSearchHistoryResults();
 }
@@ -141,6 +154,40 @@ function bindTaskListEvents() {
 
 function taskHistoryInteractiveRoot() {
   return els.taskHistoryShell || els.sidebarContent || els.taskList;
+}
+
+function taskNavigationCards(): HTMLElement[] {
+  const root = taskHistoryInteractiveRoot();
+  if (!root) return [];
+  return Array.from(root.querySelectorAll(".task-card[data-task-id]")) as HTMLElement[];
+}
+
+function focusTaskNavigationCard(card: HTMLElement): void {
+  card.focus({ preventScroll: true });
+  card.scrollIntoView({ block: "nearest", inline: "nearest" });
+}
+
+function isTaskListKeyboardInputTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  return Boolean(target.closest("button, input, select, textarea, a, [contenteditable='true'], [role='textbox']"));
+}
+
+function handleTaskCardArrowNavigation(card: HTMLElement, event: KeyboardEvent): boolean {
+  if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return false;
+  if (event.altKey || event.metaKey || event.ctrlKey || isTaskListKeyboardInputTarget(event.target)) return false;
+  const cards = taskNavigationCards();
+  const currentIndex = cards.indexOf(card);
+  if (currentIndex < 0) return false;
+  event.preventDefault();
+  event.stopPropagation();
+  const nextIndex = currentIndex + (event.key === "ArrowDown" ? 1 : -1);
+  const nextCard = cards[nextIndex];
+  if (!nextCard) return true;
+  focusTaskNavigationCard(nextCard);
+  if (!state.batchMode) {
+    void legacyMethod("selectTask", nextCard.dataset.taskId);
+  }
+  return true;
 }
 
 function commitExpandedTaskGroupKey(nextKey: string | null, behavior: ScrollBehavior | null = null) {
@@ -225,10 +272,12 @@ function handleTaskListClick(event: any) {
 }
 
 function handleTaskListKeydown(event: any) {
-  if (event.key !== "Enter" && event.key !== " ") return;
+  if (isTaskListKeyboardInputTarget(event.target)) return;
   const card = event.target.closest(".task-card[data-task-id]");
   const root = taskHistoryInteractiveRoot();
-  if (!card || !root?.contains(card) || event.target.closest("button")) return;
+  if (!card || !root?.contains(card)) return;
+  if (handleTaskCardArrowNavigation(card, event)) return;
+  if (event.key !== "Enter" && event.key !== " ") return;
   event.preventDefault();
   if (handleBatchTaskShortcutSelection(card.dataset.taskId, event)) return;
   if (state.batchMode) {
@@ -242,11 +291,14 @@ export function initTaskListControlsFeature() {
   if (taskListControlsInitialized) return;
   taskListControlsInitialized = true;
   Object.assign(getLegacyBridge().methods, {
+    updateTaskSearchClearButton,
+    clearTaskSearch,
     updateTaskFilterSummary,
     setTaskFilterPopoverOpen,
     clearTaskFilters,
     bindTaskListControlEvents,
     bindTaskListEvents,
+    handleTaskCardArrowNavigation,
     handleTaskListClick,
     handleTaskListKeydown,
   });

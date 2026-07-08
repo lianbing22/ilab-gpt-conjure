@@ -3,8 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#457B66" />
     <title>iLab GPT CONJURE</title>
-    <link rel="icon" href="data:," />
+    <link rel="icon" type="image/svg+xml" href="/static/brand/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <script src="/static/pwa.js?v=pwa-1" defer></script>
     <script>
       (() => {
         const THEME_STORAGE_KEY = "codex-image-theme-preference";
@@ -110,7 +113,7 @@
         });
       })();
     </script>
-    <link rel="stylesheet" href="/static/styles.css?v=runtime-405" />
+    <link rel="stylesheet" href="/static/styles.css?v=runtime-432" />
   </head>
   <body>
     <div class="layout-container">
@@ -153,6 +156,19 @@
           <div class="sidebar-search">
             <input id="taskSearch" type="search" placeholder="搜索对话..." data-i18n-attr="placeholder:sidebar.searchPlaceholder" />
             <button
+              id="taskSearchClearButton"
+              class="task-search-clear-button"
+              type="button"
+              aria-label="清空"
+              title="清空"
+              data-i18n-attr="aria-label:action.clear;title:action.clear"
+              hidden
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <button
               id="taskFilterButton"
               class="task-filter-button"
               type="button"
@@ -169,7 +185,7 @@
             </button>
             <div
               id="taskFilterPopover"
-              class="task-filter-popover"
+              class="task-filter-panel"
               role="dialog"
               aria-label="任务筛选"
               data-i18n-attr="aria-label:sidebar.filters"
@@ -401,7 +417,12 @@
                   </div>
 
                   <div id="galleryManagePanel" class="gallery-manage-panel">
-                    <button id="galleryManageButton" class="ghost-button text-sm" type="button" aria-controls="galleryDrawer" aria-expanded="false" title="管理公用库" data-i18n="gallery.manage" data-i18n-attr="title:gallery.manage">管理公用库</button>
+                    <button id="galleryManageButton" class="ghost-button text-sm icon-text-button resource-manage-button gallery-manage-button" type="button" aria-controls="galleryDrawer" aria-expanded="false" title="管理公用库" data-i18n-attr="title:gallery.manage">
+                      <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M4 5h16v14H4zM8 13l2.2-2.2 2.8 3.2 2-2 3 4M8 9h.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                      <span data-i18n="gallery.manage">管理公用库</span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -465,7 +486,7 @@
                   <div id="promptTemplateRecentDock" class="prompt-template-recent-dock hidden" aria-label="最近使用模板" data-i18n-attr="aria-label:prompt.recentTemplates"></div>
                 </div>
                 <div class="prompt-template-entry">
-                  <button id="promptTemplateButton" class="ghost-button text-sm icon-text-button prompt-template-button" type="button" aria-controls="promptTemplateDrawer" aria-expanded="false" title="管理模板库" data-i18n-attr="title:prompt.manageTemplates">
+                  <button id="promptTemplateButton" class="ghost-button text-sm icon-text-button resource-manage-button prompt-template-button" type="button" aria-controls="promptTemplateDrawer" aria-expanded="false" title="管理模板库" data-i18n-attr="title:prompt.manageTemplates">
                     <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                       <path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
@@ -564,9 +585,24 @@
                 <div class="field orientation-field">
                   <span data-i18n="output.orientation">方向</span>
                   <div class="radio-group" id="orientationGroup">
-                    <button class="radio-btn active" data-val="square" type="button" data-i18n="output.square">方形</button>
-                    <button class="radio-btn" data-val="portrait" type="button" data-i18n="output.portrait">竖图</button>
-                    <button class="radio-btn" data-val="landscape" type="button" data-i18n="output.landscape">横图</button>
+                    <button class="radio-btn active" data-val="square" type="button">
+                      <svg class="orientation-option-icon orientation-option-icon-square" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                        <rect x="5" y="5" width="10" height="10" rx="2"></rect>
+                      </svg>
+                      <span data-i18n="output.square">方形</span>
+                    </button>
+                    <button class="radio-btn" data-val="portrait" type="button">
+                      <svg class="orientation-option-icon orientation-option-icon-portrait" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                        <rect x="6.5" y="3" width="7" height="14" rx="2"></rect>
+                      </svg>
+                      <span data-i18n="output.portrait">竖图</span>
+                    </button>
+                    <button class="radio-btn" data-val="landscape" type="button">
+                      <svg class="orientation-option-icon orientation-option-icon-landscape" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                        <rect x="3" y="6.5" width="14" height="7" rx="2"></rect>
+                      </svg>
+                      <span data-i18n="output.landscape">横图</span>
+                    </button>
                   </div>
                   <select id="orientation" class="hidden">
                     <option value="square" selected data-i18n="output.square">方形</option>
@@ -794,7 +830,14 @@
         </button>
       </div>
       <div class="prompt-template-toolbar">
-        <input id="promptTemplateSearch" class="control" type="text" name="prompt-template-search" inputmode="search" autocomplete="new-password" autocapitalize="off" spellcheck="false" placeholder="搜索模板、标签、内容" aria-label="搜索提示词模板" readonly data-i18n-attr="placeholder:templates.search;aria-label:templates.search" />
+        <div class="prompt-template-search-wrap">
+          <input id="promptTemplateSearch" class="control" type="text" name="prompt-template-search" inputmode="search" autocomplete="new-password" autocapitalize="off" spellcheck="false" placeholder="搜索模板、标签、内容" aria-label="搜索提示词模板" readonly data-i18n-attr="placeholder:templates.search;aria-label:templates.search" />
+          <button id="promptTemplateSearchClearButton" class="prompt-template-search-clear-button" type="button" aria-label="清空" title="清空" data-i18n-attr="aria-label:action.clear;title:action.clear" hidden>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
         <button id="promptTemplateCreateButton" class="ghost-button text-sm" type="button" data-i18n="action.new">新建</button>
         <button id="promptTemplateImportButton" class="ghost-button text-sm" type="button" data-i18n="action.import">导入</button>
         <button id="promptTemplateExportButton" class="ghost-button text-sm" type="button" data-i18n="action.export">导出</button>
@@ -854,7 +897,7 @@
           <button id="systemSettingsStorageTab" class="system-settings-tab" type="button" role="tab" aria-selected="false" aria-controls="systemSettingsStoragePanel" data-system-settings-tab="storage" data-i18n="systemSettings.storageTab">存储与通知</button>
         </div>
         <section id="systemSettingsApiPanel" class="system-settings-section" role="tabpanel" aria-labelledby="systemSettingsApiTab">
-          <div class="api-provider-section">
+          <div id="apiProviderSection" class="api-provider-section">
             <div class="api-provider-section-header">
               <div class="api-provider-section-title">
                 <span data-i18n="apiSettings.providers">API 供应商</span>
@@ -920,7 +963,23 @@
               </label>
               <label class="field api-key-field">
                 <span>API Key</span>
-                <input id="apiKey" class="control" type="password" autocomplete="off" placeholder="sk-..." />
+                <div class="api-key-input-wrap">
+                  <input id="apiKey" class="control" type="password" autocomplete="off" placeholder="sk-..." />
+                  <button
+                    id="apiKeyRevealButton"
+                    class="api-key-reveal-button"
+                    type="button"
+                    aria-label="显示 API Key"
+                    title="显示 API Key"
+                    aria-pressed="false"
+                    data-i18n-attr="aria-label:apiSettings.showApiKey;title:apiSettings.showApiKey"
+                  >
+                    <svg class="api-key-reveal-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                      <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  </button>
+                </div>
               </label>
               <label class="field api-image-model-field">
                 <span data-i18n="apiSettings.imageModel">图像工具模型</span>
@@ -1290,7 +1349,7 @@
     </div>
 
     <div id="taskNotificationToastRegion" class="task-notification-toast-region" aria-live="polite"></div>
-  <script src="/static/app.js?v=runtime-405"></script>
+  <script src="/static/app.js?v=runtime-432"></script>
     <script>
       (() => {
         document.querySelectorAll(".radio-group").forEach((group) => {

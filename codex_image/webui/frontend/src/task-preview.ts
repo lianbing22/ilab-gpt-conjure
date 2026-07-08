@@ -65,9 +65,12 @@ function queueContainsTask(items: any[] | undefined, taskId: string) {
   return items.some((item: any) => String(item?.task_id || "") === taskId);
 }
 
+const TERMINAL_TASK_STATUSES = new Set(["completed", "failed", "partial_failed"]);
+
 function taskPreviewStatus(task: any) {
   const status = String(task?.status || "");
   const taskId = String(task?.task_id || "");
+  if (TERMINAL_TASK_STATUSES.has(status)) return status;
   if (queueContainsTask(state.queue.running, taskId)) return "running";
   if (queueContainsTask(state.queue.waiting, taskId)) return status === "submitting" ? "submitting" : "queued";
   return status;

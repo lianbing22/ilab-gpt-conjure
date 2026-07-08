@@ -71,6 +71,7 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         self.assertNotIn("will-change", tasks)
         self.assertRegex(styles, r"\.task-card\s*\{[^}]*background var\(--motion-base\)")
         self.assertRegex(styles, r"\.task-card:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--primary\)")
+        self.assertRegex(styles, r"\.task-card\.active:focus-visible,\s*\.task-card\.batch-selected:focus-visible\s*\{[^}]*outline:\s*none")
         self.assertRegex(
             styles,
             r"\.sidebar-resize-handle:hover::before[\s\S]*color-mix\(in srgb, var\(--primary\) 34%, transparent\)",
@@ -87,7 +88,12 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
             Path("codex_image/webui/static/styles/40-controls.css"),
             Path("codex_image/webui/static/styles/50-image-input-gallery.css"),
             Path("codex_image/webui/static/styles/60-prompt.css"),
-            Path("codex_image/webui/static/styles/70-settings-preview.css"),
+            Path("codex_image/webui/static/styles/70-output-settings.css"),
+            Path("codex_image/webui/static/styles/71-preview-results.css"),
+            Path("codex_image/webui/static/styles/72-queue-modals.css"),
+            Path("codex_image/webui/static/styles/73-gallery-drawer.css"),
+            Path("codex_image/webui/static/styles/74-api-system-settings.css"),
+            Path("codex_image/webui/static/styles/75-gallery-card-image-editor.css"),
         ]
         source = "\n".join(path.read_text(encoding="utf-8") for path in source_paths)
         styles = Path("codex_image/webui/static/styles.css").read_text(encoding="utf-8")
@@ -135,8 +141,8 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         script = self._frontend_script_source()
         styles = Path("codex_image/webui/static/styles.css").read_text(encoding="utf-8")
 
-        self.assertIn('/static/app.js?v=runtime-405', html)
-        self.assertIn('/static/styles.css?v=runtime-405', html)
+        self.assertIn('/static/app.js?v=runtime-432', html)
+        self.assertIn('/static/styles.css?v=runtime-432', html)
         self.assertIn('id="recentAssetDock"', html)
         self.assertRegex(html, r'class="image-input-footer"[\s\S]*id="recentAssetDock"[\s\S]*id="recentAssetList"')
         self.assertRegex(html, r'id="recentAssetDock"[\s\S]*id="quickGalleryDock"[\s\S]*id="galleryManagePanel"')
@@ -659,6 +665,8 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         styles = Path("codex_image/webui/static/styles.css").read_text(encoding="utf-8")
 
         self.assertIn("<title>iLab GPT CONJURE</title>", html)
+        self.assertIn('<link rel="icon" type="image/svg+xml" href="/static/brand/favicon.svg" />', html)
+        self.assertNotIn('<link rel="icon" href="data:," />', html)
         self.assertIn('<div class="brand-lockup">', html)
         self.assertIn('class="brand-mark brand-mark-rabbit"', html)
         self.assertIn('class="brand-rabbit-logo"', html)
@@ -669,6 +677,13 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         self.assertIn('<div class="brand-subtitle">CONJURE</div>', html)
         self.assertIn('aria-label="iLab GPT CONJURE"', html)
         self.assertNotIn("GPT-image-2 Studio", html)
+        favicon_path = Path("codex_image/webui/static/brand/favicon.svg")
+        self.assertTrue(favicon_path.exists())
+        favicon_source = favicon_path.read_text(encoding="utf-8")
+        self.assertIn('viewBox="0 0 128 128"', favicon_source)
+        self.assertIn('fill="#457B66"', favicon_source)
+        self.assertIn('fill="#FFFFFF"', favicon_source)
+        self.assertNotIn("currentColor", favicon_source)
         self.assertNotIn("sodipodi:", Path("codex_image/webui/static/brand/rabbit-logo.svg").read_text(encoding="utf-8"))
         self.assertNotIn("inkscape:", Path("codex_image/webui/static/brand/rabbit-logo.svg").read_text(encoding="utf-8"))
 
@@ -962,7 +977,8 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         self.assertIn('id="galleryManageButton"', html)
         self.assertNotIn('id="galleryManageSummary"', html)
         self.assertNotIn("查看全部", html)
-        self.assertIn(">管理公用库</button>", html)
+        self.assertIn('class="ghost-button text-sm icon-text-button resource-manage-button gallery-manage-button"', html)
+        self.assertRegex(html, r'id="galleryManageButton"[\s\S]*<svg class="button-icon"[\s\S]*<span[^>]*>管理公用库</span>')
         self.assertIn('data-quick-gallery-category="portrait"', html)
         self.assertIn('data-quick-gallery-category="character"', html)
         self.assertIn('data-quick-gallery-category="product"', html)
@@ -1059,7 +1075,7 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         self.assertRegex(styles, r"\.image-input-actions\s*\{[^}]*justify-content:\s*flex-start")
         self.assertRegex(styles, r"\.image-input-actions\s*\{[^}]*height:\s*var\(--image-input-action-height\)")
         self.assertRegex(styles, r"\.image-input-actions\s*\{[^}]*flex-wrap:\s*nowrap")
-        self.assertRegex(styles, r"\.image-input-actions\s+\.ghost-button\s*,\s*\.gallery-manage-panel\s+\.ghost-button\s*\{[^}]*height:\s*var\(--image-input-action-height\)")
+        self.assertRegex(styles, r"\.image-input-actions\s+\.ghost-button\s*,\s*\.gallery-manage-panel\s+\.resource-manage-button\s*\{[^}]*height:\s*var\(--image-input-action-height\)")
         self.assertRegex(styles, r"\.image-gallery-column\s*\{[^}]*display:\s*grid")
         self.assertRegex(styles, r"\.image-gallery-column\s*\{[^}]*grid-template-rows:\s*var\(--quick-gallery-height\)\s+var\(--image-input-action-height\)")
         self.assertRegex(styles, r"\.image-uploader-grid\s*\{[^}]*width:\s*100%")
@@ -1151,9 +1167,12 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         self.assertRegex(styles, r"\.gallery-manage-panel\s*\{[^}]*width:\s*100%")
         self.assertRegex(styles, r"\.gallery-manage-panel\s*\{[^}]*justify-content:\s*flex-end")
         self.assertNotRegex(styles, r"\.gallery-manage-panel\s*\{[^}]*border:")
-        self.assertRegex(styles, r"\.gallery-manage-panel\s+\.ghost-button\s*\{[^}]*background:\s*var\(--primary\)")
-        self.assertRegex(styles, r"\.gallery-manage-panel\s+\.ghost-button\s*\{[^}]*border-color:\s*var\(--primary\)")
-        self.assertRegex(styles, r"\.gallery-manage-panel\s+\.ghost-button\s*\{[^}]*color:\s*var\(--primary-foreground\)")
+        self.assertRegex(styles, r"\.gallery-manage-panel\s+\.resource-manage-button\s*\{[^}]*flex:\s*1 1 auto")
+        resource_button_styles = self._extract_css_block(styles, ".resource-manage-button")
+        self.assertIn("width: 100%", resource_button_styles)
+        self.assertIn("background: var(--primary)", resource_button_styles)
+        self.assertIn("border-color: var(--primary)", resource_button_styles)
+        self.assertIn("color: var(--primary-foreground)", resource_button_styles)
         self.assertNotIn("thumb-label", script)
         self.assertNotIn(".thumb-label", styles)
     def test_short_desktop_layout_reduces_input_prompt_and_output_settings_height(self) -> None:
@@ -1732,7 +1751,7 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         self.assertRegex(styles, r"\.radio-group\.segmented-indicator-host\s+\.radio-btn\.active\s*\{[^}]*background:\s*transparent")
         self.assertRegex(styles, r"\.auth-source-group\.segmented-indicator-host\s+\.auth-source-button\.active\s*\{[^}]*background:\s*transparent")
         self.assertRegex(styles, r"\.system-settings-tabs\.segmented-indicator-host\s+\.system-settings-tab\.active\s*\{[^}]*background:\s*transparent")
-        self.assertRegex(styles, r"\.system-settings-tabs\.segmented-indicator-host\s+\.system-settings-tab\.active\s*\{[^}]*color:\s*#fff")
+        self.assertRegex(styles, r"\.system-settings-tabs\.segmented-indicator-host\s+\.system-settings-tab\.active\s*\{[^}]*color:\s*var\(--primary-foreground\)")
         self.assertRegex(styles, r"@media \(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*\.segmented-indicator\s*\{[^}]*transition:\s*none")
     def test_api_source_switcher_and_system_settings_modal_exist(self) -> None:
         html = Path("codex_image/webui/static/index.html").read_text(encoding="utf-8")
@@ -1811,6 +1830,7 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         self.assertIn('id="apiProvider"', html)
         self.assertIn('id="apiProviderCount"', html)
         self.assertIn('id="apiProviderList"', html)
+        self.assertIn('id="apiProviderSection"', html)
         self.assertIn('id="apiProviderDetail"', html)
         self.assertNotIn('id="apiProviderDetailName"', html)
         self.assertNotIn('id="apiProviderDetailMeta"', html)
@@ -1818,6 +1838,10 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         self.assertIn('id="apiProviderDetailKey"', html)
         self.assertIn('id="apiProviderEditor"', html)
         self.assertIn('id="apiProviderName"', html)
+        self.assertIn('class="api-key-input-wrap"', html)
+        self.assertIn('id="apiKeyRevealButton"', html)
+        self.assertIn('aria-pressed="false"', html)
+        self.assertIn('data-i18n-attr="aria-label:apiSettings.showApiKey;title:apiSettings.showApiKey"', html)
         self.assertIn('id="editApiProviderButton"', html)
         self.assertIn('id="copyApiProviderButton"', html)
         self.assertIn('id="addApiProviderButton"', html)
@@ -1863,6 +1887,7 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         self.assertIn("window.history.replaceState", script)
         self.assertIn("apiBaseUrl: document.querySelector", script)
         self.assertIn("apiKey: document.querySelector", script)
+        self.assertIn("apiKeyRevealButton: document.querySelector", script)
         self.assertIn("apiImageModel: document.querySelector", script)
         self.assertIn("apiImagesConcurrency: document.querySelector", script)
         self.assertIn("codexMode: document.querySelector", script)
@@ -1883,6 +1908,7 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         self.assertIn("webSearchField: document.querySelector", script)
         self.assertIn('apiDirectSettingsButton?.addEventListener("click", () => call(methods, "openApiSettingsModal"))', script)
         self.assertIn("apiProviderName: document.querySelector", script)
+        self.assertIn("apiProviderSection: document.querySelector", script)
         self.assertIn("apiProviderList: document.querySelector", script)
         self.assertIn("apiProviderDetail: document.querySelector", script)
         self.assertIn("apiProviderEditor: document.querySelector", script)
@@ -1908,6 +1934,10 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         self.assertIn("function renderApiProviderList", script)
         self.assertIn("function renderApiProviderDetail", script)
         self.assertIn("function renderApiProviderEditor", script)
+        self.assertIn("function setApiKeyRevealVisible", script)
+        self.assertIn("function updateApiKeyRevealButton", script)
+        self.assertIn("function revealApiKeyWhilePressed", script)
+        self.assertIn("function hideApiKeyReveal", script)
         self.assertIn("function addApiProvider", script)
         self.assertIn("function deleteApiProvider", script)
         self.assertIn("apiProviderDraft", script)
@@ -1959,6 +1989,12 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         self.assertIn('deleteApiProviderButton?.addEventListener("click", () => call(methods, "confirmDeleteApiProvider", els.deleteApiProviderButton))', script)
         self.assertIn('cancelApiProviderEditButton?.addEventListener("click", () => call(methods, "cancelApiProviderEdit"))', script)
         self.assertIn('saveApiProviderEditButton?.addEventListener("click", () => call(methods, "saveApiProviderEdit"))', script)
+        self.assertIn('apiKeyRevealButton?.addEventListener("pointerdown"', script)
+        self.assertIn('apiKeyRevealButton?.addEventListener("pointerup"', script)
+        self.assertIn('apiKeyRevealButton?.addEventListener("pointerleave"', script)
+        self.assertIn('apiKeyRevealButton?.addEventListener("keydown"', script)
+        self.assertIn('apiKeyRevealButton?.addEventListener("keyup"', script)
+        self.assertIn('apiKey?.addEventListener("input"', script)
         self.assertNotIn("[els.codexMode, els.apiProviderName, els.apiBaseUrl, els.apiKey, els.apiMode, els.apiImageModel, els.apiImagesConcurrency]", script)
         self.assertIn("auth_source: authSource", script)
         self.assertIn("function backendForAuthSource", script)
@@ -2008,12 +2044,19 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         self.assertRegex(styles, r"\.api-provider-section-header\s*\{[^}]*justify-content:\s*space-between")
         self.assertRegex(styles, r"\.api-provider-editor-heading\s*\{[^}]*justify-content:\s*flex-start")
         self.assertRegex(styles, r"\.api-provider-detail-actions,\s*\.api-provider-editor-actions\s*\{[^}]*justify-content:\s*center")
-        self.assertRegex(styles, r"\.api-provider-editor-actions\s*\{[^}]*justify-content:\s*flex-end")
+        self.assertNotRegex(styles, r"\.api-provider-editor-actions\s*\{[^}]*justify-content:\s*flex-end")
         self.assertRegex(styles, r"\.api-provider-detail-actions \.ghost-button,\s*\.api-provider-detail-actions \.danger-button,[\s\S]*height:\s*40px")
+        self.assertRegex(styles, r"\.api-provider-editor-actions \.ghost-button,\s*\.api-provider-editor-actions \.run-button\s*\{[^}]*border-radius:\s*8px")
         self.assertRegex(styles, r"\.api-provider-choice-grid\s*\{[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)")
+        self.assertRegex(styles, r"\.api-provider-choice-grid\s*\{[^}]*max-height:\s*min\(280px,\s*32vh\)")
+        self.assertRegex(styles, r"\.api-provider-choice-grid\s*\{[^}]*overflow-y:\s*auto")
+        self.assertRegex(styles, r"\.api-provider-section\.editing\s+\.api-provider-choice-grid\s*\{[^}]*max-height:\s*168px")
+        self.assertRegex(styles, r"\.api-provider-section\.editing\s+\.api-provider-add-card\s*\{[^}]*display:\s*none")
         self.assertRegex(styles, r"\.api-provider-list\s*\{[^}]*display:\s*contents")
         self.assertNotRegex(styles, r"\.api-provider-list\s*\{[^}]*overflow-x:\s*auto")
         self.assertRegex(styles, r"\.api-provider-choice\.active\s*\{[^}]*background:\s*var\(--primary\)")
+        self.assertRegex(styles, r"\.api-provider-choice\.active\s*\{[^}]*color:\s*var\(--primary-foreground\)")
+        self.assertRegex(styles, r"\.api-provider-choice\.active span\s*\{[^}]*color:\s*color-mix\(in srgb,\s*var\(--primary-foreground\)\s*82%,\s*transparent\)")
         self.assertRegex(styles, r"\.api-provider-detail-grid\s*\{[^}]*grid-template-columns:")
         self.assertRegex(styles, r"\.api-provider-editor\.hidden\s*,\s*\.api-provider-detail-panel\.hidden\s*\{[^}]*display:\s*none")
         self.assertIn("const MIN_SYSTEM_SETTINGS_MODAL_EDGE = 30", script)
@@ -2026,7 +2069,13 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         self.assertIn("const wasHidden = els.systemSettingsModal?.classList.contains(\"hidden\") ?? true", script)
         self.assertIn("panel.scrollHeight", script)
         self.assertIn("(prefers-reduced-motion: reduce)", script)
-        self.assertRegex(styles, r"\.api-settings-grid\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1\.15fr\)\s+minmax\(220px,\s*0\.85fr\)")
+        self.assertRegex(styles, r"\.api-settings-grid\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)")
+        self.assertRegex(styles, r"\.api-key-input-wrap\s*\{[^}]*position:\s*relative")
+        self.assertRegex(styles, r"\.api-key-input-wrap \.control\s*\{[^}]*padding-right:\s*40px")
+        self.assertRegex(styles, r"\.api-key-reveal-button\s*\{[^}]*position:\s*absolute")
+        self.assertRegex(styles, r"\.api-key-reveal-button\s*\{[^}]*right:\s*6px")
+        self.assertRegex(styles, r"#apiImagesConcurrency\s*\{[^}]*appearance:\s*textfield")
+        self.assertRegex(styles, r"#apiImagesConcurrency::-webkit-outer-spin-button,\s*#apiImagesConcurrency::-webkit-inner-spin-button\s*\{[^}]*-webkit-appearance:\s*none")
         self.assertRegex(styles, r"#systemSettingsModal\s*\{[^}]*--system-settings-modal-top:\s*30px")
         self.assertRegex(styles, r"#systemSettingsModal\s*\{[^}]*align-items:\s*flex-start")
         self.assertRegex(styles, r"#systemSettingsModal\s*\{[^}]*overflow:\s*auto")
@@ -2042,7 +2091,7 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         self.assertNotIn(".system-settings-section-heading", styles)
         self.assertRegex(styles, r"\.system-settings-tabs\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)")
         self.assertRegex(styles, r"\.system-settings-tabs\s*\{[^}]*--segmented-indicator-radius:\s*999px")
-        self.assertRegex(styles, r"\.system-settings-tab\.active\s*\{[^}]*color:\s*#fff")
+        self.assertRegex(styles, r"\.system-settings-tab\.active\s*\{[^}]*color:\s*var\(--primary-foreground\)")
         self.assertRegex(styles, r"\.system-settings-tabs\s+\.segmented-indicator\s*\{[^}]*border-radius:\s*999px")
         self.assertIn(".codex-channel-notes", styles)
         self.assertIn(".codex-channel-note.active", styles)
@@ -2181,6 +2230,7 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
     def test_resolution_and_orientation_use_button_groups(self) -> None:
         html = Path("codex_image/webui/static/index.html").read_text(encoding="utf-8")
         script = self._frontend_script_source()
+        styles = Path("codex_image/webui/static/styles.css").read_text(encoding="utf-8")
 
         self.assertIn('id="resolutionGroup"', html)
         self.assertRegex(html, r'id="resolutionGroup"[\s\S]*data-val="standard"[^>]*>1K')
@@ -2193,11 +2243,17 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         self.assertIn('data-val="2k"', html)
         self.assertIn('data-val="4k"', html)
         self.assertRegex(html, r'<select id="resolution" class="hidden">')
-        self.assertRegex(html, r'id="orientationGroup"[\s\S]*data-val="square"[\s\S]*方形')
+        self.assertRegex(html, r'id="orientationGroup"[\s\S]*data-val="square"[\s\S]*orientation-option-icon-square[\s\S]*data-i18n="output\.square"[\s\S]*方形')
+        self.assertRegex(html, r'id="orientationGroup"[\s\S]*data-val="portrait"[\s\S]*orientation-option-icon-portrait[\s\S]*data-i18n="output\.portrait"[\s\S]*竖图')
+        self.assertRegex(html, r'id="orientationGroup"[\s\S]*data-val="landscape"[\s\S]*orientation-option-icon-landscape[\s\S]*data-i18n="output\.landscape"[\s\S]*横图')
+        self.assertIn('class="orientation-option-icon orientation-option-icon-square"', html)
         orientation_controls = re.search(r'id="orientationGroup"[\s\S]*?<select id="orientation" class="hidden">[\s\S]*?</select>', html)
         self.assertIsNotNone(orientation_controls)
         self.assertNotIn('data-val="auto"', orientation_controls.group(0))
         self.assertNotIn('<option value="auto"', orientation_controls.group(0))
+        self.assertRegex(styles, r"#orientationGroup \.radio-btn\s*\{[^}]*gap:\s*4px")
+        self.assertRegex(styles, r"\.orientation-option-icon\s*\{[^}]*width:\s*12px")
+        self.assertRegex(styles, r"\.orientation-option-icon\s*\{[^}]*stroke:\s*currentColor")
         self.assertIn('DEFAULT_RESOLUTION = "standard"', script)
         self.assertIn('DEFAULT_RATIO = "1:1"', script)
         self.assertIn('DEFAULT_ORIENTATION = "square"', script)
@@ -2457,7 +2513,18 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
                   const value = Number.parseInt(input?.value || "", 10);
                   return Number.isInteger(value) ? value : null;
                 }
-                function customSizeValidationMessage() { return ""; }
+                const GPT_IMAGE_2_MIN_PIXELS = 655360;
+                const GPT_IMAGE_2_MAX_PIXELS = 8294400;
+                const GPT_IMAGE_2_MAX_LONG_SHORT_RATIO = 3;
+                function customSizeValidationMessage(width = customDimensionValue(els.customWidth), height = customDimensionValue(els.customHeight)) {
+                  if (width === null || height === null) return "请输入宽度和高度";
+                  if (width < 16 || width > 3840 || height < 16 || height > 3840) return "宽高需在 16-3840 px 之间";
+                  if (width % 16 !== 0 || height % 16 !== 0) return "宽高需为 16 的倍数";
+                  if (Math.max(width, height) / Math.min(width, height) > GPT_IMAGE_2_MAX_LONG_SHORT_RATIO) return "长短边比例不能超过 3:1";
+                  const totalPixels = width * height;
+                  if (totalPixels < GPT_IMAGE_2_MIN_PIXELS || totalPixels > GPT_IMAGE_2_MAX_PIXELS) return "总像素需在 655,360-8,294,400 之间";
+                  return "";
+                }
                 function updateCustomSize() {}
                 function updatePixelPreview() {}
                 function updateRequestPreview() { requestPreviewUpdated += 1; }
@@ -2465,8 +2532,8 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
                 function sourcePreviewUrl(source) { return source.previewUrl || source.image_url || ""; }
                 global.Image = class {
                   set src(value) {
-                    this.naturalWidth = value.includes("wide") ? 1600 : 1024;
-                    this.naturalHeight = value.includes("wide") ? 900 : 1536;
+                    this.naturalWidth = value.includes("wide") || value.includes("four-three") ? 1600 : 1024;
+                    this.naturalHeight = value.includes("wide") ? 900 : value.includes("four-three") ? 1200 : 1536;
                     setTimeout(() => this.onload && this.onload(), 0);
                   }
                 };
@@ -2503,6 +2570,26 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
                 }).then(() => {
                   if (els.customRatioWidth.value !== "9" || els.customRatioHeight.value !== "5") {
                     throw new Error(`expected nearest single digit ratio 9:5, got ${els.customRatioWidth.value}:${els.customRatioHeight.value}`);
+                  }
+                  if (customSizeValidationMessage() !== "") {
+                    throw new Error(`expected first-image ratio to keep custom size valid, got ${els.customWidth.value}x${els.customHeight.value}: ${customSizeValidationMessage()}`);
+                  }
+                  if (els.customWidth.value !== "1152" || els.customHeight.value !== "640") {
+                    throw new Error(`expected nearest valid 9:5 dimensions 1152x640, got ${els.customWidth.value}x${els.customHeight.value}`);
+                  }
+                  els.customWidth.value = "240";
+                  els.customHeight.value = "240";
+                  state.images = [{ kind: "upload", previewUrl: "blob:four-three" }];
+                  return applyFirstReferenceImageAspectRatio();
+                }).then(() => {
+                  if (els.customRatioWidth.value !== "4" || els.customRatioHeight.value !== "3") {
+                    throw new Error(`expected 4:3 from first image, got ${els.customRatioWidth.value}:${els.customRatioHeight.value}`);
+                  }
+                  if (customSizeValidationMessage() !== "") {
+                    throw new Error(`expected small custom size to be raised into valid range, got ${els.customWidth.value}x${els.customHeight.value}: ${customSizeValidationMessage()}`);
+                  }
+                  if (els.customWidth.value !== "960" || els.customHeight.value !== "720") {
+                    throw new Error(`expected nearest valid 4:3 dimensions 960x720, got ${els.customWidth.value}x${els.customHeight.value}`);
                   }
                 }).catch((error) => {
                   console.error(error);
@@ -2931,8 +3018,8 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         script = self._frontend_script_source()
         styles = Path("codex_image/webui/static/styles.css").read_text(encoding="utf-8")
 
-        self.assertIn('/static/app.js?v=runtime-405', html)
-        self.assertIn('/static/styles.css?v=runtime-405', html)
+        self.assertIn('/static/app.js?v=runtime-432', html)
+        self.assertIn('/static/styles.css?v=runtime-432', html)
         self.assertIn('id="pasteClipboardButton"', html)
         self.assertIn('id="statusText"', html)
         self.assertRegex(
@@ -3376,13 +3463,18 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         script = self._frontend_script_source()
         styles = Path("codex_image/webui/static/styles.css").read_text(encoding="utf-8")
 
-        self.assertIn("/static/app.js?v=runtime-405", html)
-        self.assertIn("/static/styles.css?v=runtime-405", html)
+        self.assertIn("/static/app.js?v=runtime-432", html)
+        self.assertIn("/static/styles.css?v=runtime-432", html)
         self.assertIn('const THEME_STORAGE_KEY = "codex-image-theme-preference";', script)
         self.assertIn('themePreference: "system"', script)
         self.assertIn('call(methods, "restoreThemePreference")', script)
         self.assertIn("function resolveEffectiveTheme", script)
         self.assertIn("function applyThemePreference", script)
+        self.assertIn("let themeTransitionLockFrameId", script)
+        self.assertIn("function lockThemeTransitions", script)
+        self.assertIn('document.documentElement.classList.add("theme-transition-lock")', script)
+        self.assertIn('document.documentElement.classList.remove("theme-transition-lock")', script)
+        self.assertRegex(script, r"function applyThemePreference\(preference,[\s\S]*lockThemeTransitions\(\)")
         self.assertIn("function updateThemeSwitcher", script)
         self.assertIn("function handleThemeSystemChange", script)
         self.assertIn('localStorage.getItem(THEME_STORAGE_KEY)', script)
@@ -3397,6 +3489,10 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         self.assertRegex(styles, r"\.theme-option\s*\{[^}]*height:\s*var\(--top-nav-segment-height\)")
         self.assertRegex(styles, r"\.theme-option\s*\{[^}]*border-radius:\s*var\(--top-nav-control-radius\)")
         self.assertRegex(styles, r"\.theme-option\.active\s*\{[^}]*background:\s*var\(--primary\)")
+        self.assertRegex(
+            styles,
+            r":root\.theme-transition-lock \*,\s*:root\.theme-transition-lock \*::before,\s*:root\.theme-transition-lock \*::after\s*\{[^}]*transition:\s*none !important",
+        )
     def test_dark_theme_primary_controls_use_contrast_foreground(self) -> None:
         styles = Path("codex_image/webui/static/styles.css").read_text(encoding="utf-8")
 
@@ -3407,10 +3503,14 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
             ".run-button",
             ".theme-option.active",
             ".auth-source-button.active",
+            ".system-settings-tab.active",
+            ".system-settings-tabs.segmented-indicator-host .system-settings-tab.active",
+            ".api-provider-choice.active",
+            ".codex-channel-current",
             ".segment.active",
             ".radio-btn.active",
             ".quick-gallery-category.active",
-            ".gallery-manage-panel .ghost-button",
+            ".resource-manage-button",
             ".prompt-copy-button",
             ".image-editor-tool.active",
         ):
@@ -3420,7 +3520,17 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
                     rf"{re.escape(selector)}\s*\{{[^}}]*color:\s*var\(--primary-foreground\)",
                 )
 
-        for selector in (".primary-button", ".run-button", ".segment.active", ".radio-btn.active", ".auth-source-button.active"):
+        for selector in (
+            ".primary-button",
+            ".run-button",
+            ".segment.active",
+            ".radio-btn.active",
+            ".auth-source-button.active",
+            ".system-settings-tab.active",
+            ".system-settings-tabs.segmented-indicator-host .system-settings-tab.active",
+            ".api-provider-choice.active",
+            ".codex-channel-current",
+        ):
             with self.subTest(selector=selector):
                 self.assertNotRegex(
                     styles,

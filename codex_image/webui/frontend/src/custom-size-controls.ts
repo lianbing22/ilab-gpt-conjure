@@ -3,6 +3,9 @@ import {
   DEFAULT_ORIENTATION,
   DEFAULT_RATIO,
   DEFAULT_RESOLUTION,
+  GPT_IMAGE_2_MAX_LONG_SHORT_RATIO,
+  GPT_IMAGE_2_MAX_PIXELS,
+  GPT_IMAGE_2_MIN_PIXELS,
   GPT_IMAGE_2_SIZE_PRESETS,
   ORIENTATION_DEFAULT_RATIOS,
   RATIO_COUNTERPARTS,
@@ -183,6 +186,32 @@ export function applyCustomAspectRatioDigits(widthRatio: any, heightRatio: any):
   els.customRatioHeight.value = String(heightRatio || "");
   setCustomAspectRatioFromManualInputs();
   applyCustomAspectRatioFromWidth();
+  const numericWidthRatio = Number(widthRatio);
+  const numericHeightRatio = Number(heightRatio);
+  if (
+    Number.isFinite(numericWidthRatio)
+    && Number.isFinite(numericHeightRatio)
+    && numericWidthRatio > 0
+    && numericHeightRatio > 0
+    && Math.max(numericWidthRatio, numericHeightRatio) / Math.min(numericWidthRatio, numericHeightRatio) <= GPT_IMAGE_2_MAX_LONG_SHORT_RATIO
+    && els.customWidth
+    && els.customHeight
+  ) {
+    const baseWidth = numericWidthRatio * 16;
+    const baseHeight = numericHeightRatio * 16;
+    const basePixels = baseWidth * baseHeight;
+    const minUnitByPixels = Math.max(1, Math.ceil(Math.sqrt(GPT_IMAGE_2_MIN_PIXELS / basePixels)));
+    const maxUnitByPixels = Math.floor(Math.sqrt(GPT_IMAGE_2_MAX_PIXELS / basePixels));
+    const maxUnitByBounds = Math.floor(Math.min(3840 / baseWidth, 3840 / baseHeight));
+    const maxUnit = Math.min(maxUnitByPixels, maxUnitByBounds);
+    if (maxUnit >= minUnitByPixels) {
+      const currentWidth = customDimensionValue(els.customWidth);
+      const preferredUnit = Math.max(1, Math.round((currentWidth || baseWidth * minUnitByPixels) / baseWidth));
+      const unit = Math.min(maxUnit, Math.max(minUnitByPixels, preferredUnit));
+      els.customWidth.value = String(baseWidth * unit);
+      els.customHeight.value = String(baseHeight * unit);
+    }
+  }
   updateCustomSize();
   updatePixelPreview("custom");
   updateRequestPreview();

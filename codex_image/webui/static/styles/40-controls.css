@@ -119,6 +119,23 @@
   gap: 6px;
 }
 
+.resource-manage-button {
+  width: 100%;
+  min-width: 0;
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.resource-manage-button:hover,
+.resource-manage-button:focus-visible {
+  border-color: var(--primary-strong);
+  background: var(--primary-strong);
+  color: var(--primary-foreground);
+}
+
 .button-icon {
   width: 14px;
   height: 14px;

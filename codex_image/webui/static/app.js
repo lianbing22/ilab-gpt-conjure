@@ -9,6 +9,7 @@
   }
   async function handleRefreshButtonClick(methods) {
     call(methods, "closePromptPopover");
+    await window.refreshQueue?.();
     await call(methods, "refreshTasks");
   }
   function isRunTaskShortcut(event) {
@@ -86,6 +87,16 @@
     els43.deleteApiProviderButton?.addEventListener("click", () => call(methods, "confirmDeleteApiProvider", els43.deleteApiProviderButton));
     els43.cancelApiProviderEditButton?.addEventListener("click", () => call(methods, "cancelApiProviderEdit"));
     els43.saveApiProviderEditButton?.addEventListener("click", () => call(methods, "saveApiProviderEdit"));
+    els43.apiKeyRevealButton?.addEventListener("pointerdown", (event) => call(methods, "revealApiKeyWhilePressed", event));
+    els43.apiKeyRevealButton?.addEventListener("pointerup", () => call(methods, "hideApiKeyReveal"));
+    els43.apiKeyRevealButton?.addEventListener("pointercancel", () => call(methods, "hideApiKeyReveal"));
+    els43.apiKeyRevealButton?.addEventListener("pointerleave", () => call(methods, "hideApiKeyReveal"));
+    els43.apiKeyRevealButton?.addEventListener("blur", () => call(methods, "hideApiKeyReveal"));
+    els43.apiKeyRevealButton?.addEventListener("keydown", (event) => {
+      if (event.key === " " || event.key === "Enter") call(methods, "revealApiKeyWhilePressed", event);
+    });
+    els43.apiKeyRevealButton?.addEventListener("keyup", () => call(methods, "hideApiKeyReveal"));
+    els43.apiKey?.addEventListener("input", () => call(methods, "updateApiKeyRevealButton"));
     [els43.codexMode].filter(Boolean).forEach((element2) => {
       element2?.addEventListener("input", () => {
         call(methods, "readApiSettingsForm");
@@ -194,6 +205,7 @@
       taskActiveList: document.querySelector("#taskActiveList"),
       taskList: document.querySelector("#taskList"),
       taskSearch: document.querySelector("#taskSearch"),
+      taskSearchClearButton: document.querySelector("#taskSearchClearButton"),
       taskFilterButton: document.querySelector("#taskFilterButton"),
       taskFilterPopover: document.querySelector("#taskFilterPopover"),
       taskFilterClearButton: document.querySelector("#taskFilterClearButton"),
@@ -242,6 +254,7 @@
       codexModeGroup: document.querySelector("#codexModeGroup"),
       codexModeNotes: document.querySelectorAll("[data-codex-mode-note]"),
       apiProvider: document.querySelector("#apiProvider"),
+      apiProviderSection: document.querySelector("#apiProviderSection"),
       apiProviderCount: document.querySelector("#apiProviderCount"),
       apiProviderList: document.querySelector("#apiProviderList"),
       apiProviderDetail: document.querySelector("#apiProviderDetail"),
@@ -261,6 +274,7 @@
       saveApiProviderEditButton: document.querySelector("#saveApiProviderEditButton"),
       apiBaseUrl: document.querySelector("#apiBaseUrl"),
       apiKey: document.querySelector("#apiKey"),
+      apiKeyRevealButton: document.querySelector("#apiKeyRevealButton"),
       apiMode: document.querySelector("#apiMode"),
       apiImageModel: document.querySelector("#apiImageModel"),
       apiImagesConcurrency: document.querySelector("#apiImagesConcurrency"),
@@ -336,6 +350,7 @@
       promptTemplateDrawerBackdrop: document.querySelector("#promptTemplateDrawerBackdrop"),
       promptTemplateSummary: document.querySelector("#promptTemplateSummary"),
       promptTemplateSearch: document.querySelector("#promptTemplateSearch"),
+      promptTemplateSearchClearButton: document.querySelector("#promptTemplateSearchClearButton"),
       promptTemplateCreateButton: document.querySelector("#promptTemplateCreateButton"),
       promptTemplateImportButton: document.querySelector("#promptTemplateImportButton"),
       promptTemplateImportInput: document.querySelector("#promptTemplateImportInput"),
@@ -1229,6 +1244,8 @@
     "apiSettings.concurrencyValue": "concurrency {concurrency}",
     "apiSettings.keySaved": "API key saved",
     "apiSettings.keyNotSet": "API key not set",
+    "apiSettings.showApiKey": "Show API key",
+    "apiSettings.hideApiKey": "Hide API key",
     "apiSettings.editProvider": "Edit provider",
     "apiSettings.newProviderTitle": "New provider",
     "apiSettings.editHint": "Save provider writes this edit to the backend. Cancel discards it.",
@@ -2126,6 +2143,8 @@
     "apiSettings.concurrencyValue": "Parallelit\xE4t {concurrency}",
     "apiSettings.keySaved": "API Schl\xFCssel gespeichert",
     "apiSettings.keyNotSet": "Schl\xFCssel API nicht gesetzt",
+    "apiSettings.showApiKey": "API-Key anzeigen",
+    "apiSettings.hideApiKey": "API-Key ausblenden",
     "apiSettings.editProvider": "Anbieter bearbeiten",
     "apiSettings.newProviderTitle": "Neuer Anbieter",
     "apiSettings.editHint": "Der Speicheranbieter schreibt diese \xC4nderung in das Backend. Abbrechen verwirft es.",
@@ -3023,6 +3042,8 @@
     "apiSettings.concurrencyValue": "concurrencia {concurrency}",
     "apiSettings.keySaved": "API clave guardada",
     "apiSettings.keyNotSet": "API clave no configurada",
+    "apiSettings.showApiKey": "Mostrar API Key",
+    "apiSettings.hideApiKey": "Ocultar API Key",
     "apiSettings.editProvider": "Editar proveedor",
     "apiSettings.newProviderTitle": "Nuevo proveedor",
     "apiSettings.editHint": "El proveedor de guardado escribe esta edici\xF3n en el backend. Cancelar lo descarta.",
@@ -3920,6 +3941,8 @@
     "apiSettings.concurrencyValue": "concurrence {concurrency}",
     "apiSettings.keySaved": "Cl\xE9 API enregistr\xE9e",
     "apiSettings.keyNotSet": "Cl\xE9 API non d\xE9finie",
+    "apiSettings.showApiKey": "Afficher la cl\xE9 API",
+    "apiSettings.hideApiKey": "Masquer la cl\xE9 API",
     "apiSettings.editProvider": "Modifier le fournisseur",
     "apiSettings.newProviderTitle": "Nouveau fournisseur",
     "apiSettings.editHint": "Le fournisseur de sauvegarde \xE9crit cette modification dans le backend. Annuler le supprime.",
@@ -4817,6 +4840,8 @@
     "apiSettings.concurrencyValue": "\u540C\u6642\u5B9F\u884C\u6027{concurrency}",
     "apiSettings.keySaved": "API Key\u304C\u4FDD\u5B58\u3055\u308C\u307E\u3057\u305F",
     "apiSettings.keyNotSet": "API Key\u304C\u8A2D\u5B9A\u3055\u308C\u3066\u3044\u307E\u305B\u3093",
+    "apiSettings.showApiKey": "API\u30AD\u30FC\u3092\u8868\u793A",
+    "apiSettings.hideApiKey": "API\u30AD\u30FC\u3092\u96A0\u3059",
     "apiSettings.editProvider": "\u30D7\u30ED\u30D0\u30A4\u30C0\u30FC\u3092\u7DE8\u96C6",
     "apiSettings.newProviderTitle": "\u65B0\u3057\u3044\u30D7\u30ED\u30D0\u30A4\u30C0\u30FC",
     "apiSettings.editHint": "\u300C\u30D7\u30ED\u30D0\u30A4\u30C0\u30FC\u3092\u4FDD\u5B58\u300D\u3092\u62BC\u3059\u307E\u3067\u3001\u3053\u306E\u7DE8\u96C6\u306F\u30D0\u30C3\u30AF\u30A8\u30F3\u30C9\u306B\u66F8\u304D\u8FBC\u307E\u308C\u307E\u305B\u3093\u3002\u30AD\u30E3\u30F3\u30BB\u30EB\u3059\u308B\u3068\u7834\u68C4\u3055\u308C\u307E\u3059\u3002",
@@ -5714,6 +5739,8 @@
     "apiSettings.concurrencyValue": "\uB3D9\uC2DC\uC131{concurrency}",
     "apiSettings.keySaved": "API Key\uAC00 \uC800\uC7A5\uB418\uC5C8\uC2B5\uB2C8\uB2E4",
     "apiSettings.keyNotSet": "API Key\uAC00 \uC124\uC815\uB418\uC9C0 \uC54A\uC558\uC2B5\uB2C8\uB2E4.",
+    "apiSettings.showApiKey": "API Key \uD45C\uC2DC",
+    "apiSettings.hideApiKey": "API Key \uC228\uAE30\uAE30",
     "apiSettings.editProvider": "\uACF5\uAE09\uC790 \uD3B8\uC9D1",
     "apiSettings.newProviderTitle": "\uC0C8 \uACF5\uAE09\uC790",
     "apiSettings.editHint": "\uACF5\uAE09\uC790 \uC800\uC7A5\uC744 \uB204\uB974\uAE30 \uC804\uAE4C\uC9C0 \uC774 \uD3B8\uC9D1 \uB0B4\uC6A9\uC740 \uBC31\uC5D4\uB4DC\uC5D0 \uAE30\uB85D\uB418\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4. \uCDE8\uC18C\uD558\uBA74 \uD3D0\uAE30\uB429\uB2C8\uB2E4.",
@@ -6611,6 +6638,8 @@
     "apiSettings.concurrencyValue": "simultaneidade {concurrency}",
     "apiSettings.keySaved": "Chave API salva",
     "apiSettings.keyNotSet": "Chave API n\xE3o definida",
+    "apiSettings.showApiKey": "Mostrar API Key",
+    "apiSettings.hideApiKey": "Ocultar API Key",
     "apiSettings.editProvider": "Editar provedor",
     "apiSettings.newProviderTitle": "Novo provedor",
     "apiSettings.editHint": "O provedor de salvamento grava esta edi\xE7\xE3o no back-end. Cancelar descarta-o.",
@@ -7508,6 +7537,8 @@
     "apiSettings.concurrencyValue": "\u043F\u0430\u0440\u0430\u043B\u043B\u0435\u043B\u0438\u0437\u043C {concurrency}",
     "apiSettings.keySaved": "\u041A\u043B\u044E\u0447 API \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D.",
     "apiSettings.keyNotSet": "\u041A\u043B\u044E\u0447 API \u043D\u0435 \u0443\u0441\u0442\u0430\u043D\u043E\u0432\u043B\u0435\u043D",
+    "apiSettings.showApiKey": "\u041F\u043E\u043A\u0430\u0437\u0430\u0442\u044C API Key",
+    "apiSettings.hideApiKey": "\u0421\u043A\u0440\u044B\u0442\u044C API Key",
     "apiSettings.editProvider": "\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u043F\u043E\u0441\u0442\u0430\u0432\u0449\u0438\u043A\u0430",
     "apiSettings.newProviderTitle": "\u041D\u043E\u0432\u044B\u0439 \u043F\u0440\u043E\u0432\u0430\u0439\u0434\u0435\u0440",
     "apiSettings.editHint": "\u041F\u043E\u0441\u0442\u0430\u0432\u0449\u0438\u043A \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u0438\u044F \u0437\u0430\u043F\u0438\u0441\u044B\u0432\u0430\u0435\u0442 \u044D\u0442\u043E \u0438\u0437\u043C\u0435\u043D\u0435\u043D\u0438\u0435 \u043D\u0430 \u0441\u0435\u0440\u0432\u0435\u0440\u043D\u0443\u044E \u0447\u0430\u0441\u0442\u044C. \u041E\u0442\u043C\u0435\u043D\u0430 \u043E\u0442\u043C\u0435\u043D\u044F\u0435\u0442 \u0435\u0433\u043E.",
@@ -8405,6 +8436,8 @@
     "apiSettings.concurrencyValue": "concorrenza {concurrency}",
     "apiSettings.keySaved": "Chiave API salvata",
     "apiSettings.keyNotSet": "Chiave API non impostata",
+    "apiSettings.showApiKey": "Mostra API Key",
+    "apiSettings.hideApiKey": "Nascondi API Key",
     "apiSettings.editProvider": "Modifica fornitore",
     "apiSettings.newProviderTitle": "Nuovo fornitore",
     "apiSettings.editHint": "Il provider di salvataggio scrive questa modifica sul backend. Annulla lo scarta.",
@@ -9302,6 +9335,8 @@
     "apiSettings.concurrencyValue": "\u0938\u092E\u0935\u0930\u094D\u0924\u0940 {concurrency}",
     "apiSettings.keySaved": "API \u0915\u0941\u0902\u091C\u0940 \u0938\u0939\u0947\u091C\u0940 \u0917\u0908",
     "apiSettings.keyNotSet": "API \u0915\u0941\u0902\u091C\u0940 \u0938\u0947\u091F \u0928\u0939\u0940\u0902 \u0939\u0948",
+    "apiSettings.showApiKey": "API Key \u0926\u093F\u0916\u093E\u090F\u0902",
+    "apiSettings.hideApiKey": "API Key \u091B\u093F\u092A\u093E\u090F\u0902",
     "apiSettings.editProvider": "\u092A\u094D\u0930\u0926\u093E\u0924\u093E \u0938\u0902\u092A\u093E\u0926\u093F\u0924 \u0915\u0930\u0947\u0902",
     "apiSettings.newProviderTitle": "\u0928\u092F\u093E \u092A\u094D\u0930\u0926\u093E\u0924\u093E",
     "apiSettings.editHint": "\u092A\u094D\u0930\u0926\u093E\u0924\u093E \u0938\u0939\u0947\u091C\u0947\u0902 \u0907\u0938 \u0938\u0902\u092A\u093E\u0926\u0928 \u0915\u094B \u092C\u0948\u0915\u090F\u0902\u0921 \u092E\u0947\u0902 \u0932\u093F\u0916\u0924\u093E \u0939\u0948\u0964 \u0930\u0926\u094D\u0926 \u0915\u0930\u0947\u0902 \u0907\u0938\u0947 \u091B\u094B\u0921\u093C \u0926\u0947\u0924\u093E \u0939\u0948\u0964",
@@ -10209,6 +10244,8 @@
     "apiSettings.concurrencyValue": "\u5E76\u53D1 {concurrency}",
     "apiSettings.keySaved": "\u5DF2\u4FDD\u5B58 API Key",
     "apiSettings.keyNotSet": "\u672A\u8BBE\u7F6E API Key",
+    "apiSettings.showApiKey": "\u663E\u793A API Key",
+    "apiSettings.hideApiKey": "\u9690\u85CF API Key",
     "apiSettings.editProvider": "\u7F16\u8F91\u4F9B\u5E94\u5546",
     "apiSettings.newProviderTitle": "\u65B0\u589E\u4F9B\u5E94\u5546",
     "apiSettings.editHint": "\u70B9\u51FB\u4FDD\u5B58\u4F9B\u5E94\u5546\u540E\u5199\u5165\u540E\u7AEF\uFF0C\u53D6\u6D88\u53EF\u653E\u5F03\u672C\u6B21\u7F16\u8F91\u3002",
@@ -11116,6 +11153,8 @@
     "apiSettings.concurrencyValue": "\u4F75\u767C{concurrency}",
     "apiSettings.keySaved": "\u5DF2\u5132\u5B58API Key",
     "apiSettings.keyNotSet": "\u672A\u8A2D\u5B9AAPI Key",
+    "apiSettings.showApiKey": "\u986F\u793A API Key",
+    "apiSettings.hideApiKey": "\u96B1\u85CF API Key",
     "apiSettings.editProvider": "\u7DE8\u8F2F\u4F9B\u61C9\u5546",
     "apiSettings.newProviderTitle": "\u65B0\u589E\u4F9B\u61C9\u5546",
     "apiSettings.editHint": "\u9EDE\u9078\u5132\u5B58\u4F9B\u61C9\u5546\u5F8C\u5BEB\u5165\u5F8C\u7AEF\uFF0C\u53D6\u6D88\u53EF\u653E\u68C4\u672C\u6B21\u7DE8\u8F2F\u3002",
@@ -12023,6 +12062,8 @@
     "apiSettings.concurrencyValue": "\u4F75\u767C{concurrency}",
     "apiSettings.keySaved": "\u5DF2\u5132\u5B58API Key",
     "apiSettings.keyNotSet": "\u672A\u8A2D\u5B9AAPI Key",
+    "apiSettings.showApiKey": "\u986F\u793A API Key",
+    "apiSettings.hideApiKey": "\u96B1\u85CF API Key",
     "apiSettings.editProvider": "\u7DE8\u8F2F\u4F9B\u61C9\u5546",
     "apiSettings.newProviderTitle": "\u65B0\u589E\u4F9B\u61C9\u5546",
     "apiSettings.editHint": "\u9EDE\u9078\u5132\u5B58\u4F9B\u61C9\u5546\u5F8C\u5BEB\u5165\u5F8C\u7AEF\uFF0C\u53D6\u6D88\u53EF\u653E\u68C4\u672C\u6B21\u7DE8\u8F2F\u3002",
@@ -29399,7 +29440,41 @@ ${hint}` : hint;
   function setElementText(element2, value) {
     if (element2) element2.textContent = String(value ?? "");
   }
+  function setApiKeyRevealVisible(visible) {
+    if (!els10.apiKey) return;
+    const canReveal = Boolean(els10.apiKey.value);
+    const shouldReveal = Boolean(visible && canReveal);
+    els10.apiKey.type = shouldReveal ? "text" : "password";
+    els10.apiKeyRevealButton?.setAttribute("aria-pressed", shouldReveal ? "true" : "false");
+    const label = translate(shouldReveal ? "apiSettings.hideApiKey" : "apiSettings.showApiKey");
+    els10.apiKeyRevealButton?.setAttribute("aria-label", label);
+    els10.apiKeyRevealButton?.setAttribute("title", label);
+    els10.apiKeyRevealButton?.classList.toggle("active", shouldReveal);
+  }
+  function hideApiKeyReveal() {
+    setApiKeyRevealVisible(false);
+  }
+  function updateApiKeyRevealButton() {
+    if (!els10.apiKeyRevealButton) return;
+    const canReveal = Boolean(els10.apiKey?.value);
+    if (!canReveal) hideApiKeyReveal();
+    els10.apiKeyRevealButton.disabled = !canReveal;
+    const label = translate("apiSettings.showApiKey");
+    els10.apiKeyRevealButton.setAttribute("aria-label", label);
+    els10.apiKeyRevealButton.setAttribute("title", label);
+  }
+  function revealApiKeyWhilePressed(event) {
+    if (!els10.apiKey?.value || els10.apiKeyRevealButton?.disabled) return;
+    event?.preventDefault();
+    setApiKeyRevealVisible(true);
+  }
+  function scrollApiProviderEditorIntoView() {
+    window.requestAnimationFrame(() => {
+      els10.apiProviderEditor?.scrollIntoView?.({ block: "nearest", inline: "nearest" });
+    });
+  }
   function setApiProviderEditorVisible(visible) {
+    els10.apiProviderSection?.classList.toggle("editing", visible);
     els10.apiProviderEditor?.classList.toggle("hidden", !visible);
     els10.apiProviderEditor?.setAttribute("aria-hidden", visible ? "false" : "true");
     els10.apiProviderDetail?.classList.toggle("hidden", visible);
@@ -29412,6 +29487,7 @@ ${hint}` : hint;
     if (els10.deleteApiProviderButton) {
       els10.deleteApiProviderButton.disabled = visible || normalizeApiSettings(state9.apiSettings).providers.length <= 1;
     }
+    if (!visible) hideApiKeyReveal();
   }
   function apiProviderEditorActive() {
     return Boolean(state9.apiProviderEditingId && state9.apiProviderDraft);
@@ -29444,6 +29520,8 @@ ${hint}` : hint;
       els10.apiKey.value = provider.api_key || "";
       els10.apiKey.placeholder = provider.api_key_set && !provider.api_key ? translate("apiSettings.savedKeyPlaceholder") : "sk-...";
     }
+    hideApiKeyReveal();
+    updateApiKeyRevealButton();
   }
   function renderApiProviderList() {
     const settings = normalizeApiSettings(state9.apiSettings);
@@ -29460,7 +29538,7 @@ ${hint}` : hint;
       els10.sortApiProvidersButton.textContent = translate(sorting ? "apiSettings.finishSortProviders" : "apiSettings.sortProviders");
       els10.sortApiProvidersButton.setAttribute("aria-pressed", sorting ? "true" : "false");
     }
-    els10.addApiProviderButton?.classList.toggle("hidden", sorting);
+    els10.addApiProviderButton?.classList.toggle("hidden", sorting || apiProviderEditorActive());
     if (!els10.apiProviderList) return;
     els10.apiProviderList.classList.toggle("is-sorting", sorting);
     els10.apiProviderList.setAttribute("role", sorting ? "list" : "listbox");
@@ -29684,6 +29762,7 @@ ${hint}` : hint;
     }, state9.apiSettings.providers.length);
     populateApiSettingsForm();
     setApiSettingsFeedback(translate("apiSettings.newDraftStatus"), "running");
+    scrollApiProviderEditorIntoView();
     els10.apiProviderName?.focus();
   }
   function copyApiProvider() {
@@ -29708,6 +29787,7 @@ ${hint}` : hint;
     }, state9.apiSettings.providers.length);
     populateApiSettingsForm();
     setApiSettingsFeedback(translate(copiesSavedKey ? "apiSettings.copyProviderStatus" : "apiSettings.copyProviderWithoutKeyStatus"), "running");
+    scrollApiProviderEditorIntoView();
     els10.apiProviderName?.focus();
   }
   function deleteApiProvider() {
@@ -29782,6 +29862,7 @@ ${hint}` : hint;
     state9.apiProviderDraft = normalizeApiProvider({ ...provider }, 0);
     populateApiSettingsForm();
     setApiSettingsFeedback(translate("apiSettings.editDraftStatus"), "running");
+    scrollApiProviderEditorIntoView();
     els10.apiProviderName?.focus();
   }
   function cancelApiProviderEdit() {
@@ -30066,10 +30147,14 @@ ${hint}` : hint;
       copyApiProvider,
       deleteApiProvider,
       editApiProvider,
+      hideApiKeyReveal,
       cancelApiProviderEdit,
       saveApiProviderEdit,
       selectApiProvider,
       selectCodexMode,
+      setApiKeyRevealVisible,
+      updateApiKeyRevealButton,
+      revealApiKeyWhilePressed,
       syncCodexModeNotes,
       moveApiProvider,
       toggleApiProviderSortMode,
@@ -31753,9 +31838,33 @@ ${hint}` : hint;
   }
   function syncPromptTemplateSearchInput() {
     const input = els15.promptTemplateSearch;
-    if (!input) return;
+    if (!input) {
+      updatePromptTemplateSearchClearButton();
+      return;
+    }
     const nextValue = String(state13.promptTemplateQuery || "");
     if (input.value !== nextValue) input.value = nextValue;
+    updatePromptTemplateSearchClearButton();
+  }
+  function promptTemplateSearchHasValue() {
+    return Boolean(String(state13.promptTemplateQuery || "").trim());
+  }
+  function updatePromptTemplateSearchClearButton() {
+    const button = els15.promptTemplateSearchClearButton;
+    if (!button) return;
+    button.hidden = !promptTemplateSearchHasValue();
+  }
+  function clearPromptTemplateSearch() {
+    const input = els15.promptTemplateSearch;
+    state13.promptTemplateQuery = "";
+    promptTemplateSearchAcceptManualInput = false;
+    setPromptTemplateSearchLocked(false);
+    if (input) {
+      input.value = "";
+      input.focus({ preventScroll: true });
+    }
+    updatePromptTemplateSearchClearButton();
+    renderPromptTemplateList();
   }
   function setPromptTemplateSearchLocked(locked) {
     const input = els15.promptTemplateSearch;
@@ -31893,8 +32002,8 @@ ${hint}` : hint;
     els15.promptTemplateList.innerHTML = templates.map((template) => `
     <button class="prompt-template-card" type="button" data-prompt-template-id="${escapeHtml10(template.id)}">
       ${template.thumbnail_url ? `<span class="prompt-template-card-thumb"><img src="${escapeHtml10(template.thumbnail_url)}" alt=""></span>` : ""}
-      <span class="prompt-template-card-title">${escapeHtml10(template.short_title)}</span>
-      <span class="prompt-template-card-subtitle">${escapeHtml10(template.title)}</span>
+      <span class="prompt-template-card-title">${escapeHtml10(promptTemplateCardTitle(template))}</span>
+      ${promptTemplateCardSubtitle(template) ? `<span class="prompt-template-card-subtitle">${escapeHtml10(promptTemplateCardSubtitle(template))}</span>` : ""}
       <span class="prompt-template-card-preview">${escapeHtml10(promptTemplatePreview(template.content, 64))}</span>
       <span class="prompt-template-card-meta">
         <span>${escapeHtml10(promptTemplateCategoryLabel(template.category))}</span>
@@ -31902,6 +32011,15 @@ ${hint}` : hint;
       </span>
     </button>
   `).join("");
+  }
+  function promptTemplateCardTitle(template) {
+    const title = String(template?.title || "").trim();
+    return String(template?.short_title || "").trim() || title;
+  }
+  function promptTemplateCardSubtitle(template) {
+    const title = String(template?.title || "").trim();
+    const primaryTitle = promptTemplateCardTitle(template);
+    return title && title !== primaryTitle ? title : "";
   }
   function renderPromptTemplateRecentDock() {
     if (!els15.promptTemplateRecentDock) return;
@@ -31925,8 +32043,8 @@ ${hint}` : hint;
     hidePromptTemplateForm();
     els15.promptTemplateDetail.innerHTML = `
     <div class="prompt-template-detail-header">
-      <button class="ghost-button text-sm" type="button" data-prompt-template-back>${translate("templates.back")}</button>
-      <button class="ghost-button text-sm" type="button" data-prompt-template-edit="${escapeHtml10(template.id)}">${translate("templates.edit")}</button>
+      <button class="ghost-button prompt-template-detail-back" type="button" data-prompt-template-back>${translate("templates.back")}</button>
+      <button class="ghost-button prompt-template-detail-edit" type="button" data-prompt-template-edit="${escapeHtml10(template.id)}">${translate("templates.edit")}</button>
     </div>
     ${template.thumbnail_url ? `<img class="prompt-template-detail-thumb" src="${escapeHtml10(template.thumbnail_url)}" alt="">` : ""}
     <h3>${escapeHtml10(template.title)}</h3>
@@ -31938,9 +32056,11 @@ ${hint}` : hint;
     <div class="prompt-template-detail-content">${escapeHtml10(template.content)}</div>
     ${template.notes ? `<p class="prompt-template-detail-notes">${escapeHtml10(template.notes)}</p>` : ""}
     <div class="prompt-template-detail-actions">
-      <button class="ghost-button text-sm" type="button" data-prompt-template-copy="${escapeHtml10(template.id)}">${translate("templates.copy")}</button>
-      <button class="ghost-button text-sm" type="button" data-prompt-template-insert="${escapeHtml10(template.id)}">${translate("templates.insert")}</button>
-      <button class="run-button" type="button" data-prompt-template-replace="${escapeHtml10(template.id)}">${translate("action.replace")}</button>
+      <div class="prompt-template-detail-secondary-actions">
+        <button class="ghost-button text-sm" type="button" data-prompt-template-copy="${escapeHtml10(template.id)}">${translate("templates.copy")}</button>
+        <button class="ghost-button text-sm" type="button" data-prompt-template-insert="${escapeHtml10(template.id)}">${translate("templates.insert")}</button>
+      </div>
+      <button class="ghost-button text-sm prompt-template-detail-replace" type="button" data-prompt-template-replace="${escapeHtml10(template.id)}">${translate("action.replace")}</button>
     </div>
   `;
     els15.promptTemplateList?.classList.add("hidden");
@@ -32295,6 +32415,7 @@ ${hint}` : hint;
       void importPromptTemplatePack(file);
       if (input) input.value = "";
     });
+    els15.promptTemplateSearchClearButton?.addEventListener("click", clearPromptTemplateSearch);
     els15.promptTemplateSearch?.addEventListener("pointerdown", (event) => {
       const input = els15.promptTemplateSearch;
       if (!input?.readOnly) return;
@@ -32316,6 +32437,7 @@ ${hint}` : hint;
           const nextValue = isClearKey ? "" : key;
           input.value = nextValue;
           state13.promptTemplateQuery = nextValue;
+          updatePromptTemplateSearchClearButton();
           renderPromptTemplateList();
         }
         return;
@@ -32339,6 +32461,7 @@ ${hint}` : hint;
         return;
       }
       state13.promptTemplateQuery = els15.promptTemplateSearch?.value || "";
+      updatePromptTemplateSearchClearButton();
       renderPromptTemplateList();
     });
     els15.promptTemplateSearch?.addEventListener("focus", () => {
@@ -32527,7 +32650,25 @@ ${hint}` : hint;
   }
   function getPromptText5() {
     if (!els16.promptEditor) return els16.prompt.value;
-    return promptTextFromNode(els16.promptEditor).replace(/\u00a0/g, " ").trim();
+    return normalizePromptEditorText(promptTextFromNode(els16.promptEditor).replace(/\u00a0/g, " ")).trim();
+  }
+  function normalizePromptEditorText(value) {
+    return String(value || "").replace(/\r\n?/g, "\n");
+  }
+  function createPromptTextFragment(text) {
+    const normalized = normalizePromptEditorText(text);
+    const fragment = document.createDocumentFragment();
+    let lastNode = null;
+    normalized.split("\n").forEach((part, index) => {
+      if (index > 0) {
+        lastNode = document.createElement("br");
+        fragment.append(lastNode);
+      }
+      if (!part) return;
+      lastNode = document.createTextNode(part);
+      fragment.append(lastNode);
+    });
+    return { fragment, lastNode };
   }
   function promptTextFromNode(node) {
     let text = "";
@@ -32595,10 +32736,13 @@ ${hint}` : hint;
     updatePromptChipSelectionState();
   }
   function setPromptText2(text) {
+    const normalized = normalizePromptEditorText(text);
     if (els16.promptEditor) {
-      els16.promptEditor.textContent = text || "";
+      els16.promptEditor.innerHTML = "";
+      const { fragment } = createPromptTextFragment(normalized);
+      els16.promptEditor.append(fragment);
     }
-    els16.prompt.value = text || "";
+    els16.prompt.value = normalized;
     hideMentionSuggest();
     hideColorSuggest2();
     hidePromptSnippetSuggest2();
@@ -32612,7 +32756,7 @@ ${hint}` : hint;
     }
     const refList = Array.isArray(refs) ? refs : [];
     const sortedRefs = galleryRefsByMentionLength(refList);
-    const promptText = String(text || "");
+    const promptText = normalizePromptEditorText(text);
     els16.promptEditor.innerHTML = "";
     let cursor = 0;
     let plainStart = 0;
@@ -32652,9 +32796,8 @@ ${hint}` : hint;
     hidePromptSnippetSuggest2();
   }
   function appendPromptText4(text) {
-    if (text) {
-      els16.promptEditor.append(document.createTextNode(text));
-    }
+    const { fragment } = createPromptTextFragment(text);
+    els16.promptEditor.append(fragment);
   }
   function clearPromptEditorIfEmpty() {
     if (!els16.promptEditor) return;
@@ -32669,6 +32812,8 @@ ${hint}` : hint;
   function initPromptSerializationFeature() {
     Object.assign(getLegacyBridge().methods, {
       getPromptText: getPromptText5,
+      normalizePromptEditorText,
+      createPromptTextFragment,
       promptTextFromNode,
       promptSelectionText,
       promptTextFromRange: promptTextFromRange2,
@@ -33032,6 +33177,9 @@ ${hint}` : hint;
   function rangeIntersectsNode3(range, node) {
     return legacyMethod21("rangeIntersectsNode", range, node);
   }
+  function createPromptTextFragment2(text) {
+    return legacyMethod21("createPromptTextFragment", text);
+  }
   function setCaretAfterNode4(node) {
     legacyMethod21("setCaretAfterNode", node);
   }
@@ -33089,22 +33237,23 @@ ${hint}` : hint;
     const normalized = normalizePromptPasteText(text);
     if (!normalized) return;
     els18.promptEditor.focus();
-    const textNode = document.createTextNode(normalized);
+    const { fragment, lastNode } = createPromptTextFragment2(normalized);
+    if (!lastNode) return;
     const selection = window.getSelection();
     if (!selection || !selection.rangeCount) {
-      els18.promptEditor.append(textNode);
-      setCaretAfterNode4(textNode);
+      els18.promptEditor.append(fragment);
+      setCaretAfterNode4(lastNode);
       return;
     }
     const range = selection.getRangeAt(0);
     if (!rangeIntersectsNode3(range, els18.promptEditor)) {
-      els18.promptEditor.append(textNode);
-      setCaretAfterNode4(textNode);
+      els18.promptEditor.append(fragment);
+      setCaretAfterNode4(lastNode);
       return;
     }
     range.deleteContents();
-    range.insertNode(textNode);
-    setCaretAfterNode4(textNode);
+    range.insertNode(fragment);
+    setCaretAfterNode4(lastNode);
   }
   function handlePromptEditorPaste(event) {
     if (!event.clipboardData || !els18.promptEditor?.contains(event.target)) return;
@@ -33239,6 +33388,10 @@ ${hint}` : hint;
     els19.prompt.value = getPromptText7();
   }
   function handlePromptEditorKeydown(event) {
+    if (isPromptEditorArrowKey(event.key)) {
+      event.stopPropagation();
+      return;
+    }
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "a") {
       event.preventDefault();
       selectPromptEditorContents2();
@@ -33284,6 +33437,9 @@ ${hint}` : hint;
         if (snippet) insertPromptSnippet2(snippet);
       }
     }
+  }
+  function isPromptEditorArrowKey(key) {
+    return key === "ArrowUp" || key === "ArrowDown" || key === "ArrowLeft" || key === "ArrowRight";
   }
   function handlePromptEditorClick(event) {
     const removeButton = event.target.closest?.("[data-remove-gallery-chip], [data-remove-color-chip], [data-remove-prompt-snippet-chip]");
@@ -33492,7 +33648,11 @@ ${hint}` : hint;
   function setCaretAfterNode5(node) {
     if (!node) return;
     const range = document.createRange();
-    range.setStartAfter(node);
+    if (node.nodeType === Node.TEXT_NODE) {
+      range.setStart(node, (node.textContent || "").length);
+    } else {
+      range.setStartAfter(node);
+    }
     range.collapse(true);
     const selection = window.getSelection();
     if (!selection) return;
@@ -34420,6 +34580,24 @@ ${galleryText}`;
     els26.customRatioHeight.value = String(heightRatio || "");
     setCustomAspectRatioFromManualInputs();
     applyCustomAspectRatioFromWidth();
+    const numericWidthRatio = Number(widthRatio);
+    const numericHeightRatio = Number(heightRatio);
+    if (Number.isFinite(numericWidthRatio) && Number.isFinite(numericHeightRatio) && numericWidthRatio > 0 && numericHeightRatio > 0 && Math.max(numericWidthRatio, numericHeightRatio) / Math.min(numericWidthRatio, numericHeightRatio) <= GPT_IMAGE_2_MAX_LONG_SHORT_RATIO && els26.customWidth && els26.customHeight) {
+      const baseWidth = numericWidthRatio * 16;
+      const baseHeight = numericHeightRatio * 16;
+      const basePixels = baseWidth * baseHeight;
+      const minUnitByPixels = Math.max(1, Math.ceil(Math.sqrt(GPT_IMAGE_2_MIN_PIXELS / basePixels)));
+      const maxUnitByPixels = Math.floor(Math.sqrt(GPT_IMAGE_2_MAX_PIXELS / basePixels));
+      const maxUnitByBounds = Math.floor(Math.min(3840 / baseWidth, 3840 / baseHeight));
+      const maxUnit = Math.min(maxUnitByPixels, maxUnitByBounds);
+      if (maxUnit >= minUnitByPixels) {
+        const currentWidth = customDimensionValue(els26.customWidth);
+        const preferredUnit = Math.max(1, Math.round((currentWidth || baseWidth * minUnitByPixels) / baseWidth));
+        const unit = Math.min(maxUnit, Math.max(minUnitByPixels, preferredUnit));
+        els26.customWidth.value = String(baseWidth * unit);
+        els26.customHeight.value = String(baseHeight * unit);
+      }
+    }
     updateCustomSize();
     updatePixelPreview("custom");
     updateRequestPreview10();
@@ -34979,7 +35157,10 @@ ${galleryText}`;
       return;
     }
     const group = layout.expandedGroup;
-    els28.taskList.innerHTML = renderExpandedTaskGroupShellHtml(group);
+    const shouldAnimateExpandedGroup = state19.expandedTaskGroupAnimationPending === true;
+    els28.taskList.innerHTML = renderExpandedTaskGroupShellHtml(group, {
+      startExpanded: !shouldAnimateExpandedGroup
+    });
     scheduleExpandedTaskGroupItemsRender(group, layout.expandedKey || group?.key || null);
     updateDocumentTitle();
     restoreTaskListScrollAnchor(scrollAnchor);
@@ -35260,8 +35441,9 @@ ${galleryText}`;
       legacyMethod29("setStatus", translate("status.shownActiveTasks"), "ok");
     }
   }
-  function renderExpandedTaskGroupShellHtml(group) {
+  function renderExpandedTaskGroupShellHtml(group, options = {}) {
     const groupKey = escapeHtml13(group.key);
+    const startExpanded = options.startExpanded !== false;
     return `
     <section class="task-group task-group-expanded" data-task-group="${groupKey}">
       <button
@@ -35269,7 +35451,7 @@ ${galleryText}`;
         type="button"
         data-task-group-toggle-key="${groupKey}"
         data-task-group-expanded="true"
-        aria-expanded="false"
+        aria-expanded="${startExpanded ? "true" : "false"}"
         aria-label="${escapeHtml13(formatTranslation("taskGroup.collapse", { label: group.label }))}"
       >
         <span class="task-group-label-button">
@@ -37461,6 +37643,21 @@ ${galleryText}`;
   function activeTaskFilterCount() {
     return taskFilterControls().filter((element2) => Boolean(element2.value)).length;
   }
+  function taskSearchHasValue() {
+    return Boolean(String(els34.taskSearch?.value || "").trim());
+  }
+  function updateTaskSearchClearButton() {
+    if (!els34.taskSearchClearButton) return;
+    els34.taskSearchClearButton.hidden = !taskSearchHasValue();
+  }
+  function clearTaskSearch() {
+    if (!els34.taskSearch?.value) return;
+    els34.taskSearch.value = "";
+    updateTaskSearchClearButton();
+    renderTasks6();
+    void syncTaskSearchHistoryResults();
+    els34.taskSearch.focus({ preventScroll: true });
+  }
   function setTaskFilterPopoverOpen(open) {
     if (!els34.taskFilterPopover || !els34.taskFilterButton) return;
     els34.taskFilterPopover.hidden = !open;
@@ -37494,12 +37691,6 @@ ${galleryText}`;
       els34.taskFilterClearButton.disabled = activeCount === 0;
     }
   }
-  function handleTaskFilterDocumentClick(event) {
-    const target = event.target;
-    const root = els34.taskFilterButton?.closest(".sidebar-search") || els34.taskFilterPopover;
-    if (!target || root?.contains(target)) return;
-    setTaskFilterPopoverOpen(false);
-  }
   function handleTaskFilterKeydown(event) {
     if (event.key !== "Escape" || els34.taskFilterPopover?.hidden) return;
     event.preventDefault();
@@ -37518,9 +37709,9 @@ ${galleryText}`;
     els34.batchDeleteButton?.addEventListener("click", openBatchDeleteConfirm2);
     els34.batchCancelButton?.addEventListener("click", () => toggleBatchMode2(false));
     els34.taskSearch.addEventListener("input", handleTaskSearchInput);
+    els34.taskSearchClearButton?.addEventListener("click", clearTaskSearch);
     els34.taskFilterButton?.addEventListener("click", toggleTaskFilterPopover);
     els34.taskFilterClearButton?.addEventListener("click", () => clearTaskFilters());
-    document.addEventListener("click", handleTaskFilterDocumentClick);
     document.addEventListener("keydown", handleTaskFilterKeydown);
     taskFilterControls().forEach((element2) => {
       element2.addEventListener("change", () => {
@@ -37528,10 +37719,12 @@ ${galleryText}`;
         renderTasks6();
       });
     });
+    updateTaskSearchClearButton();
     updateTaskFilterSummary();
     bindTaskListEvents();
   }
   function handleTaskSearchInput() {
+    updateTaskSearchClearButton();
     renderTasks6();
     void syncTaskSearchHistoryResults();
   }
@@ -37543,6 +37736,36 @@ ${galleryText}`;
   }
   function taskHistoryInteractiveRoot() {
     return els34.taskHistoryShell || els34.sidebarContent || els34.taskList;
+  }
+  function taskNavigationCards() {
+    const root = taskHistoryInteractiveRoot();
+    if (!root) return [];
+    return Array.from(root.querySelectorAll(".task-card[data-task-id]"));
+  }
+  function focusTaskNavigationCard(card) {
+    card.focus({ preventScroll: true });
+    card.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }
+  function isTaskListKeyboardInputTarget(target) {
+    if (!(target instanceof HTMLElement)) return false;
+    return Boolean(target.closest("button, input, select, textarea, a, [contenteditable='true'], [role='textbox']"));
+  }
+  function handleTaskCardArrowNavigation(card, event) {
+    if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return false;
+    if (event.altKey || event.metaKey || event.ctrlKey || isTaskListKeyboardInputTarget(event.target)) return false;
+    const cards = taskNavigationCards();
+    const currentIndex = cards.indexOf(card);
+    if (currentIndex < 0) return false;
+    event.preventDefault();
+    event.stopPropagation();
+    const nextIndex = currentIndex + (event.key === "ArrowDown" ? 1 : -1);
+    const nextCard = cards[nextIndex];
+    if (!nextCard) return true;
+    focusTaskNavigationCard(nextCard);
+    if (!state25.batchMode) {
+      void legacyMethod35("selectTask", nextCard.dataset.taskId);
+    }
+    return true;
   }
   function commitExpandedTaskGroupKey(nextKey, behavior = null) {
     const previousLayout = captureTaskHistoryLayout3();
@@ -37615,10 +37838,12 @@ ${galleryText}`;
     legacyMethod35("selectTask", card.dataset.taskId);
   }
   function handleTaskListKeydown(event) {
-    if (event.key !== "Enter" && event.key !== " ") return;
+    if (isTaskListKeyboardInputTarget(event.target)) return;
     const card = event.target.closest(".task-card[data-task-id]");
     const root = taskHistoryInteractiveRoot();
-    if (!card || !root?.contains(card) || event.target.closest("button")) return;
+    if (!card || !root?.contains(card)) return;
+    if (handleTaskCardArrowNavigation(card, event)) return;
+    if (event.key !== "Enter" && event.key !== " ") return;
     event.preventDefault();
     if (handleBatchTaskShortcutSelection2(card.dataset.taskId, event)) return;
     if (state25.batchMode) {
@@ -37631,11 +37856,14 @@ ${galleryText}`;
     if (taskListControlsInitialized) return;
     taskListControlsInitialized = true;
     Object.assign(getLegacyBridge().methods, {
+      updateTaskSearchClearButton,
+      clearTaskSearch,
       updateTaskFilterSummary,
       setTaskFilterPopoverOpen,
       clearTaskFilters,
       bindTaskListControlEvents,
       bindTaskListEvents,
+      handleTaskCardArrowNavigation,
       handleTaskListClick,
       handleTaskListKeydown
     });
@@ -39120,8 +39348,17 @@ ${galleryText}`;
     return "";
   }
   function taskSizeDimensions(task) {
-    const size = String(task?.output_size || task?.params?.size || task?.request?.size || "");
-    const match = size.match(/^(\d{2,5})x(\d{2,5})$/i);
+    return parseTaskSizeDimensions(taskRequestedSize(task)) || parseTaskSizeDimensions(taskOutputSize(task));
+  }
+  function taskRequestedSize(task) {
+    return String(task?.params?.size || task?.request?.size || "").trim();
+  }
+  function taskOutputSize(task) {
+    return String(task?.output_size || "").trim();
+  }
+  function parseTaskSizeDimensions(size) {
+    const text = String(size || "").trim();
+    const match = text.match(/^(\d{2,5})x(\d{2,5})$/i);
     if (!match) return null;
     const width = Number.parseInt(match[1] || "", 10);
     const height = Number.parseInt(match[2] || "", 10);
@@ -39795,9 +40032,11 @@ ${galleryText}`;
     if (!taskId || !Array.isArray(items)) return false;
     return items.some((item) => String(item?.task_id || "") === taskId);
   }
+  var TERMINAL_TASK_STATUSES = /* @__PURE__ */ new Set(["completed", "failed", "partial_failed"]);
   function taskPreviewStatus(task) {
     const status = String(task?.status || "");
     const taskId = String(task?.task_id || "");
+    if (TERMINAL_TASK_STATUSES.has(status)) return status;
     if (queueContainsTask(state28.queue.running, taskId)) return "running";
     if (queueContainsTask(state28.queue.waiting, taskId)) return status === "submitting" ? "submitting" : "queued";
     return status;
@@ -41226,16 +41465,31 @@ ${galleryText}`;
       count: Array.from(normalizedPromptText(value)).length
     });
   }
-  function promptPopoverSection(label, text, meta, tone = "") {
+  function promptPopoverSection(label, text, meta, tone = "", actions = "") {
     const toneClass = tone ? ` prompt-popover-section-${tone}` : "";
     return `
     <section class="prompt-popover-section${toneClass}">
       <div class="prompt-popover-section-head">
         <div class="prompt-popover-label">${escapeHtml20(label)}</div>
-        <span class="prompt-popover-meta">${escapeHtml20(meta || promptLengthLabel(text))}</span>
+        <div class="prompt-popover-section-tools">
+          <span class="prompt-popover-meta">${escapeHtml20(meta || promptLengthLabel(text))}</span>
+          ${actions}
+        </div>
       </div>
       <pre class="prompt-popover-text">${escapeHtml20(text || translate("promptPopover.empty"))}</pre>
     </section>
+  `;
+  }
+  function optimizedPromptCopyButton(optimizedPrompt) {
+    return `
+    <button
+      class="prompt-copy-button prompt-copy-inline"
+      type="button"
+      data-copy-optimized-prompt
+      aria-label="${escapeHtml20(translate("promptPopover.copyOptimized"))}"
+      title="${escapeHtml20(translate("promptPopover.copyOptimized"))}"
+      ${optimizedPrompt ? "" : "disabled"}
+    >${escapeHtml20(translate("templates.copy"))}</button>
   `;
   }
   function submittedPromptDetails(originalPrompt, submittedPrompt) {
@@ -41282,12 +41536,15 @@ ${galleryText}`;
     <div class="prompt-popover-body">
       <div class="prompt-popover-compare">
         ${promptPopoverSection(translate("promptPopover.original"), originalPrompt || translate("promptPopover.empty"), promptLengthLabel(originalPrompt), "original")}
-        ${promptPopoverSection(translate("promptPopover.optimized"), optimizedPrompt || translate("promptPopover.noOptimized"), optimizedLength, optimizedPrompt ? "optimized" : "empty")}
+        ${promptPopoverSection(
+      translate("promptPopover.optimized"),
+      optimizedPrompt || translate("promptPopover.noOptimized"),
+      optimizedLength,
+      optimizedPrompt ? "optimized" : "empty",
+      optimizedPromptCopyButton(optimizedPrompt)
+    )}
       </div>
       ${submittedPromptDetails(originalPrompt, submittedPrompt)}
-    </div>
-    <div class="prompt-popover-actions">
-      <button class="prompt-copy-button" type="button" data-copy-optimized-prompt ${optimizedPrompt ? "" : "disabled"}>${escapeHtml20(translate("promptPopover.copyOptimized"))}</button>
     </div>
   `;
     popover.querySelector(".prompt-popover-close")?.addEventListener("click", closePromptPopover9);
@@ -41299,14 +41556,17 @@ ${galleryText}`;
   }
   function positionPromptPopover(anchor, popover) {
     const anchorRect = anchor.getBoundingClientRect();
+    const horizontalAnchorRect = promptPopoverHorizontalAnchorRect(anchor);
+    const horizontalAnchorCenter = horizontalAnchorRect.left + horizontalAnchorRect.width / 2;
     const margin = 12;
-    const width = Math.min(860, Math.max(360, window.innerWidth - margin * 2));
+    const viewportWidth = Math.max(0, window.innerWidth - margin * 2);
+    const width = Math.min(760, viewportWidth);
     popover.style.left = "0px";
     popover.style.top = "0px";
     popover.style.width = `${width}px`;
     const height = popover.offsetHeight;
     const left = clampPopoverPosition2(
-      anchorRect.left + anchorRect.width / 2 - width / 2,
+      horizontalAnchorCenter - width / 2,
       margin,
       window.innerWidth - width - margin
     );
@@ -41315,6 +41575,23 @@ ${galleryText}`;
     const top = preferredTop >= margin ? preferredTop : clampPopoverPosition2(fallbackTop, margin, window.innerHeight - height - margin);
     popover.style.left = `${left}px`;
     popover.style.top = `${top}px`;
+  }
+  function promptPopoverHorizontalAnchorRect(anchor) {
+    const image = anchor.closest?.(".preview-card")?.querySelector?.("img[data-lightbox-url]");
+    if (!(image instanceof HTMLImageElement)) return anchor.getBoundingClientRect();
+    const imageRect = image.getBoundingClientRect();
+    if (!imageRect.width || !imageRect.height || !image.naturalWidth || !image.naturalHeight) return imageRect;
+    const scale = Math.min(imageRect.width / image.naturalWidth, imageRect.height / image.naturalHeight);
+    const width = image.naturalWidth * scale;
+    const height = image.naturalHeight * scale;
+    return {
+      left: imageRect.left + (imageRect.width - width) / 2,
+      top: imageRect.top + (imageRect.height - height) / 2,
+      right: imageRect.left + (imageRect.width + width) / 2,
+      bottom: imageRect.top + (imageRect.height + height) / 2,
+      width,
+      height
+    };
   }
   function clampPopoverPosition2(value, min, max) {
     return Math.min(Math.max(value, min), Math.max(min, max));
@@ -41335,11 +41612,13 @@ ${galleryText}`;
   async function copyOptimizedPrompt(button) {
     const text = promptPopoverState.optimizedPrompt;
     if (!text) return;
+    const defaultLabel = button.dataset.copyLabel || button.textContent || translate("templates.copy");
+    button.dataset.copyLabel = defaultLabel;
     await navigator.clipboard.writeText(text);
     button.textContent = translate("promptPopover.copied");
     clearPromptPopoverCopyTimer();
     promptPopoverState.copyTimerId = window.setTimeout(() => {
-      button.textContent = translate("promptPopover.copyOptimized");
+      button.textContent = defaultLabel;
       promptPopoverState.copyTimerId = null;
     }, 1200);
   }
@@ -41403,6 +41682,7 @@ ${galleryText}`;
       ensurePromptPopover,
       openPromptPopover: openPromptPopover2,
       positionPromptPopover,
+      promptPopoverHorizontalAnchorRect,
       clampPopoverPosition: clampPopoverPosition2,
       closePromptPopover: closePromptPopover9,
       clearPromptPopoverCopyTimer,
@@ -41410,6 +41690,17 @@ ${galleryText}`;
       handleDocumentClick,
       handleDocumentKeydown
     });
+  }
+
+  // codex_image/webui/frontend/src/web-app-title.ts
+  function isStandaloneWebApp() {
+    const iosNavigator = navigator;
+    return Boolean(
+      window.matchMedia?.("(display-mode: standalone)")?.matches || iosNavigator.standalone === true
+    );
+  }
+  function webAppDocumentTitle(standaloneTitle, fullTitle) {
+    return isStandaloneWebApp() ? standaloneTitle : fullTitle;
   }
 
   // codex_image/webui/frontend/src/shell-ui.ts
@@ -41427,6 +41718,7 @@ ${galleryText}`;
   var previewPanelHeightFrameId = null;
   var sidebarResizeFrameId = null;
   var sidebarResizePendingWidth = null;
+  var themeTransitionLockFrameId = null;
   function legacyMethod42(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
@@ -41530,9 +41822,24 @@ ${galleryText}`;
       button.setAttribute("aria-pressed", active ? "true" : "false");
     });
   }
+  function lockThemeTransitions() {
+    document.documentElement.classList.add("theme-transition-lock");
+    if (themeTransitionLockFrameId !== null) {
+      cancelAnimationFrame(themeTransitionLockFrameId);
+    }
+    themeTransitionLockFrameId = requestAnimationFrame(() => {
+      themeTransitionLockFrameId = requestAnimationFrame(() => {
+        document.documentElement.classList.remove("theme-transition-lock");
+        themeTransitionLockFrameId = null;
+      });
+    });
+  }
   function applyThemePreference(preference, { persist = true } = {}) {
     state31.themePreference = normalizeThemePreference(preference);
     const effectiveTheme = resolveEffectiveTheme(state31.themePreference);
+    if (document.documentElement.dataset.theme !== effectiveTheme) {
+      lockThemeTransitions();
+    }
     document.documentElement.dataset.theme = effectiveTheme;
     document.documentElement.dataset.themePreference = state31.themePreference;
     if (persist) {
@@ -41741,7 +42048,9 @@ ${galleryText}`;
       const selected = state31.tasks.find((item) => String(item.task_id) === String(state31.selectedTaskId));
       status = selected ? formatTaskStatus4(selected) : "";
     }
-    document.title = status ? `${status} \xB7 ${getLegacyBridge().constants.defaultDocumentTitle}` : getLegacyBridge().constants.defaultDocumentTitle;
+    const defaultTitle = getLegacyBridge().constants.defaultDocumentTitle;
+    const fullTitle = status ? `${status} \xB7 ${defaultTitle}` : defaultTitle;
+    document.title = webAppDocumentTitle(status, fullTitle);
   }
   function setStatus22(message, type) {
     if (!els41.statusText) return;

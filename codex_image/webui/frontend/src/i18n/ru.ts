@@ -772,6 +772,8 @@ export const RU_DICTIONARY: TranslationDictionary = {
     "apiSettings.concurrencyValue": "параллелизм {concurrency}",
     "apiSettings.keySaved": "Ключ API сохранен.",
     "apiSettings.keyNotSet": "Ключ API не установлен",
+    "apiSettings.showApiKey": "Показать API Key",
+    "apiSettings.hideApiKey": "Скрыть API Key",
     "apiSettings.editProvider": "Изменить поставщика",
     "apiSettings.newProviderTitle": "Новый провайдер",
     "apiSettings.editHint": "Поставщик сохранения записывает это изменение на серверную часть. Отмена отменяет его.",

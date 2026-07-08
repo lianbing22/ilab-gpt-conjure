@@ -13,8 +13,10 @@ import {
   type HistoryWindowEdge,
   type HistoryWindowDirection,
   captureHistoryScrollAnchor,
+  historyTaskArrowTargetCard,
   historyTaskCards,
   historyWindowEdgeCursor,
+  isHistoryTaskArrowKey,
   restoreHistoryScrollAnchor,
 } from "./history-window";
 import {
@@ -25,6 +27,7 @@ import {
   type HistoryLightboxTaskNavigationContext,
 } from "./history-lightbox";
 import { initSegmentedIndicatorFeature } from "./segmented-indicator";
+import { webAppDocumentTitle } from "./web-app-title";
 
 type HistoryFacet = { value: string; count: number };
 type HistoryMonth = { month: string; count: number };
@@ -132,6 +135,7 @@ const historyState = {
 
 let historyGridLayoutFrame = 0;
 let pendingHistoryGridKeepTaskId = "";
+let historyDetailLoadToken = 0;
 let historyContextMenuEl: HTMLElement | null = null;
 let activeHistoryResizer: {
   side: HistoryResizerSide;
@@ -224,7 +228,11 @@ function bindHistoryThemePreference(): void {
 
 function applyHistoryLocale(): void {
   restoreLocalePreference();
-  document.title = translate("history.documentTitle");
+  document.title = historyDocumentTitle();
+}
+
+function historyDocumentTitle(): string {
+  return webAppDocumentTitle(translate("history.title"), translate("history.documentTitle"));
 }
 
 function truncateText(value: unknown, limit: number): string {
@@ -1114,6 +1122,32 @@ function visibleHistoryTaskIds(): string[] {
     .filter(Boolean);
 }
 
+function focusHistoryTaskButton(taskId: string): void {
+  const card = historyTaskCardElement(taskId);
+  const button = card?.querySelector<HTMLElement>("[data-history-task-id]");
+  button?.focus({ preventScroll: true });
+  ensureHistoryTaskCardVisible(taskId);
+}
+
+function handleHistoryTaskArrowNavigation(event: KeyboardEvent): boolean {
+  if (!isHistoryTaskArrowKey(event.key)) return false;
+  if (event.altKey || event.metaKey || event.ctrlKey) return false;
+  const target = event.target as HTMLElement | null;
+  const taskButton = target?.closest<HTMLElement>("[data-history-task-id]");
+  if (!taskButton || !els.taskList?.contains(taskButton)) return false;
+  const taskId = taskButton.dataset.historyTaskId || "";
+  const nextCard = historyTaskArrowTargetCard(els.taskList, taskId, event.key, historyState.view);
+  if (!nextCard && historyState.view === "list" && (event.key === "ArrowLeft" || event.key === "ArrowRight")) return false;
+  event.preventDefault();
+  event.stopPropagation();
+  const nextTaskId = nextCard?.dataset.historyTaskCardId || "";
+  if (!nextTaskId) return true;
+  clearHistoryTaskSelection({ updateVisuals: false });
+  focusHistoryTaskButton(nextTaskId);
+  void loadTaskDetail(nextTaskId);
+  return true;
+}
+
 function applyHistoryTaskSelection(taskIds: string[], anchorTaskId = ""): void {
   historyState.selectedTaskIds = new Set(taskIds.filter(Boolean));
   if (anchorTaskId) historyState.selectionAnchorTaskId = anchorTaskId;
@@ -1178,6 +1212,8 @@ function handleHistoryTaskShortcutSelection(taskId: string, event: MouseEvent | 
 
 async function loadTaskDetail(taskId: string): Promise<void> {
   if (!taskId) return;
+  const loadToken = ++historyDetailLoadToken;
+  const keepCurrentDetail = els.detail?.dataset.historyDetailMode === "task" && Boolean(historyState.detailTask?.task_id);
   historyState.selectedTaskId = taskId;
   clearHistoryDeleteConfirmation();
   historyState.deleteConfirmTaskId = "";
@@ -1185,11 +1221,28 @@ async function loadTaskDetail(taskId: string): Promise<void> {
   updateHistoryUrl();
   updateTaskSelectionVisuals(taskId);
   els.page?.classList.add("history-detail-open");
-  renderDetailShell(translate("history.loadingDetail"));
+  if (keepCurrentDetail) {
+    els.detail?.classList.add("history-detail-pending");
+    els.detail?.setAttribute("aria-busy", "true");
+  } else {
+    renderDetailShell(translate("history.loadingDetail"));
+  }
   try {
-    renderTaskDetail(await fetchHistoryTaskDetail(taskId));
+    const detail = await fetchHistoryTaskDetail(taskId);
+    if (!isCurrentHistoryDetailLoad(loadToken, taskId)) return;
+    if (keepCurrentDetail) {
+      await preloadHistoryDetailImages(detail);
+    }
+    if (!isCurrentHistoryDetailLoad(loadToken, taskId)) return;
+    renderTaskDetail(detail);
   } catch (error) {
+    if (!isCurrentHistoryDetailLoad(loadToken, taskId)) return;
     renderDetailShell(errorMessage(error, translate("history.detailFailed")), "history-error");
+  } finally {
+    if (isCurrentHistoryDetailLoad(loadToken, taskId)) {
+      els.detail?.classList.remove("history-detail-pending");
+      els.detail?.removeAttribute("aria-busy");
+    }
   }
 }
 
@@ -1200,9 +1253,44 @@ async function fetchHistoryTaskDetail(taskId: string): Promise<any> {
   return data.task || {};
 }
 
+function isCurrentHistoryDetailLoad(loadToken: number, taskId: string): boolean {
+  return loadToken === historyDetailLoadToken && historyState.selectedTaskId === taskId;
+}
+
+async function preloadHistoryDetailImages(task: any): Promise<void> {
+  const urls = taskOutputRecords(task)
+    .map((record) => record.url)
+    .filter((url): url is string => Boolean(url));
+  if (!urls.length) return;
+  await Promise.all(urls.map((url) => preloadHistoryDetailImage(url)));
+}
+
+async function preloadHistoryDetailImage(url: string): Promise<boolean> {
+  const image = document.createElement("img");
+  const loadedPromise = waitForHistoryDetailImageLoad(image);
+  image.decoding = "async";
+  image.src = url;
+  const loaded = image.complete && image.naturalWidth > 0 ? true : await loadedPromise;
+  if (!loaded) return false;
+  try {
+    await image.decode?.();
+  } catch {
+    // Some browsers reject decode() for already usable cached images.
+  }
+  return true;
+}
+
+function waitForHistoryDetailImageLoad(image: HTMLImageElement): Promise<boolean> {
+  return new Promise((resolve) => {
+    image.onload = () => resolve(true);
+    image.onerror = () => resolve(false);
+  });
+}
+
 function renderDetailShell(message: string, className = "history-detail-empty"): void {
   if (!els.detail) return;
   els.detail.dataset.historyDetailMode = "empty";
+  historyState.detailTask = null;
   els.detail.innerHTML = `
     <div class="history-detail-header">
       <div>
@@ -2288,6 +2376,7 @@ function bindEvents(): void {
     void openHistoryTaskLightbox(card.dataset.historyTaskCardId || "");
   });
   els.taskList?.addEventListener("keydown", (event) => {
+    if (handleHistoryTaskArrowNavigation(event)) return;
     if (event.key !== "ContextMenu" && !(event.shiftKey && event.key === "F10")) return;
     const target = event.target as HTMLElement | null;
     const card = target?.closest<HTMLElement>(".history-task-card[data-history-task-card-id]");
@@ -2327,7 +2416,7 @@ function bindEvents(): void {
     applyHistoryLayoutWidths(widths.left, widths.right, { preserveActiveTask: true });
   }, { passive: true });
   document.addEventListener(LOCALE_CHANGE_EVENT, () => {
-    document.title = translate("history.documentTitle");
+    document.title = historyDocumentTitle();
     syncHistoryViewMode();
     syncArchiveButtons();
     els.taskList?.querySelectorAll<HTMLElement>(".history-task-active-badge").forEach((badge) => {

@@ -782,6 +782,8 @@ export const ZH_CN_DICTIONARY: TranslationDictionary = {
     "apiSettings.concurrencyValue": "并发 {concurrency}",
     "apiSettings.keySaved": "已保存 API Key",
     "apiSettings.keyNotSet": "未设置 API Key",
+    "apiSettings.showApiKey": "显示 API Key",
+    "apiSettings.hideApiKey": "隐藏 API Key",
     "apiSettings.editProvider": "编辑供应商",
     "apiSettings.newProviderTitle": "新增供应商",
     "apiSettings.editHint": "点击保存供应商后写入后端，取消可放弃本次编辑。",

@@ -152,15 +152,15 @@ http://127.0.0.1:8787/
 ## App packages
 
 Download the current packages from [Downloads / Releases](RELEASES.md), or open
-[GitHub Release v0.5.5](https://github.com/kadevin/ilab-gpt-conjure/releases/tag/v0.5.5)
+[GitHub Release v0.5.6](https://github.com/kadevin/ilab-gpt-conjure/releases/tag/v0.5.6)
 directly.
 
 New users should choose the standard packages:
 
-1. macOS: download `iLab-GPT-CONJURE-macos-arm64-0.5.5.dmg`
-   for Apple Silicon or `iLab-GPT-CONJURE-macos-x64-0.5.5.dmg`
+1. macOS: download `iLab-GPT-CONJURE-macos-arm64-0.5.6.dmg`
+   for Apple Silicon or `iLab-GPT-CONJURE-macos-x64-0.5.6.dmg`
    for Intel, then drag `iLab GPT CONJURE.app` to Applications.
-2. Windows: download `iLab-GPT-CONJURE-windows-x64_0.5.5.zip`,
+2. Windows: download `iLab-GPT-CONJURE-windows-x64_0.5.6.zip`,
    extract it into a normal user directory, and run `iLab GPT CONJURE.exe`.
 
 Standard packages store user data in `~/Library/Application Support/iLab GPT
@@ -206,8 +206,8 @@ saves replaced files under `.backup/`.
 Choose `macos_portable_arm64` for Apple Silicon Macs and
 `macos_portable_x64` for Intel Macs.
 
-The standard macOS DMG and macOS portable zips are unsigned and not notarized in
-0.5.5. If macOS blocks the app after download, right-click or Control-click the
+The standard macOS DMG and macOS portable zips are unsigned and not notarized.
+If macOS blocks the app after download, right-click or Control-click the
 app, choose Open, then confirm Open again in the macOS security prompt. For
 portable zips, you can also remove quarantine from the extracted folder:
 

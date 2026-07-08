@@ -327,8 +327,26 @@ class WebUIStaticHistoryTests(unittest.TestCase):
             source,
             r"if \(taskButton\) \{[\s\S]*handleHistoryTaskShortcutSelection\(taskButton\.dataset\.historyTaskId \|\| \"\", event\)[\s\S]*clearHistoryTaskSelection\(\{ updateVisuals: false \}\);[\s\S]*loadTaskDetail\(taskButton\.dataset\.historyTaskId \|\| \"\"\)",
         )
+        self.assertIn("function handleHistoryTaskArrowNavigation", source)
+        self.assertIn("isHistoryTaskArrowKey(event.key)", source)
+        self.assertIn("historyTaskArrowTargetCard(els.taskList, taskId, event.key, historyState.view)", source)
+        self.assertIn('historyState.view === "list" && (event.key === "ArrowLeft" || event.key === "ArrowRight")', source)
+        self.assertIn('event.preventDefault();\n  event.stopPropagation();', source)
+        self.assertIn('focusHistoryTaskButton(nextTaskId);', source)
+        self.assertIn('void loadTaskDetail(nextTaskId);', source)
+        self.assertIn('if (handleHistoryTaskArrowNavigation(event)) return;', source)
 
         for marker in [
+            "export const HISTORY_TASK_ARROW_KEYS",
+            '["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"]',
+            "export function isHistoryTaskArrowKey",
+            "function historyGridVerticalArrowTargetCard",
+            "candidate.x - current.x",
+            "primaryDistance * 10000 + dx",
+            "export function historyTaskArrowTargetCard",
+            'view: "grid" | "list"',
+            'if (key === "ArrowLeft") return cards[currentIndex - 1] ?? null;',
+            'if (key === "ArrowRight") return cards[currentIndex + 1] ?? null;',
             "export type HistoryWindowDirection",
             "export type HistoryWindowEdge",
             "export function historyTaskCards",
@@ -685,6 +703,34 @@ class WebUIStaticHistoryTests(unittest.TestCase):
         self.assertRegex(styles, r"\.history-lightbox-nav\s*\{[^}]*position:\s*absolute")
         self.assertRegex(styles, r"\.history-lightbox-counter\s*\{[^}]*position:\s*absolute")
         self.assertIn(':root[data-theme="dark"] .history-task-card.selected', styles)
+
+    def test_history_detail_switch_keeps_existing_preview_until_next_images_are_ready(self) -> None:
+        source = Path("codex_image/webui/frontend/src/history.ts").read_text(encoding="utf-8")
+
+        load_body = _typescript_function_body(source, "loadTaskDetail")
+        self.assertIn("let historyDetailLoadToken = 0", source)
+        self.assertIn("const loadToken = ++historyDetailLoadToken", load_body)
+        self.assertIn("const keepCurrentDetail", load_body)
+        self.assertRegex(
+            load_body,
+            r"if \(keepCurrentDetail\) \{[\s\S]*history-detail-pending[\s\S]*\} else \{[\s\S]*renderDetailShell\(translate\(\"history\.loadingDetail\"\)\)",
+        )
+        self.assertIn('els.detail?.setAttribute("aria-busy", "true")', load_body)
+        self.assertIn("await preloadHistoryDetailImages(detail)", load_body)
+        self.assertIn("if (!isCurrentHistoryDetailLoad(loadToken, taskId)) return;", load_body)
+        self.assertIn('els.detail?.removeAttribute("aria-busy")', load_body)
+
+        current_guard_body = _typescript_function_body(source, "isCurrentHistoryDetailLoad")
+        self.assertIn("loadToken === historyDetailLoadToken", current_guard_body)
+        self.assertIn("historyState.selectedTaskId === taskId", current_guard_body)
+
+        self.assertRegex(
+            source,
+            r"async function preloadHistoryDetailImage\(url: string\): Promise<boolean> \{[\s\S]*document\.createElement\(\"img\"\)[\s\S]*image\.decoding = \"async\"[\s\S]*await image\.decode\?\.\(\)",
+        )
+
+        shell_body = _typescript_function_body(source, "renderDetailShell")
+        self.assertIn("historyState.detailTask = null", shell_body)
 
     def test_history_task_reuse_handoff_is_consumed_by_main_page(self) -> None:
         history_source = Path("codex_image/webui/frontend/src/history.ts").read_text(encoding="utf-8")

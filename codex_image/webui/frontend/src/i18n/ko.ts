@@ -772,6 +772,8 @@ export const KO_DICTIONARY: TranslationDictionary = {
     "apiSettings.concurrencyValue": "동시성{concurrency}",
     "apiSettings.keySaved": "API Key가 저장되었습니다",
     "apiSettings.keyNotSet": "API Key가 설정되지 않았습니다.",
+    "apiSettings.showApiKey": "API Key 표시",
+    "apiSettings.hideApiKey": "API Key 숨기기",
     "apiSettings.editProvider": "공급자 편집",
     "apiSettings.newProviderTitle": "새 공급자",
     "apiSettings.editHint": "공급자 저장을 누르기 전까지 이 편집 내용은 백엔드에 기록되지 않습니다. 취소하면 폐기됩니다.",

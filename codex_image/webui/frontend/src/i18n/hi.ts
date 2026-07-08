@@ -772,6 +772,8 @@ export const HI_DICTIONARY: TranslationDictionary = {
     "apiSettings.concurrencyValue": "समवर्ती {concurrency}",
     "apiSettings.keySaved": "API कुंजी सहेजी गई",
     "apiSettings.keyNotSet": "API कुंजी सेट नहीं है",
+    "apiSettings.showApiKey": "API Key दिखाएं",
+    "apiSettings.hideApiKey": "API Key छिपाएं",
     "apiSettings.editProvider": "प्रदाता संपादित करें",
     "apiSettings.newProviderTitle": "नया प्रदाता",
     "apiSettings.editHint": "प्रदाता सहेजें इस संपादन को बैकएंड में लिखता है। रद्द करें इसे छोड़ देता है।",

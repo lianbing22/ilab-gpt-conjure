@@ -782,6 +782,8 @@
     "apiSettings.concurrencyValue": "concurrency {concurrency}",
     "apiSettings.keySaved": "API key saved",
     "apiSettings.keyNotSet": "API key not set",
+    "apiSettings.showApiKey": "Show API key",
+    "apiSettings.hideApiKey": "Hide API key",
     "apiSettings.editProvider": "Edit provider",
     "apiSettings.newProviderTitle": "New provider",
     "apiSettings.editHint": "Save provider writes this edit to the backend. Cancel discards it.",
@@ -1679,6 +1681,8 @@
     "apiSettings.concurrencyValue": "Parallelit\xE4t {concurrency}",
     "apiSettings.keySaved": "API Schl\xFCssel gespeichert",
     "apiSettings.keyNotSet": "Schl\xFCssel API nicht gesetzt",
+    "apiSettings.showApiKey": "API-Key anzeigen",
+    "apiSettings.hideApiKey": "API-Key ausblenden",
     "apiSettings.editProvider": "Anbieter bearbeiten",
     "apiSettings.newProviderTitle": "Neuer Anbieter",
     "apiSettings.editHint": "Der Speicheranbieter schreibt diese \xC4nderung in das Backend. Abbrechen verwirft es.",
@@ -2576,6 +2580,8 @@
     "apiSettings.concurrencyValue": "concurrencia {concurrency}",
     "apiSettings.keySaved": "API clave guardada",
     "apiSettings.keyNotSet": "API clave no configurada",
+    "apiSettings.showApiKey": "Mostrar API Key",
+    "apiSettings.hideApiKey": "Ocultar API Key",
     "apiSettings.editProvider": "Editar proveedor",
     "apiSettings.newProviderTitle": "Nuevo proveedor",
     "apiSettings.editHint": "El proveedor de guardado escribe esta edici\xF3n en el backend. Cancelar lo descarta.",
@@ -3473,6 +3479,8 @@
     "apiSettings.concurrencyValue": "concurrence {concurrency}",
     "apiSettings.keySaved": "Cl\xE9 API enregistr\xE9e",
     "apiSettings.keyNotSet": "Cl\xE9 API non d\xE9finie",
+    "apiSettings.showApiKey": "Afficher la cl\xE9 API",
+    "apiSettings.hideApiKey": "Masquer la cl\xE9 API",
     "apiSettings.editProvider": "Modifier le fournisseur",
     "apiSettings.newProviderTitle": "Nouveau fournisseur",
     "apiSettings.editHint": "Le fournisseur de sauvegarde \xE9crit cette modification dans le backend. Annuler le supprime.",
@@ -4370,6 +4378,8 @@
     "apiSettings.concurrencyValue": "\u540C\u6642\u5B9F\u884C\u6027{concurrency}",
     "apiSettings.keySaved": "API Key\u304C\u4FDD\u5B58\u3055\u308C\u307E\u3057\u305F",
     "apiSettings.keyNotSet": "API Key\u304C\u8A2D\u5B9A\u3055\u308C\u3066\u3044\u307E\u305B\u3093",
+    "apiSettings.showApiKey": "API\u30AD\u30FC\u3092\u8868\u793A",
+    "apiSettings.hideApiKey": "API\u30AD\u30FC\u3092\u96A0\u3059",
     "apiSettings.editProvider": "\u30D7\u30ED\u30D0\u30A4\u30C0\u30FC\u3092\u7DE8\u96C6",
     "apiSettings.newProviderTitle": "\u65B0\u3057\u3044\u30D7\u30ED\u30D0\u30A4\u30C0\u30FC",
     "apiSettings.editHint": "\u300C\u30D7\u30ED\u30D0\u30A4\u30C0\u30FC\u3092\u4FDD\u5B58\u300D\u3092\u62BC\u3059\u307E\u3067\u3001\u3053\u306E\u7DE8\u96C6\u306F\u30D0\u30C3\u30AF\u30A8\u30F3\u30C9\u306B\u66F8\u304D\u8FBC\u307E\u308C\u307E\u305B\u3093\u3002\u30AD\u30E3\u30F3\u30BB\u30EB\u3059\u308B\u3068\u7834\u68C4\u3055\u308C\u307E\u3059\u3002",
@@ -5267,6 +5277,8 @@
     "apiSettings.concurrencyValue": "\uB3D9\uC2DC\uC131{concurrency}",
     "apiSettings.keySaved": "API Key\uAC00 \uC800\uC7A5\uB418\uC5C8\uC2B5\uB2C8\uB2E4",
     "apiSettings.keyNotSet": "API Key\uAC00 \uC124\uC815\uB418\uC9C0 \uC54A\uC558\uC2B5\uB2C8\uB2E4.",
+    "apiSettings.showApiKey": "API Key \uD45C\uC2DC",
+    "apiSettings.hideApiKey": "API Key \uC228\uAE30\uAE30",
     "apiSettings.editProvider": "\uACF5\uAE09\uC790 \uD3B8\uC9D1",
     "apiSettings.newProviderTitle": "\uC0C8 \uACF5\uAE09\uC790",
     "apiSettings.editHint": "\uACF5\uAE09\uC790 \uC800\uC7A5\uC744 \uB204\uB974\uAE30 \uC804\uAE4C\uC9C0 \uC774 \uD3B8\uC9D1 \uB0B4\uC6A9\uC740 \uBC31\uC5D4\uB4DC\uC5D0 \uAE30\uB85D\uB418\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4. \uCDE8\uC18C\uD558\uBA74 \uD3D0\uAE30\uB429\uB2C8\uB2E4.",
@@ -6164,6 +6176,8 @@
     "apiSettings.concurrencyValue": "simultaneidade {concurrency}",
     "apiSettings.keySaved": "Chave API salva",
     "apiSettings.keyNotSet": "Chave API n\xE3o definida",
+    "apiSettings.showApiKey": "Mostrar API Key",
+    "apiSettings.hideApiKey": "Ocultar API Key",
     "apiSettings.editProvider": "Editar provedor",
     "apiSettings.newProviderTitle": "Novo provedor",
     "apiSettings.editHint": "O provedor de salvamento grava esta edi\xE7\xE3o no back-end. Cancelar descarta-o.",
@@ -7061,6 +7075,8 @@
     "apiSettings.concurrencyValue": "\u043F\u0430\u0440\u0430\u043B\u043B\u0435\u043B\u0438\u0437\u043C {concurrency}",
     "apiSettings.keySaved": "\u041A\u043B\u044E\u0447 API \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D.",
     "apiSettings.keyNotSet": "\u041A\u043B\u044E\u0447 API \u043D\u0435 \u0443\u0441\u0442\u0430\u043D\u043E\u0432\u043B\u0435\u043D",
+    "apiSettings.showApiKey": "\u041F\u043E\u043A\u0430\u0437\u0430\u0442\u044C API Key",
+    "apiSettings.hideApiKey": "\u0421\u043A\u0440\u044B\u0442\u044C API Key",
     "apiSettings.editProvider": "\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u043F\u043E\u0441\u0442\u0430\u0432\u0449\u0438\u043A\u0430",
     "apiSettings.newProviderTitle": "\u041D\u043E\u0432\u044B\u0439 \u043F\u0440\u043E\u0432\u0430\u0439\u0434\u0435\u0440",
     "apiSettings.editHint": "\u041F\u043E\u0441\u0442\u0430\u0432\u0449\u0438\u043A \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u0438\u044F \u0437\u0430\u043F\u0438\u0441\u044B\u0432\u0430\u0435\u0442 \u044D\u0442\u043E \u0438\u0437\u043C\u0435\u043D\u0435\u043D\u0438\u0435 \u043D\u0430 \u0441\u0435\u0440\u0432\u0435\u0440\u043D\u0443\u044E \u0447\u0430\u0441\u0442\u044C. \u041E\u0442\u043C\u0435\u043D\u0430 \u043E\u0442\u043C\u0435\u043D\u044F\u0435\u0442 \u0435\u0433\u043E.",
@@ -7958,6 +7974,8 @@
     "apiSettings.concurrencyValue": "concorrenza {concurrency}",
     "apiSettings.keySaved": "Chiave API salvata",
     "apiSettings.keyNotSet": "Chiave API non impostata",
+    "apiSettings.showApiKey": "Mostra API Key",
+    "apiSettings.hideApiKey": "Nascondi API Key",
     "apiSettings.editProvider": "Modifica fornitore",
     "apiSettings.newProviderTitle": "Nuovo fornitore",
     "apiSettings.editHint": "Il provider di salvataggio scrive questa modifica sul backend. Annulla lo scarta.",
@@ -8855,6 +8873,8 @@
     "apiSettings.concurrencyValue": "\u0938\u092E\u0935\u0930\u094D\u0924\u0940 {concurrency}",
     "apiSettings.keySaved": "API \u0915\u0941\u0902\u091C\u0940 \u0938\u0939\u0947\u091C\u0940 \u0917\u0908",
     "apiSettings.keyNotSet": "API \u0915\u0941\u0902\u091C\u0940 \u0938\u0947\u091F \u0928\u0939\u0940\u0902 \u0939\u0948",
+    "apiSettings.showApiKey": "API Key \u0926\u093F\u0916\u093E\u090F\u0902",
+    "apiSettings.hideApiKey": "API Key \u091B\u093F\u092A\u093E\u090F\u0902",
     "apiSettings.editProvider": "\u092A\u094D\u0930\u0926\u093E\u0924\u093E \u0938\u0902\u092A\u093E\u0926\u093F\u0924 \u0915\u0930\u0947\u0902",
     "apiSettings.newProviderTitle": "\u0928\u092F\u093E \u092A\u094D\u0930\u0926\u093E\u0924\u093E",
     "apiSettings.editHint": "\u092A\u094D\u0930\u0926\u093E\u0924\u093E \u0938\u0939\u0947\u091C\u0947\u0902 \u0907\u0938 \u0938\u0902\u092A\u093E\u0926\u0928 \u0915\u094B \u092C\u0948\u0915\u090F\u0902\u0921 \u092E\u0947\u0902 \u0932\u093F\u0916\u0924\u093E \u0939\u0948\u0964 \u0930\u0926\u094D\u0926 \u0915\u0930\u0947\u0902 \u0907\u0938\u0947 \u091B\u094B\u0921\u093C \u0926\u0947\u0924\u093E \u0939\u0948\u0964",
@@ -9762,6 +9782,8 @@
     "apiSettings.concurrencyValue": "\u5E76\u53D1 {concurrency}",
     "apiSettings.keySaved": "\u5DF2\u4FDD\u5B58 API Key",
     "apiSettings.keyNotSet": "\u672A\u8BBE\u7F6E API Key",
+    "apiSettings.showApiKey": "\u663E\u793A API Key",
+    "apiSettings.hideApiKey": "\u9690\u85CF API Key",
     "apiSettings.editProvider": "\u7F16\u8F91\u4F9B\u5E94\u5546",
     "apiSettings.newProviderTitle": "\u65B0\u589E\u4F9B\u5E94\u5546",
     "apiSettings.editHint": "\u70B9\u51FB\u4FDD\u5B58\u4F9B\u5E94\u5546\u540E\u5199\u5165\u540E\u7AEF\uFF0C\u53D6\u6D88\u53EF\u653E\u5F03\u672C\u6B21\u7F16\u8F91\u3002",
@@ -10669,6 +10691,8 @@
     "apiSettings.concurrencyValue": "\u4F75\u767C{concurrency}",
     "apiSettings.keySaved": "\u5DF2\u5132\u5B58API Key",
     "apiSettings.keyNotSet": "\u672A\u8A2D\u5B9AAPI Key",
+    "apiSettings.showApiKey": "\u986F\u793A API Key",
+    "apiSettings.hideApiKey": "\u96B1\u85CF API Key",
     "apiSettings.editProvider": "\u7DE8\u8F2F\u4F9B\u61C9\u5546",
     "apiSettings.newProviderTitle": "\u65B0\u589E\u4F9B\u61C9\u5546",
     "apiSettings.editHint": "\u9EDE\u9078\u5132\u5B58\u4F9B\u61C9\u5546\u5F8C\u5BEB\u5165\u5F8C\u7AEF\uFF0C\u53D6\u6D88\u53EF\u653E\u68C4\u672C\u6B21\u7DE8\u8F2F\u3002",
@@ -11576,6 +11600,8 @@
     "apiSettings.concurrencyValue": "\u4F75\u767C{concurrency}",
     "apiSettings.keySaved": "\u5DF2\u5132\u5B58API Key",
     "apiSettings.keyNotSet": "\u672A\u8A2D\u5B9AAPI Key",
+    "apiSettings.showApiKey": "\u986F\u793A API Key",
+    "apiSettings.hideApiKey": "\u96B1\u85CF API Key",
     "apiSettings.editProvider": "\u7DE8\u8F2F\u4F9B\u61C9\u5546",
     "apiSettings.newProviderTitle": "\u65B0\u589E\u4F9B\u61C9\u5546",
     "apiSettings.editHint": "\u9EDE\u9078\u5132\u5B58\u4F9B\u61C9\u5546\u5F8C\u5BEB\u5165\u5F8C\u7AEF\uFF0C\u53D6\u6D88\u53EF\u653E\u68C4\u672C\u6B21\u7DE8\u8F2F\u3002",
@@ -12069,8 +12095,53 @@
   }
 
   // codex_image/webui/frontend/src/history-window.ts
+  var HISTORY_TASK_ARROW_KEYS = /* @__PURE__ */ new Set(["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"]);
   function historyTaskCards(root) {
     return [...root.querySelectorAll(".history-task-card[data-history-task-card-id]")];
+  }
+  function isHistoryTaskArrowKey(key) {
+    return HISTORY_TASK_ARROW_KEYS.has(key);
+  }
+  function historyTaskCardCenter(card) {
+    const rect = card.getBoundingClientRect();
+    return {
+      card,
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2
+    };
+  }
+  function historyGridVerticalArrowTargetCard(cards, currentCard, key) {
+    const current = historyTaskCardCenter(currentCard);
+    let bestCard = null;
+    let bestScore = Number.POSITIVE_INFINITY;
+    cards.forEach((card) => {
+      if (card === currentCard) return;
+      const candidate = historyTaskCardCenter(card);
+      const dx = Math.abs(candidate.x - current.x);
+      const dy = candidate.y - current.y;
+      if (key === "ArrowUp" && dy >= -1) return;
+      if (key === "ArrowDown" && dy <= 1) return;
+      const primaryDistance = Math.abs(dy);
+      const score = primaryDistance * 1e4 + dx;
+      if (score >= bestScore) return;
+      bestScore = score;
+      bestCard = candidate.card;
+    });
+    return bestCard;
+  }
+  function historyTaskArrowTargetCard(root, currentTaskId, key, view) {
+    const cards = historyTaskCards(root);
+    const currentIndex = cards.findIndex((card) => String(card.dataset.historyTaskCardId || "") === currentTaskId);
+    if (currentIndex < 0) return null;
+    const currentCard = cards[currentIndex];
+    if (!currentCard) return null;
+    if (view === "list") {
+      if (key !== "ArrowUp" && key !== "ArrowDown") return null;
+      return cards[currentIndex + (key === "ArrowDown" ? 1 : -1)] ?? null;
+    }
+    if (key === "ArrowLeft") return cards[currentIndex - 1] ?? null;
+    if (key === "ArrowRight") return cards[currentIndex + 1] ?? null;
+    return historyGridVerticalArrowTargetCard(cards, currentCard, key);
   }
   function encodeHistoryCursor(createdAt, taskId) {
     const raw = JSON.stringify({ created_at: createdAt, task_id: taskId });
@@ -12387,6 +12458,17 @@
     });
   }
 
+  // codex_image/webui/frontend/src/web-app-title.ts
+  function isStandaloneWebApp() {
+    const iosNavigator = navigator;
+    return Boolean(
+      window.matchMedia?.("(display-mode: standalone)")?.matches || iosNavigator.standalone === true
+    );
+  }
+  function webAppDocumentTitle(standaloneTitle, fullTitle) {
+    return isStandaloneWebApp() ? standaloneTitle : fullTitle;
+  }
+
   // codex_image/webui/frontend/src/history.ts
   var HISTORY_FILTER_KEYS = ["month", "prompt_mode", "quality", "ratio", "orientation", "backend", "provider", "archived"];
   var HISTORY_RATIO_OTHER_VALUE = "__other__";
@@ -12445,6 +12527,7 @@
   };
   var historyGridLayoutFrame = 0;
   var pendingHistoryGridKeepTaskId = "";
+  var historyDetailLoadToken = 0;
   var historyContextMenuEl = null;
   var activeHistoryResizer = null;
   var els = {
@@ -12516,7 +12599,10 @@
   }
   function applyHistoryLocale() {
     restoreLocalePreference();
-    document.title = translate("history.documentTitle");
+    document.title = historyDocumentTitle();
+  }
+  function historyDocumentTitle() {
+    return webAppDocumentTitle(translate("history.title"), translate("history.documentTitle"));
   }
   function truncateText(value, limit) {
     const text = String(value || "").replace(/\s+/g, " ").trim();
@@ -13299,6 +13385,30 @@
   function visibleHistoryTaskIds() {
     return Array.from(els.taskList?.querySelectorAll(".history-task-card[data-history-task-card-id]") || []).map((card) => String(card.dataset.historyTaskCardId || "")).filter(Boolean);
   }
+  function focusHistoryTaskButton(taskId) {
+    const card = historyTaskCardElement(taskId);
+    const button = card?.querySelector("[data-history-task-id]");
+    button?.focus({ preventScroll: true });
+    ensureHistoryTaskCardVisible(taskId);
+  }
+  function handleHistoryTaskArrowNavigation(event) {
+    if (!isHistoryTaskArrowKey(event.key)) return false;
+    if (event.altKey || event.metaKey || event.ctrlKey) return false;
+    const target = event.target;
+    const taskButton = target?.closest("[data-history-task-id]");
+    if (!taskButton || !els.taskList?.contains(taskButton)) return false;
+    const taskId = taskButton.dataset.historyTaskId || "";
+    const nextCard = historyTaskArrowTargetCard(els.taskList, taskId, event.key, historyState.view);
+    if (!nextCard && historyState.view === "list" && (event.key === "ArrowLeft" || event.key === "ArrowRight")) return false;
+    event.preventDefault();
+    event.stopPropagation();
+    const nextTaskId = nextCard?.dataset.historyTaskCardId || "";
+    if (!nextTaskId) return true;
+    clearHistoryTaskSelection({ updateVisuals: false });
+    focusHistoryTaskButton(nextTaskId);
+    void loadTaskDetail(nextTaskId);
+    return true;
+  }
   function applyHistoryTaskSelection(taskIds, anchorTaskId = "") {
     historyState.selectedTaskIds = new Set(taskIds.filter(Boolean));
     if (anchorTaskId) historyState.selectionAnchorTaskId = anchorTaskId;
@@ -13358,6 +13468,8 @@
   }
   async function loadTaskDetail(taskId) {
     if (!taskId) return;
+    const loadToken = ++historyDetailLoadToken;
+    const keepCurrentDetail = els.detail?.dataset.historyDetailMode === "task" && Boolean(historyState.detailTask?.task_id);
     historyState.selectedTaskId = taskId;
     clearHistoryDeleteConfirmation();
     historyState.deleteConfirmTaskId = "";
@@ -13365,11 +13477,28 @@
     updateHistoryUrl();
     updateTaskSelectionVisuals(taskId);
     els.page?.classList.add("history-detail-open");
-    renderDetailShell(translate("history.loadingDetail"));
+    if (keepCurrentDetail) {
+      els.detail?.classList.add("history-detail-pending");
+      els.detail?.setAttribute("aria-busy", "true");
+    } else {
+      renderDetailShell(translate("history.loadingDetail"));
+    }
     try {
-      renderTaskDetail(await fetchHistoryTaskDetail(taskId));
+      const detail = await fetchHistoryTaskDetail(taskId);
+      if (!isCurrentHistoryDetailLoad(loadToken, taskId)) return;
+      if (keepCurrentDetail) {
+        await preloadHistoryDetailImages(detail);
+      }
+      if (!isCurrentHistoryDetailLoad(loadToken, taskId)) return;
+      renderTaskDetail(detail);
     } catch (error) {
+      if (!isCurrentHistoryDetailLoad(loadToken, taskId)) return;
       renderDetailShell(errorMessage(error, translate("history.detailFailed")), "history-error");
+    } finally {
+      if (isCurrentHistoryDetailLoad(loadToken, taskId)) {
+        els.detail?.classList.remove("history-detail-pending");
+        els.detail?.removeAttribute("aria-busy");
+      }
     }
   }
   async function fetchHistoryTaskDetail(taskId) {
@@ -13378,9 +13507,37 @@
     if (!response.ok) throw new Error(data.detail || translate("history.detailFailed"));
     return data.task || {};
   }
+  function isCurrentHistoryDetailLoad(loadToken, taskId) {
+    return loadToken === historyDetailLoadToken && historyState.selectedTaskId === taskId;
+  }
+  async function preloadHistoryDetailImages(task) {
+    const urls = taskOutputRecords(task).map((record) => record.url).filter((url) => Boolean(url));
+    if (!urls.length) return;
+    await Promise.all(urls.map((url) => preloadHistoryDetailImage(url)));
+  }
+  async function preloadHistoryDetailImage(url) {
+    const image = document.createElement("img");
+    const loadedPromise = waitForHistoryDetailImageLoad(image);
+    image.decoding = "async";
+    image.src = url;
+    const loaded = image.complete && image.naturalWidth > 0 ? true : await loadedPromise;
+    if (!loaded) return false;
+    try {
+      await image.decode?.();
+    } catch {
+    }
+    return true;
+  }
+  function waitForHistoryDetailImageLoad(image) {
+    return new Promise((resolve) => {
+      image.onload = () => resolve(true);
+      image.onerror = () => resolve(false);
+    });
+  }
   function renderDetailShell(message, className = "history-detail-empty") {
     if (!els.detail) return;
     els.detail.dataset.historyDetailMode = "empty";
+    historyState.detailTask = null;
     els.detail.innerHTML = `
     <div class="history-detail-header">
       <div>
@@ -14385,6 +14542,7 @@
       void openHistoryTaskLightbox(card.dataset.historyTaskCardId || "");
     });
     els.taskList?.addEventListener("keydown", (event) => {
+      if (handleHistoryTaskArrowNavigation(event)) return;
       if (event.key !== "ContextMenu" && !(event.shiftKey && event.key === "F10")) return;
       const target = event.target;
       const card = target?.closest(".history-task-card[data-history-task-card-id]");
@@ -14424,7 +14582,7 @@
       applyHistoryLayoutWidths(widths.left, widths.right, { preserveActiveTask: true });
     }, { passive: true });
     document.addEventListener(LOCALE_CHANGE_EVENT, () => {
-      document.title = translate("history.documentTitle");
+      document.title = historyDocumentTitle();
       syncHistoryViewMode();
       syncArchiveButtons();
       els.taskList?.querySelectorAll(".history-task-active-badge").forEach((badge) => {

@@ -8,6 +8,7 @@ function call(methods: LegacyMethods, name: string, ...args: any[]): any {
 
 async function handleRefreshButtonClick(methods: LegacyMethods): Promise<void> {
   call(methods, "closePromptPopover");
+  await window.refreshQueue?.();
   await call(methods, "refreshTasks");
 }
 
@@ -97,6 +98,16 @@ export function bindWebUIEvents(state: WebUIState, els: WebUIElements, methods: 
   els.deleteApiProviderButton?.addEventListener("click", () => call(methods, "confirmDeleteApiProvider", els.deleteApiProviderButton));
   els.cancelApiProviderEditButton?.addEventListener("click", () => call(methods, "cancelApiProviderEdit"));
   els.saveApiProviderEditButton?.addEventListener("click", () => call(methods, "saveApiProviderEdit"));
+  els.apiKeyRevealButton?.addEventListener("pointerdown", (event: Event) => call(methods, "revealApiKeyWhilePressed", event));
+  els.apiKeyRevealButton?.addEventListener("pointerup", () => call(methods, "hideApiKeyReveal"));
+  els.apiKeyRevealButton?.addEventListener("pointercancel", () => call(methods, "hideApiKeyReveal"));
+  els.apiKeyRevealButton?.addEventListener("pointerleave", () => call(methods, "hideApiKeyReveal"));
+  els.apiKeyRevealButton?.addEventListener("blur", () => call(methods, "hideApiKeyReveal"));
+  els.apiKeyRevealButton?.addEventListener("keydown", (event: KeyboardEvent) => {
+    if (event.key === " " || event.key === "Enter") call(methods, "revealApiKeyWhilePressed", event);
+  });
+  els.apiKeyRevealButton?.addEventListener("keyup", () => call(methods, "hideApiKeyReveal"));
+  els.apiKey?.addEventListener("input", () => call(methods, "updateApiKeyRevealButton"));
   [els.codexMode].filter(Boolean).forEach((element) => {
     element?.addEventListener("input", () => {
       call(methods, "readApiSettingsForm");

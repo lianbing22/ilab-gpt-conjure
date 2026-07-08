@@ -355,6 +355,11 @@
   outline-offset: 1px;
 }
 
+.task-card.active:focus-visible,
+.task-card.batch-selected:focus-visible {
+  outline: none;
+}
+
 .task-card.batch-mode {
   padding-left: 42px;
   padding-right: 8px;
@@ -394,6 +399,8 @@
 
 .task-card:hover {
   background: color-mix(in srgb, var(--surface-soft) 88%, var(--surface));
+  border-color: color-mix(in srgb, var(--primary) 32%, var(--line));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary-light) 72%, transparent);
 }
 
 .task-card.unread {

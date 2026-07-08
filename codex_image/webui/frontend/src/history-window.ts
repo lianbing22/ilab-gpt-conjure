@@ -1,13 +1,75 @@
 export type HistoryWindowDirection = "next" | "previous";
 export type HistoryWindowEdge = "top" | "bottom";
+export type HistoryTaskArrowKey = "ArrowLeft" | "ArrowRight" | "ArrowUp" | "ArrowDown";
+
+export const HISTORY_TASK_ARROW_KEYS = new Set<HistoryTaskArrowKey>(["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"]);
 
 export type HistoryScrollAnchor = {
   taskId: string;
   offset: number;
 } | null;
 
+type HistoryTaskCardCenter = {
+  card: HTMLElement;
+  x: number;
+  y: number;
+};
+
 export function historyTaskCards(root: HTMLElement): HTMLElement[] {
   return [...root.querySelectorAll<HTMLElement>(".history-task-card[data-history-task-card-id]")];
+}
+
+export function isHistoryTaskArrowKey(key: string): key is HistoryTaskArrowKey {
+  return HISTORY_TASK_ARROW_KEYS.has(key as HistoryTaskArrowKey);
+}
+
+function historyTaskCardCenter(card: HTMLElement): HistoryTaskCardCenter {
+  const rect = card.getBoundingClientRect();
+  return {
+    card,
+    x: rect.left + rect.width / 2,
+    y: rect.top + rect.height / 2,
+  };
+}
+
+function historyGridVerticalArrowTargetCard(cards: HTMLElement[], currentCard: HTMLElement, key: "ArrowUp" | "ArrowDown"): HTMLElement | null {
+  const current = historyTaskCardCenter(currentCard);
+  let bestCard: HTMLElement | null = null;
+  let bestScore = Number.POSITIVE_INFINITY;
+  cards.forEach((card) => {
+    if (card === currentCard) return;
+    const candidate = historyTaskCardCenter(card);
+    const dx = Math.abs(candidate.x - current.x);
+    const dy = candidate.y - current.y;
+    if (key === "ArrowUp" && dy >= -1) return;
+    if (key === "ArrowDown" && dy <= 1) return;
+    const primaryDistance = Math.abs(dy);
+    const score = primaryDistance * 10000 + dx;
+    if (score >= bestScore) return;
+    bestScore = score;
+    bestCard = candidate.card;
+  });
+  return bestCard;
+}
+
+export function historyTaskArrowTargetCard(
+  root: HTMLElement,
+  currentTaskId: string,
+  key: HistoryTaskArrowKey,
+  view: "grid" | "list",
+): HTMLElement | null {
+  const cards = historyTaskCards(root);
+  const currentIndex = cards.findIndex((card) => String(card.dataset.historyTaskCardId || "") === currentTaskId);
+  if (currentIndex < 0) return null;
+  const currentCard = cards[currentIndex];
+  if (!currentCard) return null;
+  if (view === "list") {
+    if (key !== "ArrowUp" && key !== "ArrowDown") return null;
+    return cards[currentIndex + (key === "ArrowDown" ? 1 : -1)] ?? null;
+  }
+  if (key === "ArrowLeft") return cards[currentIndex - 1] ?? null;
+  if (key === "ArrowRight") return cards[currentIndex + 1] ?? null;
+  return historyGridVerticalArrowTargetCard(cards, currentCard, key);
 }
 
 export function encodeHistoryCursor(createdAt: string, taskId: string): string {

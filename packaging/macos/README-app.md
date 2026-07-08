@@ -14,9 +14,9 @@ before copying it into the standard app data directory. Migration copies portabl
 data only; it does not move or delete the old `data/` folder, and it will not
 overwrite an existing standard data directory.
 
-The app is not notarized in 0.5.5. If Gatekeeper blocks first launch, right-click
+The app is not notarized. If Gatekeeper blocks first launch, right-click
 or Control-click iLab GPT CONJURE.app, choose Open, and confirm the system
 prompt.
 
 The standard app checks for updates by opening the GitHub Release page. Automatic
-self-replacement is intentionally limited to portable packages in 0.5.5.
+self-replacement is intentionally limited to portable packages.

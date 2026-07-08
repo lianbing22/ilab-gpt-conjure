@@ -408,6 +408,7 @@ def _sidebar_task_card(metadata: dict[str, Any]) -> dict[str, Any]:
     task_id = str(metadata.get("task_id") or "")
     params = metadata.get("params") if isinstance(metadata.get("params"), dict) else {}
     size = _sidebar_display_size(metadata, params)
+    requested_size = _sidebar_requested_size(params) or size
     thumbnail_url = _first_sidebar_thumbnail_url(metadata)
     card = {
         "task_id": task_id,
@@ -425,7 +426,10 @@ def _sidebar_task_card(metadata: dict[str, Any]) -> dict[str, Any]:
         "prompt": _truncate_text(metadata.get("prompt") or metadata.get("prompt_for_model") or "", 260),
         "output_size": size,
         "params": {
-            "size": size,
+            "size": requested_size,
+            "ratio": params.get("ratio") or "",
+            "resolution": params.get("resolution") or "",
+            "orientation": params.get("orientation") or "",
             "n": _nonnegative_int(metadata.get("total_count") or params.get("n") or 1, 1),
             "prompt_fidelity": params.get("prompt_fidelity") or "",
             "api_provider_id": params.get("api_provider_id") or "",
@@ -461,6 +465,10 @@ def _sidebar_display_size(metadata: dict[str, Any], params: dict[str, Any]) -> s
             return size
     requested_size = str(params.get("size") or "")
     return requested_size if requested_size and not requested_size.isdigit() else ""
+
+
+def _sidebar_requested_size(params: dict[str, Any]) -> str:
+    return _normalize_dimension_size(params.get("size"))
 
 
 def _normalize_dimension_size(value: Any) -> str:

@@ -29,7 +29,27 @@ function closePromptSnippetPopover(): void { legacyMethod("closePromptSnippetPop
 
 export function getPromptText(): string {
   if (!els.promptEditor) return els.prompt.value;
-  return promptTextFromNode(els.promptEditor).replace(/\u00a0/g, " ").trim();
+  return normalizePromptEditorText(promptTextFromNode(els.promptEditor).replace(/\u00a0/g, " ")).trim();
+}
+
+export function normalizePromptEditorText(value: any): string {
+  return String(value || "").replace(/\r\n?/g, "\n");
+}
+
+export function createPromptTextFragment(text: any): { fragment: DocumentFragment; lastNode: Node | null } {
+  const normalized = normalizePromptEditorText(text);
+  const fragment = document.createDocumentFragment();
+  let lastNode: Node | null = null;
+  normalized.split("\n").forEach((part, index) => {
+    if (index > 0) {
+      lastNode = document.createElement("br");
+      fragment.append(lastNode);
+    }
+    if (!part) return;
+    lastNode = document.createTextNode(part);
+    fragment.append(lastNode);
+  });
+  return { fragment, lastNode };
 }
 
 export function promptTextFromNode(node: any): string {
@@ -103,10 +123,13 @@ export function selectPromptEditorContents(): void {
 }
 
 export function setPromptText(text: any): void {
+  const normalized = normalizePromptEditorText(text);
   if (els.promptEditor) {
-    els.promptEditor.textContent = text || "";
+    els.promptEditor.innerHTML = "";
+    const { fragment } = createPromptTextFragment(normalized);
+    els.promptEditor.append(fragment);
   }
-  els.prompt.value = text || "";
+  els.prompt.value = normalized;
   hideMentionSuggest();
   hideColorSuggest();
   hidePromptSnippetSuggest();
@@ -121,7 +144,7 @@ export function setPromptWithGalleryRefs(text: any, refs: any): void {
   }
   const refList = Array.isArray(refs) ? refs : [];
   const sortedRefs = galleryRefsByMentionLength(refList);
-  const promptText = String(text || "");
+  const promptText = normalizePromptEditorText(text);
   els.promptEditor.innerHTML = "";
   let cursor = 0;
   let plainStart = 0;
@@ -162,9 +185,8 @@ export function setPromptWithGalleryRefs(text: any, refs: any): void {
 }
 
 export function appendPromptText(text: any): void {
-  if (text) {
-    els.promptEditor.append(document.createTextNode(text));
-  }
+  const { fragment } = createPromptTextFragment(text);
+  els.promptEditor.append(fragment);
 }
 
 export function clearPromptEditorIfEmpty(): void {
@@ -182,6 +204,8 @@ export function syncPromptFromEditor(): void {
 export function initPromptSerializationFeature(): void {
   Object.assign(getLegacyBridge().methods, {
     getPromptText,
+    normalizePromptEditorText,
+    createPromptTextFragment,
     promptTextFromNode,
     promptSelectionText,
     promptTextFromRange,

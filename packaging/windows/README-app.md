@@ -15,4 +15,4 @@ data only; it does not move or delete the old `data\` folder, and it will not
 overwrite an existing standard data directory.
 
 The standard app checks for updates by opening the GitHub Release page. Automatic
-self-replacement is intentionally limited to portable packages in 0.5.5.
+self-replacement is intentionally limited to portable packages.

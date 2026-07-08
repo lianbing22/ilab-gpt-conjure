@@ -118,7 +118,46 @@ function setElementText(element: any, value: any): void {
   if (element) element.textContent = String(value ?? "");
 }
 
+export function setApiKeyRevealVisible(visible: boolean): void {
+  if (!els.apiKey) return;
+  const canReveal = Boolean(els.apiKey.value);
+  const shouldReveal = Boolean(visible && canReveal);
+  els.apiKey.type = shouldReveal ? "text" : "password";
+  els.apiKeyRevealButton?.setAttribute("aria-pressed", shouldReveal ? "true" : "false");
+  const label = translate(shouldReveal ? "apiSettings.hideApiKey" : "apiSettings.showApiKey");
+  els.apiKeyRevealButton?.setAttribute("aria-label", label);
+  els.apiKeyRevealButton?.setAttribute("title", label);
+  els.apiKeyRevealButton?.classList.toggle("active", shouldReveal);
+}
+
+export function hideApiKeyReveal(): void {
+  setApiKeyRevealVisible(false);
+}
+
+export function updateApiKeyRevealButton(): void {
+  if (!els.apiKeyRevealButton) return;
+  const canReveal = Boolean(els.apiKey?.value);
+  if (!canReveal) hideApiKeyReveal();
+  els.apiKeyRevealButton.disabled = !canReveal;
+  const label = translate("apiSettings.showApiKey");
+  els.apiKeyRevealButton.setAttribute("aria-label", label);
+  els.apiKeyRevealButton.setAttribute("title", label);
+}
+
+export function revealApiKeyWhilePressed(event?: Event): void {
+  if (!els.apiKey?.value || els.apiKeyRevealButton?.disabled) return;
+  event?.preventDefault();
+  setApiKeyRevealVisible(true);
+}
+
+function scrollApiProviderEditorIntoView(): void {
+  window.requestAnimationFrame(() => {
+    els.apiProviderEditor?.scrollIntoView?.({ block: "nearest", inline: "nearest" });
+  });
+}
+
 function setApiProviderEditorVisible(visible: boolean): void {
+  els.apiProviderSection?.classList.toggle("editing", visible);
   els.apiProviderEditor?.classList.toggle("hidden", !visible);
   els.apiProviderEditor?.setAttribute("aria-hidden", visible ? "false" : "true");
   els.apiProviderDetail?.classList.toggle("hidden", visible);
@@ -131,6 +170,7 @@ function setApiProviderEditorVisible(visible: boolean): void {
   if (els.deleteApiProviderButton) {
     els.deleteApiProviderButton.disabled = visible || normalizeApiSettings(state.apiSettings).providers.length <= 1;
   }
+  if (!visible) hideApiKeyReveal();
 }
 
 function apiProviderEditorActive(): boolean {
@@ -168,6 +208,8 @@ function writeProviderForm(provider: any): void {
       ? translate("apiSettings.savedKeyPlaceholder")
       : "sk-...";
   }
+  hideApiKeyReveal();
+  updateApiKeyRevealButton();
 }
 
 function renderApiProviderList(): void {
@@ -185,7 +227,7 @@ function renderApiProviderList(): void {
     els.sortApiProvidersButton.textContent = translate(sorting ? "apiSettings.finishSortProviders" : "apiSettings.sortProviders");
     els.sortApiProvidersButton.setAttribute("aria-pressed", sorting ? "true" : "false");
   }
-  els.addApiProviderButton?.classList.toggle("hidden", sorting);
+  els.addApiProviderButton?.classList.toggle("hidden", sorting || apiProviderEditorActive());
   if (!els.apiProviderList) return;
   els.apiProviderList.classList.toggle("is-sorting", sorting);
   els.apiProviderList.setAttribute("role", sorting ? "list" : "listbox");
@@ -426,6 +468,7 @@ export function addApiProvider(): void {
   }, state.apiSettings.providers.length);
   populateApiSettingsForm();
   setApiSettingsFeedback(translate("apiSettings.newDraftStatus"), "running");
+  scrollApiProviderEditorIntoView();
   els.apiProviderName?.focus();
 }
 
@@ -451,6 +494,7 @@ export function copyApiProvider(): void {
   }, state.apiSettings.providers.length);
   populateApiSettingsForm();
   setApiSettingsFeedback(translate(copiesSavedKey ? "apiSettings.copyProviderStatus" : "apiSettings.copyProviderWithoutKeyStatus"), "running");
+  scrollApiProviderEditorIntoView();
   els.apiProviderName?.focus();
 }
 
@@ -531,6 +575,7 @@ export function editApiProvider(): void {
   state.apiProviderDraft = normalizeApiProvider({ ...provider }, 0);
   populateApiSettingsForm();
   setApiSettingsFeedback(translate("apiSettings.editDraftStatus"), "running");
+  scrollApiProviderEditorIntoView();
   els.apiProviderName?.focus();
 }
 

@@ -112,8 +112,20 @@ function taskResolution(task: any) {
 }
 
 function taskSizeDimensions(task: any): [number, number] | null {
-  const size = String(task?.output_size || task?.params?.size || task?.request?.size || "");
-  const match = size.match(/^(\d{2,5})x(\d{2,5})$/i);
+  return parseTaskSizeDimensions(taskRequestedSize(task)) || parseTaskSizeDimensions(taskOutputSize(task));
+}
+
+function taskRequestedSize(task: any) {
+  return String(task?.params?.size || task?.request?.size || "").trim();
+}
+
+function taskOutputSize(task: any) {
+  return String(task?.output_size || "").trim();
+}
+
+function parseTaskSizeDimensions(size: any): [number, number] | null {
+  const text = String(size || "").trim();
+  const match = text.match(/^(\d{2,5})x(\d{2,5})$/i);
   if (!match) return null;
   const width = Number.parseInt(match[1] || "", 10);
   const height = Number.parseInt(match[2] || "", 10);

@@ -104,7 +104,10 @@ function renderTasks(options: { preserveScroll?: boolean } = {}) {
   }
 
   const group = layout.expandedGroup;
-  els.taskList.innerHTML = renderExpandedTaskGroupShellHtml(group);
+  const shouldAnimateExpandedGroup = state.expandedTaskGroupAnimationPending === true;
+  els.taskList.innerHTML = renderExpandedTaskGroupShellHtml(group, {
+    startExpanded: !shouldAnimateExpandedGroup,
+  });
   scheduleExpandedTaskGroupItemsRender(group, layout.expandedKey || group?.key || null);
   updateDocumentTitle();
   restoreTaskListScrollAnchor(scrollAnchor);
@@ -410,8 +413,9 @@ function revealActiveTaskGroup() {
   }
 }
 
-function renderExpandedTaskGroupShellHtml(group: any) {
+function renderExpandedTaskGroupShellHtml(group: any, options: { startExpanded?: boolean } = {}) {
   const groupKey = escapeHtml(group.key);
+  const startExpanded = options.startExpanded !== false;
   return `
     <section class="task-group task-group-expanded" data-task-group="${groupKey}">
       <button
@@ -419,7 +423,7 @@ function renderExpandedTaskGroupShellHtml(group: any) {
         type="button"
         data-task-group-toggle-key="${groupKey}"
         data-task-group-expanded="true"
-        aria-expanded="false"
+        aria-expanded="${startExpanded ? "true" : "false"}"
         aria-label="${escapeHtml(formatTranslation("taskGroup.collapse", { label: group.label }))}"
       >
         <span class="task-group-label-button">

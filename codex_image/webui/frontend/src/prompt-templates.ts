@@ -150,9 +150,36 @@ async function refreshPromptTemplates() {
 
 function syncPromptTemplateSearchInput() {
   const input = els.promptTemplateSearch as HTMLInputElement | null;
-  if (!input) return;
+  if (!input) {
+    updatePromptTemplateSearchClearButton();
+    return;
+  }
   const nextValue = String(state.promptTemplateQuery || "");
   if (input.value !== nextValue) input.value = nextValue;
+  updatePromptTemplateSearchClearButton();
+}
+
+function promptTemplateSearchHasValue() {
+  return Boolean(String(state.promptTemplateQuery || "").trim());
+}
+
+function updatePromptTemplateSearchClearButton() {
+  const button = els.promptTemplateSearchClearButton as HTMLButtonElement | null;
+  if (!button) return;
+  button.hidden = !promptTemplateSearchHasValue();
+}
+
+function clearPromptTemplateSearch() {
+  const input = els.promptTemplateSearch as HTMLInputElement | null;
+  state.promptTemplateQuery = "";
+  promptTemplateSearchAcceptManualInput = false;
+  setPromptTemplateSearchLocked(false);
+  if (input) {
+    input.value = "";
+    input.focus({ preventScroll: true });
+  }
+  updatePromptTemplateSearchClearButton();
+  renderPromptTemplateList();
 }
 
 function setPromptTemplateSearchLocked(locked: boolean) {
@@ -303,8 +330,8 @@ function renderPromptTemplateList() {
   els.promptTemplateList.innerHTML = templates.map((template: any) => `
     <button class="prompt-template-card" type="button" data-prompt-template-id="${escapeHtml(template.id)}">
       ${template.thumbnail_url ? `<span class="prompt-template-card-thumb"><img src="${escapeHtml(template.thumbnail_url)}" alt=""></span>` : ""}
-      <span class="prompt-template-card-title">${escapeHtml(template.short_title)}</span>
-      <span class="prompt-template-card-subtitle">${escapeHtml(template.title)}</span>
+      <span class="prompt-template-card-title">${escapeHtml(promptTemplateCardTitle(template))}</span>
+      ${promptTemplateCardSubtitle(template) ? `<span class="prompt-template-card-subtitle">${escapeHtml(promptTemplateCardSubtitle(template))}</span>` : ""}
       <span class="prompt-template-card-preview">${escapeHtml(promptTemplatePreview(template.content, 64))}</span>
       <span class="prompt-template-card-meta">
         <span>${escapeHtml(promptTemplateCategoryLabel(template.category))}</span>
@@ -312,6 +339,17 @@ function renderPromptTemplateList() {
       </span>
     </button>
   `).join("");
+}
+
+function promptTemplateCardTitle(template: any) {
+  const title = String(template?.title || "").trim();
+  return String(template?.short_title || "").trim() || title;
+}
+
+function promptTemplateCardSubtitle(template: any) {
+  const title = String(template?.title || "").trim();
+  const primaryTitle = promptTemplateCardTitle(template);
+  return title && title !== primaryTitle ? title : "";
 }
 
 function renderPromptTemplateRecentDock() {
@@ -339,8 +377,8 @@ function selectPromptTemplate(templateId: any) {
   hidePromptTemplateForm();
   els.promptTemplateDetail.innerHTML = `
     <div class="prompt-template-detail-header">
-      <button class="ghost-button text-sm" type="button" data-prompt-template-back>${translate("templates.back")}</button>
-      <button class="ghost-button text-sm" type="button" data-prompt-template-edit="${escapeHtml(template.id)}">${translate("templates.edit")}</button>
+      <button class="ghost-button prompt-template-detail-back" type="button" data-prompt-template-back>${translate("templates.back")}</button>
+      <button class="ghost-button prompt-template-detail-edit" type="button" data-prompt-template-edit="${escapeHtml(template.id)}">${translate("templates.edit")}</button>
     </div>
     ${template.thumbnail_url ? `<img class="prompt-template-detail-thumb" src="${escapeHtml(template.thumbnail_url)}" alt="">` : ""}
     <h3>${escapeHtml(template.title)}</h3>
@@ -352,9 +390,11 @@ function selectPromptTemplate(templateId: any) {
     <div class="prompt-template-detail-content">${escapeHtml(template.content)}</div>
     ${template.notes ? `<p class="prompt-template-detail-notes">${escapeHtml(template.notes)}</p>` : ""}
     <div class="prompt-template-detail-actions">
-      <button class="ghost-button text-sm" type="button" data-prompt-template-copy="${escapeHtml(template.id)}">${translate("templates.copy")}</button>
-      <button class="ghost-button text-sm" type="button" data-prompt-template-insert="${escapeHtml(template.id)}">${translate("templates.insert")}</button>
-      <button class="run-button" type="button" data-prompt-template-replace="${escapeHtml(template.id)}">${translate("action.replace")}</button>
+      <div class="prompt-template-detail-secondary-actions">
+        <button class="ghost-button text-sm" type="button" data-prompt-template-copy="${escapeHtml(template.id)}">${translate("templates.copy")}</button>
+        <button class="ghost-button text-sm" type="button" data-prompt-template-insert="${escapeHtml(template.id)}">${translate("templates.insert")}</button>
+      </div>
+      <button class="ghost-button text-sm prompt-template-detail-replace" type="button" data-prompt-template-replace="${escapeHtml(template.id)}">${translate("action.replace")}</button>
     </div>
   `;
   els.promptTemplateList?.classList.add("hidden");
@@ -733,6 +773,7 @@ function bindPromptTemplateEvents() {
     void importPromptTemplatePack(file);
     if (input) input.value = "";
   });
+  els.promptTemplateSearchClearButton?.addEventListener("click", clearPromptTemplateSearch);
   els.promptTemplateSearch?.addEventListener("pointerdown", (event: Event) => {
     const input = els.promptTemplateSearch as HTMLInputElement | null;
     if (!input?.readOnly) return;
@@ -754,6 +795,7 @@ function bindPromptTemplateEvents() {
         const nextValue = isClearKey ? "" : key;
         input.value = nextValue;
         state.promptTemplateQuery = nextValue;
+        updatePromptTemplateSearchClearButton();
         renderPromptTemplateList();
       }
       return;
@@ -777,6 +819,7 @@ function bindPromptTemplateEvents() {
       return;
     }
     state.promptTemplateQuery = els.promptTemplateSearch?.value || "";
+    updatePromptTemplateSearchClearButton();
     renderPromptTemplateList();
   });
   els.promptTemplateSearch?.addEventListener("focus", () => {

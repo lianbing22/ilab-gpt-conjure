@@ -291,6 +291,28 @@ def create_app(
             headers={"Cache-Control": "no-store"},
         )
 
+    @app.api_route("/manifest.webmanifest", methods=["GET", "HEAD"], response_model=None)
+    def web_app_manifest() -> Response:
+        manifest_path = static_path / "manifest.webmanifest"
+        if manifest_path.exists():
+            return FileResponse(
+                manifest_path,
+                media_type="application/manifest+json",
+                headers={"Cache-Control": "no-store"},
+            )
+        raise HTTPException(status_code=404, detail="Web app manifest not found")
+
+    @app.api_route("/service-worker.js", methods=["GET", "HEAD"], response_model=None)
+    def service_worker() -> Response:
+        worker_path = static_path / "service-worker.js"
+        if worker_path.exists():
+            return FileResponse(
+                worker_path,
+                media_type="text/javascript",
+                headers={"Cache-Control": "no-store", "Service-Worker-Allowed": "/"},
+            )
+        raise HTTPException(status_code=404, detail="Service worker not found")
+
     ctx.route_helpers.update(
         {
             "ensure_queue_worker_running": queue_runtime.ensure_queue_worker_running,

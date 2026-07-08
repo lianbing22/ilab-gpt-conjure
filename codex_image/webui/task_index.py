@@ -73,7 +73,7 @@ SUMMARY_KEYS = {
     "assigned_auth_source",
 }
 
-TASK_INDEX_SCHEMA_VERSION = 4
+TASK_INDEX_SCHEMA_VERSION = 5
 RATIO_OTHER_VALUE = "__other__"
 KNOWN_RATIO_ORIENTATIONS = {
     "1:1": "square",
@@ -411,9 +411,12 @@ class SQLiteTaskIndex:
         if clean_query:
             search_like = f"%{clean_query}%"
             if self.fts_enabled:
-                where.append("(task_id like ? or task_id in (select task_id from task_index_fts where task_index_fts match ?))")
-                params.extend([search_like, _fts_query(clean_query)])
-                search_param_count = 2
+                where.append(
+                    "(task_id like ? or search_text like ? or "
+                    "task_id in (select task_id from task_index_fts where task_index_fts match ?))"
+                )
+                params.extend([search_like, search_like, _fts_query(clean_query)])
+                search_param_count = 3
             else:
                 where.append("(task_id like ? or search_text like ?)")
                 params.extend([search_like, search_like])
@@ -525,7 +528,7 @@ def _history_fields_for_metadata(metadata: dict[str, Any]) -> dict[str, Any]:
     created_at = str(metadata.get("created_at") or "")
     backend = str(metadata.get("backend") or metadata.get("requested_backend") or "")
     provider = str(metadata.get("api_provider_name") or params.get("api_provider_name") or metadata.get("api_provider_id") or params.get("api_provider_id") or "")
-    size = str(params.get("size") or metadata.get("output_size") or _first_list_value(metadata.get("output_sizes")) or _first_output_value(metadata, "size") or "")
+    size = _history_display_size(metadata, params)
     ratio = _history_ratio(params, size)
     failed_count = _nonnegative_int(metadata.get("failed_count"))
     generated_count = _nonnegative_int(metadata.get("generated_count"))
@@ -557,19 +560,47 @@ def _history_fields_for_metadata(metadata: dict[str, Any]) -> dict[str, Any]:
 
 
 def _history_ratio(params: dict[str, Any], size: str) -> str:
+    known = _known_ratio_from_size(size)
+    if known:
+        return known
     explicit = str(params.get("ratio") or "").strip()
     if explicit:
         return explicit
-    return _known_ratio_from_size(size)
+    return ""
 
 
 def _history_orientation(params: dict[str, Any], size: str, ratio: str) -> str:
+    from_size = _orientation_from_size(size)
+    if from_size:
+        return from_size
+    if ratio in KNOWN_RATIO_ORIENTATIONS:
+        return KNOWN_RATIO_ORIENTATIONS[ratio]
     explicit = str(params.get("orientation") or "").strip()
     if explicit:
         return explicit
-    if ratio in KNOWN_RATIO_ORIENTATIONS:
-        return KNOWN_RATIO_ORIENTATIONS[ratio]
     return _orientation_from_size(size)
+
+
+def _history_display_size(metadata: dict[str, Any], params: dict[str, Any]) -> str:
+    for value in (
+        metadata.get("output_size"),
+        _first_list_value(metadata.get("output_sizes")),
+        _first_output_value(metadata, "size"),
+        params.get("size"),
+    ):
+        size = _normalize_dimension_size(value)
+        if size:
+            return size
+    requested_size = str(params.get("size") or "")
+    return requested_size if requested_size and not requested_size.isdigit() else ""
+
+
+def _normalize_dimension_size(value: Any) -> str:
+    text = str(value or "").strip().lower()
+    dimensions = _size_dimensions(text)
+    if dimensions is None:
+        return ""
+    return f"{dimensions[0]}x{dimensions[1]}"
 
 
 def _known_ratio_from_size(size: str) -> str:
