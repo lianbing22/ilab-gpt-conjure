@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 import json
+import logging
+import os
 import re
+import tempfile
+import threading
 import uuid
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from .schemas import (
     CreatedTask,
@@ -53,6 +57,8 @@ TASK_SOURCE_DATA_SUBDIR = "tasks"
 TASK_SOURCE_DATA_SUFFIXES = ("metadata.json", "request.json", "debug-sse.jsonl")
 DIMENSION_SIZE_RE = re.compile(r"^\s*(\d{1,5})\s*[xX×]\s*(\d{1,5})\s*$")
 
+logger = logging.getLogger(__name__)
+
 
 class TaskStorage:
     def __init__(
@@ -69,6 +75,22 @@ class TaskStorage:
         # paths are migrated to the explicit roots above.
         self.root = self.output_root
         self.task_index = SQLiteTaskIndex(self.source_data_root / "webui-task-index.db")
+        # Per-task locks guarding the read→modify→write cycle on each task's
+        # metadata.json. Writers come from multiple threads (async event loop,
+        # FastAPI threadpool routes, and future asyncio.to_thread callers), so
+        # threading.Lock is required rather than asyncio.Lock. The registry
+        # itself is guarded by _task_locks_guard so creation is race-free.
+        self._task_locks: dict[str, threading.RLock] = {}
+        self._task_locks_guard = threading.Lock()
+
+    def _task_lock(self, task_id: str) -> threading.RLock:
+        """Return the reentrant lock for ``task_id``, creating it on first use."""
+        with self._task_locks_guard:
+            lock = self._task_locks.get(task_id)
+            if lock is None:
+                lock = threading.RLock()
+                self._task_locks[task_id] = lock
+            return lock
 
     def create_task(self, mode: str) -> CreatedTask:
         task_id = datetime.now(UTC).strftime("%Y%m%d%H%M%S") + "-" + uuid.uuid4().hex[:8]
@@ -82,13 +104,76 @@ class TaskStorage:
     def write_metadata(self, task_id: str, metadata: dict[str, Any]) -> Path:
         path = self.metadata_path(task_id)
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(metadata, indent=2, ensure_ascii=False), encoding="utf-8")
-        self.task_index.upsert(metadata)
+        with self._task_lock(task_id):
+            self._write_metadata_locked(task_id, metadata, path)
         return path
+
+    def _write_metadata_locked(self, task_id: str, metadata: dict[str, Any], path: Path) -> None:
+        """Atomically persist ``metadata`` and mirror it to the SQLite index.
+
+        Caller must hold ``_task_lock(task_id)``. Writes go to a sibling temp
+        file, fsync, then ``os.replace`` so concurrent readers never observe a
+        half-written JSON. The SQLite upsert is best-effort: metadata.json is
+        the source of truth and ``refresh_stale_task_index`` reconciles drift,
+        so an index failure is logged and swallowed rather than masking the
+        successful JSON write.
+        """
+        payload = json.dumps(metadata, indent=2, ensure_ascii=False)
+        tmp_path: str | None = None
+        try:
+            with tempfile.NamedTemporaryFile(
+                mode="w",
+                encoding="utf-8",
+                delete=False,
+                dir=path.parent,
+                prefix=f".{path.name}.",
+                suffix=".tmp",
+            ) as tmp:
+                tmp_path = tmp.name
+                tmp.write(payload)
+                tmp.flush()
+                os.fsync(tmp.fileno())
+            os.replace(tmp_path, path)
+            tmp_path = None
+        finally:
+            if tmp_path is not None:
+                try:
+                    Path(tmp_path).unlink()
+                except FileNotFoundError:
+                    pass
+        try:
+            self.task_index.upsert(metadata)
+        except Exception:
+            logger.exception("task_index.upsert failed for task %s; JSON is authoritative and will be reconciled on the next stale refresh", task_id)
 
     def read_metadata(self, task_id: str) -> dict[str, Any]:
         path = self.metadata_path(task_id)
         return json.loads(path.read_text(encoding="utf-8"))
+
+    def update_metadata(self, task_id: str, mutator: Callable[[dict[str, Any]], None]) -> dict[str, Any]:
+        """Read-modify-write ``task_id`` metadata atomically under its task lock.
+
+        ``mutator`` receives the current metadata dict and mutates it in place;
+        the result is then persisted. Holding the per-task (reentrant) lock
+        across the whole cycle prevents the lost-update race where two writers
+        each read a stale copy and clobber the other's change. This is the
+        correct primitive for every concurrent metadata mutation; callers that
+        currently do ``read_metadata`` → modify → ``write_metadata`` by hand
+        should migrate here.
+        """
+        path = self.metadata_path(task_id)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with self._task_lock(task_id):
+            try:
+                metadata = json.loads(path.read_text(encoding="utf-8"))
+            except FileNotFoundError:
+                metadata = {"task_id": task_id}
+            if not isinstance(metadata, dict):
+                metadata = {"task_id": task_id}
+            metadata.setdefault("task_id", task_id)
+            mutator(metadata)
+            self._write_metadata_locked(task_id, metadata, path)
+            return metadata
 
     def write_request(self, task_id: str, request: dict[str, Any]) -> Path:
         path = self.request_path(task_id)

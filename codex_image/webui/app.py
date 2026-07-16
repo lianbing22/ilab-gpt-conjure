@@ -536,31 +536,32 @@ def _dedupe_reference_assets(items: list[dict[str, Any]]) -> list[dict[str, Any]
 
 
 def _set_task_archived(storage: TaskStorage, task_id: str, archived: bool) -> dict[str, Any]:
-    metadata = storage.read_metadata(task_id)
-    if archived:
-        metadata["archived_at"] = str(metadata.get("archived_at") or utc_now())
-    else:
-        metadata.pop("archived_at", None)
-    storage.write_metadata(task_id, metadata)
-    return metadata
+    def _apply(metadata: dict[str, Any]) -> None:
+        if archived:
+            metadata["archived_at"] = str(metadata.get("archived_at") or utc_now())
+        else:
+            metadata.pop("archived_at", None)
+
+    return storage.update_metadata(task_id, _apply)
 
 
 def _mark_task_cancelled(storage: TaskStorage, task_id: str) -> dict[str, Any]:
-    metadata = storage.read_metadata(task_id)
     cancelled_at = utc_now()
-    metadata.update(
-        {
-            "status": "failed",
-            "updated_at": cancelled_at,
-            "cancelled_at": cancelled_at,
-            "cancel_requested": True,
-            "error": "Task cancelled by user.",
-            "last_error": "Task cancelled by user.",
-        }
-    )
-    metadata.pop("request", None)
-    storage.write_metadata(task_id, metadata)
-    return metadata
+
+    def _apply(metadata: dict[str, Any]) -> None:
+        metadata.update(
+            {
+                "status": "failed",
+                "updated_at": cancelled_at,
+                "cancelled_at": cancelled_at,
+                "cancel_requested": True,
+                "error": "Task cancelled by user.",
+                "last_error": "Task cancelled by user.",
+            }
+        )
+        metadata.pop("request", None)
+
+    return storage.update_metadata(task_id, _apply)
 
 
 app = create_app()

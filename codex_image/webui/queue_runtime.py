@@ -271,21 +271,22 @@ def _api_responses_task_slot_claim(ctx: WebUIContext, task_id: str, channel: Que
 
 
 def _mark_task_cancelled(ctx: WebUIContext, task_id: str) -> dict[str, Any]:
-    metadata = ctx.storage.read_metadata(task_id)
     cancelled_at = utc_now()
-    metadata.update(
-        {
-            "status": "failed",
-            "updated_at": cancelled_at,
-            "cancelled_at": cancelled_at,
-            "cancel_requested": True,
-            "error": "Task cancelled by user.",
-            "last_error": "Task cancelled by user.",
-        }
-    )
-    metadata.pop("request", None)
-    ctx.storage.write_metadata(task_id, metadata)
-    return metadata
+
+    def _apply(metadata: dict[str, Any]) -> None:
+        metadata.update(
+            {
+                "status": "failed",
+                "updated_at": cancelled_at,
+                "cancelled_at": cancelled_at,
+                "cancel_requested": True,
+                "error": "Task cancelled by user.",
+                "last_error": "Task cancelled by user.",
+            }
+        )
+        metadata.pop("request", None)
+
+    return ctx.storage.update_metadata(task_id, _apply)
 
 
 async def execute_task(
@@ -311,24 +312,32 @@ async def execute_task(
             client_factory_overridden=client_factory_overridden,
         )
         attempt_started_at = utc_now()
-        metadata["status"] = "running"
-        metadata["started_at"] = metadata.get("started_at") or attempt_started_at
-        metadata["attempt_started_at"] = attempt_started_at
-        metadata["updated_at"] = attempt_started_at
-        metadata["assigned_auth_source"] = channel.auth_source
-        metadata["assigned_account_id"] = channel.account_id
-        metadata["backend"] = execution_contract.backend
-        if channel.auth_source == "api":
-            params = metadata.get("params") if isinstance(metadata.get("params"), dict) else {}
-            _apply_api_execution_snapshot(
-                ctx.storage,
-                task_id,
-                metadata,
-                ctx.api_settings,
-                str(params.get("api_provider_id") or "") or None,
-            )
-        metadata["attempts"] = int(metadata.get("attempts") or 0) + 1
-        ctx.storage.write_metadata(task_id, metadata)
+        is_api_channel = channel.auth_source == "api"
+        api_provider_hint = (
+            str((metadata.get("params") or {}).get("api_provider_id") or "") or None
+            if is_api_channel
+            else None
+        )
+
+        def _mark_running(m: dict[str, Any]) -> None:
+            m["status"] = "running"
+            m["started_at"] = m.get("started_at") or attempt_started_at
+            m["attempt_started_at"] = attempt_started_at
+            m["updated_at"] = attempt_started_at
+            m["assigned_auth_source"] = channel.auth_source
+            m["assigned_account_id"] = channel.account_id
+            m["backend"] = execution_contract.backend
+            if is_api_channel:
+                _apply_api_execution_snapshot(
+                    ctx.storage,
+                    task_id,
+                    m,
+                    ctx.api_settings,
+                    api_provider_hint,
+                )
+            m["attempts"] = int(m.get("attempts") or 0) + 1
+
+        ctx.storage.update_metadata(task_id, _mark_running)
 
         await _execute_stored_task(
             storage=ctx.storage,
@@ -350,11 +359,11 @@ async def execute_task(
     except Exception as exc:
         usage_limit_error = _is_usage_limit_error(exc)
         local_usage_limit_error = channel.auth_source != "api" and usage_limit_error
-        metadata = ctx.storage.read_metadata(task_id)
         reference_file_missing = _is_reference_file_missing_error(exc)
+        metadata_for_classification = ctx.storage.read_metadata(task_id)
         explicit_file_rejection = (
             execution_contract is not None
-            and bool(metadata.get("reference_files"))
+            and bool(metadata_for_classification.get("reference_files"))
             and is_explicit_file_input_rejection(exc)
         )
         if reference_file_missing:
@@ -363,11 +372,15 @@ async def execute_task(
             ctx.responses_file_unsupported_keys.add(execution_contract.reference_file_capability_key)
             exc = RuntimeError("provider_reference_files_unsupported")
         non_retryable = reference_file_missing or explicit_file_rejection or _is_non_retryable_error(exc) or local_usage_limit_error
-        metadata["status"] = "failed" if is_final_attempt or non_retryable else "queued"
-        metadata["updated_at"] = utc_now()
-        metadata["last_error"] = str(exc)
-        metadata["error"] = str(exc) if is_final_attempt or non_retryable else ""
-        ctx.storage.write_metadata(task_id, metadata)
+        final_exc = exc
+
+        def _mark_failed(m: dict[str, Any]) -> None:
+            m["status"] = "failed" if is_final_attempt or non_retryable else "queued"
+            m["updated_at"] = utc_now()
+            m["last_error"] = str(final_exc)
+            m["error"] = str(final_exc) if is_final_attempt or non_retryable else ""
+
+        ctx.storage.update_metadata(task_id, _mark_failed)
         if non_retryable:
             raise NonRetryableTaskError(str(exc)) from exc
         raise

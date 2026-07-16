@@ -36,12 +36,20 @@ def _prune_inactive_running_channels(ctx: WebUIContext) -> None:
                 metadata = ctx.storage.read_metadata(task_id)
                 if metadata.get("status") == "running":
                     message = "Service restarted before this task completed."
-                    metadata["status"] = "failed"
-                    metadata["updated_at"] = utc_now()
-                    metadata["error"] = message
-                    metadata["last_error"] = message
-                    metadata.pop("request", None)
-                    ctx.storage.write_metadata(task_id, metadata)
+                    now = utc_now()
+
+                    def _mark_stale_failed(m: dict[str, Any]) -> None:
+                        # Only fail if still running; another writer may have
+                        # finalized it between the read above and the lock.
+                        if m.get("status") != "running":
+                            return
+                        m["status"] = "failed"
+                        m["updated_at"] = now
+                        m["error"] = message
+                        m["last_error"] = message
+                        m.pop("request", None)
+
+                    ctx.storage.update_metadata(task_id, _mark_stale_failed)
         stale_channel_ids.append(str(channel_id))
     for channel_id in stale_channel_ids:
         ctx.queue_storage.clear_running(channel_id)

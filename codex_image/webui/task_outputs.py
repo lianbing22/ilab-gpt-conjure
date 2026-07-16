@@ -117,34 +117,15 @@ def _accept_partial_task_successes(storage: TaskStorage, task_id: str, metadata:
     output_files = [str(record.get("file")) for record in accepted_outputs if record.get("file")]
     output_urls = [str(record.get("url")) for record in accepted_outputs if record.get("url")]
     accepted_at = utc_now()
-    metadata.update(
-        {
-            "status": "completed",
-            "updated_at": accepted_at,
-            "viewed_at": accepted_at,
-            "generated_count": success_count,
-            "failed_count": 0,
-            "total_count": success_count,
-            "outputs": accepted_outputs,
-            "output_files": output_files,
-            "output_urls": output_urls,
-            "original_total_count": original_total_count,
-            "cleared_failed_count": cleared_failed_count,
-            "partial_failure_cleared_at": accepted_at,
-        }
-    )
-    if output_files:
-        metadata["output_file"] = output_files[0]
-    else:
-        metadata.pop("output_file", None)
-    if output_urls:
-        metadata["output_url"] = output_urls[0]
-    else:
-        metadata.pop("output_url", None)
 
+    # Rebuild derived lists from the snapshot the caller validated against, so
+    # the accept is deterministic regardless of concurrent single-field writes
+    # (e.g. archived_at/viewed_at). The merge below applies these onto the
+    # freshest metadata under the task lock so those concurrent writes survive.
+    trimmed_lists: dict[str, Any] = {}
     for key in ("output_sizes", "output_formats", "qualities", "backgrounds", "revised_prompts", "usages", "tool_usages"):
         if isinstance(metadata.get(key), list):
-            metadata[key] = metadata[key][:success_count]
+            trimmed_lists[key] = metadata[key][:success_count]
     scalar_sources = {
         "output_size": "output_sizes",
         "output_format": "output_formats",
@@ -154,15 +135,45 @@ def _accept_partial_task_successes(storage: TaskStorage, task_id: str, metadata:
         "usage": "usages",
         "tool_usage": "tool_usages",
     }
+    scalars: dict[str, Any] = {}
     for scalar_key, list_key in scalar_sources.items():
-        values = metadata.get(list_key)
+        values = trimmed_lists.get(list_key) if list_key in trimmed_lists else metadata.get(list_key)
         if isinstance(values, list) and values:
-            metadata[scalar_key] = values[0]
+            scalars[scalar_key] = values[0]
 
-    for key in ("error", "last_error", "retrying_failed_slots", "retry_failed_slots", "retry_requested_at"):
-        metadata.pop(key, None)
-    storage.write_metadata(task_id, metadata)
-    return metadata
+    def _apply(m: dict[str, Any]) -> None:
+        m.update(
+            {
+                "status": "completed",
+                "updated_at": accepted_at,
+                "viewed_at": accepted_at,
+                "generated_count": success_count,
+                "failed_count": 0,
+                "total_count": success_count,
+                "outputs": accepted_outputs,
+                "output_files": output_files,
+                "output_urls": output_urls,
+                "original_total_count": original_total_count,
+                "cleared_failed_count": cleared_failed_count,
+                "partial_failure_cleared_at": accepted_at,
+            }
+        )
+        if output_files:
+            m["output_file"] = output_files[0]
+        else:
+            m.pop("output_file", None)
+        if output_urls:
+            m["output_url"] = output_urls[0]
+        else:
+            m.pop("output_url", None)
+        for key, value in trimmed_lists.items():
+            m[key] = value
+        for key, value in scalars.items():
+            m[key] = value
+        for key in ("error", "last_error", "retrying_failed_slots", "retry_failed_slots", "retry_requested_at"):
+            m.pop(key, None)
+
+    return storage.update_metadata(task_id, _apply)
 
 
 def _retryable_failed_output_indexes(metadata: dict[str, Any]) -> list[int]:
@@ -503,10 +514,14 @@ def _set_task_output_selected(storage: TaskStorage, task_id: str, metadata: dict
         selected_indexes.add(index)
     else:
         selected_indexes.discard(index)
-    metadata["selected_output_indexes"] = sorted(selected_indexes)
-    metadata["updated_at"] = utc_now()
-    storage.write_metadata(task_id, metadata)
-    return metadata
+    final_selected = sorted(selected_indexes)
+    updated_at = utc_now()
+
+    def _apply(m: dict[str, Any]) -> None:
+        m["selected_output_indexes"] = final_selected
+        m["updated_at"] = updated_at
+
+    return storage.update_metadata(task_id, _apply)
 
 
 def _delete_unselected_task_outputs(storage: TaskStorage, task_id: str, metadata: dict[str, Any]) -> dict[str, Any]:
@@ -559,31 +574,6 @@ def _delete_unselected_task_outputs(storage: TaskStorage, task_id: str, metadata
         or len(records)
     )
     now = utc_now()
-    metadata.update(
-        {
-            "status": "completed",
-            "updated_at": now,
-            "generated_count": len(accepted_outputs),
-            "failed_count": 0,
-            "total_count": len(accepted_outputs),
-            "outputs": accepted_outputs,
-            "output_files": output_files,
-            "output_urls": output_urls,
-            "selected_output_indexes": [],
-            "deleted_output_indexes": [],
-            "original_total_count": original_total_count,
-            "pruned_output_count": len(removed_records),
-            "outputs_pruned_at": now,
-        }
-    )
-    if output_files:
-        metadata["output_file"] = output_files[0]
-    else:
-        metadata.pop("output_file", None)
-    if output_urls:
-        metadata["output_url"] = output_urls[0]
-    else:
-        metadata.pop("output_url", None)
 
     list_sources = {
         "output_sizes": "size",
@@ -594,6 +584,11 @@ def _delete_unselected_task_outputs(storage: TaskStorage, task_id: str, metadata
         "usages": "usage",
         "tool_usages": "tool_usage",
     }
+    derived_lists: dict[str, Any] = {}
+    for list_key, record_key in list_sources.items():
+        values = [record[record_key] for record in accepted_outputs if record.get(record_key) is not None]
+        if values:
+            derived_lists[list_key] = values
     scalar_sources = {
         "output_size": "output_sizes",
         "output_format": "output_formats",
@@ -603,23 +598,52 @@ def _delete_unselected_task_outputs(storage: TaskStorage, task_id: str, metadata
         "usage": "usages",
         "tool_usage": "tool_usages",
     }
-    for list_key, record_key in list_sources.items():
-        values = [record[record_key] for record in accepted_outputs if record.get(record_key) is not None]
-        if values:
-            metadata[list_key] = values
-        else:
-            metadata.pop(list_key, None)
+    derived_scalars: dict[str, Any] = {}
     for scalar_key, list_key in scalar_sources.items():
-        values = metadata.get(list_key)
+        values = derived_lists.get(list_key)
         if isinstance(values, list) and values:
-            metadata[scalar_key] = values[0]
-        else:
-            metadata.pop(scalar_key, None)
+            derived_scalars[scalar_key] = values[0]
 
-    for key in ("error", "last_error", "retrying_failed_slots", "retry_failed_slots", "retry_requested_at"):
-        metadata.pop(key, None)
-    storage.write_metadata(task_id, metadata)
-    return metadata
+    def _apply(m: dict[str, Any]) -> None:
+        m.update(
+            {
+                "status": "completed",
+                "updated_at": now,
+                "generated_count": len(accepted_outputs),
+                "failed_count": 0,
+                "total_count": len(accepted_outputs),
+                "outputs": accepted_outputs,
+                "output_files": output_files,
+                "output_urls": output_urls,
+                "selected_output_indexes": [],
+                "deleted_output_indexes": [],
+                "original_total_count": original_total_count,
+                "pruned_output_count": len(removed_records),
+                "outputs_pruned_at": now,
+            }
+        )
+        if output_files:
+            m["output_file"] = output_files[0]
+        else:
+            m.pop("output_file", None)
+        if output_urls:
+            m["output_url"] = output_urls[0]
+        else:
+            m.pop("output_url", None)
+        for list_key in list_sources:
+            if list_key in derived_lists:
+                m[list_key] = derived_lists[list_key]
+            else:
+                m.pop(list_key, None)
+        for scalar_key, value in derived_scalars.items():
+            m[scalar_key] = value
+        for scalar_key in scalar_sources:
+            if scalar_key not in derived_scalars:
+                m.pop(scalar_key, None)
+        for key in ("error", "last_error", "retrying_failed_slots", "retry_failed_slots", "retry_requested_at"):
+            m.pop(key, None)
+
+    return storage.update_metadata(task_id, _apply)
 
 
 def _write_running_metadata(
@@ -637,32 +661,32 @@ def _write_running_metadata(
     reference_files: list[dict[str, Any]] | None = None,
 ) -> None:
     input_urls = _input_urls(task_id, input_files)
-    try:
-        existing_metadata = storage.read_metadata(task_id)
-    except FileNotFoundError:
-        existing_metadata = {}
-    file_references = _reference_files_for_metadata(reference_files, existing_metadata)
-    storage.write_metadata(
-        task_id,
-        {
-            "task_id": task_id,
-            "created_at": created_at,
-            "updated_at": utc_now(),
-            "viewed_at": created_at,
-            "mode": mode,
-            "status": "running",
-            "prompt": prompt,
-            "prompt_for_model": prompt_for_model,
-            "params": params,
-            "input_files": input_files,
-            "input_urls": input_urls,
-            "gallery_refs": gallery_refs,
-            "reference_assets": reference_assets or [],
-            "reference_files": file_references,
-            "reference_file_count": len(file_references),
-            "input_sources": _input_sources(task_id, input_files, gallery_refs, reference_assets or []),
-        },
-    )
+    now = utc_now()
+
+    def _apply(m: dict[str, Any]) -> None:
+        file_references = _reference_files_for_metadata(reference_files, m)
+        m.update(
+            {
+                "task_id": task_id,
+                "created_at": created_at,
+                "updated_at": now,
+                "viewed_at": created_at,
+                "mode": mode,
+                "status": "running",
+                "prompt": prompt,
+                "prompt_for_model": prompt_for_model,
+                "params": params,
+                "input_files": input_files,
+                "input_urls": input_urls,
+                "gallery_refs": gallery_refs,
+                "reference_assets": reference_assets or [],
+                "reference_files": file_references,
+                "reference_file_count": len(file_references),
+                "input_sources": _input_sources(task_id, input_files, gallery_refs, reference_assets or []),
+            }
+        )
+
+    storage.update_metadata(task_id, _apply)
 
 
 def _write_queued_metadata(
@@ -684,37 +708,43 @@ def _write_queued_metadata(
     max_attempts: int = 2,
 ) -> dict[str, Any]:
     file_references = _reference_files_for_metadata(reference_files)
-    metadata = {
-        "task_id": task_id,
-        "created_at": created_at,
-        "updated_at": created_at,
-        "viewed_at": created_at,
-        "queued_at": created_at,
-        "mode": mode,
-        "status": "queued",
-        "prompt": prompt,
-        "prompt_for_model": prompt_for_model,
-        "params": params,
-        "input_files": input_files,
-        "mask_file": mask_file,
-        "input_urls": _input_urls(task_id, input_files),
-        "gallery_refs": gallery_refs,
-        "reference_assets": reference_assets or [],
-        "reference_files": file_references,
-        "reference_file_count": len(file_references),
-        "input_sources": _input_sources(task_id, input_files, gallery_refs, reference_assets or []),
-        "attempts": 0,
-        "max_attempts": max_attempts,
-        "last_error": "",
-    }
-    if requested_backend:
-        metadata["requested_backend"] = requested_backend
-    _apply_api_provider_metadata(metadata, params)
-    _apply_api_images_concurrency_metadata(metadata, params)
-    if prompt_constraints:
-        metadata["prompt_constraints"] = list(prompt_constraints)
-    storage.write_metadata(task_id, metadata)
-    return metadata
+    input_urls_value = _input_urls(task_id, input_files)
+    input_sources_value = _input_sources(task_id, input_files, gallery_refs, reference_assets or [])
+
+    def _apply(m: dict[str, Any]) -> None:
+        m.update(
+            {
+                "task_id": task_id,
+                "created_at": created_at,
+                "updated_at": created_at,
+                "viewed_at": created_at,
+                "queued_at": created_at,
+                "mode": mode,
+                "status": "queued",
+                "prompt": prompt,
+                "prompt_for_model": prompt_for_model,
+                "params": params,
+                "input_files": input_files,
+                "mask_file": mask_file,
+                "input_urls": input_urls_value,
+                "gallery_refs": gallery_refs,
+                "reference_assets": reference_assets or [],
+                "reference_files": file_references,
+                "reference_file_count": len(file_references),
+                "input_sources": input_sources_value,
+                "attempts": 0,
+                "max_attempts": max_attempts,
+                "last_error": "",
+            }
+        )
+        if requested_backend:
+            m["requested_backend"] = requested_backend
+        _apply_api_provider_metadata(m, params)
+        _apply_api_images_concurrency_metadata(m, params)
+        if prompt_constraints:
+            m["prompt_constraints"] = list(prompt_constraints)
+
+    return storage.update_metadata(task_id, _apply)
 
 
 def _write_progress_metadata(
@@ -739,81 +769,90 @@ def _write_progress_metadata(
     input_names = [path.name for path in input_files]
     results, output_paths, output_records = _ordered_output_progress(results, output_paths, output_records or [])
     failed_records = [record for record in output_records if record.get("status") == "failed"]
-    metadata = storage.read_metadata(task_id)
-    file_references = _reference_files_for_metadata(reference_files, metadata)
-    metadata.update(
-        {
-            "task_id": task_id,
-            "created_at": created_at,
-            "updated_at": utc_now(),
-            "mode": mode,
-            "status": "running",
-            "prompt": prompt,
-            "prompt_for_model": prompt_for_model,
-            "params": params,
-            "input_files": input_names,
-            "input_urls": _input_urls(task_id, input_names),
-            "gallery_refs": gallery_refs,
-            "reference_assets": reference_assets or [],
-            "reference_files": file_references,
-            "reference_file_count": len(file_references),
-            "input_sources": _input_sources(task_id, input_names, gallery_refs, reference_assets or []),
-            "generated_count": len(results),
-            "failed_count": len(failed_records),
-            "total_count": total_count,
-            "output_files": [storage.output_file(path) for path in output_paths],
-            "output_urls": [_output_url(storage, path) for path in output_paths],
-            "outputs": output_records,
-            "output_sizes": [result.size for result in results],
-            "output_formats": [result.output_format for result in results],
-            "qualities": [result.quality for result in results],
-            "backgrounds": [result.background for result in results],
-            "revised_prompts": [result.revised_prompt for result in results],
-            "usages": [result.usage for result in results],
-            "tool_usages": [result.tool_usage for result in results],
-        }
-    )
-    _apply_api_provider_metadata(metadata, params)
-    if failed_records:
-        metadata["last_error"] = _partial_failure_message(len(failed_records), total_count, failed_records[-1].get("error"))
-    else:
-        metadata.pop("retrying_failed_slots", None)
-        metadata.pop("retry_failed_slots", None)
-    _apply_api_images_concurrency_metadata(metadata, params)
-    metadata.pop("request", None)
-
-    if results and output_paths:
+    now = utc_now()
+    base_update: dict[str, Any] = {
+        "task_id": task_id,
+        "created_at": created_at,
+        "updated_at": now,
+        "mode": mode,
+        "status": "running",
+        "prompt": prompt,
+        "prompt_for_model": prompt_for_model,
+        "params": params,
+        "input_files": input_names,
+        "input_urls": _input_urls(task_id, input_names),
+        "gallery_refs": gallery_refs,
+        "reference_assets": reference_assets or [],
+        "reference_files": None,  # filled in mutator against freshest metadata
+        "reference_file_count": 0,
+        "input_sources": _input_sources(task_id, input_names, gallery_refs, reference_assets or []),
+        "generated_count": len(results),
+        "failed_count": len(failed_records),
+        "total_count": total_count,
+        "output_files": [storage.output_file(path) for path in output_paths],
+        "output_urls": [_output_url(storage, path) for path in output_paths],
+        "outputs": output_records,
+        "output_sizes": [result.size for result in results],
+        "output_formats": [result.output_format for result in results],
+        "qualities": [result.quality for result in results],
+        "backgrounds": [result.background for result in results],
+        "revised_prompts": [result.revised_prompt for result in results],
+        "usages": [result.usage for result in results],
+        "tool_usages": [result.tool_usage for result in results],
+    }
+    has_first = bool(results and output_paths)
+    first_fields: dict[str, Any] = {}
+    if has_first:
         first_result = results[0]
         first_output_path = output_paths[0]
-        metadata.update(
-            {
-                "output_file": storage.output_file(first_output_path),
-                "output_url": _output_url(storage, first_output_path),
-                "output_size": first_result.size,
-                "output_format": first_result.output_format,
-                "quality": first_result.quality,
-                "background": first_result.background,
-                "revised_prompt": first_result.revised_prompt,
-                "usage": first_result.usage,
-                "tool_usage": first_result.tool_usage,
-            }
-        )
-    else:
-        for key in (
-            "output_file",
-            "output_url",
-            "output_size",
-            "output_format",
-            "quality",
-            "background",
-            "revised_prompt",
-            "usage",
-            "tool_usage",
-        ):
-            metadata.pop(key, None)
+        first_fields = {
+            "output_file": storage.output_file(first_output_path),
+            "output_url": _output_url(storage, first_output_path),
+            "output_size": first_result.size,
+            "output_format": first_result.output_format,
+            "quality": first_result.quality,
+            "background": first_result.background,
+            "revised_prompt": first_result.revised_prompt,
+            "usage": first_result.usage,
+            "tool_usage": first_result.tool_usage,
+        }
+    first_scalar_keys = (
+        "output_file",
+        "output_url",
+        "output_size",
+        "output_format",
+        "quality",
+        "background",
+        "revised_prompt",
+        "usage",
+        "tool_usage",
+    )
+    failure_message = (
+        _partial_failure_message(len(failed_records), total_count, failed_records[-1].get("error"))
+        if failed_records
+        else None
+    )
 
-    storage.write_metadata(task_id, metadata)
-    return metadata
+    def _apply(m: dict[str, Any]) -> None:
+        file_references = _reference_files_for_metadata(reference_files, m)
+        base_update["reference_files"] = file_references
+        base_update["reference_file_count"] = len(file_references)
+        m.update(base_update)
+        _apply_api_provider_metadata(m, params)
+        if failure_message is not None:
+            m["last_error"] = failure_message
+        else:
+            m.pop("retrying_failed_slots", None)
+            m.pop("retry_failed_slots", None)
+        _apply_api_images_concurrency_metadata(m, params)
+        m.pop("request", None)
+        if has_first:
+            m.update(first_fields)
+        else:
+            for key in first_scalar_keys:
+                m.pop(key, None)
+
+    return storage.update_metadata(task_id, _apply)
 
 
 def _partial_failure_message(failed_count: int, total_count: int, last_error: Any = None) -> str:
@@ -872,61 +911,69 @@ def _finalize_generated_task(
     first_result = results[0]
     first_output_path = output_paths[0]
     total_count = int(params.get("n") or len(output_records) or len(results) or 1)
-    metadata = storage.read_metadata(task_id)
-    file_references = _reference_files_for_metadata(reference_files, metadata)
-    metadata.update(
-        {
-            "task_id": task_id,
-            "created_at": created_at,
-            "updated_at": utc_now(),
-            "mode": mode,
-            "status": "partial_failed" if failed_records else "completed",
-            "prompt": prompt,
-            "prompt_for_model": prompt_for_model,
-            "params": params,
-            "input_files": input_names,
-            "input_urls": _input_urls(task_id, input_names),
-            "gallery_refs": gallery_refs,
-            "reference_assets": reference_assets or [],
-            "reference_files": file_references,
-            "reference_file_count": len(file_references),
-            "input_sources": _input_sources(task_id, input_names, gallery_refs, reference_assets or []),
-            "generated_count": len(results),
-            "failed_count": len(failed_records),
-            "total_count": total_count,
-            "output_file": storage.output_file(first_output_path),
-            "output_files": [storage.output_file(path) for path in output_paths],
-            "output_url": _output_url(storage, first_output_path),
-            "output_urls": [_output_url(storage, path) for path in output_paths],
-            "outputs": output_records,
-            "output_size": first_result.size,
-            "output_sizes": [result.size for result in results],
-            "output_format": first_result.output_format,
-            "output_formats": [result.output_format for result in results],
-            "quality": first_result.quality,
-            "qualities": [result.quality for result in results],
-            "background": first_result.background,
-            "backgrounds": [result.background for result in results],
-            "revised_prompt": first_result.revised_prompt,
-            "revised_prompts": [result.revised_prompt for result in results],
-            "usage": first_result.usage,
-            "usages": [result.usage for result in results],
-            "tool_usage": first_result.tool_usage,
-            "tool_usages": [result.tool_usage for result in results],
-        }
+    now = utc_now()
+    base_update: dict[str, Any] = {
+        "task_id": task_id,
+        "created_at": created_at,
+        "updated_at": now,
+        "mode": mode,
+        "status": "partial_failed" if failed_records else "completed",
+        "prompt": prompt,
+        "prompt_for_model": prompt_for_model,
+        "params": params,
+        "input_files": input_names,
+        "input_urls": _input_urls(task_id, input_names),
+        "gallery_refs": gallery_refs,
+        "reference_assets": reference_assets or [],
+        "reference_files": None,
+        "reference_file_count": 0,
+        "input_sources": _input_sources(task_id, input_names, gallery_refs, reference_assets or []),
+        "generated_count": len(results),
+        "failed_count": len(failed_records),
+        "total_count": total_count,
+        "output_file": storage.output_file(first_output_path),
+        "output_files": [storage.output_file(path) for path in output_paths],
+        "output_url": _output_url(storage, first_output_path),
+        "output_urls": [_output_url(storage, path) for path in output_paths],
+        "outputs": output_records,
+        "output_size": first_result.size,
+        "output_sizes": [result.size for result in results],
+        "output_format": first_result.output_format,
+        "output_formats": [result.output_format for result in results],
+        "quality": first_result.quality,
+        "qualities": [result.quality for result in results],
+        "background": first_result.background,
+        "backgrounds": [result.background for result in results],
+        "revised_prompt": first_result.revised_prompt,
+        "revised_prompts": [result.revised_prompt for result in results],
+        "usage": first_result.usage,
+        "usages": [result.usage for result in results],
+        "tool_usage": first_result.tool_usage,
+        "tool_usages": [result.tool_usage for result in results],
+    }
+    failure_message = (
+        _partial_failure_message(len(failed_records), total_count, failed_records[-1].get("error"))
+        if failed_records
+        else None
     )
-    _apply_api_provider_metadata(metadata, params)
-    metadata.pop("request", None)
-    metadata.pop("error", None)
-    _apply_api_images_concurrency_metadata(metadata, params)
-    if failed_records:
-        metadata["last_error"] = _partial_failure_message(len(failed_records), total_count, failed_records[-1].get("error"))
-    else:
-        metadata.pop("last_error", None)
-    metadata.pop("retrying_failed_slots", None)
-    metadata.pop("retry_failed_slots", None)
-    storage.write_metadata(task_id, metadata)
-    return metadata
+
+    def _apply(m: dict[str, Any]) -> None:
+        file_references = _reference_files_for_metadata(reference_files, m)
+        base_update["reference_files"] = file_references
+        base_update["reference_file_count"] = len(file_references)
+        m.update(base_update)
+        _apply_api_provider_metadata(m, params)
+        m.pop("request", None)
+        m.pop("error", None)
+        _apply_api_images_concurrency_metadata(m, params)
+        if failure_message is not None:
+            m["last_error"] = failure_message
+        else:
+            m.pop("last_error", None)
+        m.pop("retrying_failed_slots", None)
+        m.pop("retry_failed_slots", None)
+
+    return storage.update_metadata(task_id, _apply)
 
 
 def _complete_task(
@@ -975,53 +1022,56 @@ def _complete_task(
     first_output_path = output_paths[0]
     input_names = [path.name for path in input_files]
     total_count = int(params.get("n") or len(result_list) or 1)
-    metadata = storage.read_metadata(task_id)
-    file_references = _reference_files_for_metadata(reference_files, metadata)
-    metadata.update(
-        {
-            "task_id": task_id,
-            "created_at": created_at,
-            "updated_at": utc_now(),
-            "mode": mode,
-            "status": "completed",
-            "prompt": prompt,
-            "prompt_for_model": prompt_for_model,
-            "params": params,
-            "input_files": input_names,
-            "input_urls": _input_urls(task_id, input_names),
-            "gallery_refs": gallery_refs,
-            "reference_assets": reference_assets or [],
-            "reference_files": file_references,
-            "reference_file_count": len(file_references),
-            "input_sources": _input_sources(task_id, input_names, gallery_refs, reference_assets or []),
-            "generated_count": len(result_list),
-            "total_count": total_count,
-            "output_file": storage.output_file(first_output_path),
-            "output_files": [storage.output_file(path) for path in output_paths],
-            "output_url": _output_url(storage, first_output_path),
-            "output_urls": [_output_url(storage, path) for path in output_paths],
-            "output_size": first_result.size,
-            "output_sizes": output_sizes,
-            "output_format": first_result.output_format,
-            "output_formats": output_formats,
-            "quality": first_result.quality,
-            "qualities": output_qualities,
-            "background": first_result.background,
-            "backgrounds": output_backgrounds,
-            "revised_prompt": first_result.revised_prompt,
-            "revised_prompts": revised_prompts,
-            "usage": first_result.usage,
-            "usages": usages,
-            "tool_usage": first_result.tool_usage,
-            "tool_usages": tool_usages,
-        }
-    )
-    _apply_api_provider_metadata(metadata, params)
-    metadata.pop("request", None)
-    metadata.pop("error", None)
-    metadata.pop("last_error", None)
-    storage.write_metadata(task_id, metadata)
-    return metadata
+    now = utc_now()
+    base_update: dict[str, Any] = {
+        "task_id": task_id,
+        "created_at": created_at,
+        "updated_at": now,
+        "mode": mode,
+        "status": "completed",
+        "prompt": prompt,
+        "prompt_for_model": prompt_for_model,
+        "params": params,
+        "input_files": input_names,
+        "input_urls": _input_urls(task_id, input_names),
+        "gallery_refs": gallery_refs,
+        "reference_assets": reference_assets or [],
+        "reference_files": None,
+        "reference_file_count": 0,
+        "input_sources": _input_sources(task_id, input_names, gallery_refs, reference_assets or []),
+        "generated_count": len(result_list),
+        "total_count": total_count,
+        "output_file": storage.output_file(first_output_path),
+        "output_files": [storage.output_file(path) for path in output_paths],
+        "output_url": _output_url(storage, first_output_path),
+        "output_urls": [_output_url(storage, path) for path in output_paths],
+        "output_size": first_result.size,
+        "output_sizes": output_sizes,
+        "output_format": first_result.output_format,
+        "output_formats": output_formats,
+        "quality": first_result.quality,
+        "qualities": output_qualities,
+        "background": first_result.background,
+        "backgrounds": output_backgrounds,
+        "revised_prompt": first_result.revised_prompt,
+        "revised_prompts": revised_prompts,
+        "usage": first_result.usage,
+        "usages": usages,
+        "tool_usage": first_result.tool_usage,
+        "tool_usages": tool_usages,
+    }
+
+    def _apply(m: dict[str, Any]) -> None:
+        file_references = _reference_files_for_metadata(reference_files, m)
+        base_update["reference_files"] = file_references
+        base_update["reference_file_count"] = len(file_references)
+        m.update(base_update)
+        _apply_api_provider_metadata(m, params)
+        m.pop("request", None)
+        m.pop("error", None)
+        m.pop("last_error", None)
+
+    return storage.update_metadata(task_id, _apply)
 
 
 def _fail_task(
@@ -1040,28 +1090,30 @@ def _fail_task(
     reference_files: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     input_names = [path.name for path in input_files]
-    try:
-        existing_metadata = storage.read_metadata(task_id)
-    except FileNotFoundError:
-        existing_metadata = {}
-    file_references = _reference_files_for_metadata(reference_files, existing_metadata)
-    metadata = {
-        "task_id": task_id,
-        "created_at": created_at,
-        "updated_at": utc_now(),
-        "mode": mode,
-        "status": "failed",
-        "prompt": prompt,
-        "prompt_for_model": prompt_for_model,
-        "params": params,
-        "input_files": input_names,
-        "input_urls": _input_urls(task_id, input_names),
-        "gallery_refs": gallery_refs,
-        "reference_assets": reference_assets or [],
-        "reference_files": file_references,
-        "reference_file_count": len(file_references),
-        "input_sources": _input_sources(task_id, input_names, gallery_refs, reference_assets or []),
-        "error": str(exc),
-    }
-    storage.write_metadata(task_id, metadata)
-    return metadata
+    now = utc_now()
+    failure_message = str(exc)
+
+    def _apply(m: dict[str, Any]) -> None:
+        file_references = _reference_files_for_metadata(reference_files, m)
+        m.update(
+            {
+                "task_id": task_id,
+                "created_at": created_at,
+                "updated_at": now,
+                "mode": mode,
+                "status": "failed",
+                "prompt": prompt,
+                "prompt_for_model": prompt_for_model,
+                "params": params,
+                "input_files": input_names,
+                "input_urls": _input_urls(task_id, input_names),
+                "gallery_refs": gallery_refs,
+                "reference_assets": reference_assets or [],
+                "reference_files": file_references,
+                "reference_file_count": len(file_references),
+                "input_sources": _input_sources(task_id, input_names, gallery_refs, reference_assets or []),
+                "error": failure_message,
+            }
+        )
+
+    return storage.update_metadata(task_id, _apply)
