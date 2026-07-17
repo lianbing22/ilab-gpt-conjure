@@ -103,6 +103,8 @@ from .schemas import (
 )
 from .storage import GalleryStorage, QueueStorage, ReferenceAssetStorage, SQLiteQueueStorage, TaskStorage, _guess_mime_type, utc_now
 from .reference_files import ReferenceFileStorage
+from .brand_assets import BrandAssetStorage
+from .brand_templates import BrandTemplateStore
 from .settings_store import (
     ApiSettings,
     AuthSettings,
@@ -225,6 +227,10 @@ def create_app(
     gallery_storage = GalleryStorage(gallery_path)
     reference_asset_storage = ReferenceAssetStorage(reference_asset_path)
     reference_file_storage = ReferenceFileStorage(reference_file_path)
+    brand_asset_path = source_data_path / "brand-assets"
+    brand_template_path = source_data_path / "brand-templates.json"
+    brand_asset_storage = BrandAssetStorage(brand_asset_path)
+    brand_template_store = BrandTemplateStore(brand_template_path)
     queue_storage = (
         QueueStorage(Path(queue_path))
         if queue_path is not None
@@ -267,6 +273,11 @@ def create_app(
         source_data_root=source_data_path,
         auto_start_queue=auto_start_queue,
     )
+    ctx.brand_asset_storage = brand_asset_storage
+    ctx.brand_template_store = brand_template_store
+    from codex_image.branding.service import BrandingService
+
+    ctx.branding_service = BrandingService(storage, brand_asset_storage, brand_template_store)
     ctx.install_on_app_state()
 
     queue_runtime = install_queue_runtime(

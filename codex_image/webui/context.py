@@ -45,6 +45,10 @@ class WebUIContext:
     api_task_slot_reservations: dict[str, dict[str, Any]] = field(default_factory=dict)
     responses_file_unsupported_keys: set[tuple[str, str, str, str]] = field(default_factory=set)
     route_helpers: dict[str, Any] = field(default_factory=dict)
+    # Brand-overlay subsystem (optional; absent in contexts that don't enable it).
+    brand_asset_storage: Any = None
+    brand_template_store: Any = None
+    branding_service: Any = None
 
     def install_on_app_state(self) -> None:
         self.app.state.ctx = self
@@ -72,5 +76,11 @@ class WebUIContext:
         self.app.state.api_task_slot_reservations = self.api_task_slot_reservations
         self.app.state.responses_file_unsupported_keys = self.responses_file_unsupported_keys
         self.app.state.route_helpers = self.route_helpers
+        if self.brand_asset_storage is not None:
+            self.app.state.brand_asset_storage = self.brand_asset_storage
+        if self.brand_template_store is not None:
+            self.app.state.brand_template_store = self.brand_template_store
+        if self.branding_service is not None:
+            self.app.state.branding_service = self.branding_service
         if self.queue_manager is not None:
             self.app.state.queue_manager = self.queue_manager
