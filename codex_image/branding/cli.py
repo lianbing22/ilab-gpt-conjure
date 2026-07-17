@@ -7,7 +7,7 @@ from typing import Sequence
 
 from PIL import Image, UnidentifiedImageError
 
-from codex_image.branding.compositor import compose_with_report
+from codex_image.branding.compositor import compose_with_assets, compose_with_report
 from codex_image.branding.models import BrandTemplate, PlacementConfig
 
 
@@ -59,23 +59,25 @@ def _branded_output_path(output_dir: Path, source: Path) -> Path:
 def _process_one(
     source: Path,
     output: Path,
-    logo: Image.Image,
-    slogan: Image.Image,
     template: BrandTemplate,
+    *,
+    single: tuple[Image.Image, Image.Image] | None = None,
+    dual: dict[str, dict[str, Image.Image]] | None = None,
 ) -> dict[str, object]:
-    """Compose one image and write it out. Returns the diagnostic report."""
+    """Compose one image and write it out. Returns the diagnostic report.
+
+    ``single`` is a (logo, slogan) pair for the single-asset path;
+    ``dual`` is {tone: {element: Image}} for the auto-selecting path. Exactly
+    one must be provided.
+    """
     with Image.open(source) as raw:
-        # Detach from the file-backed image so the result outlives the `with`.
         raw.load()
-        composed, report = compose_with_report(
-            raw,
-            logo=logo,
-            slogan=slogan,
-            template=template,
-        )
+        if dual is not None:
+            composed, report = compose_with_assets(raw, assets=dual, template=template)
+        else:
+            assert single is not None
+            composed, report = compose_with_report(raw, logo=single[0], slogan=single[1], template=template)
     output.parent.mkdir(parents=True, exist_ok=True)
-    # Flatten to RGB and save as PNG so branded outputs are portable and
-    # preview-friendly (no alpha surprises in viewers).
     composed.convert("RGB").save(output, format="PNG")
     report["output"] = str(output)
     return report
@@ -87,8 +89,22 @@ def main(argv: Sequence[str] | None = None) -> int:
         description="Offline batch brand overlay (Logo + Slogan PNGs) for generated images.",
     )
     parser.add_argument("--inputs", required=True, type=Path, help="Directory of base PNG images to brand.")
-    parser.add_argument("--logo", required=True, type=Path, help="Transparent PNG logo to overlay.")
-    parser.add_argument("--slogan", required=True, type=Path, help="Transparent PNG slogan to overlay.")
+    parser.add_argument("--logo", type=Path, default=None, help="Transparent PNG logo to overlay (single-asset mode).")
+    parser.add_argument("--slogan", type=Path, default=None, help="Transparent PNG slogan to overlay (single-asset mode).")
+    parser.add_argument(
+        "--logo-light",
+        type=Path,
+        default=None,
+        help="Light-toned logo PNG (for dark backgrounds). Enables auto-select mode when all four are given.",
+    )
+    parser.add_argument(
+        "--logo-dark",
+        type=Path,
+        default=None,
+        help="Dark-toned logo PNG (for bright backgrounds). Enables auto-select mode when all four are given.",
+    )
+    parser.add_argument("--slogan-light", type=Path, default=None, help="Light-toned slogan PNG (for dark backgrounds).")
+    parser.add_argument("--slogan-dark", type=Path, default=None, help="Dark-toned slogan PNG (for bright backgrounds).")
     parser.add_argument("--output", required=True, type=Path, help="Output directory for branded PNGs.")
     parser.add_argument("--anchor-logo", default="top-left", help="Corner for the logo.")
     parser.add_argument("--anchor-slogan", default="bottom-right", help="Corner for the slogan.")
@@ -110,9 +126,34 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 2
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    # Auto-select mode requires all four tone variants; otherwise fall back to
+    # the single-asset path which still needs --logo and --slogan.
+    dual_paths = [args.logo_light, args.logo_dark, args.slogan_light, args.slogan_dark]
+    use_dual = all(p is not None for p in dual_paths)
+    if not use_dual and (args.logo is None or args.slogan is None):
+        print(
+            "error: provide either --logo and --slogan (single-asset), "
+            "or all of --logo-light/--logo-dark/--slogan-light/--slogan-dark (auto-select)",
+            file=sys.stderr,
+        )
+        return 2
+
+    single: tuple[Image.Image, Image.Image] | None = None
+    dual: dict[str, dict[str, Image.Image]] | None = None
     try:
-        logo = Image.open(args.logo).convert("RGBA")
-        slogan = Image.open(args.slogan).convert("RGBA")
+        if use_dual:
+            dual = {
+                "light-assets": {
+                    "logo": Image.open(args.logo_light).convert("RGBA"),
+                    "slogan": Image.open(args.slogan_light).convert("RGBA"),
+                },
+                "dark-assets": {
+                    "logo": Image.open(args.logo_dark).convert("RGBA"),
+                    "slogan": Image.open(args.slogan_dark).convert("RGBA"),
+                },
+            }
+        else:
+            single = (Image.open(args.logo).convert("RGBA"), Image.open(args.slogan).convert("RGBA"))
     except (OSError, UnidentifiedImageError, ValueError) as exc:
         print(f"error: could not load logo/slogan assets: {exc}", file=sys.stderr)
         return 2
@@ -128,7 +169,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     for source in sources:
         output = _branded_output_path(output_dir, source)
         try:
-            report = _process_one(source, output, logo, slogan, template)
+            report = _process_one(source, output, template, single=single, dual=dual)
         except (OSError, UnidentifiedImageError, ValueError) as exc:
             print(f"skip {source.name}: {exc}", file=sys.stderr)
             continue
@@ -137,15 +178,19 @@ def main(argv: Sequence[str] | None = None) -> int:
         assert isinstance(elements, dict)
         logo_el = elements["logo"]
         slogan_el = elements["slogan"]
+        chosen = ""
+        if use_dual:
+            chosen = f" | logo_tone={logo_el.get('chosen_tone')} slogan_tone={slogan_el.get('chosen_tone')}"
         print(
             f"{source.name} -> {Path(str(report['output'])).name} | "
             f"layout={report['layout']} tone={report['tone']} | "
             f"logo box={logo_el['box']} scrim={logo_el['scrim']} | "
-            f"slogan box={slogan_el['box']} scrim={slogan_el['scrim']}"
+            f"slogan box={slogan_el['box']} scrim={slogan_el['scrim']}{chosen}"
         )
         processed += 1
 
-    print(f"done: branded {processed}/{len(sources)} image(s) into {output_dir}")
+    mode = "auto-select" if use_dual else "single-asset"
+    print(f"done ({mode}): branded {processed}/{len(sources)} image(s) into {output_dir}")
     return 0
 
 

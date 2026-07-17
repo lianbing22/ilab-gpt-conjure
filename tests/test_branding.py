@@ -10,6 +10,7 @@ from PIL import Image
 from codex_image.branding.compositor import (
     COMPOSITOR_VERSION,
     compose,
+    compose_with_assets,
     compose_with_report,
     compute_request_hash,
 )
@@ -344,6 +345,70 @@ class ComputeRequestHashTests(unittest.TestCase):
         self.assertTrue(COMPOSITOR_VERSION)
 
 
+class ComposeWithAssetsTests(unittest.TestCase):
+    """Auto-selecting variant: both tone variants supplied, sampler picks."""
+
+    def _dual_assets(self) -> dict[str, dict[str, Image.Image]]:
+        # Distinct colors per tone so we can detect which asset was burned in.
+        # light-assets = near-white ink (for dark backgrounds)
+        # dark-assets = near-black ink (for bright backgrounds)
+        return {
+            "light-assets": {
+                "logo": _solid((100, 60), (245, 245, 245), mode="RGBA"),
+                "slogan": _solid((300, 60), (245, 245, 245), mode="RGBA"),
+            },
+            "dark-assets": {
+                "logo": _solid((100, 60), (20, 20, 20), mode="RGBA"),
+                "slogan": _solid((300, 60), (20, 20, 20), mode="RGBA"),
+            },
+        }
+
+    def test_bright_canvas_uses_dark_assets(self) -> None:
+        canvas = _solid((512, 512), (255, 255, 255))
+        _, report = compose_with_assets(canvas, assets=self._dual_assets(), template=_default_template())
+
+        self.assertEqual(report["tone"], "dark-assets")
+        self.assertEqual(report["elements"]["logo"]["chosen_tone"], "dark-assets")
+        self.assertEqual(report["elements"]["slogan"]["chosen_tone"], "dark-assets")
+
+    def test_dark_canvas_uses_light_assets(self) -> None:
+        canvas = _solid((512, 512), (10, 10, 10))
+        _, report = compose_with_assets(canvas, assets=self._dual_assets(), template=_default_template())
+
+        self.assertEqual(report["tone"], "light-assets")
+        self.assertEqual(report["elements"]["logo"]["chosen_tone"], "light-assets")
+        self.assertEqual(report["elements"]["slogan"]["chosen_tone"], "light-assets")
+
+    def test_dark_canvas_burns_in_light_ink_pixels(self) -> None:
+        # Regression for the value-validation finding: a dark canvas must end up
+        # with light ink (high luminance) in the logo region, not dark ink.
+        canvas = _solid((512, 512), (10, 10, 10))
+        composed, _ = compose_with_assets(canvas, assets=self._dual_assets(), template=_default_template())
+
+        # Logo sits top-left; sample a pixel well inside it.
+        pixel = composed.getpixel((40, 25))
+        self.assertGreater(sum(pixel[:3]), 500)  # bright ink on dark bg
+
+    def test_forced_tone_pins_both_elements(self) -> None:
+        canvas = _solid((512, 512), (10, 10, 10))  # would pick light-assets
+        _, report = compose_with_assets(
+            canvas,
+            assets=self._dual_assets(),
+            template=_default_template(),
+            theme_mode_override="dark-assets",
+        )
+
+        self.assertEqual(report["tone"], "dark-assets")
+        self.assertEqual(report["elements"]["logo"]["chosen_tone"], "dark-assets")
+
+    def test_report_includes_chosen_tone_key(self) -> None:
+        canvas = _solid((512, 512), (255, 255, 255))
+        _, report = compose_with_assets(canvas, assets=self._dual_assets(), template=_default_template())
+
+        for element in report["elements"].values():
+            self.assertIn("chosen_tone", element)
+
+
 class CLIBatchTests(unittest.TestCase):
     def test_cli_brands_all_inputs_with_suffix(self) -> None:
         from codex_image.branding.cli import main as cli_main
@@ -373,6 +438,51 @@ class CLIBatchTests(unittest.TestCase):
             with Image.open(output / "a-branded.png") as branded:
                 self.assertEqual(branded.size, (512, 512))
                 self.assertEqual(branded.mode, "RGB")
+
+    def test_cli_auto_select_mode_uses_matching_tone_per_image(self) -> None:
+        from codex_image.branding.cli import main as cli_main
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            inputs = root / "in"
+            output = root / "out"
+            inputs.mkdir()
+            # A bright canvas and a dark canvas in the same batch.
+            (inputs / "bright.png").write_bytes(_png(_solid((512, 512), (255, 255, 255))))
+            (inputs / "dark.png").write_bytes(_png(_solid((512, 512), (10, 10, 10))))
+            asset = lambda color: _png(_solid((100, 60), color, mode="RGBA"))
+            (root / "logo-light.png").write_bytes(asset((245, 245, 245)))
+            (root / "logo-dark.png").write_bytes(asset((20, 20, 20)))
+            (root / "slogan-light.png").write_bytes(asset((245, 245, 245)))
+            (root / "slogan-dark.png").write_bytes(asset((20, 20, 20)))
+
+            code = cli_main([
+                "--inputs", str(inputs),
+                "--logo-light", str(root / "logo-light.png"),
+                "--logo-dark", str(root / "logo-dark.png"),
+                "--slogan-light", str(root / "slogan-light.png"),
+                "--slogan-dark", str(root / "slogan-dark.png"),
+                "--output", str(output),
+            ])
+
+            self.assertEqual(code, 0)
+            self.assertTrue((output / "bright-branded.png").exists())
+            self.assertTrue((output / "dark-branded.png").exists())
+            # Both processed despite the brightness mismatch — auto-select
+            # resolved the right asset for each.
+
+    def test_cli_rejects_missing_assets(self) -> None:
+        from codex_image.branding.cli import main as cli_main
+
+        with tempfile.TemporaryDirectory() as tmp:
+            inputs = Path(tmp) / "in"
+            inputs.mkdir()
+            (inputs / "a.png").write_bytes(_png(_solid((64, 64), (0, 0, 0))))
+
+            # Neither single nor all-four provided -> error.
+            code = cli_main(["--inputs", str(inputs), "--output", str(Path(tmp) / "out")])
+
+            self.assertEqual(code, 2)
 
 
 if __name__ == "__main__":

@@ -240,3 +240,89 @@ def compute_request_hash(
     slogan_sha = hashlib.sha256(slogan_bytes).hexdigest()
     payload = "|".join([raw_sha, template_hash, logo_sha, slogan_sha, COMPOSITOR_VERSION])
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def compose_with_assets(
+    raw_image: Image.Image,
+    *,
+    assets: dict[ToneKey, dict[OverlayKey, Image.Image]],
+    template: BrandTemplate,
+    theme_mode_override: str | None = None,
+) -> tuple[Image.Image, dict[str, object]]:
+    """Auto-selecting variant of :func:`compose_with_report`.
+
+    Instead of a single logo/slogan, the caller supplies *both* tone variants
+    (``light-assets`` and ``dark-assets``) for each overlay. The function
+    samples the canvas per element (honoring ``variant_policy`` and any forced
+    ``theme_mode``), then burns in the tone-matching asset. This is the correct
+    entry point for production: a mixed-brightness set of generated images each
+    gets the legible asset without the caller pre-sorting by background.
+
+    Falls back to the single-asset report shape; the chosen ``tone`` and each
+    element's ``box``/``scrim``/``chosen_tone`` are in the report so the service
+    layer can record exactly which asset was used (for audit / idempotency).
+    """
+    from codex_image.branding.models import OverlayKey, ToneKey  # local for typing
+
+    canvas = ImageOps.exif_transpose(raw_image).convert("RGBA")
+    canvas_w, canvas_h = canvas.size
+    layout = classify_layout(canvas_w, canvas_h)
+    placements = template.placements.get(layout)
+    if placements is None:
+        return canvas, {"layout": layout, "elements": {}}
+
+    forced_tone = _resolve_forced_tone(template, theme_mode_override)
+
+    logo_box = _box_for(canvas, canvas_w, canvas_h, placements["logo"], assets["dark-assets"]["logo"])
+    slogan_box = _box_for(canvas, canvas_w, canvas_h, placements["slogan"], assets["dark-assets"]["slogan"])
+
+    if forced_tone is not None:
+        tone: ToneKey = forced_tone
+        logo_lum = mean_luminance(_crop_region(canvas, logo_box))
+        slogan_lum = mean_luminance(_crop_region(canvas, slogan_box))
+    elif template.variant_policy == "unified":
+        logo_lum = mean_luminance(_crop_region(canvas, logo_box))
+        tone = choose_asset_tone(logo_lum, _DEFAULT_THRESHOLD)
+        slogan_lum = mean_luminance(_crop_region(canvas, slogan_box))
+    else:  # per-element
+        logo_lum = mean_luminance(_crop_region(canvas, logo_box))
+        slogan_lum = mean_luminance(_crop_region(canvas, slogan_box))
+        tone = choose_asset_tone(logo_lum, _DEFAULT_THRESHOLD)
+
+    # Per-element tone selection for asset lookup. Under `unified` both elements
+    # share `tone`; under `per-element` each samples independently. forced_tone
+    # pins both.
+    def _element_tone(element_lum: float) -> ToneKey:
+        if forced_tone is not None:
+            return forced_tone
+        if template.variant_policy == "unified":
+            return tone
+        return choose_asset_tone(element_lum, _DEFAULT_THRESHOLD)
+
+    logo_tone = _element_tone(logo_lum)
+    slogan_tone = _element_tone(slogan_lum)
+    logo_asset = assets[logo_tone]["logo"]
+    slogan_asset = assets[slogan_tone]["slogan"]
+
+    canvas, logo_used_scrim = _paste_element(canvas, logo_asset, logo_box, logo_lum, forced_tone is not None)
+    canvas, slogan_used_scrim = _paste_element(canvas, slogan_asset, slogan_box, slogan_lum, forced_tone is not None)
+
+    report: dict[str, object] = {
+        "layout": layout,
+        "tone": tone,
+        "elements": {
+            "logo": {
+                "box": logo_box,
+                "luminance": logo_lum,
+                "scrim": logo_used_scrim,
+                "chosen_tone": logo_tone,
+            },
+            "slogan": {
+                "box": slogan_box,
+                "luminance": slogan_lum,
+                "scrim": slogan_used_scrim,
+                "chosen_tone": slogan_tone,
+            },
+        },
+    }
+    return canvas, report
