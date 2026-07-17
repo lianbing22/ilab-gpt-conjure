@@ -205,6 +205,28 @@ class TaskStorage:
         path.write_bytes(data)
         return path
 
+    def write_branded_output(
+        self,
+        task_id: str,
+        data: bytes,
+        *,
+        index: int,
+        request_hash: str,
+    ) -> Path:
+        """Persist a brand-composited image alongside its source raw output.
+
+        The filename embeds a short request-hash prefix so re-compositing under
+        a different template/version produces a new file rather than overwriting
+        the old one (history stays auditable). Raw outputs are never touched.
+        """
+        self._validate_task_id(task_id)
+        short_hash = (request_hash or "")[:12] or "unhashed"
+        filename = f"{task_id}-brand-{index}-{short_hash}.png"
+        path = self.output_root / _task_date_directory(task_id) / filename
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
+        return path
+
     def delete_task(self, task_id: str) -> None:
         self._validate_task_id(task_id)
         thumbnail_root = self.output_root / "thumbnails"

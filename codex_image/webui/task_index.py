@@ -72,6 +72,13 @@ SUMMARY_KEYS = {
     "requested_backend",
     "backend",
     "assigned_auth_source",
+    # Brand-overlay aggregate state (per-output detail lives inside outputs[].branding
+    # in the full metadata.json; only the summary-level fields are indexed).
+    "branding_enabled",
+    "branding_status",
+    "branding_template_id",
+    "branding_template_version",
+    "branding_thumbnail_url",
 }
 
 TASK_INDEX_SCHEMA_VERSION = 5

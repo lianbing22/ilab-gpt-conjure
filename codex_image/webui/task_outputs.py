@@ -460,12 +460,59 @@ def _safe_output_path(storage: TaskStorage, task_id: str, filename: str) -> Path
     return path
 
 
+def _safe_branded_output_path(storage: TaskStorage, task_id: str, filename: str) -> Path | None:
+    """Path guard for brand-composited outputs.
+
+    A separate validator from :func:`_safe_output_path` so the raw-image safety
+    boundary stays exactly as tight as before (only ``{task_id}-image-``), while
+    branded files (``{task_id}-brand-``) get their own prefix allow-list. Both
+    still must resolve under the output root.
+    """
+    if not filename:
+        return None
+    path = storage.output_path(filename)
+    root = storage.output_root.resolve(strict=False)
+    try:
+        path.resolve(strict=False).relative_to(root)
+    except ValueError:
+        return None
+    if not path.name.startswith(f"{task_id}-brand-"):
+        return None
+    return path
+
+
 def _delete_output_thumbnail_files(storage: TaskStorage, task_id: str, output_index: int, record: dict[str, Any]) -> None:
     candidates: set[Path] = {storage.output_thumbnail_path(task_id, output_index)}
     thumbnail_file = str(record.get("thumbnail_file") or "").strip()
     thumbnail_path = _safe_output_path(storage, task_id, thumbnail_file)
     if thumbnail_path is not None:
         candidates.add(thumbnail_path)
+    for path in candidates:
+        try:
+            path.unlink()
+        except FileNotFoundError:
+            pass
+        storage._prune_empty_output_dir(path.parent)
+
+
+def _delete_branding_derivative_files(storage: TaskStorage, task_id: str, branding: dict[str, Any] | None) -> None:
+    """Remove a single output's branded image + its thumbnail if present.
+
+    Used when an output is deleted, renumbered, or recomposited. Branded
+    filenames embed the (old) index and a request-hash prefix, so after a
+    renumber the stale file must be cleaned up before the service re-composites.
+    """
+    if not isinstance(branding, dict):
+        return
+    candidates: set[Path] = set()
+    branded_file = str(branding.get("file") or "").strip()
+    branded_path = _safe_branded_output_path(storage, task_id, branded_file)
+    if branded_path is not None:
+        candidates.add(branded_path)
+    branded_thumb = str(branding.get("thumbnail_file") or "").strip()
+    branded_thumb_path = _safe_branded_output_path(storage, task_id, branded_thumb)
+    if branded_thumb_path is not None:
+        candidates.add(branded_thumb_path)
     for path in candidates:
         try:
             path.unlink()
@@ -551,6 +598,8 @@ def _delete_unselected_task_outputs(storage: TaskStorage, task_id: str, metadata
         except FileNotFoundError:
             pass
         storage._prune_empty_output_dir(path.parent)
+        # Brand derivatives of a deleted raw output are obsolete too.
+        _delete_branding_derivative_files(storage, task_id, record.get("branding") if isinstance(record.get("branding"), dict) else None)
 
     accepted_outputs: list[dict[str, Any]] = []
     for new_index, record in enumerate(kept_records, start=1):
@@ -561,6 +610,12 @@ def _delete_unselected_task_outputs(storage: TaskStorage, task_id: str, metadata
         accepted_record.pop("error", None)
         accepted_record.pop("thumbnail_file", None)
         accepted_record.pop("thumbnail_url", None)
+        # Renumber invalidates the branded file (its name embeds the old index +
+        # request hash). Drop the stale derivative and clear branding so the
+        # service re-composites against the new index on demand.
+        if isinstance(accepted_record.get("branding"), dict):
+            _delete_branding_derivative_files(storage, task_id, accepted_record["branding"])
+            accepted_record.pop("branding", None)
         output_path = _safe_output_path(storage, task_id, _output_record_filename(record))
         if output_path is not None and output_path.is_file():
             accepted_record.update(_output_thumbnail_fields(storage, task_id, new_index, output_path))
