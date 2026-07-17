@@ -278,6 +278,12 @@ def create_app(
     from codex_image.branding.service import BrandingService
 
     ctx.branding_service = BrandingService(storage, brand_asset_storage, brand_template_store)
+    # Resume any branding that was interrupted by a crash (idempotent re-run).
+    try:
+        ctx.branding_service.recover_interrupted_branding()
+    except Exception:
+        # Recovery must never block app startup; the next task event will retry.
+        pass
     ctx.install_on_app_state()
 
     queue_runtime = install_queue_runtime(

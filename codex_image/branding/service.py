@@ -24,6 +24,7 @@ Key properties (from the approved v3 plan):
 from __future__ import annotations
 
 import io
+import json
 import logging
 from dataclasses import dataclass
 from pathlib import Path
@@ -274,7 +275,7 @@ class BrandingService:
             return ""
         return self.storage.output_file(thumb_path)
 
-    def _record_task_status(self, task_id: str, metadata: dict[str, Any] | None, status: str, *, error: str | None = None) -> None:
+    def _record_task_status(self, task_id: str, metadata: dict[str, Any] | None, status: str, *, error: str = None) -> None:
         def _apply(m: dict[str, Any]) -> None:
             m["branding_status"] = status
             m["branding_updated_at"] = utc_now()
@@ -284,6 +285,42 @@ class BrandingService:
                 m.pop("branding_error", None)
 
         self.storage.update_metadata(task_id, _apply)
+
+    # ----------------------------------------------------------- recovery
+
+    def recover_interrupted_branding(self, *, limit: int = 500) -> int:
+        """Resume branding for tasks left in pending/running by a crash.
+
+        Scans task metadata for tasks with branding enabled but an incomplete
+        branding_status, resets them, and re-applies idempotent compositing.
+        Safe to call at startup (single-threaded) and re-runnable. Returns the
+        number of tasks reprocessed.
+        """
+        reprocessed = 0
+        for metadata_path in self.storage.iter_metadata_paths()[:limit]:
+            try:
+                metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                continue
+            if not isinstance(metadata, dict):
+                continue
+            task_id = str(metadata.get("task_id") or metadata_path.name.removesuffix(".metadata.json"))
+            params = metadata.get("params") if isinstance(metadata.get("params"), dict) else {}
+            branding_request = params.get("branding_request") if isinstance(params.get("branding_request"), dict) else None
+            status = str(metadata.get("branding_status") or "")
+            if not branding_request or not branding_request.get("enabled"):
+                continue
+            if status not in ("pending", "running"):
+                continue
+            # Reset and re-run. apply_task_branding is idempotent, so already-
+            # written branded files (matching hash) are preserved.
+            self._record_task_status(task_id, None, "pending")
+            try:
+                self.apply_task_branding(task_id)
+                reprocessed += 1
+            except Exception:
+                logger.exception("branding recovery failed for task %s", task_id)
+        return reprocessed
 
 
 def _completed_outputs(metadata: dict[str, Any]) -> list[dict[str, Any]]:

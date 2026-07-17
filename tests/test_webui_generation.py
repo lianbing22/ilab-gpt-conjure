@@ -677,3 +677,64 @@ class WebUIGenerationTests(unittest.TestCase):
         self.assertEqual(task["input_sources"][0]["kind"], "asset")
         self.assertEqual(task["mask_file"], input_name(task["task_id"], "mask.png", kind="mask"))
         self.assertEqual(fake.edit_calls, [])
+
+    def test_worker_applies_branding_when_template_id_submitted(self) -> None:
+        from codex_image.client import ImageResult
+        from codex_image.webui.app import create_app
+        from codex_image.branding.models import BrandTemplate, PlacementConfig
+
+        class BrandingImageClient(FakeImageClient):
+            def generate_image(inner_self, **kwargs: Any):
+                inner_self.generate_calls.append(kwargs)
+                return ImageResult(self._png_bytes((1024, 1024)), "revised", "png", kwargs["size"], "auto", kwargs["quality"], {})
+
+        fake = BrandingImageClient()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            app = create_app(
+                output_root=root,
+                client_factory=lambda: fake,
+                auth_checker=lambda: True,
+                auth_settings_path=root / "auth-settings.json",
+                batch_delay_seconds=0,
+                auto_start_queue=False,
+            )
+            client = TestClient(app)
+            ctx = app.state.ctx
+            # Seed brand assets (both tones) + publish a template.
+            ids = {}
+            for element in ("logo", "slogan"):
+                for tone, color in (("light-assets", (245, 245, 245, 255)), ("dark-assets", (20, 20, 20, 255))):
+                    asset = ctx.brand_asset_storage.create_or_touch(
+                        f"{element}-{tone}.png",
+                        self._png_bytes((200, 80)) if element == "slogan" else self._png_bytes((100, 60)),
+                        "image/png",
+                    )
+                    ids[(tone, element)] = asset.id
+            template = BrandTemplate(
+                id="metro", version=1, name="metro", theme_mode="auto", variant_policy="per-element",
+                placements={l: {"logo": PlacementConfig("top-left", 0.16, 0.035, 0.035), "slogan": PlacementConfig("bottom-right", 0.30, 0.035, 0.035)} for l in ("square", "portrait", "landscape")},
+                asset_variants={"light-assets": {"logo": ids[("light-assets", "logo")], "slogan": ids[("light-assets", "slogan")]}, "dark-assets": {"logo": ids[("dark-assets", "logo")], "slogan": ids[("dark-assets", "slogan")]}},
+            )
+            ctx.brand_template_store.publish(template)
+
+            created = client.post("/api/generate", data={"prompt": "branded", "size": "1024x1024", "quality": "low", "branding_template_id": "metro"})
+            self.assertEqual(created.status_code, 200)
+            task_id = created.json()["task"]["task_id"]
+            # Frozen request should carry the template version + content hash.
+            frozen = created.json()["task"]["params"]["branding_request"]
+            self.assertEqual(frozen["template_id"], "metro")
+            self.assertEqual(frozen["template_version"], 1)
+            self.assertTrue(frozen["template_content_hash"])
+
+            asyncio.run(app.state.queue_manager.run_available_once())
+            metadata = json.loads(metadata_path(root, task_id).read_text(encoding="utf-8"))
+
+        # Generation succeeded AND branding was applied as a post-process.
+        self.assertEqual(metadata["status"], "completed")
+        self.assertEqual(metadata["branding_status"], "completed")
+        branding = metadata["outputs"][0]["branding"]
+        self.assertEqual(branding["status"], "completed")
+        self.assertTrue(branding["request_hash"])
+        self.assertEqual(branding["template_id"], "metro")
+        self.assertEqual(len(fake.generate_calls), 1)  # one generation, branding is pure post-process

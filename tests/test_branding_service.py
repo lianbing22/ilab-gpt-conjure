@@ -195,6 +195,42 @@ class BrandingServiceTests(unittest.TestCase):
             self.assertEqual(raw_path.read_bytes(), raw_bytes_before)
             self.assertEqual(raw_path.stat().st_mtime_ns, raw_mtime)
 
+    def test_recovery_resumes_interrupted_branding(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            storage, asset_storage, template_store, service = self._setup(Path(tmp))
+            ids = self._seed_brand_assets(asset_storage)
+            template_store.publish(_template(ids))
+            task_id = self._seed_completed_task(
+                storage,
+                branding_request={"enabled": True, "template_id": "t1", "template_version": 1},
+            )
+            # Simulate a crash mid-branding: status stuck at running, no output.branding yet.
+            storage.update_metadata(task_id, lambda m: m.__setitem__("branding_status", "running"))
+
+            recovered = service.recover_interrupted_branding()
+
+            self.assertEqual(recovered, 1)
+            metadata = storage.read_metadata(task_id)
+            self.assertEqual(metadata["branding_status"], "completed")
+            self.assertEqual(metadata["outputs"][0]["branding"]["status"], "completed")
+
+    def test_recovery_skips_completed_and_disabled_tasks(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            storage, asset_storage, template_store, service = self._setup(Path(tmp))
+            ids = self._seed_brand_assets(asset_storage)
+            template_store.publish(_template(ids))
+            # Completed-branding task + a disabled task.
+            completed_id = self._seed_completed_task(
+                storage,
+                branding_request={"enabled": True, "template_id": "t1", "template_version": 1},
+            )
+            service.apply_task_branding(completed_id)
+            disabled_id = self._seed_completed_task(storage, branding_request=None)
+
+            recovered = service.recover_interrupted_branding()
+
+            self.assertEqual(recovered, 0)
+
 
 if __name__ == "__main__":
     unittest.main()

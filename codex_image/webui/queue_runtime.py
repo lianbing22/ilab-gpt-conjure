@@ -349,6 +349,17 @@ async def execute_task(
             batch_delay_seconds=batch_delay_seconds,
             request_context=(lambda params: _api_provider_request_context(ctx, params)) if channel.auth_source == "api" else None,
         )
+        # Brand post-processing runs only after generation succeeded. It must
+        # NEVER flip the task to failed, so it is fully isolated: run off the
+        # event loop (Pillow is sync/CPU-bound) and swallow any exception. The
+        # service records branding_status itself; here we only guard.
+        if ctx.branding_service is not None:
+            try:
+                await asyncio.to_thread(ctx.branding_service.apply_task_branding, task_id)
+            except Exception:
+                # Last-resort guard: even a bug in the service must not reach the
+                # generation exception handler below and flip the task to failed.
+                pass
     except asyncio.CancelledError:
         try:
             if _task_cancel_requested(ctx.storage, task_id):

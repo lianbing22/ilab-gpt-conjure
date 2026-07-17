@@ -52,6 +52,30 @@ PROVIDER_REFERENCE_FILES_UNSUPPORTED_DETAIL = {
 }
 
 
+def _freeze_branding_request(ctx: WebUIContext, branding_template_id: str | None) -> dict[str, Any] | None:
+    """Resolve a brand template id into an immutable request snapshot.
+
+    Returns None when branding is not requested or the store is absent. Raises
+    HTTPException(404) if the caller named a template that doesn't exist, so the
+    submit fails fast rather than silently branding nothing.
+    """
+    if not branding_template_id:
+        return None
+    store = ctx.brand_template_store
+    if store is None:
+        raise HTTPException(status_code=503, detail="Branding is not enabled")
+    try:
+        version = store.get(branding_template_id)  # latest active version
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail="Brand template not found") from exc
+    return {
+        "enabled": True,
+        "template_id": version.template_id,
+        "template_version": version.version,
+        "template_content_hash": version.content_hash,
+    }
+
+
 def _reject_cached_unsupported_reference_files(
     ctx: WebUIContext,
     *,
@@ -147,6 +171,7 @@ def register_generation_routes(app: FastAPI, ctx: WebUIContext) -> None:
         reference_file_ids: list[str] | None = Form(None),
         reference_images: list[UploadFile] | None = File(None),
         reference_files: list[UploadFile] | None = File(None),
+        branding_template_id: str | None = Form(None),
     ) -> dict[str, Any]:
         if not ctx.auth_checker():
             raise HTTPException(status_code=401, detail="Codex auth is not available")
@@ -266,6 +291,11 @@ def register_generation_routes(app: FastAPI, ctx: WebUIContext) -> None:
             params["api_provider_name"] = effective_api_provider_name
         if auth_source == "api":
             params["api_images_concurrency"] = effective_api_images_concurrency
+        # Freeze the brand request at enqueue time so a template published
+        # later (or a re-published asset) doesn't change what this run composes.
+        branding_request = _freeze_branding_request(ctx, branding_template_id)
+        if branding_request is not None:
+            params["branding_request"] = branding_request
         metadata = _write_queued_metadata(
             ctx.storage,
             task.task_id,
