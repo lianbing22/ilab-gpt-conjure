@@ -195,6 +195,7 @@ function buildPreviewRequest() {
     reference_asset_ids: assets.map((source: any) => source.id),
     reference_files: fileUploads.map((source: any) => source.filename),
     reference_file_ids: storedFiles.map((source: any) => source.id),
+    branding_template_id: state.selectedBrandingTemplateId || null,
   };
   if (isApi) {
     const apiMode = currentApiMode();
@@ -369,6 +370,9 @@ async function runTask() {
   assets.forEach((source: any) => form.append("reference_asset_ids", source.id));
   fileUploads.forEach((source: any) => form.append("reference_files", source.file));
   storedFiles.forEach((source: any) => form.append("reference_file_ids", source.id));
+  if (state.selectedBrandingTemplateId) {
+    form.append("branding_template_id", state.selectedBrandingTemplateId);
+  }
 
   if (state.mode === "generate") {
     uploads.forEach((source: any) => form.append("reference_images", source.file));

@@ -354,6 +354,7 @@ def register_generation_routes(app: FastAPI, ctx: WebUIContext) -> None:
         images: list[UploadFile] | None = File(None),
         mask: UploadFile | None = File(None),
         reference_files: list[UploadFile] | None = File(None),
+        branding_template_id: str | None = Form(None),
     ) -> dict[str, Any]:
         if not ctx.auth_checker():
             raise HTTPException(status_code=401, detail="Codex auth is not available")
@@ -486,6 +487,9 @@ def register_generation_routes(app: FastAPI, ctx: WebUIContext) -> None:
             params["api_provider_name"] = effective_api_provider_name
         if auth_source == "api":
             params["api_images_concurrency"] = effective_api_images_concurrency
+        branding_request = _freeze_branding_request(ctx, branding_template_id)
+        if branding_request is not None:
+            params["branding_request"] = branding_request
         metadata = _write_queued_metadata(
             ctx.storage,
             task.task_id,

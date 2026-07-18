@@ -16,7 +16,7 @@ class WebUIPWATests(unittest.TestCase):
 
         manifest_link = '<link rel="manifest" href="/manifest.webmanifest" />'
         theme_meta = '<meta name="theme-color" content="#457B66" />'
-        pwa_script = '<script src="/static/pwa.js?v=pwa-1" defer></script>'
+        pwa_script = '<script src="/static/pwa.js?v=runtime-pwa" defer></script>'
 
         self.assertIn(manifest_link, index_html)
         self.assertIn(manifest_link, history_html)
@@ -86,7 +86,7 @@ class WebUIPWATests(unittest.TestCase):
         self.assertTrue(worker_path.exists())
         source = worker_path.read_text(encoding="utf-8")
 
-        self.assertIn('const CACHE_NAME = "ilab-gpt-conjure-shell-v50";', source)
+        self.assertIn('const CACHE_NAME = "ilab-gpt-conjure-shell-v52";', source)
         self.assertIn('"/"', source)
         self.assertIn('"/history"', source)
         self.assertIn('"/manifest.webmanifest"', source)

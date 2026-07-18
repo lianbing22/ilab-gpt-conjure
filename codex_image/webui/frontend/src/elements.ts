@@ -164,6 +164,8 @@ export function createWebUIElements(): WebUIElements {
   quickGalleryPreview: document.querySelector("#quickGalleryPreview"),
   quickGalleryList: document.querySelector("#quickGalleryList"),
   quickGalleryRail: document.querySelector("#quickGalleryRail"),
+  brandMaterialPicker: document.querySelector("#brandMaterialPicker"),
+  brandMaterialList: document.querySelector("#brandMaterialList"),
   galleryManagePanel: document.querySelector("#galleryManagePanel"),
   galleryManageButton: document.querySelector("#galleryManageButton"),
   galleryDrawer: document.querySelector("#galleryDrawer"),

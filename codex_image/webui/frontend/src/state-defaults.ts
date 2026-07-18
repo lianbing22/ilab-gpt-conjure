@@ -59,6 +59,8 @@ export function createDefaultState(): WebUIState {
   promptTemplateQuery: "",
   selectedPromptTemplateId: null,
   recentAssets: [],
+  brandTemplates: [],
+  selectedBrandingTemplateId: "",
   collectedReferences: [],
   galleryCategories: defaultGalleryCategories(),
   activeGalleryCategory: "portrait",

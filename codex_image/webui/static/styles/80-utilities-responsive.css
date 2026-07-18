@@ -1123,6 +1123,35 @@ button:disabled {
 
 /* ===== Mobile (narrow viewport) refinements: stack prompt/settings, fix drawer heights ===== */
 @media (max-width: 520px) {
+  .brand-material-picker {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 10px;
+  }
+
+  .brand-material-heading {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: baseline;
+    column-gap: 8px;
+  }
+
+  .brand-material-heading span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .brand-material-list {
+    margin-right: -12px;
+    padding-right: 12px;
+    scroll-snap-type: x proximity;
+  }
+
+  .brand-material-option {
+    scroll-snap-align: start;
+  }
+
   /* 提示词区：操作按钮移到下方，输入框占满宽度 */
   .prompt-heading,
   .prompt-compose,

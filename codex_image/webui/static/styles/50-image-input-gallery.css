@@ -22,6 +22,108 @@
   min-width: 0;
 }
 
+.brand-material-picker {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.22fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+}
+
+.brand-material-picker.hidden {
+  display: none;
+}
+
+.brand-material-heading {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.brand-material-heading strong {
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.brand-material-heading span {
+  color: var(--text-secondary);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.brand-material-list {
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+  overflow-x: auto;
+  padding: 2px 1px 4px;
+  scrollbar-width: thin;
+}
+
+.brand-material-option {
+  display: inline-grid;
+  grid-template-columns: 54px max-content;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  min-height: 42px;
+  padding: 5px 10px 5px 6px;
+  border: 1px solid color-mix(in srgb, var(--line) 88%, transparent);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: border-color var(--motion-fast), background var(--motion-fast), color var(--motion-fast);
+}
+
+.brand-material-option:hover {
+  border-color: color-mix(in srgb, var(--primary) 50%, var(--line));
+  color: var(--text-primary);
+}
+
+.brand-material-option.active {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary-light) 76%, var(--surface));
+  color: var(--primary-strong);
+}
+
+.brand-material-option:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--primary) 74%, white);
+  outline-offset: 2px;
+}
+
+.brand-material-preview {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 30px;
+  overflow: hidden;
+  border-radius: 5px;
+  background: #fff;
+}
+
+.brand-material-preview img {
+  display: block;
+  width: 48px;
+  height: 22px;
+  object-fit: contain;
+}
+
+.brand-material-none-mark {
+  color: var(--text-secondary);
+  font-size: 18px;
+}
+
+.brand-material-name {
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
 .image-input-left {
   display: flex;
   flex-direction: column;

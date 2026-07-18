@@ -102,6 +102,11 @@ class ComputePlacementTests(unittest.TestCase):
         # x = canvas_w - target_w - margin = 1000 - 200 - 50 = 750
         self.assertEqual((x, y, w, h), (750, 50, 200, 100))
 
+    def test_top_center_anchor(self) -> None:
+        placement = self._config("top-center")
+        x, y, w, h = compute_placement(1000, 1000, placement, 200, 100)
+        self.assertEqual((x, y, w, h), (400, 50, 200, 100))
+
     def test_bottom_left_anchor(self) -> None:
         placement = self._config("bottom-left")
         x, y, w, h = compute_placement(1000, 1000, placement, 200, 100)
@@ -112,6 +117,11 @@ class ComputePlacementTests(unittest.TestCase):
         placement = self._config("bottom-right")
         x, y, w, h = compute_placement(1000, 1000, placement, 200, 100)
         self.assertEqual((x, y, w, h), (750, 850, 200, 100))
+
+    def test_bottom_center_anchor(self) -> None:
+        placement = self._config("bottom-center")
+        x, y, w, h = compute_placement(1000, 1000, placement, 200, 100)
+        self.assertEqual((x, y, w, h), (400, 850, 200, 100))
 
     def test_aspect_ratio_preserved_for_tall_element(self) -> None:
         # element 100x400 (tall) at width ratio 0.5 on a 1000 wide canvas.

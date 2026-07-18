@@ -6,8 +6,15 @@ from dataclasses import asdict, dataclass, field
 from typing import Literal
 
 
-# Corner anchors for placing an overlay element on the canvas.
-Anchor = Literal["top-left", "top-right", "bottom-left", "bottom-right"]
+# Edge anchors for placing an overlay element on the canvas.
+Anchor = Literal[
+    "top-left",
+    "top-center",
+    "top-right",
+    "bottom-left",
+    "bottom-center",
+    "bottom-right",
+]
 
 # Image aspect-ratio buckets. Driven by real pixel dimensions, not metadata.
 LayoutKind = Literal["square", "portrait", "landscape"]

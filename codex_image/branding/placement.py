@@ -103,9 +103,13 @@ def _anchor_origin(
     """Resolve top-left corner (x, y) for the box given the anchor and margins."""
     if anchor == "top-left":
         return (margin_x, margin_y)
+    if anchor == "top-center":
+        return ((canvas_w - target_w) / 2, margin_y)
     if anchor == "top-right":
         return (canvas_w - target_w - margin_x, margin_y)
     if anchor == "bottom-left":
         return (margin_x, canvas_h - target_h - margin_y)
+    if anchor == "bottom-center":
+        return ((canvas_w - target_w) / 2, canvas_h - target_h - margin_y)
     # bottom-right
     return (canvas_w - target_w - margin_x, canvas_h - target_h - margin_y)
