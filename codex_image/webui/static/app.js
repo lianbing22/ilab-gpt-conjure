@@ -37177,6 +37177,93 @@ ${galleryText}`;
     initialized3 = true;
   }
 
+  // codex_image/webui/frontend/src/mobile-workspace.ts
+  var initialized4 = false;
+  function selectedLabel(select, fallback) {
+    if (!select) return fallback;
+    return select.selectedOptions[0]?.textContent?.trim() || select.value || fallback;
+  }
+  function initMobileWorkspaceFeature() {
+    if (initialized4) return;
+    initialized4 = true;
+    const dashboard = document.querySelector(".dashboard");
+    const outputPanel = document.querySelector(".output-panel");
+    const outputToggle = document.querySelector("#mobileOutputSettingsToggle");
+    const advancedToggle = document.querySelector("#mobileAdvancedSettingsToggle");
+    const imagePanel = document.querySelector(".image-panel");
+    const imageHeading = imagePanel?.querySelector(".panel-heading");
+    const previewGrid = document.querySelector("#previewGrid");
+    const navActions = document.querySelector(".nav-actions");
+    const topNav = document.querySelector(".top-nav");
+    const sidebar = document.querySelector(".sidebar");
+    const navPlaceholder = document.createComment("mobile-nav-placeholder");
+    const mobileQuery = window.matchMedia("(max-width: 520px)");
+    const setExpanded = (expanded) => {
+      outputPanel?.classList.toggle("mobile-settings-expanded", expanded);
+      outputToggle?.setAttribute("aria-expanded", String(expanded));
+      if (outputToggle) outputToggle.textContent = expanded ? "\u6536\u8D77" : "\u5C55\u5F00";
+    };
+    const setAdvanced = (expanded) => {
+      outputPanel?.classList.toggle("mobile-advanced-expanded", expanded);
+      advancedToggle?.setAttribute("aria-expanded", String(expanded));
+      if (advancedToggle) advancedToggle.textContent = expanded ? "\u6536\u8D77\u9AD8\u7EA7\u8BBE\u7F6E" : "\u9AD8\u7EA7\u8BBE\u7F6E";
+    };
+    const syncSummary = () => {
+      const ratio = document.querySelector("#ratio");
+      const resolution = document.querySelector("#resolution");
+      const quality = document.querySelector("#quality");
+      const quantity = document.querySelector("#nInput");
+      const custom = document.querySelector("#customSizeToggle")?.checked;
+      const set = (id, value) => {
+        const node = document.querySelector(id);
+        if (node) node.textContent = value;
+      };
+      set("#mobileSummaryRatio", custom ? "\u81EA\u5B9A\u4E49" : selectedLabel(ratio, "9:16"));
+      set("#mobileSummaryResolution", selectedLabel(resolution, "1K").replace("standard", "1K").toUpperCase());
+      const qualityText = selectedLabel(quality, "\u9AD8");
+      set("#mobileSummaryQuality", qualityText === "\u9AD8" ? "\u9AD8\u8D28\u91CF" : qualityText);
+      set("#mobileSummaryQuantity", `${quantity?.value || "1"} \u5F20`);
+    };
+    const syncPreviewState = () => {
+      const hasPreview = Boolean(previewGrid?.querySelector(".preview-card, [data-preview-status-card]"));
+      dashboard?.classList.toggle("mobile-has-preview", hasPreview);
+    };
+    const relocateNav = () => {
+      if (!navActions || !topNav || !sidebar) return;
+      if (mobileQuery.matches) {
+        if (navActions.parentNode === topNav) topNav.insertBefore(navPlaceholder, navActions);
+        navActions.classList.add("mobile-drawer-tools");
+        sidebar.appendChild(navActions);
+        return;
+      }
+      navActions.classList.remove("mobile-drawer-tools");
+      if (navPlaceholder.parentNode) navPlaceholder.parentNode.insertBefore(navActions, navPlaceholder);
+    };
+    outputToggle?.addEventListener("click", () => setExpanded(!outputPanel?.classList.contains("mobile-settings-expanded")));
+    advancedToggle?.addEventListener("click", () => setAdvanced(!outputPanel?.classList.contains("mobile-advanced-expanded")));
+    imageHeading?.setAttribute("role", "button");
+    imageHeading?.setAttribute("tabindex", "0");
+    imageHeading?.setAttribute("aria-expanded", "false");
+    const toggleReference = () => {
+      const expanded = !imagePanel?.classList.contains("mobile-reference-expanded");
+      imagePanel?.classList.toggle("mobile-reference-expanded", expanded);
+      imageHeading?.setAttribute("aria-expanded", String(expanded));
+    };
+    imageHeading?.addEventListener("click", toggleReference);
+    imageHeading?.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      toggleReference();
+    });
+    document.addEventListener("input", syncSummary);
+    document.addEventListener("change", syncSummary);
+    previewGrid && new MutationObserver(syncPreviewState).observe(previewGrid, { childList: true, subtree: true });
+    mobileQuery.addEventListener("change", relocateNav);
+    syncSummary();
+    syncPreviewState();
+    relocateNav();
+  }
+
   // codex_image/webui/frontend/src/task-list-render.ts
   var bridge25 = getLegacyBridge();
   var state19 = bridge25.state;
@@ -44860,6 +44947,7 @@ ${galleryText}`;
   initGalleryCategoriesFeature();
   initRecentAssetsFeature();
   initSidebarDrawerFeature();
+  initMobileWorkspaceFeature();
   initQuickGalleryFeature();
   initGalleryGridFeature();
   initGalleryItemActionsFeature();

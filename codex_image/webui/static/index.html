@@ -509,6 +509,7 @@
             <section class="panel output-panel">
               <div id="outputSettingsHeader" class="output-settings-header">
                 <h2 data-i18n="outputSettings.title">输出设置</h2>
+                <button id="mobileOutputSettingsToggle" class="mobile-section-toggle" type="button" aria-expanded="false" aria-controls="settingsGrid">展开</button>
                 <button
                   id="outputSettingsLockButton"
                   class="output-settings-lock-button"
@@ -526,6 +527,12 @@
                 </button>
               </div>
               <div id="outputSettingsStage" class="output-settings-stage">
+                <div id="mobileOutputSummary" class="mobile-output-summary" aria-label="当前输出设置">
+                  <span id="mobileSummaryRatio" class="mobile-summary-pill is-active">9:16</span>
+                  <span id="mobileSummaryResolution" class="mobile-summary-pill">1K</span>
+                  <span id="mobileSummaryQuality" class="mobile-summary-pill">高质量</span>
+                  <span id="mobileSummaryQuantity" class="mobile-summary-pill">1 张</span>
+                </div>
                 <div id="outputSettingsLockedSummary" class="output-settings-locked-summary hidden" aria-hidden="true">
                   <div id="outputSettingsSummaryContent" class="output-settings-summary-content"></div>
                   <div id="outputSettingsTaskAction" class="output-settings-task-action hidden">
@@ -841,6 +848,7 @@
                   </select>
                 </div>
                 </div>
+                <button id="mobileAdvancedSettingsToggle" class="mobile-advanced-settings-toggle" type="button" aria-expanded="false">高级设置</button>
               </div>
             </section>
           </div>
