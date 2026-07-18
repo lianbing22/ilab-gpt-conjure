@@ -187,8 +187,8 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         script = self._frontend_script_source()
         styles = Path("codex_image/webui/static/styles.css").read_text(encoding="utf-8")
 
-        self.assertIn('/static/app.js?v=runtime-569', html)
-        self.assertIn('/static/styles.css?v=runtime-569', html)
+        self.assertIn('/static/app.js?v=runtime-570', html)
+        self.assertIn('/static/styles.css?v=runtime-570', html)
         self.assertIn('id="recentAssetDock"', html)
         self.assertRegex(html, r'class="image-input-footer"[\s\S]*id="recentAssetDock"[\s\S]*id="recentAssetList"')
         self.assertRegex(html, r'id="recentAssetDock"[\s\S]*id="quickGalleryDock"[\s\S]*id="galleryManagePanel"')
@@ -902,7 +902,7 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         self.assertRegex(stacked, r"\.preview-col\s*\{[^}]*height:\s*auto[^}]*min-height:\s*260px[^}]*overflow:\s*visible")
         self.assertRegex(stacked, r"\.preview-panel\s*\{[^}]*min-height:\s*260px")
 
-        for title in ("参考输入（可选）", "提示词", "输出设置"):
+        for title in ("素材与参考（可选）", "提示词", "输出设置"):
             self.assertIn(title, html)
         self.assertIn("justify-content: space-between", self._extract_css_block(layout, ".panel-heading"))
         self.assertIn("justify-content: space-between", self._extract_css_block(prompt, ".prompt-heading-main"))
@@ -1099,7 +1099,7 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         self.assertIn('id="galleryManagePanel"', html)
         self.assertIn('id="galleryManageButton"', html)
         self.assertNotIn('id="galleryManageSummary"', html)
-        self.assertNotIn("查看全部", html)
+        self.assertIn('id="brandMaterialOpenButton"', html)
         self.assertIn('class="ghost-button text-sm icon-text-button resource-manage-button gallery-manage-button"', html)
         self.assertRegex(html, r'id="galleryManageButton"[\s\S]*<svg class="button-icon"[\s\S]*<span[^>]*>管理公用库</span>')
         self.assertIn('data-quick-gallery-category="portrait"', html)
@@ -1111,7 +1111,7 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         self.assertNotIn('id="gallerySearch"', html)
         self.assertNotIn('id="galleryButtons"', html)
         self.assertNotIn("gallery-picker-row", html)
-        self.assertRegex(html, r'<div class="panel-heading">\s*<h2[^>]*>参考输入（可选）</h2>\s*</div>')
+        self.assertRegex(html, r'<div class="panel-heading">\s*<h2[^>]*>素材与参考（可选）</h2>\s*</div>')
         self.assertRegex(html, r'<div class="image-input-footer">[\s\S]*<div class="image-input-actions">[\s\S]*<button id="clearImagesButton"')
         self.assertRegex(html, r'<div class="image-input-footer">[\s\S]*id="recentAssetDock"[\s\S]*id="recentAssetList"')
         self.assertRegex(html, r'<div class="image-gallery-column">[\s\S]*id="quickGalleryDock"[\s\S]*id="galleryManagePanel"')
@@ -3115,8 +3115,8 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         script = self._frontend_script_source()
         styles = Path("codex_image/webui/static/styles.css").read_text(encoding="utf-8")
 
-        self.assertIn('/static/app.js?v=runtime-569', html)
-        self.assertIn('/static/styles.css?v=runtime-569', html)
+        self.assertIn('/static/app.js?v=runtime-570', html)
+        self.assertIn('/static/styles.css?v=runtime-570', html)
         self.assertIn('id="pasteClipboardButton"', html)
         self.assertIn('id="statusText"', html)
         self.assertRegex(
@@ -3561,8 +3561,8 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         script = self._frontend_script_source()
         styles = Path("codex_image/webui/static/styles.css").read_text(encoding="utf-8")
 
-        self.assertIn("/static/app.js?v=runtime-569", html)
-        self.assertIn("/static/styles.css?v=runtime-569", html)
+        self.assertIn("/static/app.js?v=runtime-570", html)
+        self.assertIn("/static/styles.css?v=runtime-570", html)
         self.assertIn('const THEME_STORAGE_KEY = "codex-image-theme-preference";', script)
         self.assertIn('themePreference: "system"', script)
         self.assertIn('call(methods, "restoreThemePreference")', script)

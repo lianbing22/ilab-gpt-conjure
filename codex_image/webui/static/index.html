@@ -113,7 +113,7 @@
         });
       })();
     </script>
-    <link rel="stylesheet" href="/static/styles.css?v=runtime-569" />
+    <link rel="stylesheet" href="/static/styles.css?v=runtime-570" />
   </head>
   <body>
     <div class="layout-container">
@@ -145,19 +145,17 @@
               </div>
             </div>
             <div class="brand-actions">
-              <button id="newTaskButton" class="primary-button brand-new-button" type="button" aria-label="新建对话" data-i18n-attr="aria-label:app.newTaskAria">
-                <svg class="brand-new-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.3" strokecap="round"/>
-                </svg>
-                <span data-i18n="app.newTask">新建</span>
-              </button>
-              <button id="sidebarDrawerToggle" class="sidebar-drawer-toggle" type="button" aria-label="打开任务列表" aria-expanded="false" aria-controls="sidebar" hidden>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+              <button id="sidebarDrawerToggle" class="sidebar-drawer-toggle" type="button" aria-label="打开任务中心" aria-expanded="false" aria-controls="sidebar" data-i18n-attr="aria-label:sidebar.openTaskCenter" hidden>
+                <svg class="sidebar-menu-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
                   <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <svg class="sidebar-close-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                 </svg>
               </button>
             </div>
           </div>
+          <div class="mobile-drawer-title" aria-hidden="true" data-i18n="sidebar.taskCenter">任务中心</div>
           <div class="sidebar-search">
             <input id="taskSearch" type="search" placeholder="搜索对话..." data-i18n-attr="placeholder:sidebar.searchPlaceholder" />
             <button
@@ -236,6 +234,12 @@
               </div>
             </div>
           </div>
+          <button id="newTaskButton" class="primary-button brand-new-button" type="button" aria-label="新建对话" data-i18n-attr="aria-label:app.newTaskAria">
+            <svg class="brand-new-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/>
+            </svg>
+            <span data-i18n="app.newTaskFull">新建任务</span>
+          </button>
         </div>
 
         <div class="task-history-shell">
@@ -308,6 +312,11 @@
       <div class="main-wrapper">
         <!-- Top Navigation -->
         <header class="top-nav">
+          <div class="workspace-title" aria-label="AI 创作工作室，新建图片" data-i18n-attr="aria-label:workspace.ariaLabel">
+            <span data-i18n="workspace.title">AI 创作工作室</span>
+            <span class="workspace-title-separator" aria-hidden="true">/</span>
+            <strong data-i18n="workspace.newImage">新建图片</strong>
+          </div>
           <div class="nav-actions">
             <button id="queueButton" class="queue-button queue-status-chip" type="button" aria-label="队列状态：暂无排队" title="跳转到进行中任务" data-i18n-attr="aria-label:queue.emptyAria;title:queue.jumpTitle">
               <span id="queueStatusText" data-i18n="queue.empty">暂无排队</span>
@@ -358,13 +367,86 @@
         <main class="dashboard">
           <div class="dashboard-col controls-col">
             <input id="model" type="hidden" value="gpt-image-2" />
+            <!-- Prompt -->
+            <section class="panel prompt-panel">
+              <div class="panel-heading prompt-heading">
+                <div class="prompt-heading-main">
+                  <h2 data-i18n="prompt.title">提示词</h2>
+                  <span id="charCount" class="prompt-count">0 / 4000</span>
+                </div>
+              </div>
+              <div class="prompt-compose">
+                <div class="prompt-editor-wrap">
+                  <div
+                    id="promptEditor"
+                    class="prompt-box prompt-editor"
+                    contenteditable="true"
+                    role="textbox"
+                    aria-multiline="true"
+                    data-placeholder="描述你要生成或编辑的图片，输入 @ 可调用图库参考图，输入 # 可插入颜色码，输入 ~ 或 ～ 可调用提示词片段"
+                    aria-label="提示词"
+                    data-i18n-attr="aria-label:prompt.editorLabel;data-placeholder:prompt.placeholder"
+                  ></div>
+                  <input id="prompt" type="hidden" maxlength="4000" value="" />
+                  <div id="mentionSuggest" class="mention-suggest hidden"></div>
+                  <div id="colorSuggest" class="color-suggest hidden" aria-label="颜色码选择器"></div>
+                </div>
+                <div class="prompt-run-wrap">
+                  <button id="runButton" class="run-button prompt-run-button" type="button" aria-keyshortcuts="Meta+Enter" title="开始生成（Cmd+Enter）" data-i18n="prompt.run" data-i18n-attr="title:prompt.runTitle">开始生成</button>
+                </div>
+              </div>
+              <div class="prompt-template-row">
+                <div class="prompt-template-recent-cell">
+                  <div class="prompt-footer">
+                    <button id="clearPromptButton" class="ghost-button icon-text-button text-sm quiet-danger-button" type="button">
+                      <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M3 6h18M9 6V4h6v2m-8 0 1 14h8l1-14M10 11v5M14 11v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                      <span data-i18n="action.clear">清空</span>
+                    </button>
+                    <button id="promptFindButton" class="ghost-button icon-text-button text-sm prompt-find-button" type="button" aria-controls="promptFindPanel" aria-expanded="false">
+                      <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="m20 20-4.2-4.2M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                      <span data-i18n="action.find">查找</span>
+                    </button>
+                    <div id="promptFindPanel" class="prompt-find-panel hidden" aria-label="查找替换提示词" data-i18n-attr="aria-label:prompt.findPanel">
+                      <input id="promptFindInput" class="control prompt-find-input" type="text" placeholder="查找" autocomplete="off" spellcheck="false" aria-label="查找文本" data-i18n-attr="placeholder:action.find;aria-label:prompt.findText" />
+                      <input id="promptReplaceInput" class="control prompt-find-input" type="text" placeholder="替换为" autocomplete="off" spellcheck="false" aria-label="替换为" data-i18n-attr="placeholder:prompt.replaceWith;aria-label:prompt.replaceWith" />
+                      <div class="prompt-find-actions" role="group" aria-label="查找替换操作" data-i18n-attr="aria-label:prompt.findActions">
+                        <span id="promptFindCount" class="prompt-find-count" data-i18n="prompt.countZero">0 处</span>
+                        <button class="ghost-button text-sm prompt-find-action" type="button" data-prompt-find-action="count" data-i18n="action.find">查找</button>
+                        <button class="ghost-button text-sm prompt-find-action" type="button" data-prompt-find-action="replace-all" data-i18n="action.replace">替换</button>
+                        <button id="promptFindClose" class="ghost-button text-sm prompt-find-close" type="button" aria-label="关闭查找替换" title="关闭" data-i18n-attr="aria-label:prompt.closeFind;title:action.close">×</button>
+                      </div>
+                      <span id="promptFindStatus" class="prompt-find-status" aria-live="polite"></span>
+                    </div>
+                  </div>
+                  <div id="promptTemplateRecentDock" class="prompt-template-recent-dock hidden" aria-label="最近使用模板" data-i18n-attr="aria-label:prompt.recentTemplates"></div>
+                </div>
+                <div class="prompt-template-entry">
+                  <button id="promptTemplateButton" class="ghost-button text-sm icon-text-button resource-manage-button prompt-template-button" type="button" aria-controls="promptTemplateDrawer" aria-expanded="false" title="管理模板库" data-i18n-attr="title:prompt.manageTemplates">
+                    <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                      <path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span data-i18n="prompt.manageTemplates">管理模板库</span>
+                  </button>
+                </div>
+              </div>
+            </section>
+
             <!-- Image Input -->
             <section class="panel image-panel">
               <div class="panel-heading">
-                <h2 data-i18n="imageInput.referenceTitle">参考输入（可选）</h2>
+                <h2 data-i18n="imageInput.materialsTitle">素材与参考（可选）</h2>
               </div>
 
-              <div class="image-input-workspace">
+              <div class="material-section reference-material-section">
+                <div class="material-section-header">
+                  <strong data-i18n="imageInput.referenceImages">参考图片</strong>
+                  <span data-i18n="imageInput.referenceImagesHint">影响生成内容、构图或风格</span>
+                </div>
+                <div class="image-input-workspace">
                 <div class="image-input-left">
                   <div class="image-input-main">
                     <div class="image-uploader-grid">
@@ -434,82 +516,21 @@
                     </button>
                   </div>
                 </div>
+                </div>
               </div>
 
               <div id="brandMaterialPicker" class="brand-material-picker hidden" aria-label="品牌素材" data-i18n-attr="aria-label:brand.materialsTitle">
-                <div class="brand-material-heading">
-                  <strong data-i18n="brand.materialsTitle">品牌素材</strong>
-                  <span data-i18n="brand.materialsHint">生成后原样叠加，不会被 AI 重绘</span>
-                </div>
-                <div id="brandMaterialList" class="brand-material-list" role="radiogroup" aria-label="选择品牌套件" data-i18n-attr="aria-label:brand.materialsChoose"></div>
-              </div>
-            </section>
-
-            <!-- Prompt -->
-            <section class="panel prompt-panel">
-              <div class="panel-heading prompt-heading">
-                <div class="prompt-heading-main">
-                  <h2 data-i18n="prompt.title">提示词</h2>
-                  <span id="charCount" class="prompt-count">0 / 4000</span>
-                </div>
-              </div>
-              <div class="prompt-compose">
-                <div class="prompt-editor-wrap">
-                  <div
-                    id="promptEditor"
-                    class="prompt-box prompt-editor"
-                    contenteditable="true"
-                    role="textbox"
-                    aria-multiline="true"
-                    data-placeholder="描述你要生成或编辑的图片，输入 @ 可调用图库参考图，输入 # 可插入颜色码，输入 ~ 或 ～ 可调用提示词片段"
-                    aria-label="提示词"
-                    data-i18n-attr="aria-label:prompt.editorLabel;data-placeholder:prompt.placeholder"
-                  ></div>
-                  <input id="prompt" type="hidden" maxlength="4000" value="" />
-                  <div id="mentionSuggest" class="mention-suggest hidden"></div>
-                  <div id="colorSuggest" class="color-suggest hidden" aria-label="颜色码选择器"></div>
-                </div>
-                <div class="prompt-run-wrap">
-                  <button id="runButton" class="run-button prompt-run-button" type="button" aria-keyshortcuts="Meta+Enter" title="开始生成（Cmd+Enter）" data-i18n="prompt.run" data-i18n-attr="title:prompt.runTitle">开始生成</button>
-                </div>
-              </div>
-              <div class="prompt-template-row">
-                <div class="prompt-template-recent-cell">
-                  <div class="prompt-footer">
-                    <button id="clearPromptButton" class="ghost-button icon-text-button text-sm quiet-danger-button" type="button">
-                      <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                        <path d="M3 6h18M9 6V4h6v2m-8 0 1 14h8l1-14M10 11v5M14 11v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                      <span data-i18n="action.clear">清空</span>
-                    </button>
-                    <button id="promptFindButton" class="ghost-button icon-text-button text-sm prompt-find-button" type="button" aria-controls="promptFindPanel" aria-expanded="false">
-                      <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                        <path d="m20 20-4.2-4.2M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                      <span data-i18n="action.find">查找</span>
-                    </button>
-                    <div id="promptFindPanel" class="prompt-find-panel hidden" aria-label="查找替换提示词" data-i18n-attr="aria-label:prompt.findPanel">
-                      <input id="promptFindInput" class="control prompt-find-input" type="text" placeholder="查找" autocomplete="off" spellcheck="false" aria-label="查找文本" data-i18n-attr="placeholder:action.find;aria-label:prompt.findText" />
-                      <input id="promptReplaceInput" class="control prompt-find-input" type="text" placeholder="替换为" autocomplete="off" spellcheck="false" aria-label="替换为" data-i18n-attr="placeholder:prompt.replaceWith;aria-label:prompt.replaceWith" />
-                      <div class="prompt-find-actions" role="group" aria-label="查找替换操作" data-i18n-attr="aria-label:prompt.findActions">
-                        <span id="promptFindCount" class="prompt-find-count" data-i18n="prompt.countZero">0 处</span>
-                        <button class="ghost-button text-sm prompt-find-action" type="button" data-prompt-find-action="count" data-i18n="action.find">查找</button>
-                        <button class="ghost-button text-sm prompt-find-action" type="button" data-prompt-find-action="replace-all" data-i18n="action.replace">替换</button>
-                        <button id="promptFindClose" class="ghost-button text-sm prompt-find-close" type="button" aria-label="关闭查找替换" title="关闭" data-i18n-attr="aria-label:prompt.closeFind;title:action.close">×</button>
-                      </div>
-                      <span id="promptFindStatus" class="prompt-find-status" aria-live="polite"></span>
-                    </div>
+                <div class="brand-material-toolbar">
+                  <div class="brand-material-heading">
+                    <strong data-i18n="brand.materialsTitle">品牌素材</strong>
+                    <span data-i18n="brand.materialsHint">生成后原样叠加，不会被 AI 重绘</span>
                   </div>
-                  <div id="promptTemplateRecentDock" class="prompt-template-recent-dock hidden" aria-label="最近使用模板" data-i18n-attr="aria-label:prompt.recentTemplates"></div>
-                </div>
-                <div class="prompt-template-entry">
-                  <button id="promptTemplateButton" class="ghost-button text-sm icon-text-button resource-manage-button prompt-template-button" type="button" aria-controls="promptTemplateDrawer" aria-expanded="false" title="管理模板库" data-i18n-attr="title:prompt.manageTemplates">
-                    <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                      <path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <span data-i18n="prompt.manageTemplates">管理模板库</span>
+                  <button id="brandMaterialOpenButton" class="ghost-button text-sm brand-material-open-button" type="button" aria-controls="brandMaterialDrawer" aria-expanded="false" aria-label="查看全部素材" data-i18n-attr="aria-label:brand.viewAll">
+                    <span data-i18n="brand.viewAll">查看全部素材</span>
+                    <span aria-hidden="true">→</span>
                   </button>
                 </div>
+                <div id="brandMaterialList" class="brand-material-list" role="radiogroup" aria-label="选择品牌套件" data-i18n-attr="aria-label:brand.materialsChoose"></div>
               </div>
             </section>
 
@@ -892,6 +913,36 @@
         </main>
       </div>
     </div>
+
+    <div id="brandMaterialDrawer" class="resource-sheet brand-material-drawer" role="dialog" aria-modal="true" aria-hidden="true" aria-label="品牌素材">
+      <div class="resource-sheet-header brand-material-drawer-header">
+        <div>
+          <h2 data-i18n="brand.drawerTitle">品牌素材</h2>
+          <p data-i18n="brand.drawerSummary">选择一套生成后自动叠加的品牌规范</p>
+        </div>
+        <button id="brandMaterialDrawerClose" class="ghost-button drawer-close-button" type="button" aria-label="关闭品牌素材" title="关闭">
+          <svg class="drawer-close-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M7 7L17 17M17 7L7 17" />
+          </svg>
+        </button>
+      </div>
+      <div class="brand-material-drawer-body">
+        <label class="brand-material-search-wrap">
+          <span class="sr-only" data-i18n="brand.search">搜索品牌套件</span>
+          <input id="brandMaterialSearch" class="control" type="search" autocomplete="off" placeholder="搜索品牌套件" data-i18n-attr="placeholder:brand.search" />
+        </label>
+        <div class="brand-material-filter-row" aria-label="品牌素材筛选">
+          <span class="brand-material-filter active" data-i18n="brand.all">全部</span>
+        </div>
+        <div id="brandMaterialDrawerList" class="brand-material-drawer-list" role="radiogroup" aria-label="选择品牌套件" data-i18n-attr="aria-label:brand.materialsChoose"></div>
+        <div id="brandMaterialDrawerEmpty" class="brand-material-drawer-empty hidden" data-i18n="brand.empty">没有找到匹配的品牌套件</div>
+      </div>
+      <div class="brand-material-drawer-footer">
+        <button id="brandMaterialDrawerCancel" class="ghost-button" type="button" data-i18n="action.cancel">取消</button>
+        <button id="brandMaterialDrawerConfirm" class="primary-button" type="button" data-i18n="brand.confirm">确认使用</button>
+      </div>
+    </div>
+    <div id="brandMaterialDrawerBackdrop" class="resource-sheet-backdrop brand-material-drawer-backdrop hidden"></div>
 
     <div id="promptTemplateDrawer" class="resource-sheet prompt-template-drawer" aria-hidden="true">
       <div class="resource-sheet-header prompt-template-drawer-header">
@@ -1457,7 +1508,7 @@
     </div>
 
     <div id="taskNotificationToastRegion" class="task-notification-toast-region" aria-live="polite"></div>
-  <script src="/static/app.js?v=runtime-569"></script>
+  <script src="/static/app.js?v=runtime-570"></script>
     <script>
       (() => {
         document.querySelectorAll(".radio-group").forEach((group) => {

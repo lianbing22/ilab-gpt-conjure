@@ -45,7 +45,7 @@ class WebUIStaticTaskTests(WebUIStaticTestCase):
         self.assertIn('id="historyMonthList"', history_html)
         self.assertIn('id="historyTaskList"', history_html)
         self.assertIn('id="historyDetail"', history_html)
-        self.assertIn('/static/history.js?v=history-70', history_html)
+        self.assertIn('/static/history.js?v=history-71', history_html)
         self.assertIn('fetch("/api/task-history/summary")', history_source)
         self.assertIn('new URLSearchParams', history_source)
         self.assertIn('/api/task-history/tasks?', history_source)
@@ -409,28 +409,16 @@ class WebUIStaticTaskTests(WebUIStaticTestCase):
         self.assertIn("function taskSearchHistoryResultMatches", script)
         self.assertIn("state.taskSearchHistoryResultIds || []).some", script)
         self.assertRegex(script, r"const text = `\$\{task\.task_id \|\| \"\"\} \$\{task\.prompt")
-    def test_sidebar_new_task_button_is_compact_brand_action(self) -> None:
+    def test_sidebar_new_task_button_is_full_width_primary_action(self) -> None:
         html = Path("codex_image/webui/static/index.html").read_text(encoding="utf-8")
-        styles = Path("codex_image/webui/static/styles.css").read_text(encoding="utf-8")
+        styles = Path("codex_image/webui/static/styles/85-ui-redesign.css").read_text(encoding="utf-8")
 
-        self.assertRegex(
-            html,
-            r'<div class="brand-actions">\s*<button id="newTaskButton" class="primary-button brand-new-button" type="button" aria-label="新建对话"[^>]*>',
-        )
-        self.assertRegex(html, r'<span[^>]*>新建</span>')
+        self.assertLess(html.index('class="sidebar-search"'), html.index('id="newTaskButton"'))
+        self.assertRegex(html, r'<span[^>]*data-i18n="app\.newTaskFull"[^>]*>新建任务</span>')
         self.assertIn('class="brand-new-icon"', html)
-        self.assertRegex(
-            html,
-            r'<button id="newTaskButton" class="primary-button brand-new-button"[^>]*>\s*<svg class="brand-new-icon"[\s\S]*?</svg>\s*<span[^>]*>新建</span>\s*</button>',
-        )
-        self.assertRegex(styles, r"\.brand\s*\{[^}]*justify-content:\s*space-between")
-        self.assertRegex(styles, r"\.brand-new-button\s*\{[^}]*min-width:\s*84px")
-        self.assertRegex(styles, r"\.brand-new-button\s*\{[^}]*height:\s*34px")
-        self.assertRegex(styles, r"\.brand-new-button\s*\{[^}]*width:\s*auto")
-        self.assertRegex(styles, r"\.brand-new-icon\s*\{[^}]*display:\s*block")
-        self.assertRegex(styles, r"\.sidebar-search\s*\{[^}]*margin-top:\s*0")
-        self.assertRegex(styles, r"\.task-search-clear-button\s*\{[^}]*right:\s*39px")
-        self.assertRegex(styles, r"\.task-search-clear-button\[hidden\]\s*\{[^}]*display:\s*none")
+        self.assertRegex(styles, r"\.brand-new-button\s*\{[^}]*width:\s*100%")
+        self.assertRegex(styles, r"\.brand-new-button\s*\{[^}]*min-width:\s*0")
+        self.assertRegex(styles, r"\.brand-new-button\s*\{[^}]*height:\s*var\(--touch-target\)")
     def test_sidebar_history_groups_by_dates_and_uses_anchor_navigation(self) -> None:
         script = self._frontend_script_source()
         render_source = self._task_list_render_source()
@@ -1710,9 +1698,10 @@ class WebUIStaticTaskTests(WebUIStaticTestCase):
     def test_history_cards_are_fixed_height_and_deletable(self) -> None:
         script = self._frontend_script_source()
         styles = Path("codex_image/webui/static/styles.css").read_text(encoding="utf-8")
+        redesign_styles = Path("codex_image/webui/static/styles/85-ui-redesign.css").read_text(encoding="utf-8")
 
         self.assertIn("deleteTask", script)
-        self.assertIn("data-delete-task-id", script)
+        self.assertIn("data-task-menu-id", script)
         self.assertIn('class="task-card-actions"', script)
         self.assertIn('translate("taskActions.group")', script)
         self.assertIn('translate("taskContext.archive")', script)
@@ -1721,8 +1710,9 @@ class WebUIStaticTaskTests(WebUIStaticTestCase):
         self.assertIn('translate("taskActions.deleteMessage")', script)
         self.assertIn('translate("taskActions.runningCannotDelete")', script)
         self.assertIn("task-action-icon", script)
-        self.assertIn("task-delete-icon", script)
-        self.assertIn('<svg class="task-action-icon task-delete-icon"', script)
+        self.assertIn("task-more-button", script)
+        self.assertIn('taskContextButton("delete", translate("taskContext.delete")', script)
+        self.assertIn('data-task-context-action="${action}"', script)
         self.assertIn('method: "DELETE"', script)
         self.assertRegex(styles, r"\.task-card\s*\{[^}]*height:\s*66px")
         self.assertNotRegex(styles, r"\.task-card\.failed\s*,\s*\.task-card\.partial_failed\s*\{[^}]*height:")
@@ -1732,19 +1722,14 @@ class WebUIStaticTaskTests(WebUIStaticTestCase):
         self.assertRegex(styles, r"\.task-card-actions\s*\{[^}]*right:\s*8px")
         self.assertRegex(styles, r"\.task-card-actions\s*\{[^}]*top:\s*50%")
         self.assertRegex(styles, r"\.task-card-actions\s*\{[^}]*display:\s*inline-flex")
-        self.assertRegex(styles, r"\.task-card-actions\s*\{[^}]*flex-direction:\s*column")
-        self.assertRegex(styles, r"\.task-card-actions\s*\{[^}]*gap:\s*6px")
+        self.assertRegex(redesign_styles, r"\.task-card-actions\s*\{[^}]*flex-direction:\s*row")
         self.assertRegex(styles, r"\.task-card-actions\s*\{[^}]*transform:\s*translateY\(-50%\)")
         self.assertRegex(styles, r"\.task-card-actions\s*\{[^}]*opacity:\s*0")
-        self.assertRegex(styles, r"\.task-archive-button\s*,\s*\.task-delete-button\s*\{[^}]*display:\s*grid")
-        self.assertRegex(styles, r"\.task-archive-button\s*,\s*\.task-delete-button\s*\{[^}]*place-items:\s*center")
-        self.assertRegex(styles, r"\.task-archive-button\s*,\s*\.task-delete-button\s*\{[^}]*width:\s*26px")
-        self.assertRegex(styles, r"\.task-delete-button\s*\{[^}]*background:\s*var\(--surface-soft\)")
-        self.assertRegex(styles, r"\.task-delete-button\s*\{[^}]*color:\s*var\(--text-secondary\)")
+        self.assertRegex(redesign_styles, r"\.task-more-button\s*\{[^}]*display:\s*grid")
+        self.assertRegex(redesign_styles, r"\.task-more-button\s*\{[^}]*width:\s*30px")
         self.assertRegex(styles, r"\.task-action-icon\s*\{[^}]*display:\s*block")
         self.assertRegex(styles, r"\.task-action-icon\s*\{[^}]*stroke-linecap:\s*round")
         self.assertRegex(styles, r"\.task-card:hover\s+\.task-card-actions\s*,\s*\.task-card:focus-within\s+\.task-card-actions")
-        self.assertRegex(styles, r"\.task-delete-button:hover\s*,\s*\.task-delete-button:focus-visible\s*\{[^}]*color:\s*var\(--danger\)")
     def test_history_cards_show_completed_or_failed_runtime(self) -> None:
         script = self._frontend_script_source()
         styles = Path("codex_image/webui/static/styles.css").read_text(encoding="utf-8")

@@ -30,6 +30,7 @@ function bindTaskContextMenuEvents() {
   taskContextMenuEventsBound = true;
 
   els.taskList.addEventListener("contextmenu", handleTaskListContextMenu);
+  els.taskList.addEventListener("click", handleTaskListMenuButtonClick);
   els.taskList.addEventListener("keydown", handleTaskListContextMenuKeydown);
   document.addEventListener("click", handleTaskContextDocumentClick, true);
   document.addEventListener("keydown", handleTaskContextDocumentKeydown);
@@ -39,6 +40,17 @@ function bindTaskContextMenuEvents() {
     taskListMutationObserver = new MutationObserver(closeTaskContextMenu);
     taskListMutationObserver.observe(els.taskList, { childList: true });
   }
+}
+
+function handleTaskListMenuButtonClick(event: MouseEvent) {
+  const target = eventTargetElement(event);
+  const button = target?.closest("[data-task-menu-id]") as HTMLElement | null;
+  const card = button?.closest(".task-card[data-task-id]") as HTMLElement | null;
+  if (!button || !card || !els.taskList.contains(card)) return;
+  event.preventDefault();
+  event.stopPropagation();
+  const rect = button.getBoundingClientRect();
+  openTaskContextMenu(card, rect.right - 8, rect.bottom + 4);
 }
 
 function handleTaskListContextMenu(event: MouseEvent) {

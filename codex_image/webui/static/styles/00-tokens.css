@@ -23,6 +23,12 @@
   --task-title: var(--text);
   --radius: 8px;
   --radius-lg: 12px;
+  --radius-xl: 16px;
+  --space-1: 8px;
+  --space-2: 12px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --touch-target: 44px;
   --motion-fast: 140ms ease;
   --motion-base: 180ms ease;
   --motion-height: 220ms ease;

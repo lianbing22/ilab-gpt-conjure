@@ -329,6 +329,15 @@
       quickGalleryRail: document.querySelector("#quickGalleryRail"),
       brandMaterialPicker: document.querySelector("#brandMaterialPicker"),
       brandMaterialList: document.querySelector("#brandMaterialList"),
+      brandMaterialOpenButton: document.querySelector("#brandMaterialOpenButton"),
+      brandMaterialDrawer: document.querySelector("#brandMaterialDrawer"),
+      brandMaterialDrawerClose: document.querySelector("#brandMaterialDrawerClose"),
+      brandMaterialDrawerBackdrop: document.querySelector("#brandMaterialDrawerBackdrop"),
+      brandMaterialDrawerCancel: document.querySelector("#brandMaterialDrawerCancel"),
+      brandMaterialDrawerConfirm: document.querySelector("#brandMaterialDrawerConfirm"),
+      brandMaterialDrawerList: document.querySelector("#brandMaterialDrawerList"),
+      brandMaterialDrawerEmpty: document.querySelector("#brandMaterialDrawerEmpty"),
+      brandMaterialSearch: document.querySelector("#brandMaterialSearch"),
       galleryManagePanel: document.querySelector("#galleryManagePanel"),
       galleryManageButton: document.querySelector("#galleryManageButton"),
       galleryDrawer: document.querySelector("#galleryDrawer"),
@@ -481,8 +490,12 @@
   // codex_image/webui/frontend/src/i18n/en.ts
   var EN_DICTIONARY = {
     "app.newTask": "New",
+    "app.newTaskFull": "New task",
     "app.newTaskAria": "New chat",
     "sidebar.searchPlaceholder": "Search prompts or task ID",
+    "sidebar.taskCenter": "Task center",
+    "sidebar.openTaskCenter": "Open task center",
+    "sidebar.closeTaskCenter": "Close task center",
     "sidebar.filters": "Task filters",
     "sidebar.allRatios": "All ratios",
     "sidebar.allOrientations": "All orientations",
@@ -492,6 +505,9 @@
     "sidebar.topAnchors": "Top time navigation",
     "sidebar.bottomAnchors": "Bottom time navigation",
     "sidebar.resize": "Resize sidebar",
+    "workspace.title": "AI Creation Studio",
+    "workspace.newImage": "New image",
+    "workspace.ariaLabel": "AI Creation Studio, new image",
     "batch.selected": "0 selected",
     "batch.selectedCount": "{count} selected",
     "batch.archivedCount": "Archived {count} chats",
@@ -1065,6 +1081,17 @@
     "brand.materialsHint": "Applied after generation without AI redrawing",
     "brand.materialsChoose": "Choose a brand package",
     "brand.materialsNone": "None",
+    "brand.viewAll": "View all kits",
+    "brand.drawerTitle": "Brand assets",
+    "brand.drawerSummary": "Choose one brand kit to apply after generation",
+    "brand.search": "Search brand kits",
+    "brand.all": "All",
+    "brand.empty": "No matching brand kits",
+    "brand.confirm": "Confirm",
+    "brand.selected": "Selected",
+    "brand.clickToSelect": "Select",
+    "brand.confirmUse": "Use",
+    "brand.confirmNone": "Continue without brand assets",
     "lightbox.label": "Image preview",
     "lightbox.close": "Close preview",
     "lightbox.previous": "Previous image",
@@ -1082,6 +1109,7 @@
     "promptPopover.copyOptimized": "Copy optimized prompt",
     "promptPopover.copied": "Copied",
     "taskContext.menuLabel": "Task context menu",
+    "taskContext.more": "More actions",
     "taskContext.view": "View task",
     "taskContext.copyId": "Copy task ID",
     "taskContext.copyPrompt": "Copy prompt",
@@ -1437,6 +1465,9 @@
     "close.addGallery": "Close add to gallery panel",
     "close.version": "Close version update panel",
     "imageInput.referenceTitle": "Reference input (optional)",
+    "imageInput.materialsTitle": "Materials & references (optional)",
+    "imageInput.referenceImages": "Reference images",
+    "imageInput.referenceImagesHint": "Guide content, composition, or style",
     "referenceFiles.add": "Add file",
     "referenceFiles.selected": "Reference files",
     "referenceFiles.recent": "Recent files",
@@ -10212,8 +10243,12 @@
   // codex_image/webui/frontend/src/i18n/zh-cn.ts
   var ZH_CN_DICTIONARY = {
     "app.newTask": "\u65B0\u5EFA",
+    "app.newTaskFull": "\u65B0\u5EFA\u4EFB\u52A1",
     "app.newTaskAria": "\u65B0\u5EFA\u5BF9\u8BDD",
     "sidebar.searchPlaceholder": "\u641C\u7D22\u63D0\u793A\u8BCD\u6216\u4EFB\u52A1 ID",
+    "sidebar.taskCenter": "\u4EFB\u52A1\u4E2D\u5FC3",
+    "sidebar.openTaskCenter": "\u6253\u5F00\u4EFB\u52A1\u4E2D\u5FC3",
+    "sidebar.closeTaskCenter": "\u5173\u95ED\u4EFB\u52A1\u4E2D\u5FC3",
     "sidebar.filters": "\u4EFB\u52A1\u7B5B\u9009",
     "sidebar.allRatios": "\u5168\u90E8\u6BD4\u4F8B",
     "sidebar.allOrientations": "\u5168\u90E8\u65B9\u5411",
@@ -10223,6 +10258,9 @@
     "sidebar.topAnchors": "\u9876\u90E8\u65F6\u95F4\u5BFC\u822A",
     "sidebar.bottomAnchors": "\u5E95\u90E8\u65F6\u95F4\u5BFC\u822A",
     "sidebar.resize": "\u8C03\u6574\u4FA7\u680F\u5BBD\u5EA6",
+    "workspace.title": "AI \u521B\u4F5C\u5DE5\u4F5C\u5BA4",
+    "workspace.newImage": "\u65B0\u5EFA\u56FE\u7247",
+    "workspace.ariaLabel": "AI \u521B\u4F5C\u5DE5\u4F5C\u5BA4\uFF0C\u65B0\u5EFA\u56FE\u7247",
     "batch.selected": "\u5DF2\u9009\u62E9 0 \u4E2A",
     "batch.selectedCount": "\u5DF2\u9009\u62E9 {count} \u4E2A",
     "batch.archivedCount": "\u5DF2\u5F52\u6863 {count} \u4E2A\u4F1A\u8BDD",
@@ -10796,6 +10834,17 @@
     "brand.materialsHint": "\u751F\u6210\u540E\u539F\u6837\u53E0\u52A0\uFF0C\u4E0D\u4F1A\u88AB AI \u91CD\u7ED8",
     "brand.materialsChoose": "\u9009\u62E9\u54C1\u724C\u5957\u4EF6",
     "brand.materialsNone": "\u4E0D\u6DFB\u52A0",
+    "brand.viewAll": "\u67E5\u770B\u5168\u90E8\u7D20\u6750",
+    "brand.drawerTitle": "\u54C1\u724C\u7D20\u6750",
+    "brand.drawerSummary": "\u9009\u62E9\u4E00\u5957\u751F\u6210\u540E\u81EA\u52A8\u53E0\u52A0\u7684\u54C1\u724C\u89C4\u8303",
+    "brand.search": "\u641C\u7D22\u54C1\u724C\u5957\u4EF6",
+    "brand.all": "\u5168\u90E8",
+    "brand.empty": "\u6CA1\u6709\u627E\u5230\u5339\u914D\u7684\u54C1\u724C\u5957\u4EF6",
+    "brand.confirm": "\u786E\u8BA4\u4F7F\u7528",
+    "brand.selected": "\u5DF2\u9009\u62E9",
+    "brand.clickToSelect": "\u70B9\u51FB\u9009\u62E9",
+    "brand.confirmUse": "\u786E\u8BA4\u4F7F\u7528",
+    "brand.confirmNone": "\u786E\u8BA4\u4E0D\u6DFB\u52A0\u54C1\u724C\u7D20\u6750",
     "lightbox.label": "\u56FE\u7247\u9884\u89C8",
     "lightbox.close": "\u5173\u95ED\u9884\u89C8",
     "lightbox.previous": "\u4E0A\u4E00\u5F20",
@@ -10813,6 +10862,7 @@
     "promptPopover.copyOptimized": "\u590D\u5236\u4F18\u5316\u540E\u63D0\u793A\u8BCD",
     "promptPopover.copied": "\u5DF2\u590D\u5236",
     "taskContext.menuLabel": "\u4EFB\u52A1\u53F3\u952E\u83DC\u5355",
+    "taskContext.more": "\u66F4\u591A\u64CD\u4F5C",
     "taskContext.view": "\u67E5\u770B\u4EFB\u52A1",
     "taskContext.copyId": "\u590D\u5236\u4EFB\u52A1 ID",
     "taskContext.copyPrompt": "\u590D\u5236\u63D0\u793A\u8BCD",
@@ -11168,6 +11218,9 @@
     "close.addGallery": "\u5173\u95ED\u6DFB\u52A0\u5230\u56FE\u5E93\u9762\u677F",
     "close.version": "\u5173\u95ED\u7248\u672C\u66F4\u65B0\u9762\u677F",
     "imageInput.referenceTitle": "\u53C2\u8003\u8F93\u5165\uFF08\u53EF\u9009\uFF09",
+    "imageInput.materialsTitle": "\u7D20\u6750\u4E0E\u53C2\u8003\uFF08\u53EF\u9009\uFF09",
+    "imageInput.referenceImages": "\u53C2\u8003\u56FE\u7247",
+    "imageInput.referenceImagesHint": "\u5F71\u54CD\u751F\u6210\u5185\u5BB9\u3001\u6784\u56FE\u6216\u98CE\u683C",
     "referenceFiles.add": "\u6DFB\u52A0\u6587\u4EF6",
     "referenceFiles.selected": "\u53C2\u8003\u6587\u4EF6",
     "referenceFiles.recent": "\u6700\u8FD1\u6587\u4EF6",
@@ -37115,6 +37168,7 @@ ${galleryText}`;
 
   // codex_image/webui/frontend/src/sidebar-drawer.ts
   var initialized3 = false;
+  var drawerTrigger = null;
   function isMobileLayout() {
     return window.matchMedia("(max-width: 1180px)").matches;
   }
@@ -37124,22 +37178,37 @@ ${galleryText}`;
     const toggle = document.getElementById("sidebarDrawerToggle");
     if (!sidebar || !backdrop || !toggle) return;
     if (open) {
+      drawerTrigger = document.activeElement instanceof HTMLElement ? document.activeElement : toggle;
       sidebar.classList.add("sidebar-drawer-open", "is-open");
       backdrop.hidden = false;
       toggle.setAttribute("aria-expanded", "true");
+      toggle.setAttribute("aria-label", translate("sidebar.closeTaskCenter"));
+      sidebar.setAttribute("role", "dialog");
+      sidebar.setAttribute("aria-modal", "true");
+      sidebar.setAttribute("aria-label", translate("sidebar.taskCenter"));
+      document.body.classList.add("mobile-task-drawer-open");
+      window.setTimeout(() => document.getElementById("taskSearch")?.focus({ preventScroll: true }), 0);
     } else {
       sidebar.classList.remove("is-open");
       toggle.setAttribute("aria-expanded", "false");
+      toggle.setAttribute("aria-label", translate("sidebar.openTaskCenter"));
+      sidebar.removeAttribute("role");
+      sidebar.removeAttribute("aria-modal");
+      sidebar.removeAttribute("aria-label");
+      document.body.classList.remove("mobile-task-drawer-open");
       const cleanup = () => {
         sidebar.classList.remove("sidebar-drawer-open");
         backdrop.hidden = true;
         sidebar.removeEventListener("transitionend", cleanup);
+        drawerTrigger?.focus?.({ preventScroll: true });
       };
       sidebar.addEventListener("transitionend", cleanup);
       window.setTimeout(() => {
         if (!sidebar.classList.contains("is-open")) {
           sidebar.classList.remove("sidebar-drawer-open");
           backdrop.hidden = true;
+          sidebar.removeEventListener("transitionend", cleanup);
+          drawerTrigger?.focus?.({ preventScroll: true });
         }
       }, 300);
     }
@@ -37160,20 +37229,47 @@ ${galleryText}`;
       const toggle = document.getElementById("sidebarDrawerToggle");
       if (sidebar) {
         sidebar.classList.remove("sidebar-drawer-open", "is-open");
+        sidebar.removeAttribute("role");
+        sidebar.removeAttribute("aria-modal");
+        sidebar.removeAttribute("aria-label");
       }
       if (backdrop) backdrop.hidden = true;
-      if (toggle) toggle.setAttribute("aria-expanded", "false");
+      if (toggle) {
+        toggle.setAttribute("aria-expanded", "false");
+        toggle.setAttribute("aria-label", translate("sidebar.openTaskCenter"));
+      }
+      document.body.classList.remove("mobile-task-drawer-open");
     }
   }
   function handleSidebarClick(event) {
     const target = event.target instanceof Element ? event.target : null;
     if (!target) return;
-    if (target.closest("[data-task-id], .task-card, #newTaskButton, .task-filter-button")) {
+    if (target.closest("[data-task-id], .task-card, #newTaskButton")) {
       closeDrawer();
     }
   }
   function handleKeydown(event) {
-    if (event.key === "Escape") closeDrawer();
+    const sidebar = document.getElementById("sidebar");
+    if (!sidebar?.classList.contains("is-open")) return;
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeDrawer();
+      return;
+    }
+    if (event.key !== "Tab") return;
+    const focusable = Array.from(
+      sidebar.querySelectorAll("button:not(:disabled), input:not(:disabled), select:not(:disabled), a[href], [tabindex]:not([tabindex='-1'])")
+    ).filter((node) => !node.hidden && node.offsetParent !== null);
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last?.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first?.focus();
+    }
   }
   function initSidebarDrawerFeature() {
     if (initialized3) return;
@@ -37208,8 +37304,10 @@ ${galleryText}`;
     const previewGrid = document.querySelector("#previewGrid");
     const navActions = document.querySelector(".nav-actions");
     const topNav = document.querySelector(".top-nav");
+    const notificationCenter = document.querySelector("#taskNotificationCenter");
     const sidebar = document.querySelector(".sidebar");
     const navPlaceholder = document.createComment("mobile-nav-placeholder");
+    const notificationPlaceholder = document.createComment("mobile-notification-placeholder");
     const mobileQuery = window.matchMedia("(max-width: 520px)");
     const setExpanded = (expanded) => {
       outputPanel?.classList.toggle("mobile-settings-expanded", expanded);
@@ -37245,12 +37343,23 @@ ${galleryText}`;
       if (!navActions || !topNav || !sidebar) return;
       if (mobileQuery.matches) {
         if (navActions.parentNode === topNav) topNav.insertBefore(navPlaceholder, navActions);
+        if (notificationCenter?.parentNode === topNav) topNav.insertBefore(notificationPlaceholder, notificationCenter);
         navActions.classList.add("mobile-drawer-tools");
         sidebar.appendChild(navActions);
+        if (notificationCenter) {
+          notificationCenter.classList.add("mobile-drawer-notifications");
+          sidebar.appendChild(notificationCenter);
+        }
         return;
       }
       navActions.classList.remove("mobile-drawer-tools");
       if (navPlaceholder.parentNode) navPlaceholder.parentNode.insertBefore(navActions, navPlaceholder);
+      if (notificationCenter) {
+        notificationCenter.classList.remove("mobile-drawer-notifications");
+        if (notificationPlaceholder.parentNode) {
+          notificationPlaceholder.parentNode.insertBefore(notificationCenter, notificationPlaceholder);
+        }
+      }
     };
     outputToggle?.addEventListener("click", () => setExpanded(!outputPanel?.classList.contains("mobile-settings-expanded")));
     advancedToggle?.addEventListener("click", () => setAdvanced(!outputPanel?.classList.contains("mobile-advanced-expanded")));
@@ -37937,24 +38046,14 @@ ${galleryText}`;
   function taskCardActionsHtml(taskId, queueSection = "") {
     if (queueSection) return "";
     const actionGroupLabel = escapeHtml13(translate("taskActions.group"));
-    const archiveLabel = escapeHtml13(translate("taskContext.archive"));
-    const deleteLabel = escapeHtml13(translate("taskContext.delete"));
+    const moreLabel = escapeHtml13(translate("taskContext.more"));
     return `
       <div class="task-card-actions" role="group" aria-label="${actionGroupLabel}">
-        <button class="task-archive-button" type="button" data-archive-task-id="${taskId}" aria-label="${archiveLabel}" title="${archiveLabel}">
+        <button class="task-more-button" type="button" data-task-menu-id="${taskId}" aria-label="${moreLabel}" title="${moreLabel}" aria-haspopup="menu">
           <svg class="task-action-icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-            <path d="M4 6h12v11H4z" />
-            <path d="M6 3h8l2 3H4l2-3z" />
-            <path d="M10 8v5" />
-            <path d="M7.5 10.5L10 13l2.5-2.5" />
-          </svg>
-        </button>
-        <button class="task-delete-button" type="button" data-delete-task-id="${taskId}" aria-label="${deleteLabel}" title="${deleteLabel}">
-          <svg class="task-action-icon task-delete-icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-            <path d="M5 5h10" />
-            <path d="M8 5l1-2h2l1 2" />
-            <path d="M6 5l1 12h6l1-12" />
-            <path d="M8.5 8v6M11.5 8v6" />
+            <circle cx="10" cy="4" r="1" fill="currentColor" stroke="none" />
+            <circle cx="10" cy="10" r="1" fill="currentColor" stroke="none" />
+            <circle cx="10" cy="16" r="1" fill="currentColor" stroke="none" />
           </svg>
         </button>
       </div>
@@ -40906,6 +41005,7 @@ ${galleryText}`;
     if (taskContextMenuEventsBound) return;
     taskContextMenuEventsBound = true;
     els36.taskList.addEventListener("contextmenu", handleTaskListContextMenu);
+    els36.taskList.addEventListener("click", handleTaskListMenuButtonClick);
     els36.taskList.addEventListener("keydown", handleTaskListContextMenuKeydown);
     document.addEventListener("click", handleTaskContextDocumentClick, true);
     document.addEventListener("keydown", handleTaskContextDocumentKeydown);
@@ -40915,6 +41015,16 @@ ${galleryText}`;
       taskListMutationObserver = new MutationObserver(closeTaskContextMenu);
       taskListMutationObserver.observe(els36.taskList, { childList: true });
     }
+  }
+  function handleTaskListMenuButtonClick(event) {
+    const target = eventTargetElement3(event);
+    const button = target?.closest("[data-task-menu-id]");
+    const card = button?.closest(".task-card[data-task-id]");
+    if (!button || !card || !els36.taskList.contains(card)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const rect = button.getBoundingClientRect();
+    openTaskContextMenu(card, rect.right - 8, rect.bottom + 4);
   }
   function handleTaskListContextMenu(event) {
     const target = eventTargetElement3(event);
@@ -43279,6 +43389,9 @@ ${galleryText}`;
   var state30 = getLegacyBridge().state;
   var els39 = getLegacyBridge().els;
   var brandMaterialsInitialized = false;
+  var draftTemplateId = "";
+  var drawerQuery = "";
+  var lastDrawerTrigger = null;
   function legacyMethod41(name, ...args) {
     return getLegacyBridge().methods[name]?.(...args);
   }
@@ -43288,45 +43401,122 @@ ${galleryText}`;
   function previewAssetId(template) {
     return String(template?.recipe?.asset_variants?.["dark-assets"]?.logo || "");
   }
-  function renderBrandMaterials() {
-    if (!els39.brandMaterialPicker || !els39.brandMaterialList) return;
+  function templateOptions() {
     const templates = Array.isArray(state30.brandTemplates) ? state30.brandTemplates : [];
-    els39.brandMaterialPicker.classList.toggle("hidden", templates.length === 0);
-    if (!templates.length) {
-      els39.brandMaterialList.replaceChildren();
-      return;
-    }
-    const options = [
-      {
-        template_id: "",
-        name: translate("brand.materialsNone"),
-        preview_id: ""
-      },
+    return [
+      { template_id: "", name: translate("brand.materialsNone"), preview_id: "" },
       ...templates.map((template) => ({
         template_id: String(template.template_id || ""),
         name: String(template.name || template.template_id || ""),
         preview_id: previewAssetId(template)
       }))
     ];
-    els39.brandMaterialList.innerHTML = options.map((option) => {
-      const selected = option.template_id === state30.selectedBrandingTemplateId;
-      const preview = option.preview_id ? `<img src="/api/brand/assets/${encodeURIComponent(option.preview_id)}/image" alt="" loading="lazy" decoding="async">` : `<span class="brand-material-none-mark" aria-hidden="true">\u2014</span>`;
-      return `
-      <button class="brand-material-option${selected ? " active" : ""}" type="button"
-        role="radio" aria-checked="${selected ? "true" : "false"}"
-        data-brand-template-id="${escapeHtml20(option.template_id)}">
-        <span class="brand-material-preview">${preview}</span>
-        <span class="brand-material-name">${escapeHtml20(option.name)}</span>
-      </button>
-    `;
-    }).join("");
+  }
+  function previewHtml(option, large = false) {
+    if (!option.preview_id) {
+      return `<span class="brand-material-none-mark" aria-hidden="true">\u2014</span>`;
+    }
+    const sizeClass = large ? " brand-material-drawer-preview" : "";
+    return `<span class="brand-material-preview${sizeClass}"><img src="/api/brand/assets/${encodeURIComponent(option.preview_id)}/image" alt="" loading="lazy" decoding="async"></span>`;
+  }
+  function optionHtml(option, selected) {
+    return `
+    <button class="brand-material-option${selected ? " active" : ""}" type="button"
+      role="radio" aria-checked="${selected ? "true" : "false"}"
+      data-brand-template-id="${escapeHtml20(option.template_id)}">
+      ${previewHtml(option)}
+      <span class="brand-material-name">${escapeHtml20(option.name)}</span>
+      <span class="brand-material-check" aria-hidden="true">\u2713</span>
+    </button>
+  `;
+  }
+  function quickOptions(options) {
+    const visible = options.slice(0, 4);
+    const selected = options.find((option) => option.template_id === state30.selectedBrandingTemplateId);
+    if (selected && !visible.includes(selected)) visible[visible.length - 1] = selected;
+    return visible;
+  }
+  function renderBrandMaterials() {
+    if (!els39.brandMaterialPicker || !els39.brandMaterialList) return;
+    const templates = Array.isArray(state30.brandTemplates) ? state30.brandTemplates : [];
+    els39.brandMaterialPicker.classList.toggle("hidden", templates.length === 0);
+    if (!templates.length) {
+      els39.brandMaterialList.replaceChildren();
+      renderBrandMaterialDrawer();
+      return;
+    }
+    const options = quickOptions(templateOptions());
+    els39.brandMaterialList.innerHTML = options.map((option) => optionHtml(option, option.template_id === state30.selectedBrandingTemplateId)).join("");
+    renderBrandMaterialDrawer();
+  }
+  function filteredDrawerOptions() {
+    const query = drawerQuery.trim().toLocaleLowerCase();
+    if (!query) return templateOptions();
+    return templateOptions().filter((option) => String(option.name || "").toLocaleLowerCase().includes(query));
+  }
+  function drawerOptionHtml(option) {
+    const selected = option.template_id === draftTemplateId;
+    return `
+    <button class="brand-material-drawer-option${selected ? " active" : ""}" type="button"
+      role="radio" aria-checked="${selected ? "true" : "false"}"
+      data-brand-drawer-template-id="${escapeHtml20(option.template_id)}">
+      <span class="brand-material-drawer-visual">${previewHtml(option, true)}</span>
+      <span class="brand-material-drawer-copy">
+        <strong>${escapeHtml20(option.name)}</strong>
+        <span>${selected ? escapeHtml20(translate("brand.selected")) : escapeHtml20(translate("brand.clickToSelect"))}</span>
+      </span>
+      <span class="brand-material-drawer-check" aria-hidden="true">\u2713</span>
+    </button>
+  `;
+  }
+  function renderBrandMaterialDrawer() {
+    if (!els39.brandMaterialDrawerList) return;
+    const options = filteredDrawerOptions();
+    els39.brandMaterialDrawerList.innerHTML = options.map(drawerOptionHtml).join("");
+    els39.brandMaterialDrawerEmpty?.classList.toggle("hidden", options.length > 0);
+    if (els39.brandMaterialDrawerConfirm) {
+      const selected = templateOptions().find((option) => option.template_id === draftTemplateId);
+      els39.brandMaterialDrawerConfirm.textContent = selected?.template_id ? `${translate("brand.confirmUse")} ${selected.name}` : translate("brand.confirmNone");
+    }
   }
   function selectBrandTemplate(templateId) {
     const cleanId = String(templateId || "");
     const exists = !cleanId || state30.brandTemplates.some((template) => template.template_id === cleanId);
     state30.selectedBrandingTemplateId = exists ? cleanId : "";
+    draftTemplateId = state30.selectedBrandingTemplateId;
     renderBrandMaterials();
     legacyMethod41("updateRequestPreview");
+  }
+  function openBrandMaterialDrawer(trigger) {
+    legacyMethod41("closePromptTemplateDrawer", { restoreFocus: false });
+    legacyMethod41("closeGallery", { restoreFocus: false });
+    draftTemplateId = String(state30.selectedBrandingTemplateId || "");
+    drawerQuery = "";
+    lastDrawerTrigger = trigger || (document.activeElement instanceof HTMLElement ? document.activeElement : null);
+    if (els39.brandMaterialSearch) els39.brandMaterialSearch.value = "";
+    renderBrandMaterialDrawer();
+    els39.brandMaterialDrawer?.classList.add("open");
+    els39.brandMaterialDrawer?.setAttribute("aria-hidden", "false");
+    els39.brandMaterialDrawerBackdrop?.classList.remove("hidden");
+    els39.brandMaterialOpenButton?.setAttribute("aria-expanded", "true");
+    document.body.classList.add("brand-material-drawer-open");
+    window.setTimeout(() => els39.brandMaterialSearch?.focus?.({ preventScroll: true }), 0);
+  }
+  function closeBrandMaterialDrawer(options = {}) {
+    const restoreFocus = options.restoreFocus !== false;
+    els39.brandMaterialDrawer?.classList.remove("open");
+    els39.brandMaterialDrawer?.setAttribute("aria-hidden", "true");
+    els39.brandMaterialDrawerBackdrop?.classList.add("hidden");
+    els39.brandMaterialOpenButton?.setAttribute("aria-expanded", "false");
+    document.body.classList.remove("brand-material-drawer-open");
+    draftTemplateId = String(state30.selectedBrandingTemplateId || "");
+    if (restoreFocus) {
+      (lastDrawerTrigger || els39.brandMaterialOpenButton)?.focus?.({ preventScroll: true });
+    }
+  }
+  function confirmBrandMaterialDrawer() {
+    selectBrandTemplate(draftTemplateId);
+    closeBrandMaterialDrawer();
   }
   async function refreshBrandTemplates() {
     try {
@@ -43341,6 +43531,7 @@ ${galleryText}`;
       state30.brandTemplates = [];
       state30.selectedBrandingTemplateId = "";
     }
+    draftTemplateId = String(state30.selectedBrandingTemplateId || "");
     renderBrandMaterials();
   }
   function handleBrandMaterialClick(event) {
@@ -43349,15 +43540,59 @@ ${galleryText}`;
     if (!button) return;
     selectBrandTemplate(button.dataset.brandTemplateId || "");
   }
+  function handleDrawerMaterialClick(event) {
+    const target = event.target instanceof Element ? event.target : null;
+    const button = target?.closest("[data-brand-drawer-template-id]");
+    if (!button) return;
+    draftTemplateId = String(button.dataset.brandDrawerTemplateId || "");
+    renderBrandMaterialDrawer();
+  }
+  function handleDrawerSearch(event) {
+    drawerQuery = event.target instanceof HTMLInputElement ? event.target.value : "";
+    renderBrandMaterialDrawer();
+  }
+  function handleDrawerKeydown(event) {
+    const drawer = els39.brandMaterialDrawer;
+    if (!drawer?.classList.contains("open")) return;
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeBrandMaterialDrawer();
+      return;
+    }
+    if (event.key !== "Tab") return;
+    const focusable = Array.from(
+      drawer.querySelectorAll("button:not(:disabled), input:not(:disabled), [tabindex]:not([tabindex='-1'])")
+    ).filter((node) => !node.hidden && node.offsetParent !== null);
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last?.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first?.focus();
+    }
+  }
   function initBrandMaterialsFeature() {
     if (brandMaterialsInitialized) return;
     brandMaterialsInitialized = true;
     els39.brandMaterialList?.addEventListener("click", handleBrandMaterialClick);
+    els39.brandMaterialOpenButton?.addEventListener("click", (event) => openBrandMaterialDrawer(event.currentTarget));
+    els39.brandMaterialDrawerList?.addEventListener("click", handleDrawerMaterialClick);
+    els39.brandMaterialDrawerClose?.addEventListener("click", () => closeBrandMaterialDrawer());
+    els39.brandMaterialDrawerCancel?.addEventListener("click", () => closeBrandMaterialDrawer());
+    els39.brandMaterialDrawerConfirm?.addEventListener("click", confirmBrandMaterialDrawer);
+    els39.brandMaterialDrawerBackdrop?.addEventListener("click", () => closeBrandMaterialDrawer());
+    els39.brandMaterialSearch?.addEventListener("input", handleDrawerSearch);
+    document.addEventListener("keydown", handleDrawerKeydown);
     document.addEventListener(LOCALE_CHANGE_EVENT, renderBrandMaterials);
     Object.assign(getLegacyBridge().methods, {
       refreshBrandTemplates,
       renderBrandMaterials,
-      selectBrandTemplate
+      selectBrandTemplate,
+      openBrandMaterialDrawer,
+      closeBrandMaterialDrawer
     });
   }
 

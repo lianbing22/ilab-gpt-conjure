@@ -84,11 +84,30 @@ def test_frontend_exposes_brand_material_picker_and_submits_selected_template() 
     submit = (ROOT / "codex_image/webui/frontend/src/task-submit.ts").read_text(encoding="utf-8")
     styles = (ROOT / "codex_image/webui/static/styles/50-image-input-gallery.css").read_text(encoding="utf-8")
     responsive = (ROOT / "codex_image/webui/static/styles/80-utilities-responsive.css").read_text(encoding="utf-8")
+    redesign = (ROOT / "codex_image/webui/static/styles/85-ui-redesign.css").read_text(encoding="utf-8")
 
     assert 'id="brandMaterialPicker"' in html
     assert 'id="brandMaterialList"' in html
+    assert 'id="brandMaterialDrawer"' in html
+    assert 'data-i18n-attr="aria-label:brand.viewAll"' in html
+    assert 'id="brandMaterialSearch"' in html
+    assert 'id="brandMaterialDrawerConfirm"' in html
     assert 'fetch("/api/brand/templates")' in module
     assert 'role="radio"' in module
+    assert "draftTemplateId = String(state.selectedBrandingTemplateId" in module
+    assert "confirmBrandMaterialDrawer" in module
+    assert "drawerQuery.trim().toLocaleLowerCase()" in module
     assert 'form.append("branding_template_id", state.selectedBrandingTemplateId)' in submit
     assert ".brand-material-option.active" in styles
     assert "scroll-snap-type: x proximity" in responsive
+    assert "text-overflow: clip" in redesign
+
+
+def test_workspace_places_prompt_before_materials_and_output_settings() -> None:
+    html = (ROOT / "codex_image/webui/static/index.html").read_text(encoding="utf-8")
+
+    prompt_index = html.index('class="panel prompt-panel"')
+    materials_index = html.index('class="panel image-panel"')
+    output_index = html.index('class="panel output-panel"')
+
+    assert prompt_index < materials_index < output_index

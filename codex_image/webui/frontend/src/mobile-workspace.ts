@@ -18,8 +18,10 @@ export function initMobileWorkspaceFeature(): void {
   const previewGrid = document.querySelector<HTMLElement>("#previewGrid");
   const navActions = document.querySelector<HTMLElement>(".nav-actions");
   const topNav = document.querySelector<HTMLElement>(".top-nav");
+  const notificationCenter = document.querySelector<HTMLElement>("#taskNotificationCenter");
   const sidebar = document.querySelector<HTMLElement>(".sidebar");
   const navPlaceholder = document.createComment("mobile-nav-placeholder");
+  const notificationPlaceholder = document.createComment("mobile-notification-placeholder");
   const mobileQuery = window.matchMedia("(max-width: 520px)");
 
   const setExpanded = (expanded: boolean): void => {
@@ -60,12 +62,23 @@ export function initMobileWorkspaceFeature(): void {
     if (!navActions || !topNav || !sidebar) return;
     if (mobileQuery.matches) {
       if (navActions.parentNode === topNav) topNav.insertBefore(navPlaceholder, navActions);
+      if (notificationCenter?.parentNode === topNav) topNav.insertBefore(notificationPlaceholder, notificationCenter);
       navActions.classList.add("mobile-drawer-tools");
       sidebar.appendChild(navActions);
+      if (notificationCenter) {
+        notificationCenter.classList.add("mobile-drawer-notifications");
+        sidebar.appendChild(notificationCenter);
+      }
       return;
     }
     navActions.classList.remove("mobile-drawer-tools");
     if (navPlaceholder.parentNode) navPlaceholder.parentNode.insertBefore(navActions, navPlaceholder);
+    if (notificationCenter) {
+      notificationCenter.classList.remove("mobile-drawer-notifications");
+      if (notificationPlaceholder.parentNode) {
+        notificationPlaceholder.parentNode.insertBefore(notificationCenter, notificationPlaceholder);
+      }
+    }
   };
 
   outputToggle?.addEventListener("click", () => setExpanded(!outputPanel?.classList.contains("mobile-settings-expanded")));

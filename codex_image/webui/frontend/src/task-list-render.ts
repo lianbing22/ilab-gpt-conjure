@@ -686,24 +686,14 @@ function taskQueueActionStripHtml(task: any, queueSection = taskQueueSection(tas
 function taskCardActionsHtml(taskId: string, queueSection = "") {
   if (queueSection) return "";
   const actionGroupLabel = escapeHtml(translate("taskActions.group"));
-  const archiveLabel = escapeHtml(translate("taskContext.archive"));
-  const deleteLabel = escapeHtml(translate("taskContext.delete"));
+  const moreLabel = escapeHtml(translate("taskContext.more"));
   return `
       <div class="task-card-actions" role="group" aria-label="${actionGroupLabel}">
-        <button class="task-archive-button" type="button" data-archive-task-id="${taskId}" aria-label="${archiveLabel}" title="${archiveLabel}">
+        <button class="task-more-button" type="button" data-task-menu-id="${taskId}" aria-label="${moreLabel}" title="${moreLabel}" aria-haspopup="menu">
           <svg class="task-action-icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-            <path d="M4 6h12v11H4z" />
-            <path d="M6 3h8l2 3H4l2-3z" />
-            <path d="M10 8v5" />
-            <path d="M7.5 10.5L10 13l2.5-2.5" />
-          </svg>
-        </button>
-        <button class="task-delete-button" type="button" data-delete-task-id="${taskId}" aria-label="${deleteLabel}" title="${deleteLabel}">
-          <svg class="task-action-icon task-delete-icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-            <path d="M5 5h10" />
-            <path d="M8 5l1-2h2l1 2" />
-            <path d="M6 5l1 12h6l1-12" />
-            <path d="M8.5 8v6M11.5 8v6" />
+            <circle cx="10" cy="4" r="1" fill="currentColor" stroke="none" />
+            <circle cx="10" cy="10" r="1" fill="currentColor" stroke="none" />
+            <circle cx="10" cy="16" r="1" fill="currentColor" stroke="none" />
           </svg>
         </button>
       </div>
