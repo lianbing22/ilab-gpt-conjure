@@ -171,6 +171,8 @@ async def read_reference_file_uploads(
     total_bytes = 0
     try:
         for upload in files:
+            if Path(upload.filename or "").suffix.lower() == ".pdf":
+                raise ValueError("reference_file_type_unsupported")
             data = bytearray()
             while True:
                 if len(data) >= max_file_bytes:

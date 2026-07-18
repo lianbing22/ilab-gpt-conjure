@@ -1478,7 +1478,7 @@ button:disabled {
   }
 
   .image-panel .panel-heading h2::after {
-    content: "支持图片、PDF 与素材库";
+    content: "支持图片与素材库";
     display: block;
     margin-top: 4px;
     color: var(--muted);

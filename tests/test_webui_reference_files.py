@@ -126,6 +126,26 @@ OFFICIAL_CATEGORY_MIME_ALIASES = {
 
 
 class ReferenceFilePolicyTests(unittest.TestCase):
+    def test_pdf_upload_is_rejected_before_reading_body(self) -> None:
+        class PdfUpload:
+            filename = "large.pdf"
+            content_type = "application/pdf"
+            read_called = False
+            closed = False
+
+            async def read(self, _size: int = -1) -> bytes:
+                self.read_called = True
+                raise AssertionError("disabled PDF body must not be read")
+
+            async def close(self) -> None:
+                self.closed = True
+
+        upload = PdfUpload()
+        with self.assertRaisesRegex(ValueError, "^reference_file_type_unsupported$"):
+            asyncio.run(read_reference_file_uploads([upload]))  # type: ignore[list-item]
+        self.assertFalse(upload.read_called)
+        self.assertTrue(upload.closed)
+
     def test_upload_reader_uses_bounded_reads_and_stops_after_total_limit(self) -> None:
         class InstrumentedUpload:
             def __init__(self, filename: str, data: bytes) -> None:
@@ -1374,8 +1394,8 @@ class ReferenceFileExecutionTests(unittest.TestCase):
             )
             created = TestClient(app).post(
                 "/api/generate",
-                data={"prompt": "Use the PDF", "codex_mode": "responses"},
-                files={"reference_files": ("brief.pdf", b"%PDF-1.4\nbrief", "application/pdf")},
+                data={"prompt": "Use the brief", "codex_mode": "responses"},
+                files={"reference_files": ("brief.txt", b"brief", "text/plain")},
             ).json()["task"]
             app.state.queue_manager.channels = [QueueChannel("api:default:1", "api")]
 
@@ -1391,8 +1411,8 @@ class ReferenceFileExecutionTests(unittest.TestCase):
             self.assertEqual(metadata["params"]["api_images_concurrency"], 3)
             self.assertEqual(len(fake.reference_file_snapshots), 1)
             sent_file = fake.reference_file_snapshots[0][0]
-            self.assertEqual(sent_file.filename, "brief.pdf")
-            self.assertTrue(sent_file.file_data.startswith("data:application/pdf;base64,"))
+            self.assertEqual(sent_file.filename, "brief.txt")
+            self.assertTrue(sent_file.file_data.startswith("data:text/plain;base64,"))
             stored_request = json.loads(app.state.ctx.storage.request_path(created["task_id"]).read_text(encoding="utf-8"))
             self.assertEqual(stored_request["webui_requested_backend"], "openai_responses")
             self.assertEqual(stored_request["webui_api_provider_id"], "provider-a")

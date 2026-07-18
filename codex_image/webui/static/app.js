@@ -13983,7 +13983,6 @@
 
   // codex_image/webui/frontend/src/reference-file-inputs.ts
   var FAMILY_BY_EXTENSION = {
-    pdf: "pdf",
     xla: "spreadsheet",
     xlb: "spreadsheet",
     xlc: "spreadsheet",
@@ -14052,7 +14051,6 @@
     "xml"
   ]);
   var MIME_BY_EXTENSION = {
-    pdf: "application/pdf",
     xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     csv: "text/csv",
     tsv: "text/tsv",

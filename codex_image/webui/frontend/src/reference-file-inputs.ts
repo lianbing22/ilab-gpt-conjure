@@ -15,7 +15,6 @@ export type ReferenceFileSource = {
 };
 
 const FAMILY_BY_EXTENSION: Record<string, ReferenceFileSource["family"]> = {
-  pdf: "pdf",
   xla: "spreadsheet", xlb: "spreadsheet", xlc: "spreadsheet", xlm: "spreadsheet",
   xls: "spreadsheet", xlt: "spreadsheet", xlw: "spreadsheet", xlsx: "spreadsheet",
   csv: "spreadsheet", tsv: "spreadsheet", iif: "spreadsheet",
@@ -30,7 +29,6 @@ const TEXT_EXTENSIONS = new Set([
   "vcf", "vtt", "xml",
 ]);
 const MIME_BY_EXTENSION: Record<string, string> = {
-  pdf: "application/pdf",
   xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   csv: "text/csv", tsv: "text/tsv", iif: "text/x-iif",
   doc: "application/msword",

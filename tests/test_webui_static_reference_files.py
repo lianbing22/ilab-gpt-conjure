@@ -397,7 +397,8 @@ class ReferenceFileFrontendContractTests(unittest.TestCase):
         self.assertIsNotNone(accept_match)
         accept_tokens = {token.strip() for token in accept_match.group(1).split(",") if token.strip()}
         self.assertIn("image/*", accept_tokens)
-        self.assertEqual(accept_tokens - {"image/*"}, set(REFERENCE_FILE_TYPES))
+        self.assertEqual(accept_tokens - {"image/*"}, set(REFERENCE_FILE_TYPES) - {".pdf"})
+        self.assertNotIn(".pdf", accept_tokens)
         self.assertRegex(input_tag, r"\bmultiple\b")
         self.assertNotIn('id="referenceFileInput"', html)
         self.assertNotIn('id="referenceFileButton"', html)
