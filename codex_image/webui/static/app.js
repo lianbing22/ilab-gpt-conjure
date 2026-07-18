@@ -20,58 +20,58 @@
       "#promptTemplateDrawer.open, #galleryDrawer.open, .modal-overlay:not(.hidden), .prompt-popover:not(.hidden), .confirm-popover:not(.hidden), .compression-popover:not(.hidden), .task-notification-center:not(.hidden)"
     ));
   }
-  function handleRunTaskShortcut(event, els43, methods) {
+  function handleRunTaskShortcut(event, els44, methods) {
     if (!isRunTaskShortcut(event)) return;
-    if (hasOpenShortcutBlockingLayer() || els43.runButton.disabled) return;
+    if (hasOpenShortcutBlockingLayer() || els44.runButton.disabled) return;
     event.preventDefault();
     void call(methods, "runTask");
   }
   var systemSettingsBackdropPointerDown = false;
-  function bindWebUIEvents(state32, els43, methods) {
+  function bindWebUIEvents(state33, els44, methods) {
     call(methods, "bindShellUiEvents");
     call(methods, "bindFormControlEvents");
-    els43.clearPromptButton.addEventListener("click", () => {
+    els44.clearPromptButton.addEventListener("click", () => {
       call(methods, "setPromptText", "");
       call(methods, "syncGalleryInputsFromPrompt");
       call(methods, "updatePromptCount");
       call(methods, "updateRequestPreview");
     });
-    els43.quickGalleryRail?.addEventListener("mouseover", (event) => call(methods, "handleQuickGalleryCategoryEvent", event));
-    els43.quickGalleryRail?.addEventListener("focusin", (event) => call(methods, "handleQuickGalleryCategoryEvent", event));
-    els43.quickGalleryRail?.addEventListener("click", (event) => call(methods, "handleQuickGalleryCategoryEvent", event));
-    els43.quickGalleryList?.addEventListener("scroll", () => call(methods, "scheduleQuickGalleryFocusUpdate"));
-    els43.quickGalleryList?.addEventListener("wheel", (event) => call(methods, "handleQuickGalleryBoundaryWheel", event), { passive: false });
-    els43.addGalleryCategoryButton?.addEventListener("click", () => call(methods, "createGalleryCategory"));
-    els43.addToGalleryClose?.addEventListener("click", () => call(methods, "closeAddToGallery"));
-    els43.addToGalleryModal?.addEventListener("click", (event) => {
-      if (event.target === els43.addToGalleryModal) call(methods, "closeAddToGallery");
+    els44.quickGalleryRail?.addEventListener("mouseover", (event) => call(methods, "handleQuickGalleryCategoryEvent", event));
+    els44.quickGalleryRail?.addEventListener("focusin", (event) => call(methods, "handleQuickGalleryCategoryEvent", event));
+    els44.quickGalleryRail?.addEventListener("click", (event) => call(methods, "handleQuickGalleryCategoryEvent", event));
+    els44.quickGalleryList?.addEventListener("scroll", () => call(methods, "scheduleQuickGalleryFocusUpdate"));
+    els44.quickGalleryList?.addEventListener("wheel", (event) => call(methods, "handleQuickGalleryBoundaryWheel", event), { passive: false });
+    els44.addGalleryCategoryButton?.addEventListener("click", () => call(methods, "createGalleryCategory"));
+    els44.addToGalleryClose?.addEventListener("click", () => call(methods, "closeAddToGallery"));
+    els44.addToGalleryModal?.addEventListener("click", (event) => {
+      if (event.target === els44.addToGalleryModal) call(methods, "closeAddToGallery");
     });
-    els43.saveToGalleryButton?.addEventListener("click", () => call(methods, "saveUploadToGallery"));
-    els43.systemSettingsModalClose?.addEventListener("click", () => call(methods, "closeSystemSettingsModal"));
-    els43.systemSettingsModal?.addEventListener("pointerdown", (event) => {
-      systemSettingsBackdropPointerDown = event.target === els43.systemSettingsModal;
+    els44.saveToGalleryButton?.addEventListener("click", () => call(methods, "saveUploadToGallery"));
+    els44.systemSettingsModalClose?.addEventListener("click", () => call(methods, "closeSystemSettingsModal"));
+    els44.systemSettingsModal?.addEventListener("pointerdown", (event) => {
+      systemSettingsBackdropPointerDown = event.target === els44.systemSettingsModal;
     });
-    els43.systemSettingsModal?.addEventListener("click", (event) => {
-      if (event.target === els43.systemSettingsModal && systemSettingsBackdropPointerDown) {
+    els44.systemSettingsModal?.addEventListener("click", (event) => {
+      if (event.target === els44.systemSettingsModal && systemSettingsBackdropPointerDown) {
         call(methods, "closeSystemSettingsModal");
       }
       systemSettingsBackdropPointerDown = false;
     });
-    els43.saveSettingsButton?.addEventListener("click", () => call(methods, "saveSettings"));
-    els43.authSourceGroup?.addEventListener("click", (event) => call(methods, "handleAuthSourceClick", event));
-    els43.apiSourceSettingsButton?.addEventListener("click", () => call(methods, "openApiSettingsModal"));
-    els43.apiDirectSettingsButton?.addEventListener("click", () => call(methods, "openApiSettingsModal"));
-    els43.codexModeNotes?.forEach?.((note) => {
+    els44.saveSettingsButton?.addEventListener("click", () => call(methods, "saveSettings"));
+    els44.authSourceGroup?.addEventListener("click", (event) => call(methods, "handleAuthSourceClick", event));
+    els44.apiSourceSettingsButton?.addEventListener("click", () => call(methods, "openApiSettingsModal"));
+    els44.apiDirectSettingsButton?.addEventListener("click", () => call(methods, "openApiSettingsModal"));
+    els44.codexModeNotes?.forEach?.((note) => {
       note.addEventListener("click", () => call(methods, "selectCodexMode", note.dataset.codexModeNote));
     });
-    els43.apiProviderQuick?.addEventListener("change", () => {
-      call(methods, "selectApiProvider", els43.apiProviderQuick?.value || call(methods, "currentApiProviderId"));
+    els44.apiProviderQuick?.addEventListener("change", () => {
+      call(methods, "selectApiProvider", els44.apiProviderQuick?.value || call(methods, "currentApiProviderId"));
     });
-    els43.apiProvider?.addEventListener("change", () => {
-      call(methods, "selectApiProvider", els43.apiProvider?.value || call(methods, "currentApiProviderId"));
+    els44.apiProvider?.addEventListener("change", () => {
+      call(methods, "selectApiProvider", els44.apiProvider?.value || call(methods, "currentApiProviderId"));
     });
-    els43.apiProviderSearch?.addEventListener("input", () => call(methods, "renderApiProviderList"));
-    els43.apiProviderList?.addEventListener("click", (event) => {
+    els44.apiProviderSearch?.addEventListener("input", () => call(methods, "renderApiProviderList"));
+    els44.apiProviderList?.addEventListener("click", (event) => {
       const sortButton = event.target?.closest?.("[data-api-provider-sort]");
       if (sortButton) {
         call(methods, "moveApiProvider", sortButton.dataset.apiProviderId, sortButton.dataset.apiProviderSort);
@@ -81,30 +81,30 @@
       if (!button) return;
       call(methods, "selectApiProvider", button.dataset.apiProviderId);
     });
-    els43.editApiProviderButton?.addEventListener("click", () => call(methods, "editApiProvider"));
-    els43.copyApiProviderButton?.addEventListener("click", () => call(methods, "copyApiProvider"));
-    els43.addApiProviderButton?.addEventListener("click", () => call(methods, "addApiProvider"));
-    els43.sortApiProvidersButton?.addEventListener("click", () => call(methods, "toggleApiProviderSortMode"));
-    els43.deleteApiProviderButton?.addEventListener("click", () => call(methods, "confirmDeleteApiProvider", els43.deleteApiProviderButton));
-    els43.cancelApiProviderEditButton?.addEventListener("click", () => call(methods, "cancelApiProviderEdit"));
-    els43.saveApiProviderEditButton?.addEventListener("click", () => call(methods, "saveApiProviderEdit"));
-    els43.apiKeyRevealButton?.addEventListener("pointerdown", (event) => call(methods, "revealApiKeyWhilePressed", event));
-    els43.apiKeyRevealButton?.addEventListener("pointerup", () => call(methods, "hideApiKeyReveal"));
-    els43.apiKeyRevealButton?.addEventListener("pointercancel", () => call(methods, "hideApiKeyReveal"));
-    els43.apiKeyRevealButton?.addEventListener("pointerleave", () => call(methods, "hideApiKeyReveal"));
-    els43.apiKeyRevealButton?.addEventListener("blur", () => call(methods, "hideApiKeyReveal"));
-    els43.apiKeyRevealButton?.addEventListener("keydown", (event) => {
+    els44.editApiProviderButton?.addEventListener("click", () => call(methods, "editApiProvider"));
+    els44.copyApiProviderButton?.addEventListener("click", () => call(methods, "copyApiProvider"));
+    els44.addApiProviderButton?.addEventListener("click", () => call(methods, "addApiProvider"));
+    els44.sortApiProvidersButton?.addEventListener("click", () => call(methods, "toggleApiProviderSortMode"));
+    els44.deleteApiProviderButton?.addEventListener("click", () => call(methods, "confirmDeleteApiProvider", els44.deleteApiProviderButton));
+    els44.cancelApiProviderEditButton?.addEventListener("click", () => call(methods, "cancelApiProviderEdit"));
+    els44.saveApiProviderEditButton?.addEventListener("click", () => call(methods, "saveApiProviderEdit"));
+    els44.apiKeyRevealButton?.addEventListener("pointerdown", (event) => call(methods, "revealApiKeyWhilePressed", event));
+    els44.apiKeyRevealButton?.addEventListener("pointerup", () => call(methods, "hideApiKeyReveal"));
+    els44.apiKeyRevealButton?.addEventListener("pointercancel", () => call(methods, "hideApiKeyReveal"));
+    els44.apiKeyRevealButton?.addEventListener("pointerleave", () => call(methods, "hideApiKeyReveal"));
+    els44.apiKeyRevealButton?.addEventListener("blur", () => call(methods, "hideApiKeyReveal"));
+    els44.apiKeyRevealButton?.addEventListener("keydown", (event) => {
       if (event.key === " " || event.key === "Enter") call(methods, "revealApiKeyWhilePressed", event);
     });
-    els43.apiKeyRevealButton?.addEventListener("keyup", () => call(methods, "hideApiKeyReveal"));
-    els43.apiKey?.addEventListener("input", () => call(methods, "updateApiKeyRevealButton"));
-    els43.apiBaseUrl?.addEventListener("input", () => call(methods, "updateApiRequestEndpointPreview"));
-    els43.apiMode?.addEventListener("change", () => call(methods, "updateApiRequestEndpointPreview"));
-    [els43.codexMode].filter(Boolean).forEach((element2) => {
+    els44.apiKeyRevealButton?.addEventListener("keyup", () => call(methods, "hideApiKeyReveal"));
+    els44.apiKey?.addEventListener("input", () => call(methods, "updateApiKeyRevealButton"));
+    els44.apiBaseUrl?.addEventListener("input", () => call(methods, "updateApiRequestEndpointPreview"));
+    els44.apiMode?.addEventListener("change", () => call(methods, "updateApiRequestEndpointPreview"));
+    [els44.codexMode].filter(Boolean).forEach((element2) => {
       element2?.addEventListener("input", () => {
         call(methods, "readApiSettingsForm");
         call(methods, "persistApiSettings");
-        call(methods, "renderAuthSource", state32.authStatus);
+        call(methods, "renderAuthSource", state33.authStatus);
         call(methods, "updateModeSpecificSettings");
         call(methods, "updateRequestPreview");
         call(methods, "syncCodexModeNotes");
@@ -113,9 +113,9 @@
       element2?.addEventListener("change", () => call(methods, "syncCodexModeNotes"));
     });
     call(methods, "bindOverlayPopoverEvents");
-    els43.runButton.addEventListener("click", () => call(methods, "runTask"));
-    document.addEventListener("keydown", (event) => handleRunTaskShortcut(event, els43, methods));
-    els43.refreshButton.addEventListener("click", () => {
+    els44.runButton.addEventListener("click", () => call(methods, "runTask"));
+    document.addEventListener("keydown", (event) => handleRunTaskShortcut(event, els44, methods));
+    els44.refreshButton.addEventListener("click", () => {
       void handleRefreshButtonClick(methods);
     });
     call(methods, "bindTaskListControlEvents");
@@ -125,8 +125,8 @@
   function call2(methods, name, ...args) {
     return methods[name]?.(...args);
   }
-  function bootWebUI(state32, els43, methods) {
-    bindWebUIEvents(state32, els43, methods);
+  function bootWebUI(state33, els44, methods) {
+    bindWebUIEvents(state33, els44, methods);
     call2(methods, "restoreThemePreference");
     call2(methods, "restoreSidebarWidth");
     call2(methods, "restoreMainModel");
@@ -445,9 +445,9 @@
   }
 
   // codex_image/webui/frontend/src/legacy-bridge.ts
-  function installLegacyBridge(bridge39) {
-    window.__codexImageWebUI = bridge39;
-    return bridge39;
+  function installLegacyBridge(bridge40) {
+    window.__codexImageWebUI = bridge40;
+    return bridge40;
   }
   function bindBridgeMethod(name, options = {}) {
     const proxy2 = (...args) => {
@@ -465,11 +465,11 @@
 
   // codex_image/webui/frontend/src/state.ts
   function getLegacyBridge() {
-    const bridge39 = window.__codexImageWebUI;
-    if (!bridge39) {
+    const bridge40 = window.__codexImageWebUI;
+    if (!bridge40) {
       throw new Error("WebUI legacy bridge is not initialized");
     }
-    return bridge39;
+    return bridge40;
   }
   function getState() {
     return getLegacyBridge().state;
@@ -600,7 +600,7 @@
     "footer.archiveCount": "Archive {count}",
     "footer.historyLibrary": "History",
     "historyLibrary.openFull": "Open full history library",
-    "history.documentTitle": "History - iLab GPT CONJURE",
+    "history.documentTitle": "History - \u963F\u6CF0\u751F\u56FE",
     "history.back": "Back to generator",
     "history.title": "History",
     "history.loading": "Loading",
@@ -1051,6 +1051,13 @@
     "preview.prompt": "Prompt",
     "preview.download": "Download",
     "preview.downloadImage": "Download this image",
+    "brand.branded": "Branded",
+    "brand.raw": "Original",
+    "brand.downloadBranded": "Download branded",
+    "brand.processing": "Branding\u2026",
+    "brand.failed": "Branding failed",
+    "brand.recompose": "Re-composite",
+    "brand.recomposing": "Compositing\u2026",
     "lightbox.label": "Image preview",
     "lightbox.close": "Close preview",
     "lightbox.previous": "Previous image",
@@ -1581,7 +1588,7 @@
     "footer.archiveCount": "Archiv {count}",
     "footer.historyLibrary": "Geschichte",
     "historyLibrary.openFull": "\xD6ffnen Sie die vollst\xE4ndige Geschichtsbibliothek",
-    "history.documentTitle": "Geschichte \u2013 iLab GPT CONJURE",
+    "history.documentTitle": "Geschichte \u2013 \u963F\u6CF0\u751F\u56FE",
     "history.back": "Zur\xFCck zum Generator",
     "history.title": "Geschichte",
     "history.loading": "Laden",
@@ -2552,7 +2559,7 @@
     "footer.archiveCount": "Archivo {count}",
     "footer.historyLibrary": "Historia",
     "historyLibrary.openFull": "Abrir biblioteca de historia completa",
-    "history.documentTitle": "Historia - iLab GPT CONJURE",
+    "history.documentTitle": "Historia - \u963F\u6CF0\u751F\u56FE",
     "history.back": "Volver al generador",
     "history.title": "Historia",
     "history.loading": "Cargando",
@@ -3523,7 +3530,7 @@
     "footer.archiveCount": "Archiver {count}",
     "footer.historyLibrary": "Histoire",
     "historyLibrary.openFull": "Ouvrir la biblioth\xE8que d'historique compl\xE8te",
-    "history.documentTitle": "Histoire - iLab GPT CONJURE",
+    "history.documentTitle": "Histoire - \u963F\u6CF0\u751F\u56FE",
     "history.back": "Retour au g\xE9n\xE9rateur",
     "history.title": "Histoire",
     "history.loading": "Chargement",
@@ -4494,7 +4501,7 @@
     "footer.archiveCount": "\u30A2\u30FC\u30AB\u30A4\u30D6 {count}",
     "footer.historyLibrary": "\u5C65\u6B74",
     "historyLibrary.openFull": "\u5C65\u6B74\u30E9\u30A4\u30D6\u30E9\u30EA\u5168\u4F53\u3092\u958B\u304F",
-    "history.documentTitle": "\u5C65\u6B74 - iLab GPT CONJURE",
+    "history.documentTitle": "\u5C65\u6B74 - \u963F\u6CF0\u751F\u56FE",
     "history.back": "\u30B8\u30A7\u30CD\u30EC\u30FC\u30BF\u30FC\u306B\u623B\u308B",
     "history.title": "\u5C65\u6B74",
     "history.loading": "\u8AAD\u307F\u8FBC\u307F\u4E2D",
@@ -5465,7 +5472,7 @@
     "footer.archiveCount": "\uBCF4\uAD00\uD568 {count}",
     "footer.historyLibrary": "\uAE30\uB85D",
     "historyLibrary.openFull": "\uC804\uCCB4 \uAE30\uB85D \uB77C\uC774\uBE0C\uB7EC\uB9AC \uC5F4\uAE30",
-    "history.documentTitle": "\uAE30\uB85D - iLab GPT CONJURE",
+    "history.documentTitle": "\uAE30\uB85D - \u963F\u6CF0\u751F\u56FE",
     "history.back": "\uC0DD\uC131\uAE30\uB85C \uB3CC\uC544\uAC00\uAE30",
     "history.title": "\uAE30\uB85D",
     "history.loading": "\uB85C\uB4DC \uC911",
@@ -6436,7 +6443,7 @@
     "footer.archiveCount": "Arquivo {count}",
     "footer.historyLibrary": "Hist\xF3ria",
     "historyLibrary.openFull": "Abra a biblioteca de hist\xF3rico completa",
-    "history.documentTitle": "Hist\xF3ria - iLab GPT CONJURE",
+    "history.documentTitle": "Hist\xF3ria - \u963F\u6CF0\u751F\u56FE",
     "history.back": "Voltar ao gerador",
     "history.title": "Hist\xF3ria",
     "history.loading": "Carregando",
@@ -7407,7 +7414,7 @@
     "footer.archiveCount": "\u0410\u0440\u0445\u0438\u0432 {count}",
     "footer.historyLibrary": "\u0418\u0441\u0442\u043E\u0440\u0438\u044F",
     "historyLibrary.openFull": "\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u043F\u043E\u043B\u043D\u0443\u044E \u0431\u0438\u0431\u043B\u0438\u043E\u0442\u0435\u043A\u0443 \u0438\u0441\u0442\u043E\u0440\u0438\u0438",
-    "history.documentTitle": "\u0418\u0441\u0442\u043E\u0440\u0438\u044F - iLab GPT CONJURE",
+    "history.documentTitle": "\u0418\u0441\u0442\u043E\u0440\u0438\u044F - \u963F\u6CF0\u751F\u56FE",
     "history.back": "\u0412\u0435\u0440\u043D\u0443\u0442\u044C\u0441\u044F \u043A \u0433\u0435\u043D\u0435\u0440\u0430\u0442\u043E\u0440\u0443",
     "history.title": "\u0418\u0441\u0442\u043E\u0440\u0438\u044F",
     "history.loading": "\u0417\u0430\u0433\u0440\u0443\u0437\u043A\u0430",
@@ -8378,7 +8385,7 @@
     "footer.archiveCount": "Archivio {count}",
     "footer.historyLibrary": "Storia",
     "historyLibrary.openFull": "Apri la libreria della cronologia completa",
-    "history.documentTitle": "Storia - iLab GPT CONJURE",
+    "history.documentTitle": "Storia - \u963F\u6CF0\u751F\u56FE",
     "history.back": "Torniamo al generatore",
     "history.title": "Storia",
     "history.loading": "Caricamento in corso",
@@ -10320,7 +10327,7 @@
     "footer.archiveCount": "\u4F1A\u8BDD\u5F52\u6863 {count}",
     "footer.historyLibrary": "\u5386\u53F2\u5E93",
     "historyLibrary.openFull": "\u6253\u5F00\u5B8C\u6574\u5386\u53F2\u5E93",
-    "history.documentTitle": "\u5386\u53F2\u5E93 - iLab GPT CONJURE",
+    "history.documentTitle": "\u5386\u53F2\u5E93 - \u963F\u6CF0\u751F\u56FE",
     "history.back": "\u8FD4\u56DE\u751F\u6210\u9875",
     "history.title": "\u5386\u53F2\u5E93",
     "history.loading": "\u8F7D\u5165\u4E2D",
@@ -10771,6 +10778,13 @@
     "preview.prompt": "\u63D0\u793A\u8BCD",
     "preview.download": "\u4E0B\u8F7D",
     "preview.downloadImage": "\u4E0B\u8F7D\u8BE5\u56FE\u7247",
+    "brand.branded": "\u54C1\u724C\u7248",
+    "brand.raw": "\u539F\u59CB\u5E95\u56FE",
+    "brand.downloadBranded": "\u4E0B\u8F7D\u54C1\u724C\u7248",
+    "brand.processing": "\u54C1\u724C\u5904\u7406\u4E2D",
+    "brand.failed": "\u54C1\u724C\u5408\u6210\u5931\u8D25",
+    "brand.recompose": "\u91CD\u65B0\u5408\u6210",
+    "brand.recomposing": "\u5408\u6210\u4E2D\u2026",
     "lightbox.label": "\u56FE\u7247\u9884\u89C8",
     "lightbox.close": "\u5173\u95ED\u9884\u89C8",
     "lightbox.previous": "\u4E0A\u4E00\u5F20",
@@ -11301,7 +11315,7 @@
     "footer.archiveCount": "\u6703\u8A71\u6B78\u6A94{count}",
     "footer.historyLibrary": "\u6B77\u53F2\u5EAB",
     "historyLibrary.openFull": "\u958B\u555F\u5B8C\u6574\u6B77\u53F2\u5EAB",
-    "history.documentTitle": "\u6B77\u53F2\u5EAB - iLabGPTCONJURE",
+    "history.documentTitle": "\u6B77\u53F2\u5EAB - \u963F\u6CF0\u751F\u56FE",
     "history.back": "\u8FD4\u56DE\u751F\u6210\u9801",
     "history.title": "\u6B77\u53F2\u5EAB",
     "history.loading": "\u8F09\u5165\u4E2D",
@@ -12282,7 +12296,7 @@
     "footer.archiveCount": "\u6703\u8A71\u6B78\u6A94{count}",
     "footer.historyLibrary": "\u6B77\u53F2\u5EAB",
     "historyLibrary.openFull": "\u958B\u555F\u5B8C\u6574\u6B77\u53F2\u5EAB",
-    "history.documentTitle": "\u6B77\u53F2\u5EAB - iLabGPTCONJURE",
+    "history.documentTitle": "\u6B77\u53F2\u5EAB - \u963F\u6CF0\u751F\u56FE",
     "history.back": "\u8FD4\u56DE\u751F\u6210\u9801",
     "history.title": "\u6B77\u53F2\u5EAB",
     "history.loading": "\u8F09\u5165\u4E2D",
@@ -13358,21 +13372,21 @@
   var getPromptText = (...args) => legacyMethod("getPromptText", ...args);
   var syncRunButtonLabel = (...args) => legacyMethod("syncRunButtonLabel", ...args);
   function updateTaskInState(task) {
-    const state32 = getLegacyBridge().state;
+    const state33 = getLegacyBridge().state;
     if (!task?.task_id) return false;
     const taskId = String(task.task_id);
-    const previousIndex = state32.tasks.findIndex((item) => String(item.task_id) === taskId);
+    const previousIndex = state33.tasks.findIndex((item) => String(item.task_id) === taskId);
     if (previousIndex === -1) {
-      state32.tasks.unshift(task);
+      state33.tasks.unshift(task);
       return true;
     }
-    const previousTask = state32.tasks[previousIndex];
+    const previousTask = state33.tasks[previousIndex];
     if (previousTask?.local_pending) {
       revokeTaskUploadPreviewUrls(previousTask);
     }
-    state32.tasks = state32.tasks.map((item, index) => index === previousIndex ? task : item);
-    if (state32.pendingTaskId && String(state32.pendingTaskId) === taskId && !task.local_pending) {
-      state32.pendingTaskId = null;
+    state33.tasks = state33.tasks.map((item, index) => index === previousIndex ? task : item);
+    if (state33.pendingTaskId && String(state33.pendingTaskId) === taskId && !task.local_pending) {
+      state33.pendingTaskId = null;
     }
     return true;
   }
@@ -13391,25 +13405,25 @@
   }
   var uiClockVisibilityBound = false;
   function startUiClock() {
-    const state32 = getLegacyBridge().state;
+    const state33 = getLegacyBridge().state;
     if (!uiClockVisibilityBound) {
       uiClockVisibilityBound = true;
       document.addEventListener("visibilitychange", handleUiClockVisibilityChange);
     }
-    if (state32.uiClockTimerId || document.hidden) return;
-    state32.uiClockTimerId = window.setInterval(updateElapsedDisplays, 100);
+    if (state33.uiClockTimerId || document.hidden) return;
+    state33.uiClockTimerId = window.setInterval(updateElapsedDisplays, 100);
   }
   function handleUiClockVisibilityChange() {
-    const state32 = getLegacyBridge().state;
+    const state33 = getLegacyBridge().state;
     if (document.hidden) {
-      if (state32.uiClockTimerId) {
-        window.clearInterval(state32.uiClockTimerId);
-        state32.uiClockTimerId = null;
+      if (state33.uiClockTimerId) {
+        window.clearInterval(state33.uiClockTimerId);
+        state33.uiClockTimerId = null;
       }
       return;
     }
-    if (!state32.uiClockTimerId) {
-      state32.uiClockTimerId = window.setInterval(updateElapsedDisplays, 100);
+    if (!state33.uiClockTimerId) {
+      state33.uiClockTimerId = window.setInterval(updateElapsedDisplays, 100);
       updateElapsedDisplays();
     }
   }
@@ -13426,8 +13440,8 @@
   function setTextIfChanged(element2, text) {
     if (element2.textContent !== text) element2.textContent = text;
   }
-  function activeElapsedTaskCards(els43, taskId) {
-    const roots = [els43.taskActiveList, els43.taskList].filter((root) => root instanceof HTMLElement);
+  function activeElapsedTaskCards(els44, taskId) {
+    const roots = [els44.taskActiveList, els44.taskList].filter((root) => root instanceof HTMLElement);
     const cards = roots.flatMap(
       (root) => Array.from(root.querySelectorAll(`.task-card[data-task-id="${cssEscape(taskId)}"]`))
     );
@@ -13456,19 +13470,19 @@
     });
   }
   function updateTaskElapsedDisplays() {
-    const { state: state32, els: els43 } = getLegacyBridge();
-    const activeTasks = state32.tasks.filter((task) => taskNeedsElapsedTick(task));
+    const { state: state33, els: els44 } = getLegacyBridge();
+    const activeTasks = state33.tasks.filter((task) => taskNeedsElapsedTick(task));
     if (!activeTasks.length) return;
     activeTasks.forEach((task) => {
       const taskId = String(task.task_id || "");
       if (!taskId) return;
-      activeElapsedTaskCards(els43, taskId).forEach((card) => updateTaskElapsedCard(card, task));
+      activeElapsedTaskCards(els44, taskId).forEach((card) => updateTaskElapsedCard(card, task));
     });
   }
   function updatePreviewElapsedDisplay() {
-    const { els: els43 } = getLegacyBridge();
-    if (!els43.previewGrid) return;
-    els43.previewGrid.querySelectorAll("[data-preview-elapsed]").forEach((element2) => {
+    const { els: els44 } = getLegacyBridge();
+    if (!els44.previewGrid) return;
+    els44.previewGrid.querySelectorAll("[data-preview-elapsed]").forEach((element2) => {
       updateElapsedTimerElement(element2, elapsedMillisecondsSince(element2.dataset.previewStart));
     });
   }
@@ -13504,73 +13518,73 @@
     }
   }
   function updatePromptCount() {
-    const { els: els43 } = getLegacyBridge();
-    if (!els43.charCount) return;
-    els43.charCount.textContent = `${getPromptText().length} / 4000`;
+    const { els: els44 } = getLegacyBridge();
+    if (!els44.charCount) return;
+    els44.charCount.textContent = `${getPromptText().length} / 4000`;
   }
   function addPendingTask(task) {
-    const state32 = getLegacyBridge().state;
-    state32.pendingTaskId = task.task_id;
-    state32.selectedTaskId = task.task_id;
-    state32.tasks = [task, ...state32.tasks.filter((item) => item.task_id !== task.task_id)];
+    const state33 = getLegacyBridge().state;
+    state33.pendingTaskId = task.task_id;
+    state33.selectedTaskId = task.task_id;
+    state33.tasks = [task, ...state33.tasks.filter((item) => item.task_id !== task.task_id)];
     renderTasks();
     renderPreview(task);
   }
   function replacePendingTask(pendingTaskId, completedTask) {
-    const state32 = getLegacyBridge().state;
-    const removedPendingTasks = state32.tasks.filter((task) => task?.local_pending && (task.task_id === completedTask.task_id || task.task_id === pendingTaskId));
-    state32.tasks = [
+    const state33 = getLegacyBridge().state;
+    const removedPendingTasks = state33.tasks.filter((task) => task?.local_pending && (task.task_id === completedTask.task_id || task.task_id === pendingTaskId));
+    state33.tasks = [
       completedTask,
-      ...state32.tasks.filter((task) => task.task_id !== completedTask.task_id && task.task_id !== pendingTaskId)
+      ...state33.tasks.filter((task) => task.task_id !== completedTask.task_id && task.task_id !== pendingTaskId)
     ];
     removedPendingTasks.forEach(revokeTaskUploadPreviewUrls);
-    state32.selectedTaskId = completedTask.task_id;
-    state32.pendingTaskId = null;
+    state33.selectedTaskId = completedTask.task_id;
+    state33.pendingTaskId = null;
     renderTasks();
     renderPreview(completedTask);
   }
   function markPendingTaskFailed(pendingTaskId, message) {
-    const state32 = getLegacyBridge().state;
-    const task = state32.tasks.find((item) => item.task_id === pendingTaskId);
+    const state33 = getLegacyBridge().state;
+    const task = state33.tasks.find((item) => item.task_id === pendingTaskId);
     if (!task) return;
     task.status = "failed";
     task.error = message;
     task.updated_at = (/* @__PURE__ */ new Date()).toISOString();
-    state32.selectedTaskId = pendingTaskId;
-    state32.pendingTaskId = null;
+    state33.selectedTaskId = pendingTaskId;
+    state33.pendingTaskId = null;
     renderTasks();
     renderPreview(task);
   }
   function startRunFeedback(task, actionLabel = null) {
-    const { state: state32, els: els43 } = getLegacyBridge();
+    const { state: state33, els: els44 } = getLegacyBridge();
     stopRunFeedback();
-    state32.runFeedbackAction = actionLabel;
-    state32.runStartedAt = timestampMs(task.started_at || task.created_at) || Date.now();
-    state32.runTimerId = window.setInterval(updateRunFeedback, 100);
-    els43.runButton?.classList.add("running");
+    state33.runFeedbackAction = actionLabel;
+    state33.runStartedAt = timestampMs(task.started_at || task.created_at) || Date.now();
+    state33.runTimerId = window.setInterval(updateRunFeedback, 100);
+    els44.runButton?.classList.add("running");
     updateRunFeedback();
   }
   function updateRunFeedback() {
-    const { state: state32, els: els43 } = getLegacyBridge();
-    if (!state32.runStartedAt) return;
-    const elapsed = formatDurationTenths(elapsedMillisecondsSince(state32.runStartedAt));
-    const action = state32.runFeedbackAction || (state32.mode === "edit" ? translate("runFeedback.editing") : translate("runFeedback.generating"));
-    if (els43.runButton) els43.runButton.textContent = `${action} ${elapsed}`;
+    const { state: state33, els: els44 } = getLegacyBridge();
+    if (!state33.runStartedAt) return;
+    const elapsed = formatDurationTenths(elapsedMillisecondsSince(state33.runStartedAt));
+    const action = state33.runFeedbackAction || (state33.mode === "edit" ? translate("runFeedback.editing") : translate("runFeedback.generating"));
+    if (els44.runButton) els44.runButton.textContent = `${action} ${elapsed}`;
     setStatus(formatTranslation("runFeedback.status", { action, elapsed }), "running");
     updateElapsedDisplays();
-    if (state32.selectedTaskId === state32.pendingTaskId) {
+    if (state33.selectedTaskId === state33.pendingTaskId) {
       renderPreview();
     }
   }
   function stopRunFeedback() {
-    const { state: state32, els: els43 } = getLegacyBridge();
-    if (state32.runTimerId) {
-      window.clearInterval(state32.runTimerId);
+    const { state: state33, els: els44 } = getLegacyBridge();
+    if (state33.runTimerId) {
+      window.clearInterval(state33.runTimerId);
     }
-    state32.runTimerId = null;
-    state32.runStartedAt = null;
-    state32.runFeedbackAction = null;
-    els43.runButton?.classList.remove("running");
+    state33.runTimerId = null;
+    state33.runStartedAt = null;
+    state33.runFeedbackAction = null;
+    els44.runButton?.classList.remove("running");
     syncRunButtonLabel();
   }
 
@@ -13586,7 +13600,7 @@
   var DEFAULT_CODEX_MODE = "images";
   var DEFAULT_API_IMAGES_CONCURRENCY = 4;
   var API_SETTINGS_STORAGE_KEY = "codex-image-api-settings";
-  var DEFAULT_DOCUMENT_TITLE = document.title || "iLab GPT CONJURE";
+  var DEFAULT_DOCUMENT_TITLE = document.title || "\u963F\u6CF0\u751F\u56FE";
   var TASK_HISTORY_EXPANDED_GROUP_STORAGE_KEY = "codex-image-task-history-expanded-group";
   function defaultGalleryCategories() {
     return DEFAULT_GALLERY_CATEGORIES.map((category) => ({ ...category }));
@@ -14132,7 +14146,7 @@
       showResponsesRequirement();
       return false;
     }
-    const state32 = getState();
+    const state33 = getState();
     let source = null;
     if (input instanceof File) {
       const family = familyForFilename(input.name);
@@ -14140,15 +14154,15 @@
         legacyMethod2("setStatus", translate("referenceFiles.errorUnsupported"), "error");
         return false;
       }
-      if (state32.referenceFiles.some((item) => item.kind === "upload" && item.file === input)) return false;
+      if (state33.referenceFiles.some((item) => item.kind === "upload" && item.file === input)) return false;
       source = uploadSource(input, family);
     } else {
       source = storedSource(input);
       if (!source) return false;
-      if (state32.referenceFiles.some((item) => item.kind === "asset" && item.id === source?.id)) return false;
+      if (state33.referenceFiles.some((item) => item.kind === "asset" && item.id === source?.id)) return false;
     }
     requirementActionVisible = false;
-    state32.referenceFiles.push(source);
+    state33.referenceFiles.push(source);
     renderReferenceFiles();
     legacyMethod2("updateRequestPreview");
     return true;
@@ -14169,15 +14183,15 @@
     legacyMethod2("updateRequestPreview");
   }
   function removeReferenceFile(index) {
-    const state32 = getState();
-    if (!Number.isInteger(index) || index < 0 || index >= state32.referenceFiles.length) return;
-    state32.referenceFiles.splice(index, 1);
+    const state33 = getState();
+    if (!Number.isInteger(index) || index < 0 || index >= state33.referenceFiles.length) return;
+    state33.referenceFiles.splice(index, 1);
     renderReferenceFiles();
     legacyMethod2("updateRequestPreview");
   }
   function renderReferenceFiles() {
-    const els43 = getEls();
-    const container = els43.referenceFileSelection;
+    const els44 = getEls();
+    const container = els44.referenceFileSelection;
     if (!container) return;
     requirementFeedback?.remove();
     requirementFeedback = null;
@@ -14200,7 +14214,7 @@
       action.textContent = (legacyMethod2("currentAuthSource") || "codex") === "api" ? translate("referenceFiles.openApiSettings") : translate("referenceFiles.switchToResponses");
       action.addEventListener("click", activateResponsesRequirementAction);
       feedback.append(message, action);
-      els43.imageUploaderGrid?.append(feedback);
+      els44.imageUploaderGrid?.append(feedback);
       requirementFeedback = feedback;
     }
     sources.forEach((source, index) => {
@@ -14226,7 +14240,7 @@
     });
     legacyMethod2("updateImageStripDensity");
     if (requirementActionVisible) {
-      els43.imageUploaderGrid?.classList.add("has-inputs");
+      els44.imageUploaderGrid?.classList.add("has-inputs");
     }
   }
   function syncReferenceFileAvailability() {
@@ -14243,12 +14257,12 @@
   function initReferenceFileInputsFeature() {
     if (initialized) return;
     initialized = true;
-    const els43 = getEls();
+    const els44 = getEls();
     document.addEventListener("change", (event) => {
       const target = event.target;
       if (target?.matches?.("#codexMode, #apiMode")) syncReferenceFileAvailability();
     });
-    els43.authSourceGroup?.addEventListener("click", () => queueMicrotask(syncReferenceFileAvailability));
+    els44.authSourceGroup?.addEventListener("click", () => queueMicrotask(syncReferenceFileAvailability));
     document.addEventListener(LOCALE_CHANGE_EVENT, renderReferenceFiles);
     syncReferenceFileAvailability();
     Object.assign(getLegacyBridge().methods, {
@@ -14328,12 +14342,12 @@
     });
   }
   function uploadPreviewUrlInUse(previewUrl, options = {}) {
-    const state32 = getState();
+    const state33 = getState();
     if (!previewUrl) return false;
     const ignoredCurrentSources = options.ignoredCurrentSources || /* @__PURE__ */ new Set();
     const ignoredTasks = options.ignoredTasks || /* @__PURE__ */ new Set();
-    if (sourceListUsesPreviewUrl(state32.images, previewUrl, ignoredCurrentSources)) return true;
-    return state32.tasks.some((task) => {
+    if (sourceListUsesPreviewUrl(state33.images, previewUrl, ignoredCurrentSources)) return true;
+    return state33.tasks.some((task) => {
       if (!task || ignoredTasks.has(task)) return false;
       return task.preview_url === previewUrl || sourceListUsesPreviewUrl(task.local_input_files, previewUrl) || sourceListUsesPreviewUrl(task.input_sources, previewUrl);
     });
@@ -14374,12 +14388,12 @@
     return source.name || translate("inputSource.galleryFallback");
   }
   function addGalleryInput(item, options = {}) {
-    const state32 = getState();
+    const state33 = getState();
     if (!item) return;
-    const alreadySelected = state32.images.some((source) => source.kind === "gallery" && source.id === item.id);
+    const alreadySelected = state33.images.some((source) => source.kind === "gallery" && source.id === item.id);
     if (!alreadySelected) {
-      state32.images.push(gallerySource(item));
-      if (state32.mode !== "edit") {
+      state33.images.push(gallerySource(item));
+      if (state33.mode !== "edit") {
         legacyMethod3("setMode", "edit");
       }
       legacyMethod3("renderImageStrip");
@@ -14398,14 +14412,14 @@
     return getState().images.filter((image) => image.kind === "upload");
   }
   function addImageFiles(files, options = {}) {
-    const state32 = getState();
+    const state33 = getState();
     const imageFiles = Array.from(files || []).filter(isImageFile2);
     if (!imageFiles.length) {
       if (options.emptyMessage) setStatus2(options.emptyMessage, "error");
       return false;
     }
-    state32.images.push(...imageFiles.map((file) => uploadSource2(file)));
-    if (state32.images.length > 0 && state32.mode !== "edit") {
+    state33.images.push(...imageFiles.map((file) => uploadSource2(file)));
+    if (state33.images.length > 0 && state33.mode !== "edit") {
       legacyMethod3("setMode", "edit");
     }
     legacyMethod3("renderImageStrip");
@@ -14466,8 +14480,8 @@
     });
   }
   function focusImagePasteTarget() {
-    const els43 = getEls();
-    els43.imageUploadSource?.focus({ preventScroll: true });
+    const els44 = getEls();
+    els44.imageUploadSource?.focus({ preventScroll: true });
   }
   function handleImagePaste(event) {
     const files = imageFilesFromClipboardItems(event.clipboardData?.items);
@@ -14538,13 +14552,13 @@
     return files;
   }
   async function pasteClipboardImages() {
-    const els43 = getEls();
+    const els44 = getEls();
     if (!navigator.clipboard?.read) {
       focusImagePasteTarget();
       setStatus2(clipboardReadFallbackMessage(translate("inputSource.clipboardUnsupported")), "error");
       return;
     }
-    els43.pasteClipboardButton.disabled = true;
+    els44.pasteClipboardButton.disabled = true;
     try {
       const files = await readClipboardImageFiles();
       const added = addImageFiles(files, {
@@ -14557,7 +14571,7 @@
       const reason = ["NotAllowedError", "SecurityError"].includes(String(error?.name || "")) ? translate("inputSource.clipboardDenied") : translate("inputSource.clipboardReadFailed");
       setStatus2(clipboardReadFallbackMessage(reason), "error");
     } finally {
-      els43.pasteClipboardButton.disabled = false;
+      els44.pasteClipboardButton.disabled = false;
     }
   }
   function missingGalleryInputs() {
@@ -14567,45 +14581,45 @@
     return getState().images.filter((image) => image.kind === "asset" && image.missing);
   }
   function addReferenceAssetInput(item) {
-    const state32 = getState();
+    const state33 = getState();
     if (!item?.id) return;
-    const alreadySelected = state32.images.some((source) => source.kind === "asset" && source.id === item.id);
+    const alreadySelected = state33.images.some((source) => source.kind === "asset" && source.id === item.id);
     if (alreadySelected) return;
-    state32.images.push(assetSource(item));
-    if (state32.mode !== "edit") {
+    state33.images.push(assetSource(item));
+    if (state33.mode !== "edit") {
       legacyMethod3("setMode", "edit");
     }
     legacyMethod3("renderImageStrip");
     legacyMethod3("updateRequestPreview");
   }
   function collectReferenceOutput(url, options = {}) {
-    const state32 = getState();
+    const state33 = getState();
     if (!url) return;
-    if (state32.collectedReferences.some((item) => item.url === url)) {
+    if (state33.collectedReferences.some((item) => item.url === url)) {
       setStatus2(translate("referenceCollector.alreadyStaged"), "ok");
       return;
     }
-    state32.collectedReferences.push({
+    state33.collectedReferences.push({
       url,
       name: options.name || "",
       sourceTaskId: options.sourceTaskId || "",
       outputIndex: options.outputIndex || null
     });
     renderReferenceCollector();
-    setStatus2(formatTranslation("referenceCollector.staged", { count: state32.collectedReferences.length }), "ok");
+    setStatus2(formatTranslation("referenceCollector.staged", { count: state33.collectedReferences.length }), "ok");
   }
   function renderReferenceCollector() {
-    const state32 = getState();
-    const els43 = getEls();
-    if (!els43.referenceCollector) return;
-    const items = state32.collectedReferences;
+    const state33 = getState();
+    const els44 = getEls();
+    if (!els44.referenceCollector) return;
+    const items = state33.collectedReferences;
     if (!items.length) {
-      els43.referenceCollector.classList.add("hidden");
-      els43.referenceCollector.innerHTML = "";
+      els44.referenceCollector.classList.add("hidden");
+      els44.referenceCollector.innerHTML = "";
       return;
     }
-    els43.referenceCollector.classList.remove("hidden");
-    els43.referenceCollector.innerHTML = `
+    els44.referenceCollector.classList.remove("hidden");
+    els44.referenceCollector.innerHTML = `
     <div class="reference-collector-header">
       <span>${escapeHtml2(formatTranslation("referenceCollector.title", { count: items.length }))}</span>
       <div class="reference-collector-actions">
@@ -14622,9 +14636,9 @@
       `).join("")}
     </div>
   `;
-    els43.referenceCollector.querySelector("[data-reference-collector-add-all]")?.addEventListener("click", addCollectedReferencesToInput);
-    els43.referenceCollector.querySelector("[data-reference-collector-clear]")?.addEventListener("click", () => clearCollectedReferences());
-    els43.referenceCollector.querySelectorAll("[data-reference-collector-remove]").forEach((button) => {
+    els44.referenceCollector.querySelector("[data-reference-collector-add-all]")?.addEventListener("click", addCollectedReferencesToInput);
+    els44.referenceCollector.querySelector("[data-reference-collector-clear]")?.addEventListener("click", () => clearCollectedReferences());
+    els44.referenceCollector.querySelectorAll("[data-reference-collector-remove]").forEach((button) => {
       button.addEventListener("click", () => removeCollectedReference(button.dataset.referenceCollectorRemove));
     });
   }
@@ -14674,11 +14688,11 @@
     return ensureImageFilenameExtension(item?.name || `collected-reference-${index + 1}`, "image/png");
   }
   async function addCollectedReferencesToInput() {
-    const state32 = getState();
-    const els43 = getEls();
-    const items = state32.collectedReferences.slice();
+    const state33 = getState();
+    const els44 = getEls();
+    const items = state33.collectedReferences.slice();
     if (!items.length) return;
-    const addButton = els43.referenceCollector?.querySelector("[data-reference-collector-add-all]");
+    const addButton = els44.referenceCollector?.querySelector("[data-reference-collector-add-all]");
     if (addButton) addButton.disabled = true;
     try {
       const files = [];
@@ -14760,13 +14774,13 @@
     }
   }
   function bindInputSourceEvents() {
-    const els43 = getEls();
-    els43.pasteClipboardButton?.addEventListener("click", pasteClipboardImages);
+    const els44 = getEls();
+    els44.pasteClipboardButton?.addEventListener("click", pasteClipboardImages);
     document.addEventListener("paste", handleImagePaste);
-    els43.imageUploaderGrid?.addEventListener("dragenter", handleImageDragEnter);
-    els43.imageUploaderGrid?.addEventListener("dragover", handleImageDragOver);
-    els43.imageUploaderGrid?.addEventListener("dragleave", handleImageDragLeave);
-    els43.imageUploaderGrid?.addEventListener("drop", handleImageDrop);
+    els44.imageUploaderGrid?.addEventListener("dragenter", handleImageDragEnter);
+    els44.imageUploaderGrid?.addEventListener("dragover", handleImageDragOver);
+    els44.imageUploaderGrid?.addEventListener("dragleave", handleImageDragLeave);
+    els44.imageUploaderGrid?.addEventListener("drop", handleImageDrop);
   }
   function initInputSourcesFeature() {
     if (inputSourcesFeatureInitialized) return;
@@ -17123,11 +17137,11 @@ js: import "konva/skia-backend";
       return this;
     }
     off(evtStr, callback) {
-      let events = (evtStr || "").split(SPACE), len = events.length, n, t, event, parts, baseEvent, name;
+      let events = (evtStr || "").split(SPACE), len = events.length, n, t2, event, parts, baseEvent, name;
       this._cache && this._cache.delete(ALL_LISTENERS);
       if (!evtStr) {
-        for (t in this.eventListeners) {
-          this._off(t);
+        for (t2 in this.eventListeners) {
+          this._off(t2);
         }
       }
       for (n = 0; n < len; n++) {
@@ -17140,8 +17154,8 @@ js: import "konva/skia-backend";
             this._off(baseEvent, name, callback);
           }
         } else {
-          for (t in this.eventListeners) {
-            this._off(t, name, callback);
+          for (t2 in this.eventListeners) {
+            this._off(t2, name, callback);
           }
         }
       }
@@ -20324,15 +20338,15 @@ js: import "konva/skia-backend";
         handler();
       }
     }
-    setTime(t) {
-      if (t > this.duration) {
+    setTime(t2) {
+      if (t2 > this.duration) {
         if (this.yoyo) {
           this._time = this.duration;
           this.reverse();
         } else {
           this.finish();
         }
-      } else if (t < 0) {
+      } else if (t2 < 0) {
         if (this.yoyo) {
           this._time = 0;
           this.play();
@@ -20340,7 +20354,7 @@ js: import "konva/skia-backend";
           this.reset();
         }
       } else {
-        this._time = t;
+        this._time = t2;
         this.update();
       }
     }
@@ -20352,11 +20366,11 @@ js: import "konva/skia-backend";
       this.propFunc(p);
       this._pos = p;
     }
-    getPosition(t) {
-      if (t === void 0) {
-        t = this._time;
+    getPosition(t2) {
+      if (t2 === void 0) {
+        t2 = this._time;
       }
-      return this.func(t, this.begin, this._change, this.duration);
+      return this.func(t2, this.begin, this._change, this.duration);
     }
     play() {
       this.state = PLAYING;
@@ -20371,9 +20385,9 @@ js: import "konva/skia-backend";
       this.onEnterFrame();
       this.fire("onReverse");
     }
-    seek(t) {
+    seek(t2) {
       this.pause();
-      this._time = t;
+      this._time = t2;
       this.update();
       this.fire("onSeek");
     }
@@ -20394,11 +20408,11 @@ js: import "konva/skia-backend";
       this.fire("onUpdate");
     }
     onEnterFrame() {
-      const t = this.getTimer() - this._startTime;
+      const t2 = this.getTimer() - this._startTime;
       if (this.state === PLAYING) {
-        this.setTime(t);
+        this.setTime(t2);
       } else if (this.state === REVERSING) {
-        this.setTime(this.duration - t);
+        this.setTime(this.duration - t2);
       }
     }
     pause() {
@@ -20594,8 +20608,8 @@ js: import "konva/skia-backend";
       this.tween.reset();
       return this;
     }
-    seek(t) {
-      this.tween.seek(t * 1e3);
+    seek(t2) {
+      this.tween.seek(t2 * 1e3);
       return this;
     }
     pause() {
@@ -20641,27 +20655,27 @@ js: import "konva/skia-backend";
     tween.play();
   };
   var Easings = {
-    BackEaseIn(t, b, c, d) {
+    BackEaseIn(t2, b, c, d) {
       const s = 1.70158;
-      return c * (t /= d) * t * ((s + 1) * t - s) + b;
+      return c * (t2 /= d) * t2 * ((s + 1) * t2 - s) + b;
     },
-    BackEaseOut(t, b, c, d) {
+    BackEaseOut(t2, b, c, d) {
       const s = 1.70158;
-      return c * ((t = t / d - 1) * t * ((s + 1) * t + s) + 1) + b;
+      return c * ((t2 = t2 / d - 1) * t2 * ((s + 1) * t2 + s) + 1) + b;
     },
-    BackEaseInOut(t, b, c, d) {
+    BackEaseInOut(t2, b, c, d) {
       let s = 1.70158;
-      if ((t /= d / 2) < 1) {
-        return c / 2 * (t * t * (((s *= 1.525) + 1) * t - s)) + b;
+      if ((t2 /= d / 2) < 1) {
+        return c / 2 * (t2 * t2 * (((s *= 1.525) + 1) * t2 - s)) + b;
       }
-      return c / 2 * ((t -= 2) * t * (((s *= 1.525) + 1) * t + s) + 2) + b;
+      return c / 2 * ((t2 -= 2) * t2 * (((s *= 1.525) + 1) * t2 + s) + 2) + b;
     },
-    ElasticEaseIn(t, b, c, d, a, p) {
+    ElasticEaseIn(t2, b, c, d, a, p) {
       let s = 0;
-      if (t === 0) {
+      if (t2 === 0) {
         return b;
       }
-      if ((t /= d) === 1) {
+      if ((t2 /= d) === 1) {
         return b + c;
       }
       if (!p) {
@@ -20673,14 +20687,14 @@ js: import "konva/skia-backend";
       } else {
         s = p / (2 * Math.PI) * Math.asin(c / a);
       }
-      return -(a * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
+      return -(a * Math.pow(2, 10 * (t2 -= 1)) * Math.sin((t2 * d - s) * (2 * Math.PI) / p)) + b;
     },
-    ElasticEaseOut(t, b, c, d, a, p) {
+    ElasticEaseOut(t2, b, c, d, a, p) {
       let s = 0;
-      if (t === 0) {
+      if (t2 === 0) {
         return b;
       }
-      if ((t /= d) === 1) {
+      if ((t2 /= d) === 1) {
         return b + c;
       }
       if (!p) {
@@ -20692,14 +20706,14 @@ js: import "konva/skia-backend";
       } else {
         s = p / (2 * Math.PI) * Math.asin(c / a);
       }
-      return a * Math.pow(2, -10 * t) * Math.sin((t * d - s) * (2 * Math.PI) / p) + c + b;
+      return a * Math.pow(2, -10 * t2) * Math.sin((t2 * d - s) * (2 * Math.PI) / p) + c + b;
     },
-    ElasticEaseInOut(t, b, c, d, a, p) {
+    ElasticEaseInOut(t2, b, c, d, a, p) {
       let s = 0;
-      if (t === 0) {
+      if (t2 === 0) {
         return b;
       }
-      if ((t /= d / 2) === 2) {
+      if ((t2 /= d / 2) === 2) {
         return b + c;
       }
       if (!p) {
@@ -20711,58 +20725,58 @@ js: import "konva/skia-backend";
       } else {
         s = p / (2 * Math.PI) * Math.asin(c / a);
       }
-      if (t < 1) {
-        return -0.5 * (a * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
+      if (t2 < 1) {
+        return -0.5 * (a * Math.pow(2, 10 * (t2 -= 1)) * Math.sin((t2 * d - s) * (2 * Math.PI) / p)) + b;
       }
-      return a * Math.pow(2, -10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p) * 0.5 + c + b;
+      return a * Math.pow(2, -10 * (t2 -= 1)) * Math.sin((t2 * d - s) * (2 * Math.PI) / p) * 0.5 + c + b;
     },
-    BounceEaseOut(t, b, c, d) {
-      if ((t /= d) < 1 / 2.75) {
-        return c * (7.5625 * t * t) + b;
-      } else if (t < 2 / 2.75) {
-        return c * (7.5625 * (t -= 1.5 / 2.75) * t + 0.75) + b;
-      } else if (t < 2.5 / 2.75) {
-        return c * (7.5625 * (t -= 2.25 / 2.75) * t + 0.9375) + b;
+    BounceEaseOut(t2, b, c, d) {
+      if ((t2 /= d) < 1 / 2.75) {
+        return c * (7.5625 * t2 * t2) + b;
+      } else if (t2 < 2 / 2.75) {
+        return c * (7.5625 * (t2 -= 1.5 / 2.75) * t2 + 0.75) + b;
+      } else if (t2 < 2.5 / 2.75) {
+        return c * (7.5625 * (t2 -= 2.25 / 2.75) * t2 + 0.9375) + b;
       } else {
-        return c * (7.5625 * (t -= 2.625 / 2.75) * t + 0.984375) + b;
+        return c * (7.5625 * (t2 -= 2.625 / 2.75) * t2 + 0.984375) + b;
       }
     },
-    BounceEaseIn(t, b, c, d) {
-      return c - Easings.BounceEaseOut(d - t, 0, c, d) + b;
+    BounceEaseIn(t2, b, c, d) {
+      return c - Easings.BounceEaseOut(d - t2, 0, c, d) + b;
     },
-    BounceEaseInOut(t, b, c, d) {
-      if (t < d / 2) {
-        return Easings.BounceEaseIn(t * 2, 0, c, d) * 0.5 + b;
+    BounceEaseInOut(t2, b, c, d) {
+      if (t2 < d / 2) {
+        return Easings.BounceEaseIn(t2 * 2, 0, c, d) * 0.5 + b;
       } else {
-        return Easings.BounceEaseOut(t * 2 - d, 0, c, d) * 0.5 + c * 0.5 + b;
+        return Easings.BounceEaseOut(t2 * 2 - d, 0, c, d) * 0.5 + c * 0.5 + b;
       }
     },
-    EaseIn(t, b, c, d) {
-      return c * (t /= d) * t + b;
+    EaseIn(t2, b, c, d) {
+      return c * (t2 /= d) * t2 + b;
     },
-    EaseOut(t, b, c, d) {
-      return -c * (t /= d) * (t - 2) + b;
+    EaseOut(t2, b, c, d) {
+      return -c * (t2 /= d) * (t2 - 2) + b;
     },
-    EaseInOut(t, b, c, d) {
-      if ((t /= d / 2) < 1) {
-        return c / 2 * t * t + b;
+    EaseInOut(t2, b, c, d) {
+      if ((t2 /= d / 2) < 1) {
+        return c / 2 * t2 * t2 + b;
       }
-      return -c / 2 * (--t * (t - 2) - 1) + b;
+      return -c / 2 * (--t2 * (t2 - 2) - 1) + b;
     },
-    StrongEaseIn(t, b, c, d) {
-      return c * (t /= d) * t * t * t * t + b;
+    StrongEaseIn(t2, b, c, d) {
+      return c * (t2 /= d) * t2 * t2 * t2 * t2 + b;
     },
-    StrongEaseOut(t, b, c, d) {
-      return c * ((t = t / d - 1) * t * t * t * t + 1) + b;
+    StrongEaseOut(t2, b, c, d) {
+      return c * ((t2 = t2 / d - 1) * t2 * t2 * t2 * t2 + 1) + b;
     },
-    StrongEaseInOut(t, b, c, d) {
-      if ((t /= d / 2) < 1) {
-        return c / 2 * t * t * t * t * t + b;
+    StrongEaseInOut(t2, b, c, d) {
+      if ((t2 /= d / 2) < 1) {
+        return c / 2 * t2 * t2 * t2 * t2 * t2 + b;
       }
-      return c / 2 * ((t -= 2) * t * t * t * t + 2) + b;
+      return c / 2 * ((t2 -= 2) * t2 * t2 * t2 * t2 + 2) + b;
     },
-    Linear(t, b, c, d) {
-      return c * t / d + b;
+    Linear(t2, b, c, d) {
+      return c * t2 / d + b;
     }
   };
 
@@ -20845,8 +20859,8 @@ js: import "konva/skia-backend";
   Factory.addGetterSetter(Arc, "clockwise", false, getBooleanValidator());
 
   // node_modules/konva/lib/shapes/Line.js
-  function getControlPoints(x0, y0, x1, y1, x2, y2, t) {
-    const d01 = Math.sqrt(Math.pow(x1 - x0, 2) + Math.pow(y1 - y0, 2)), d12 = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)), fa = t * d01 / (d01 + d12), fb = t * d12 / (d01 + d12), p1x = x1 - fa * (x2 - x0), p1y = y1 - fa * (y2 - y0), p2x = x1 + fb * (x2 - x0), p2y = y1 + fb * (y2 - y0);
+  function getControlPoints(x0, y0, x1, y1, x2, y2, t2) {
+    const d01 = Math.sqrt(Math.pow(x1 - x0, 2) + Math.pow(y1 - y0, 2)), d12 = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)), fa = t2 * d01 / (d01 + d12), fb = t2 * d12 / (d01 + d12), p1x = x1 - fa * (x2 - x0), p1y = y1 - fa * (y2 - y0), p2x = x1 + fb * (x2 - x0), p2y = y1 + fb * (y2 - y0);
     return [p1x, p1y, p2x, p2y];
   }
   function expandPoints(p, tension) {
@@ -20884,9 +20898,9 @@ js: import "konva/skia-backend";
         }
       }
     }
-    return extremaTs.filter((t) => t > 0 && t < 1).flatMap((t) => axisPoints.map((axis) => {
-      const mt = 1 - t;
-      return mt * mt * mt * axis[0] + 3 * mt * mt * t * axis[1] + 3 * mt * t * t * axis[2] + t * t * t * axis[3];
+    return extremaTs.filter((t2) => t2 > 0 && t2 < 1).flatMap((t2) => axisPoints.map((axis) => {
+      const mt = 1 - t2;
+      return mt * mt * mt * axis[0] + 3 * mt * mt * t2 * axis[1] + 3 * mt * t2 * t2 * axis[2] + t2 * t2 * t2 * axis[3];
     }));
   }
   var Line = class extends Shape {
@@ -21720,11 +21734,11 @@ js: import "konva/skia-backend";
     ]
   ];
   var binomialCoefficients = [[1], [1, 1], [1, 2, 1], [1, 3, 3, 1]];
-  var getCubicArcLength = (xs, ys, t) => {
+  var getCubicArcLength = (xs, ys, t2) => {
     let sum;
     let correctedT;
     const n = 20;
-    const z = t / 2;
+    const z = t2 / 2;
     sum = 0;
     for (let i = 0; i < n; i++) {
       correctedT = z * tValues[n][i] + z;
@@ -21732,9 +21746,9 @@ js: import "konva/skia-backend";
     }
     return z * sum;
   };
-  var getQuadraticArcLength = (xs, ys, t) => {
-    if (t === void 0) {
-      t = 1;
+  var getQuadraticArcLength = (xs, ys, t2) => {
+    if (t2 === void 0) {
+      t2 = 1;
     }
     const ax = xs[0] - 2 * xs[1] + xs[2];
     const ay = ys[0] - 2 * ys[1] + ys[2];
@@ -21744,24 +21758,24 @@ js: import "konva/skia-backend";
     const B = 4 * (ax * bx + ay * by);
     const C = bx * bx + by * by;
     if (A === 0) {
-      return t * Math.sqrt(Math.pow(xs[2] - xs[0], 2) + Math.pow(ys[2] - ys[0], 2));
+      return t2 * Math.sqrt(Math.pow(xs[2] - xs[0], 2) + Math.pow(ys[2] - ys[0], 2));
     }
     const b = B / (2 * A);
     const c = C / A;
-    const u = t + b;
+    const u = t2 + b;
     const k = c - b * b;
     const uuk = u * u + k > 0 ? Math.sqrt(u * u + k) : 0;
     const bbk = b * b + k > 0 ? Math.sqrt(b * b + k) : 0;
     const term = b + Math.sqrt(b * b + k) !== 0 ? k * Math.log(Math.abs((u + uuk) / (b + bbk))) : 0;
     return Math.sqrt(A) / 2 * (u * uuk - b * bbk + term);
   };
-  function BFunc(xs, ys, t) {
-    const xbase = getDerivative(1, t, xs);
-    const ybase = getDerivative(1, t, ys);
+  function BFunc(xs, ys, t2) {
+    const xbase = getDerivative(1, t2, xs);
+    const ybase = getDerivative(1, t2, ys);
     const combined = xbase * xbase + ybase * ybase;
     return Math.sqrt(combined);
   }
-  var getDerivative = (derivative, t, vs) => {
+  var getDerivative = (derivative, t2, vs) => {
     const n = vs.length - 1;
     let _vs;
     let value;
@@ -21771,7 +21785,7 @@ js: import "konva/skia-backend";
     if (derivative === 0) {
       value = 0;
       for (let k = 0; k <= n; k++) {
-        value += binomialCoefficients[n][k] * Math.pow(1 - t, n - k) * Math.pow(t, k) * vs[k];
+        value += binomialCoefficients[n][k] * Math.pow(1 - t2, n - k) * Math.pow(t2, k) * vs[k];
       }
       return value;
     } else {
@@ -21779,26 +21793,26 @@ js: import "konva/skia-backend";
       for (let k = 0; k < n; k++) {
         _vs[k] = n * (vs[k + 1] - vs[k]);
       }
-      return getDerivative(derivative - 1, t, _vs);
+      return getDerivative(derivative - 1, t2, _vs);
     }
   };
   var t2length = (length, totalLength, func) => {
     let error = 1;
-    let t = length / totalLength;
-    let step = (length - func(t)) / totalLength;
+    let t2 = length / totalLength;
+    let step = (length - func(t2)) / totalLength;
     let numIterations = 0;
     while (error > 1e-3) {
-      const increasedTLength = func(t + step);
+      const increasedTLength = func(t2 + step);
       const increasedTError = Math.abs(length - increasedTLength) / totalLength;
       if (increasedTError < error) {
         error = increasedTError;
-        t += step;
+        t2 += step;
       } else {
-        const decreasedTLength = func(t - step);
+        const decreasedTLength = func(t2 - step);
         const decreasedTError = Math.abs(length - decreasedTLength) / totalLength;
         if (decreasedTError < error) {
           error = decreasedTError;
-          t -= step;
+          t2 -= step;
         } else {
           step /= 2;
         }
@@ -21808,7 +21822,7 @@ js: import "konva/skia-backend";
         break;
       }
     }
-    return t;
+    return t2;
   };
 
   // node_modules/konva/lib/shapes/Path.js
@@ -21883,19 +21897,19 @@ js: import "konva/skia-backend";
             inc = Math.abs(start - end);
           }
           if (dTheta < 0) {
-            for (let t = start - inc; t > end; t -= inc) {
-              const point = _Path.getPointOnEllipticalArc(data.points[0], data.points[1], data.points[2], data.points[3], t, 0);
+            for (let t2 = start - inc; t2 > end; t2 -= inc) {
+              const point = _Path.getPointOnEllipticalArc(data.points[0], data.points[1], data.points[2], data.points[3], t2, 0);
               points.push(point.x, point.y);
             }
           } else {
-            for (let t = start + inc; t < end; t += inc) {
-              const point = _Path.getPointOnEllipticalArc(data.points[0], data.points[1], data.points[2], data.points[3], t, 0);
+            for (let t2 = start + inc; t2 < end; t2 += inc) {
+              const point = _Path.getPointOnEllipticalArc(data.points[0], data.points[1], data.points[2], data.points[3], t2, 0);
               points.push(point.x, point.y);
             }
           }
         } else if (data.command === "C") {
-          for (let t = 0; t <= 1; t += 0.01) {
-            const point = _Path.getPointOnCubicBezier(t, data.start.x, data.start.y, data.points[0], data.points[1], data.points[2], data.points[3], data.points[4], data.points[5]);
+          for (let t2 = 0; t2 <= 1; t2 += 0.01) {
+            const point = _Path.getPointOnCubicBezier(t2, data.start.x, data.start.y, data.points[0], data.points[1], data.points[2], data.points[3], data.points[4], data.points[5]);
             points.push(point.x, point.y);
           }
         } else {
@@ -22020,31 +22034,31 @@ js: import "konva/skia-backend";
       return { x: ix + adjustedRun, y: iy + adjustedRise };
     }
     static getPointOnCubicBezier(pct, P1x, P1y, P2x, P2y, P3x, P3y, P4x, P4y) {
-      function CB1(t) {
-        return t * t * t;
+      function CB1(t2) {
+        return t2 * t2 * t2;
       }
-      function CB2(t) {
-        return 3 * t * t * (1 - t);
+      function CB2(t2) {
+        return 3 * t2 * t2 * (1 - t2);
       }
-      function CB3(t) {
-        return 3 * t * (1 - t) * (1 - t);
+      function CB3(t2) {
+        return 3 * t2 * (1 - t2) * (1 - t2);
       }
-      function CB4(t) {
-        return (1 - t) * (1 - t) * (1 - t);
+      function CB4(t2) {
+        return (1 - t2) * (1 - t2) * (1 - t2);
       }
       const x = P4x * CB1(pct) + P3x * CB2(pct) + P2x * CB3(pct) + P1x * CB4(pct);
       const y = P4y * CB1(pct) + P3y * CB2(pct) + P2y * CB3(pct) + P1y * CB4(pct);
       return { x, y };
     }
     static getPointOnQuadraticBezier(pct, P1x, P1y, P2x, P2y, P3x, P3y) {
-      function QB1(t) {
-        return t * t;
+      function QB1(t2) {
+        return t2 * t2;
       }
-      function QB2(t) {
-        return 2 * t * (1 - t);
+      function QB2(t2) {
+        return 2 * t2 * (1 - t2);
       }
-      function QB3(t) {
-        return (1 - t) * (1 - t);
+      function QB3(t2) {
+        return (1 - t2) * (1 - t2);
       }
       const x = P3x * QB1(pct) + P2x * QB2(pct) + P1x * QB3(pct);
       const y = P3y * QB1(pct) + P2y * QB2(pct) + P1y * QB3(pct);
@@ -22376,7 +22390,7 @@ js: import "konva/skia-backend";
       return ca;
     }
     static calcLength(x, y, cmd, points) {
-      let len, p1, p2, t;
+      let len, p1, p2, t2;
       const path = _Path;
       switch (cmd) {
         case "L":
@@ -22396,14 +22410,14 @@ js: import "konva/skia-backend";
           }
           p1 = path.getPointOnEllipticalArc(points[0], points[1], points[2], points[3], start, 0);
           if (dTheta < 0) {
-            for (t = start - inc; t > end; t -= inc) {
-              p2 = path.getPointOnEllipticalArc(points[0], points[1], points[2], points[3], t, 0);
+            for (t2 = start - inc; t2 > end; t2 -= inc) {
+              p2 = path.getPointOnEllipticalArc(points[0], points[1], points[2], points[3], t2, 0);
               len += path.getLineLength(p1.x, p1.y, p2.x, p2.y);
               p1 = p2;
             }
           } else {
-            for (t = start + inc; t < end; t += inc) {
-              p2 = path.getPointOnEllipticalArc(points[0], points[1], points[2], points[3], t, 0);
+            for (t2 = start + inc; t2 < end; t2 += inc) {
+              p2 = path.getPointOnEllipticalArc(points[0], points[1], points[2], points[3], t2, 0);
               len += path.getLineLength(p1.x, p1.y, p2.x, p2.y);
               p1 = p2;
             }
@@ -24313,19 +24327,19 @@ js: import "konva/skia-backend";
             const dirY = -Math.cos(rad);
             const cx = width / 2;
             const cy = height / 2;
-            let t = Infinity;
+            let t2 = Infinity;
             if (dirY < 0) {
-              t = Math.min(t, -cy / dirY);
+              t2 = Math.min(t2, -cy / dirY);
             } else if (dirY > 0) {
-              t = Math.min(t, (height - cy) / dirY);
+              t2 = Math.min(t2, (height - cy) / dirY);
             }
             if (dirX < 0) {
-              t = Math.min(t, -cx / dirX);
+              t2 = Math.min(t2, -cx / dirX);
             } else if (dirX > 0) {
-              t = Math.min(t, (width - cx) / dirX);
+              t2 = Math.min(t2, (width - cx) / dirX);
             }
-            const edgeX = cx + dirX * t;
-            const edgeY = cy + dirY * t;
+            const edgeX = cx + dirX * t2;
+            const edgeY = cy + dirY * t2;
             const sign = Util._sign(height);
             const endX = edgeX + dirX * rotateAnchorOffset * sign;
             const endY = edgeY + dirY * rotateAnchorOffset * sign;
@@ -24592,10 +24606,10 @@ js: import "konva/skia-backend";
         this.update();
         return;
       }
-      const t = new Transform();
-      t.rotate(Konva.getAngle(this.rotation()));
+      const t2 = new Transform();
+      t2.rotate(Konva.getAngle(this.rotation()));
       if (this._movingAnchorName && newAttrs.width < 0 && this._movingAnchorName.indexOf("left") >= 0) {
-        const offset = t.point({
+        const offset = t2.point({
           x: -this.padding() * 2,
           y: 0
         });
@@ -24606,7 +24620,7 @@ js: import "konva/skia-backend";
         this._anchorDragOffset.x -= offset.x;
         this._anchorDragOffset.y -= offset.y;
       } else if (this._movingAnchorName && newAttrs.width < 0 && this._movingAnchorName.indexOf("right") >= 0) {
-        const offset = t.point({
+        const offset = t2.point({
           x: this.padding() * 2,
           y: 0
         });
@@ -24616,7 +24630,7 @@ js: import "konva/skia-backend";
         newAttrs.width += this.padding() * 2;
       }
       if (this._movingAnchorName && newAttrs.height < 0 && this._movingAnchorName.indexOf("top") >= 0) {
-        const offset = t.point({
+        const offset = t2.point({
           x: 0,
           y: -this.padding() * 2
         });
@@ -24627,7 +24641,7 @@ js: import "konva/skia-backend";
         this._anchorDragOffset.y -= offset.y;
         newAttrs.height += this.padding() * 2;
       } else if (this._movingAnchorName && newAttrs.height < 0 && this._movingAnchorName.indexOf("bottom") >= 0) {
-        const offset = t.point({
+        const offset = t2.point({
           x: 0,
           y: this.padding() * 2
         });
@@ -24776,19 +24790,19 @@ js: import "konva/skia-backend";
       const dirY = -Math.cos(rad);
       const cx = width / 2;
       const cy = height / 2;
-      let t = Infinity;
+      let t2 = Infinity;
       if (dirY < 0) {
-        t = Math.min(t, -cy / dirY);
+        t2 = Math.min(t2, -cy / dirY);
       } else if (dirY > 0) {
-        t = Math.min(t, (height - cy) / dirY);
+        t2 = Math.min(t2, (height - cy) / dirY);
       }
       if (dirX < 0) {
-        t = Math.min(t, -cx / dirX);
+        t2 = Math.min(t2, -cx / dirX);
       } else if (dirX > 0) {
-        t = Math.min(t, (width - cx) / dirX);
+        t2 = Math.min(t2, (width - cx) / dirX);
       }
-      const edgeX = cx + dirX * t;
-      const edgeY = cy + dirY * t;
+      const edgeX = cx + dirX * t2;
+      const edgeY = cy + dirY * t2;
       const sign = Util._sign(height);
       this._batchChangeChild(".rotater", {
         x: edgeX + dirX * rotateAnchorOffset * sign,
@@ -26522,10 +26536,10 @@ js: import "konva/skia-backend";
     return remoteImageSourceFile(source);
   }
   function setImageEditorStatus(message, type = "") {
-    const els43 = getEls();
-    if (!els43.imageEditorStatus) return;
-    els43.imageEditorStatus.textContent = message || "";
-    els43.imageEditorStatus.className = `image-editor-status ${type || ""}`.trim();
+    const els44 = getEls();
+    if (!els44.imageEditorStatus) return;
+    els44.imageEditorStatus.textContent = message || "";
+    els44.imageEditorStatus.className = `image-editor-status ${type || ""}`.trim();
   }
   function nextImageEditorSession() {
     imageEditorState.sessionId += 1;
@@ -26917,8 +26931,8 @@ js: import "konva/skia-backend";
     imageEditorState.previewNode = null;
   }
   function initializeImageEditorKonva(width, height) {
-    const els43 = getEls();
-    const container = els43.imageEditorKonvaMount;
+    const els44 = getEls();
+    const container = els44.imageEditorKonvaMount;
     if (!container) throw new Error(translate("imageEditor.canvasCreateFailed"));
     destroyImageEditorKonva();
     container.innerHTML = "";
@@ -26995,8 +27009,8 @@ js: import "konva/skia-backend";
     pushImageEditorHistory();
   }
   function renderImageEditor() {
-    const els43 = getEls();
-    const visible = els43.imageEditorCanvas;
+    const els44 = getEls();
+    const visible = els44.imageEditorCanvas;
     const stage = imageEditorState.konvaStage;
     const work = imageEditorState.workCanvas;
     if (visible && work) {
@@ -27040,16 +27054,16 @@ js: import "konva/skia-backend";
     restoreImageEditorSnapshot(snapshot);
   }
   function updateImageEditorControls() {
-    const els43 = getEls();
+    const els44 = getEls();
     const canUndo = imageEditorState.historyIndex > 0;
     const canRedo = imageEditorState.historyIndex >= 0 && imageEditorState.historyIndex < imageEditorState.history.length - 1;
     const selectedLayer = selectedImageEditorLayer();
-    if (els43.imageEditorUndo) els43.imageEditorUndo.disabled = !canUndo;
-    if (els43.imageEditorRedo) els43.imageEditorRedo.disabled = !canRedo;
-    if (els43.imageEditorLayerUp) els43.imageEditorLayerUp.disabled = !selectedLayer || imageEditorState.layers.indexOf(selectedLayer) >= imageEditorState.layers.length - 1;
-    if (els43.imageEditorLayerDown) els43.imageEditorLayerDown.disabled = !selectedLayer || imageEditorState.layers.indexOf(selectedLayer) <= 0;
-    if (els43.imageEditorLayerDelete) els43.imageEditorLayerDelete.disabled = !selectedLayer || imageEditorState.layers.length <= 1;
-    if (els43.imageEditorStrokeValue) els43.imageEditorStrokeValue.textContent = `${imageEditorState.strokeWidth}px`;
+    if (els44.imageEditorUndo) els44.imageEditorUndo.disabled = !canUndo;
+    if (els44.imageEditorRedo) els44.imageEditorRedo.disabled = !canRedo;
+    if (els44.imageEditorLayerUp) els44.imageEditorLayerUp.disabled = !selectedLayer || imageEditorState.layers.indexOf(selectedLayer) >= imageEditorState.layers.length - 1;
+    if (els44.imageEditorLayerDown) els44.imageEditorLayerDown.disabled = !selectedLayer || imageEditorState.layers.indexOf(selectedLayer) <= 0;
+    if (els44.imageEditorLayerDelete) els44.imageEditorLayerDelete.disabled = !selectedLayer || imageEditorState.layers.length <= 1;
+    if (els44.imageEditorStrokeValue) els44.imageEditorStrokeValue.textContent = `${imageEditorState.strokeWidth}px`;
     document.querySelectorAll("[data-image-editor-tool]").forEach((button) => {
       button.classList.toggle("active", button.dataset.imageEditorTool === imageEditorState.tool);
     });
@@ -27081,9 +27095,9 @@ js: import "konva/skia-backend";
     transformer.rotateAnchorOffset?.(Math.max(28, Math.round(28 / safeScale)));
   }
   function updateImageEditorDisplayScale() {
-    const els43 = getEls();
-    const wrap = els43.imageEditorCanvasWrap;
-    const mount = els43.imageEditorKonvaMount;
+    const els44 = getEls();
+    const wrap = els44.imageEditorCanvasWrap;
+    const mount = els44.imageEditorKonvaMount;
     const stage = imageEditorState.konvaStage;
     if (!wrap || !mount || !stage) return;
     const width = stage.width();
@@ -27106,16 +27120,16 @@ js: import "konva/skia-backend";
     mount.style.setProperty("--image-editor-stage-scale", String(displayScale));
   }
   function updateImageEditorCropBox() {
-    const els43 = getEls();
-    const box = els43.imageEditorCropBox;
-    const wrap = els43.imageEditorCanvasWrap;
+    const els44 = getEls();
+    const box = els44.imageEditorCropBox;
+    const wrap = els44.imageEditorCanvasWrap;
     const stage = imageEditorState.konvaStage;
     const crop = imageEditorState.crop;
     if (!box || !wrap || !stage || !crop) {
       box?.classList.add("hidden");
       return;
     }
-    const content = els43.imageEditorKonvaMount?.querySelector(".konvajs-content");
+    const content = els44.imageEditorKonvaMount?.querySelector(".konvajs-content");
     const rect = content?.getBoundingClientRect() || wrap.getBoundingClientRect();
     const wrapRect = wrap.getBoundingClientRect();
     const scaleX = rect.width / Math.max(1, stage.width());
@@ -27632,19 +27646,19 @@ ${hint}` : hint;
     legacyMethod4("updatePromptCount");
   }
   async function saveImageEdit() {
-    const state32 = getState();
-    const els43 = getEls();
+    const state33 = getState();
+    const els44 = getEls();
     const sessionId = imageEditorState.sessionId;
     const source = imageEditorState.source;
     const saveCanvas = imageEditorCanvasForSave();
-    if (!source || !isEditableImageSource(source) || !saveCanvas || !state32.images.includes(source)) {
+    if (!source || !isEditableImageSource(source) || !saveCanvas || !state33.images.includes(source)) {
       setImageEditorStatus(translate("imageEditor.saveFailed"), "error");
       return;
     }
-    if (els43.imageEditorSave) els43.imageEditorSave.disabled = true;
+    if (els44.imageEditorSave) els44.imageEditorSave.disabled = true;
     try {
       const blob = await imageEditorExportBlob(saveCanvas);
-      const sourceIndex = state32.images.indexOf(source);
+      const sourceIndex = state33.images.indexOf(source);
       if (sessionId !== imageEditorState.sessionId || imageEditorState.source !== source || sourceIndex < 0) {
         return;
       }
@@ -27661,7 +27675,7 @@ ${hint}` : hint;
         previewUrl: URL.createObjectURL(file),
         edited: true
       };
-      state32.images[sourceIndex] = nextSource;
+      state33.images[sourceIndex] = nextSource;
       legacyMethod4("revokeUploadPreviewUrl", source);
       legacyMethod4("syncPromptGalleryMentionsFromInputs");
       if (imageEditorState.hasInstructionMarks) ensureImageEditorPromptHint();
@@ -27672,7 +27686,7 @@ ${hint}` : hint;
     } catch (error) {
       setImageEditorStatus(error.message || translate("imageEditor.saveFailed"), "error");
     } finally {
-      if (els43.imageEditorSave) els43.imageEditorSave.disabled = false;
+      if (els44.imageEditorSave) els44.imageEditorSave.disabled = false;
     }
   }
   function sourcePreviewUrlForEditor(source) {
@@ -27681,11 +27695,11 @@ ${hint}` : hint;
     return legacyMethod4("sourcePreviewUrl", source) || "";
   }
   function renderImageEditorInsertList() {
-    const state32 = getState();
+    const state33 = getState();
     const list = getEls().imageEditorInsertList;
     if (!list) return;
     list.textContent = "";
-    const sources = state32.images.map((source, index) => ({ source, index })).filter((item) => item.index !== imageEditorState.sourceIndex && isEditableImageSource(item.source));
+    const sources = state33.images.map((source, index) => ({ source, index })).filter((item) => item.index !== imageEditorState.sourceIndex && isEditableImageSource(item.source));
     if (!sources.length) {
       const empty = document.createElement("div");
       empty.className = "image-editor-insert-empty";
@@ -27851,9 +27865,9 @@ ${hint}` : hint;
     renderImageEditor();
   }
   async function openImageEditor(index) {
-    const state32 = getState();
-    const els43 = getEls();
-    const source = state32.images[index];
+    const state33 = getState();
+    const els44 = getEls();
+    const source = state33.images[index];
     if (!source || !isEditableImageSource(source)) {
       legacyMethod4("setStatus", translate("imageEditor.uneditable"), "error");
       return;
@@ -27863,16 +27877,16 @@ ${hint}` : hint;
     imageEditorState.source = source;
     imageEditorState.originalFile = null;
     imageEditorState.tool = "crop";
-    imageEditorState.color = els43.imageEditorColor?.value || "#ff3b30";
-    imageEditorState.strokeWidth = Number(els43.imageEditorStroke?.value || 8);
+    imageEditorState.color = els44.imageEditorColor?.value || "#ff3b30";
+    imageEditorState.strokeWidth = Number(els44.imageEditorStroke?.value || 8);
     imageEditorState.hasInstructionMarks = false;
     imageEditorState.drawing = null;
     imageEditorState.canvasScope = "base";
     setImageEditorStatus("");
-    if (els43.imageEditorSubtitle) {
-      els43.imageEditorSubtitle.textContent = legacyMethod4("sourceName", source) || translate("imageEditor.inputFallback");
+    if (els44.imageEditorSubtitle) {
+      els44.imageEditorSubtitle.textContent = legacyMethod4("sourceName", source) || translate("imageEditor.inputFallback");
     }
-    els43.imageEditorModal?.classList.remove("hidden");
+    els44.imageEditorModal?.classList.remove("hidden");
     try {
       const file = await imageEditorSourceFile(source);
       if (sessionId !== imageEditorState.sessionId || imageEditorState.source !== source) return;
@@ -27889,9 +27903,9 @@ ${hint}` : hint;
     }
   }
   function closeImageEditor() {
-    const els43 = getEls();
+    const els44 = getEls();
     nextImageEditorSession();
-    els43.imageEditorModal?.classList.add("hidden");
+    els44.imageEditorModal?.classList.add("hidden");
     destroyImageEditorKonva();
     imageEditorState.sourceIndex = null;
     imageEditorState.source = null;
@@ -27953,8 +27967,8 @@ ${hint}` : hint;
     }
   }
   function isImageEditorModalOpen() {
-    const els43 = getEls();
-    return Boolean(els43.imageEditorModal && !els43.imageEditorModal.classList.contains("hidden"));
+    const els44 = getEls();
+    return Boolean(els44.imageEditorModal && !els44.imageEditorModal.classList.contains("hidden"));
   }
   function handleImageEditorHistoryShortcut(event) {
     if (!isImageEditorModalOpen()) return false;
@@ -27999,11 +28013,11 @@ ${hint}` : hint;
     });
   }
   function bindImageEditorEvents() {
-    const els43 = getEls();
-    els43.imageEditorClose?.addEventListener("click", closeImageEditor);
-    els43.imageEditorCancel?.addEventListener("click", closeImageEditor);
-    els43.imageEditorModal?.addEventListener("click", (event) => {
-      if (event.target === els43.imageEditorModal) closeImageEditor();
+    const els44 = getEls();
+    els44.imageEditorClose?.addEventListener("click", closeImageEditor);
+    els44.imageEditorCancel?.addEventListener("click", closeImageEditor);
+    els44.imageEditorModal?.addEventListener("click", (event) => {
+      if (event.target === els44.imageEditorModal) closeImageEditor();
     });
     document.querySelectorAll("[data-image-editor-tool]").forEach((button) => {
       button.addEventListener("click", () => setImageEditorTool(button.dataset.imageEditorTool));
@@ -28011,32 +28025,32 @@ ${hint}` : hint;
     document.querySelectorAll("[data-image-editor-color]").forEach((button) => {
       button.addEventListener("click", () => {
         imageEditorState.color = button.dataset.imageEditorColor || imageEditorState.color;
-        if (els43.imageEditorColor) els43.imageEditorColor.value = imageEditorState.color;
+        if (els44.imageEditorColor) els44.imageEditorColor.value = imageEditorState.color;
         updateImageEditorControls();
       });
     });
     document.querySelectorAll("[data-image-editor-canvas-scope]").forEach((button) => {
       button.addEventListener("click", () => setImageEditorCanvasScope(button.dataset.imageEditorCanvasScope));
     });
-    els43.imageEditorColor?.addEventListener("input", () => {
-      imageEditorState.color = els43.imageEditorColor.value || imageEditorState.color;
+    els44.imageEditorColor?.addEventListener("input", () => {
+      imageEditorState.color = els44.imageEditorColor.value || imageEditorState.color;
       updateImageEditorControls();
     });
-    els43.imageEditorStroke?.addEventListener("input", () => {
-      imageEditorState.strokeWidth = Number(els43.imageEditorStroke.value || 8);
+    els44.imageEditorStroke?.addEventListener("input", () => {
+      imageEditorState.strokeWidth = Number(els44.imageEditorStroke.value || 8);
       updateImageEditorControls();
     });
-    els43.imageEditorUndo?.addEventListener("click", undoImageEdit);
-    els43.imageEditorRedo?.addEventListener("click", redoImageEdit);
-    els43.imageEditorReset?.addEventListener("click", resetImageEdit);
-    els43.imageEditorSave?.addEventListener("click", saveImageEdit);
-    els43.imageEditorLayerUp?.addEventListener("click", () => moveImageEditorLayer("up"));
-    els43.imageEditorLayerDown?.addEventListener("click", () => moveImageEditorLayer("down"));
-    els43.imageEditorLayerDelete?.addEventListener("click", deleteSelectedImageEditorLayer);
-    els43.imageEditorCanvas?.addEventListener("pointerdown", handleImageEditorPointerDown);
-    els43.imageEditorCanvas?.addEventListener("pointermove", handleImageEditorPointerMove);
-    els43.imageEditorCanvas?.addEventListener("pointerup", handleImageEditorPointerUp);
-    els43.imageEditorCanvas?.addEventListener("pointercancel", handleImageEditorPointerCancel);
+    els44.imageEditorUndo?.addEventListener("click", undoImageEdit);
+    els44.imageEditorRedo?.addEventListener("click", redoImageEdit);
+    els44.imageEditorReset?.addEventListener("click", resetImageEdit);
+    els44.imageEditorSave?.addEventListener("click", saveImageEdit);
+    els44.imageEditorLayerUp?.addEventListener("click", () => moveImageEditorLayer("up"));
+    els44.imageEditorLayerDown?.addEventListener("click", () => moveImageEditorLayer("down"));
+    els44.imageEditorLayerDelete?.addEventListener("click", deleteSelectedImageEditorLayer);
+    els44.imageEditorCanvas?.addEventListener("pointerdown", handleImageEditorPointerDown);
+    els44.imageEditorCanvas?.addEventListener("pointermove", handleImageEditorPointerMove);
+    els44.imageEditorCanvas?.addEventListener("pointerup", handleImageEditorPointerUp);
+    els44.imageEditorCanvas?.addEventListener("pointercancel", handleImageEditorPointerCancel);
   }
   function initImageEditorFeature() {
     if (imageEditorFeatureInitialized) return;
@@ -28061,9 +28075,9 @@ ${hint}` : hint;
     event.target.value = "";
   }
   function clearImages() {
-    const state32 = getState();
-    legacyMethod5("revokeUploadPreviewUrls", state32.images);
-    state32.images = [];
+    const state33 = getState();
+    legacyMethod5("revokeUploadPreviewUrls", state33.images);
+    state33.images = [];
     legacyMethod5("clearReferenceFiles", { silent: true });
     legacyMethod5("syncPromptGalleryMentionsFromInputs");
     legacyMethod5("setMode", "generate");
@@ -28085,11 +28099,11 @@ ${hint}` : hint;
     return icon;
   }
   function imageStripNeedsCompactGrid() {
-    const state32 = getState();
-    const els43 = getEls();
-    const thumbCount = state32.images.length + state32.referenceFiles.length;
-    if (!els43.imageUploaderGrid || !thumbCount) return false;
-    const availableWidth = Math.max(0, els43.imageUploaderGrid.clientWidth - 24);
+    const state33 = getState();
+    const els44 = getEls();
+    const thumbCount = state33.images.length + state33.referenceFiles.length;
+    if (!els44.imageUploaderGrid || !thumbCount) return false;
+    const availableWidth = Math.max(0, els44.imageUploaderGrid.clientWidth - 24);
     if (!availableWidth) return false;
     const fullSizeThumbsWidth = thumbCount * 116 + Math.max(0, thumbCount - 1) * 10;
     const fullSizeUploadWidth = 118;
@@ -28097,27 +28111,27 @@ ${hint}` : hint;
     return fullSizeThumbsWidth + fullSizeUploadGap + fullSizeUploadWidth > availableWidth;
   }
   function updateImageStripDensity() {
-    const state32 = getState();
-    const els43 = getEls();
-    const hasImages = Boolean(state32.images.length);
-    const hasInputs = Boolean(state32.images.length + state32.referenceFiles.length);
+    const state33 = getState();
+    const els44 = getEls();
+    const hasImages = Boolean(state33.images.length);
+    const hasInputs = Boolean(state33.images.length + state33.referenceFiles.length);
     const compactGrid = imageStripNeedsCompactGrid();
-    els43.imageUploaderGrid?.classList.toggle("has-images", hasImages);
-    els43.imageUploaderGrid?.classList.toggle("has-inputs", hasInputs);
-    els43.imageUploaderGrid?.classList.toggle("compact-grid", compactGrid);
+    els44.imageUploaderGrid?.classList.toggle("has-images", hasImages);
+    els44.imageUploaderGrid?.classList.toggle("has-inputs", hasInputs);
+    els44.imageUploaderGrid?.classList.toggle("compact-grid", compactGrid);
   }
   function wheelDeltaInPixels(event) {
     const dominantDelta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
     if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) return dominantDelta * 16;
     if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
-      const els43 = getEls();
-      return dominantDelta * Math.max(1, els43.imageStrip?.clientWidth || 1);
+      const els44 = getEls();
+      return dominantDelta * Math.max(1, els44.imageStrip?.clientWidth || 1);
     }
     return dominantDelta;
   }
   function handleImageStripWheel(event) {
-    const els43 = getEls();
-    const scrollTarget = els43.imageThumbList;
+    const els44 = getEls();
+    const scrollTarget = els44.imageThumbList;
     if (!scrollTarget) return;
     const maxScrollLeft = Math.max(0, scrollTarget.scrollWidth - scrollTarget.clientWidth);
     if (!maxScrollLeft) return;
@@ -28129,10 +28143,10 @@ ${hint}` : hint;
     scrollTarget.scrollLeft = nextScrollLeft;
   }
   function renderImageStrip() {
-    const state32 = getState();
-    const els43 = getEls();
-    const hasImages = Boolean(state32.images.length);
-    const thumbItems = els43.imageThumbItems;
+    const state33 = getState();
+    const els44 = getEls();
+    const hasImages = Boolean(state33.images.length);
+    const thumbItems = els44.imageThumbItems;
     updateImageStripDensity();
     if (!thumbItems) return;
     if (!hasImages) {
@@ -28141,7 +28155,7 @@ ${hint}` : hint;
       return;
     }
     thumbItems.innerHTML = "";
-    state32.images.forEach((source, index) => {
+    state33.images.forEach((source, index) => {
       const wrapper = document.createElement("div");
       wrapper.className = `thumb ${source.kind === "gallery" ? "gallery-thumb" : source.kind === "asset" ? "asset-thumb" : "upload-thumb"}${source.missing ? " missing-thumb" : ""}`;
       const image = document.createElement("img");
@@ -28179,11 +28193,11 @@ ${hint}` : hint;
       remove.append(createThumbRemoveIcon());
       remove.addEventListener("click", (event) => {
         event.stopPropagation();
-        const removedSource = state32.images[index];
+        const removedSource = state33.images[index];
         legacyMethod5("revokeUploadPreviewUrl", removedSource, { ignoredCurrentSources: /* @__PURE__ */ new Set([removedSource]) });
-        state32.images.splice(index, 1);
+        state33.images.splice(index, 1);
         legacyMethod5("syncPromptGalleryMentionsFromInputs");
-        if (!state32.images.length) {
+        if (!state33.images.length) {
           legacyMethod5("setMode", "generate");
         }
         renderImageStrip();
@@ -28214,10 +28228,10 @@ ${hint}` : hint;
     legacyMethod5("updateCustomRatioReferenceButtonState");
   }
   function bindImageStripEvents() {
-    const els43 = getEls();
-    els43.imageInput?.addEventListener("change", addImages);
-    els43.clearImagesButton?.addEventListener("click", clearImages);
-    els43.imageStrip?.addEventListener("wheel", handleImageStripWheel, { passive: false });
+    const els44 = getEls();
+    els44.imageInput?.addEventListener("change", addImages);
+    els44.clearImagesButton?.addEventListener("click", clearImages);
+    els44.imageStrip?.addEventListener("wheel", handleImageStripWheel, { passive: false });
     window.addEventListener("resize", updateImageStripDensity);
     document.addEventListener(LOCALE_CHANGE_EVENT, renderImageStrip);
   }
@@ -28930,10 +28944,11 @@ ${hint}` : hint;
     els3.recentAssetDock.classList.toggle("hidden", !items.length);
     els3.recentAssetList.innerHTML = visibleItems.map((item) => {
       const name = recentAssetName(item);
+      const previewSrc = escapeHtml4(item.thumbnail_url || item.image_url);
       return `
     <div class="recent-asset-button" title="${escapeHtml4(name)}">
       <button class="recent-asset-use" type="button" data-reference-asset-id="${escapeHtml4(item.id)}" aria-label="${escapeHtml4(formatTranslation("recentAssets.use", { name }))}">
-        <img src="${escapeHtml4(item.image_url)}" alt="${escapeHtml4(name)}" loading="lazy" decoding="async">
+        <img src="${previewSrc}" alt="${escapeHtml4(name)}" loading="lazy" decoding="async">
         <span>${escapeHtml4(name)}</span>
       </button>
       <button class="recent-asset-delete" type="button" data-reference-asset-delete="${escapeHtml4(item.id)}" aria-label="${escapeHtml4(formatTranslation("recentAssets.delete", { name }))}">\xD7</button>
@@ -30543,9 +30558,9 @@ ${hint}` : hint;
     scheduledFrames.set(host, window.requestAnimationFrame(() => updateIndicator(host)));
   }
   function watchButtonClassChanges(host) {
-    const observer = new MutationObserver(() => scheduleIndicatorUpdate(host));
+    const observer2 = new MutationObserver(() => scheduleIndicatorUpdate(host));
     host.querySelectorAll(BUTTON_SELECTOR).forEach((button) => {
-      observer.observe(button, { attributes: true, attributeFilter: ["class"] });
+      observer2.observe(button, { attributes: true, attributeFilter: ["class"] });
     });
   }
   function initHost(host) {
@@ -30589,12 +30604,12 @@ ${hint}` : hint;
     if (typeof method === "function") method(...args);
   }
   function systemSettingsPanel() {
-    const { els: els43 } = getLegacyBridge();
-    return els43.systemSettingsModal?.querySelector(".system-settings-modal-panel") || null;
+    const { els: els44 } = getLegacyBridge();
+    return els44.systemSettingsModal?.querySelector(".system-settings-modal-panel") || null;
   }
   function shouldAnimateSystemSettingsHeight() {
-    const { els: els43 } = getLegacyBridge();
-    if (els43.systemSettingsModal?.classList.contains("hidden")) return false;
+    const { els: els44 } = getLegacyBridge();
+    if (els44.systemSettingsModal?.classList.contains("hidden")) return false;
     return !window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
   }
   function clearSystemSettingsHeightAnimation(panel) {
@@ -30607,8 +30622,8 @@ ${hint}` : hint;
     panel.style.height = "";
   }
   function positionSystemSettingsModal() {
-    const { els: els43 } = getLegacyBridge();
-    const modal = els43.systemSettingsModal;
+    const { els: els44 } = getLegacyBridge();
+    const modal = els44.systemSettingsModal;
     const panel = systemSettingsPanel();
     if (!modal || !panel || modal.classList.contains("hidden")) return;
     const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
@@ -30656,12 +30671,12 @@ ${hint}` : hint;
   }
   function setSystemSettingsTab(tab, options = {}) {
     const selected = normalizedTab(tab);
-    const { els: els43 } = getLegacyBridge();
+    const { els: els44 } = getLegacyBridge();
     const panel = systemSettingsPanel();
     const animateHeight = Boolean(panel && shouldAnimateSystemSettingsHeight());
     const beforeHeight = animateHeight && panel ? panel.getBoundingClientRect().height : 0;
     if (animateHeight && panel) clearSystemSettingsHeightAnimation(panel);
-    const buttons = Array.from(els43.systemSettingsTabs?.querySelectorAll("[data-system-settings-tab]") || []);
+    const buttons = Array.from(els44.systemSettingsTabs?.querySelectorAll("[data-system-settings-tab]") || []);
     buttons.forEach((button) => {
       const active = button.dataset.systemSettingsTab === selected;
       button.classList.toggle("active", active);
@@ -30669,10 +30684,10 @@ ${hint}` : hint;
       button.tabIndex = active ? 0 : -1;
     });
     [
-      ["api", els43.systemSettingsApiPanel],
-      ["codex", els43.systemSettingsCodexPanel],
-      ["language", els43.systemSettingsLanguagePanel],
-      ["storage", els43.systemSettingsStoragePanel]
+      ["api", els44.systemSettingsApiPanel],
+      ["codex", els44.systemSettingsCodexPanel],
+      ["language", els44.systemSettingsLanguagePanel],
+      ["storage", els44.systemSettingsStoragePanel]
     ].forEach(([name, panel2]) => {
       if (!panel2) return;
       const active = name === selected;
@@ -30690,19 +30705,19 @@ ${hint}` : hint;
     if (animateHeight && panel) animateSystemSettingsPanelHeight(panel, beforeHeight);
   }
   function openSystemSettingsModal(tab = "api") {
-    const { els: els43 } = getLegacyBridge();
-    const wasHidden = els43.systemSettingsModal?.classList.contains("hidden") ?? true;
+    const { els: els44 } = getLegacyBridge();
+    const wasHidden = els44.systemSettingsModal?.classList.contains("hidden") ?? true;
     setSystemSettingsTab(tab);
-    els43.systemSettingsModal?.classList.remove("hidden");
-    els43.systemSettingsModal?.setAttribute("aria-hidden", "false");
+    els44.systemSettingsModal?.classList.remove("hidden");
+    els44.systemSettingsModal?.setAttribute("aria-hidden", "false");
     if (wasHidden) positionSystemSettingsModal();
     refreshSegmentedIndicators();
   }
   function closeSystemSettingsModal() {
-    const { els: els43 } = getLegacyBridge();
-    els43.systemSettingsModal?.classList.add("hidden");
-    els43.systemSettingsModal?.setAttribute("aria-hidden", "true");
-    els43.systemSettingsModal?.style.removeProperty("--system-settings-modal-top");
+    const { els: els44 } = getLegacyBridge();
+    els44.systemSettingsModal?.classList.add("hidden");
+    els44.systemSettingsModal?.setAttribute("aria-hidden", "true");
+    els44.systemSettingsModal?.style.removeProperty("--system-settings-modal-top");
   }
   function openSystemSettingsFromUrl() {
     const params = new URLSearchParams(window.location.search);
@@ -30729,8 +30744,8 @@ ${hint}` : hint;
   function initSystemSettingsFeature() {
     if (systemSettingsFeatureInitialized) return;
     systemSettingsFeatureInitialized = true;
-    const { els: els43 } = getLegacyBridge();
-    els43.systemSettingsTabs?.addEventListener("click", handleSystemSettingsTabClick);
+    const { els: els44 } = getLegacyBridge();
+    els44.systemSettingsTabs?.addEventListener("click", handleSystemSettingsTabClick);
     window.addEventListener("resize", handleSystemSettingsResize);
     Object.assign(getLegacyBridge().methods, {
       setSystemSettingsTab,
@@ -31661,9 +31676,9 @@ ${hint}` : hint;
     if (apiSettingsFeatureInitialized) return;
     apiSettingsFeatureInitialized = true;
     document.addEventListener(LOCALE_CHANGE_EVENT, () => {
-      const bridge39 = getLegacyBridge();
-      renderAuthSource(bridge39.state.authStatus);
-      if (!bridge39.els.systemSettingsModal?.classList.contains("hidden") && (!bridge39.els.systemSettingsApiPanel?.hidden || !bridge39.els.systemSettingsCodexPanel?.hidden)) {
+      const bridge40 = getLegacyBridge();
+      renderAuthSource(bridge40.state.authStatus);
+      if (!bridge40.els.systemSettingsModal?.classList.contains("hidden") && (!bridge40.els.systemSettingsApiPanel?.hidden || !bridge40.els.systemSettingsCodexPanel?.hidden)) {
         setApiSettingsFeedback("", "");
       }
     });
@@ -36381,10 +36396,8 @@ ${galleryText}`;
   }
   function populateCustomSizeFromCurrentPreset() {
     if (!els26.customWidth || !els26.customHeight) return;
-    const [width, height] = sizeForPreset(els26.resolution?.value, els26.ratio?.value).split("x");
-    if (!width || !height) return;
-    els26.customWidth.value = width;
-    els26.customHeight.value = height;
+    els26.customWidth.value = "1440";
+    els26.customHeight.value = "2560";
   }
   function sizeControlName(target) {
     if (target === els26.resolution) return "resolution";
@@ -36919,12 +36932,12 @@ ${galleryText}`;
     return card;
   }
   function renderSummary(snapshot, context) {
-    const els43 = getLegacyBridge().els;
-    const root = els43.outputSettingsSummaryContent;
+    const els44 = getLegacyBridge().els;
+    const root = els44.outputSettingsSummaryContent;
     if (!root) return;
     const model = buildOutputSettingsSummaryModel(snapshot, context);
     root.replaceChildren();
-    els43.outputSettingsLockedSummary?.classList.toggle("is-task-context", context.task);
+    els44.outputSettingsLockedSummary?.classList.toggle("is-task-context", context.task);
     const intro = createElement("div", "output-settings-summary-intro");
     if (model.contextLabel) {
       intro.append(createElement("span", "output-settings-summary-context", model.contextLabel));
@@ -36952,7 +36965,7 @@ ${galleryText}`;
     if (intro.childElementCount) main.append(intro);
     main.append(cards, details);
     root.append(main, createElement("p", "output-settings-summary-hint", model.hint));
-    els43.outputSettingsTaskAction?.classList.toggle("hidden", !context.task);
+    els44.outputSettingsTaskAction?.classList.toggle("hidden", !context.task);
   }
   function updateLockButton() {
     const button = getLegacyBridge().els.outputSettingsLockButton;
@@ -36964,13 +36977,13 @@ ${galleryText}`;
     button.title = label;
   }
   function setLockedViewVisible(visible) {
-    const els43 = getLegacyBridge().els;
-    const panel = els43.outputSettingsHeader?.closest(".output-panel");
+    const els44 = getLegacyBridge().els;
+    const panel = els44.outputSettingsHeader?.closest(".output-panel");
     panel?.classList.toggle("is-locked-view", visible);
-    els43.settingsGrid?.toggleAttribute("inert", visible);
-    els43.settingsGrid?.setAttribute("aria-hidden", visible ? "true" : "false");
-    els43.outputSettingsLockedSummary?.classList.toggle("hidden", !visible);
-    els43.outputSettingsLockedSummary?.setAttribute("aria-hidden", visible ? "false" : "true");
+    els44.settingsGrid?.toggleAttribute("inert", visible);
+    els44.settingsGrid?.setAttribute("aria-hidden", visible ? "true" : "false");
+    els44.outputSettingsLockedSummary?.classList.toggle("hidden", !visible);
+    els44.outputSettingsLockedSummary?.setAttribute("aria-hidden", visible ? "false" : "true");
   }
   function persistLockState() {
     try {
@@ -37085,6 +37098,83 @@ ${galleryText}`;
     getLegacyBridge().els.outputSettingsLockButton?.addEventListener("click", toggleOutputSettingsLock);
     getLegacyBridge().els.adoptTaskOutputSettingsButton?.addEventListener("click", adoptTaskOutputSettings);
     document.addEventListener(LOCALE_CHANGE_EVENT, refreshOutputSettingsLock);
+  }
+
+  // codex_image/webui/frontend/src/sidebar-drawer.ts
+  var initialized3 = false;
+  function isMobileLayout() {
+    return window.matchMedia("(max-width: 1180px)").matches;
+  }
+  function setDrawerOpen(open) {
+    const sidebar = document.getElementById("sidebar");
+    const backdrop = document.getElementById("sidebarDrawerBackdrop");
+    const toggle = document.getElementById("sidebarDrawerToggle");
+    if (!sidebar || !backdrop || !toggle) return;
+    if (open) {
+      sidebar.classList.add("sidebar-drawer-open", "is-open");
+      backdrop.hidden = false;
+      toggle.setAttribute("aria-expanded", "true");
+    } else {
+      sidebar.classList.remove("is-open");
+      toggle.setAttribute("aria-expanded", "false");
+      const cleanup = () => {
+        sidebar.classList.remove("sidebar-drawer-open");
+        backdrop.hidden = true;
+        sidebar.removeEventListener("transitionend", cleanup);
+      };
+      sidebar.addEventListener("transitionend", cleanup);
+      window.setTimeout(() => {
+        if (!sidebar.classList.contains("is-open")) {
+          sidebar.classList.remove("sidebar-drawer-open");
+          backdrop.hidden = true;
+        }
+      }, 300);
+    }
+  }
+  function closeDrawer() {
+    setDrawerOpen(false);
+  }
+  function handleToggleClick() {
+    const sidebar = document.getElementById("sidebar");
+    if (!sidebar) return;
+    const isOpen = sidebar.classList.contains("is-open");
+    setDrawerOpen(!isOpen);
+  }
+  function handleResize() {
+    if (!isMobileLayout()) {
+      const sidebar = document.getElementById("sidebar");
+      const backdrop = document.getElementById("sidebarDrawerBackdrop");
+      const toggle = document.getElementById("sidebarDrawerToggle");
+      if (sidebar) {
+        sidebar.classList.remove("sidebar-drawer-open", "is-open");
+      }
+      if (backdrop) backdrop.hidden = true;
+      if (toggle) toggle.setAttribute("aria-expanded", "false");
+    }
+  }
+  function handleSidebarClick(event) {
+    const target = event.target instanceof Element ? event.target : null;
+    if (!target) return;
+    if (target.closest("[data-task-id], .task-card, #newTaskButton, .task-filter-button")) {
+      closeDrawer();
+    }
+  }
+  function handleKeydown(event) {
+    if (event.key === "Escape") closeDrawer();
+  }
+  function initSidebarDrawerFeature() {
+    if (initialized3) return;
+    const toggle = document.getElementById("sidebarDrawerToggle");
+    const backdrop = document.getElementById("sidebarDrawerBackdrop");
+    const sidebar = document.getElementById("sidebar");
+    if (!toggle || !backdrop || !sidebar) return;
+    toggle.hidden = false;
+    toggle.addEventListener("click", handleToggleClick);
+    backdrop.addEventListener("click", closeDrawer);
+    sidebar.addEventListener("click", handleSidebarClick);
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("keydown", handleKeydown);
+    initialized3 = true;
   }
 
   // codex_image/webui/frontend/src/task-list-render.ts
@@ -40021,16 +40111,16 @@ ${galleryText}`;
     window.updateQueueElapsedDisplays = updateQueueElapsedDisplays;
   }
   function bindQueueControls() {
-    const els43 = getEls();
-    els43.queueButton?.addEventListener("click", jumpToActiveTaskGroup);
+    const els44 = getEls();
+    els44.queueButton?.addEventListener("click", jumpToActiveTaskGroup);
   }
   function startRealtimeUpdates({ migrateLegacyArchives = false } = {}) {
-    const state32 = getState();
+    const state33 = getState();
     if (!window.EventSource) return false;
     closeRealtimeUpdates();
-    state32.realtimeSnapshotNeedsArchiveMigration = migrateLegacyArchives;
+    state33.realtimeSnapshotNeedsArchiveMigration = migrateLegacyArchives;
     const source = new EventSource(REALTIME_EVENTS_URL);
-    state32.realtimeSource = source;
+    state33.realtimeSource = source;
     source.onmessage = (event) => {
       handleRealtimeMessage(event).catch((error) => {
         console.error(error);
@@ -40038,10 +40128,10 @@ ${galleryText}`;
       });
     };
     source.onerror = () => {
-      if (state32.realtimeSource !== source) return;
-      const shouldMigrateArchives = state32.realtimeSnapshotNeedsArchiveMigration;
+      if (state33.realtimeSource !== source) return;
+      const shouldMigrateArchives = state33.realtimeSnapshotNeedsArchiveMigration;
       closeRealtimeUpdates();
-      state32.realtimeSnapshotNeedsArchiveMigration = false;
+      state33.realtimeSnapshotNeedsArchiveMigration = false;
       void refreshQueue();
       void getLegacyBridge().methods.refreshTasks({ migrateLegacyArchives: shouldMigrateArchives });
       getLegacyBridge().methods.setStatus(translate("queue.realtimeDisconnected"), "error");
@@ -40049,10 +40139,10 @@ ${galleryText}`;
     return true;
   }
   function closeRealtimeUpdates() {
-    const state32 = getState();
-    if (!state32.realtimeSource) return;
-    state32.realtimeSource.close();
-    state32.realtimeSource = null;
+    const state33 = getState();
+    if (!state33.realtimeSource) return;
+    state33.realtimeSource.close();
+    state33.realtimeSource = null;
   }
   async function handleRealtimeMessage(event) {
     if (!event.data) return;
@@ -40060,15 +40150,15 @@ ${galleryText}`;
     await handleRealtimePayload(payload2);
   }
   async function handleRealtimePayload(payload2) {
-    const bridge39 = getLegacyBridge();
-    const state32 = bridge39.state;
+    const bridge40 = getLegacyBridge();
+    const state33 = bridge40.state;
     if (payload2?.type === "snapshot") {
       applyQueueState(payload2.queue);
-      await bridge39.methods.applyTasksSnapshot(payload2.tasks || [], {
-        migrateLegacyArchives: state32.realtimeSnapshotNeedsArchiveMigration
+      await bridge40.methods.applyTasksSnapshot(payload2.tasks || [], {
+        migrateLegacyArchives: state33.realtimeSnapshotNeedsArchiveMigration
       });
       applyQueueTasks(payload2.queue);
-      state32.realtimeSnapshotNeedsArchiveMigration = false;
+      state33.realtimeSnapshotNeedsArchiveMigration = false;
       return;
     }
     if (payload2?.type === "queue") {
@@ -40082,29 +40172,29 @@ ${galleryText}`;
     }
   }
   async function applyRealtimeTaskPayloads(tasks) {
-    const bridge39 = getLegacyBridge();
-    const state32 = bridge39.state;
+    const bridge40 = getLegacyBridge();
+    const state33 = bridge40.state;
     for (const task of tasks) {
-      const previousTask = state32.tasks.find((item) => String(item.task_id) === String(task?.task_id));
-      bridge39.methods.notifyTaskUpdate?.(previousTask, task);
-      await bridge39.methods.applyTaskUpdate(task);
+      const previousTask = state33.tasks.find((item) => String(item.task_id) === String(task?.task_id));
+      bridge40.methods.notifyTaskUpdate?.(previousTask, task);
+      await bridge40.methods.applyTaskUpdate(task);
     }
   }
   async function refreshQueue() {
-    const bridge39 = getLegacyBridge();
-    const state32 = bridge39.state;
-    const requestSeq = ++state32.queueRequestSeq;
+    const bridge40 = getLegacyBridge();
+    const state33 = bridge40.state;
+    const requestSeq = ++state33.queueRequestSeq;
     try {
       const response = await fetch("/api/queue");
       const data = await response.json();
-      if (requestSeq !== state32.queueRequestSeq) return;
+      if (requestSeq !== state33.queueRequestSeq) return;
       if (!response.ok) {
         throw new Error(data.detail || translate("queue.readFailed"));
       }
-      state32.queue = normalizeQueueState(data);
+      state33.queue = normalizeQueueState(data);
       renderQueue();
     } catch (error) {
-      bridge39.methods.setStatus(errorMessage5(error, translate("queue.readFailed")), "error");
+      bridge40.methods.setStatus(errorMessage5(error, translate("queue.readFailed")), "error");
     }
   }
   function defaultQueueState() {
@@ -40122,17 +40212,17 @@ ${galleryText}`;
     getState().queueRequestSeq += 1;
   }
   function applyQueueState(queue) {
-    const state32 = getState();
+    const state33 = getState();
     invalidateQueueRequests();
-    state32.queue = normalizeQueueState(queue);
+    state33.queue = normalizeQueueState(queue);
     renderQueue();
   }
   function renderQueue() {
-    const bridge39 = getLegacyBridge();
-    const state32 = bridge39.state;
-    const summary = state32.queue.summary || {};
-    const waitingCount = Number(summary.waiting_count ?? state32.queue.waiting.length ?? 0);
-    const runningCount = Number(summary.running_count ?? state32.queue.running.length ?? 0);
+    const bridge40 = getLegacyBridge();
+    const state33 = bridge40.state;
+    const summary = state33.queue.summary || {};
+    const waitingCount = Number(summary.waiting_count ?? state33.queue.waiting.length ?? 0);
+    const runningCount = Number(summary.running_count ?? state33.queue.running.length ?? 0);
     const channelCount = Number(summary.channel_count ?? 0);
     const usableChannelCount = Number(summary.usable_channel_count ?? channelCount);
     const dispatchPending = isQueueDispatchPending();
@@ -40143,23 +40233,23 @@ ${galleryText}`;
       usableChannelCount,
       dispatchPending
     });
-    bridge39.methods.updateDocumentTitle();
+    bridge40.methods.updateDocumentTitle();
     if (dispatchPending) {
       scheduleQueueDispatchSync();
     } else {
       clearQueueDispatchSync();
     }
     const nextRenderKey = queueListRenderKey();
-    if (state32.queueRenderKey === nextRenderKey) {
+    if (state33.queueRenderKey === nextRenderKey) {
       updateQueueElapsedDisplays();
       return;
     }
-    state32.queueRenderKey = nextRenderKey;
+    state33.queueRenderKey = nextRenderKey;
     renderActiveTaskGroupForQueueChange();
   }
   function renderActiveTaskGroupForQueueChange() {
-    const bridge39 = getLegacyBridge();
-    bridge39.methods.renderTasks?.();
+    const bridge40 = getLegacyBridge();
+    bridge40.methods.renderTasks?.();
   }
   function renderQueueStatusChip({
     waitingCount,
@@ -40168,55 +40258,55 @@ ${galleryText}`;
     usableChannelCount,
     dispatchPending
   }) {
-    const els43 = getEls();
+    const els44 = getEls();
     const total = waitingCount + runningCount;
     const channelText = usableChannelCount === channelCount ? formatTranslation("queue.channel", { count: channelCount }) : formatTranslation("queue.availableChannels", { usable: usableChannelCount, total: channelCount });
     const text = dispatchPending ? formatTranslation("queue.dispatching", { waiting: waitingCount }) : total ? formatTranslation("queue.runningWaiting", { running: runningCount, waiting: waitingCount }) : translate("queue.empty");
     const label = total ? formatTranslation("queue.statusLabel", { text, channelText }) : translate("queue.emptyAria");
-    if (els43.queueStatusText) els43.queueStatusText.textContent = text;
-    if (els43.queueButton) {
-      els43.queueButton.setAttribute("aria-label", label);
-      els43.queueButton.title = total ? translate("queue.jumpTitle") : translate("queue.emptyTitle");
-      els43.queueButton.classList.toggle("has-queue", total > 0 || dispatchPending);
+    if (els44.queueStatusText) els44.queueStatusText.textContent = text;
+    if (els44.queueButton) {
+      els44.queueButton.setAttribute("aria-label", label);
+      els44.queueButton.title = total ? translate("queue.jumpTitle") : translate("queue.emptyTitle");
+      els44.queueButton.classList.toggle("has-queue", total > 0 || dispatchPending);
     }
   }
   function jumpToActiveTaskGroup() {
-    const bridge39 = getLegacyBridge();
-    const state32 = bridge39.state;
-    const hasActiveTasks = Boolean((state32.queue.running || []).length || (state32.queue.waiting || []).length);
+    const bridge40 = getLegacyBridge();
+    const state33 = bridge40.state;
+    const hasActiveTasks = Boolean((state33.queue.running || []).length || (state33.queue.waiting || []).length);
     if (!hasActiveTasks) return;
-    bridge39.methods.revealActiveTaskGroup?.();
+    bridge40.methods.revealActiveTaskGroup?.();
   }
   function isQueueDispatchPending() {
-    const state32 = getState();
-    const summary = state32.queue.summary || {};
-    const waitingCount = Number(summary.waiting_count ?? state32.queue.waiting.length ?? 0);
-    const runningCount = Number(summary.running_count ?? state32.queue.running.length ?? 0);
+    const state33 = getState();
+    const summary = state33.queue.summary || {};
+    const waitingCount = Number(summary.waiting_count ?? state33.queue.waiting.length ?? 0);
+    const runningCount = Number(summary.running_count ?? state33.queue.running.length ?? 0);
     const channelCount = Number(summary.channel_count ?? 0);
     const usableChannelCount = Number(summary.usable_channel_count ?? channelCount);
     return waitingCount > 0 && runningCount === 0 && usableChannelCount > 0;
   }
   function scheduleQueueDispatchSync() {
-    const state32 = getState();
-    if (state32.queueDispatchSyncTimerId) return;
-    state32.queueDispatchSyncTimerId = window.setTimeout(() => {
-      state32.queueDispatchSyncTimerId = null;
+    const state33 = getState();
+    if (state33.queueDispatchSyncTimerId) return;
+    state33.queueDispatchSyncTimerId = window.setTimeout(() => {
+      state33.queueDispatchSyncTimerId = null;
       if (isQueueDispatchPending()) {
         void refreshQueue();
       }
     }, QUEUE_DISPATCH_RESYNC_DELAY_MS);
   }
   function clearQueueDispatchSync() {
-    const state32 = getState();
-    if (!state32.queueDispatchSyncTimerId) return;
-    window.clearTimeout(state32.queueDispatchSyncTimerId);
-    state32.queueDispatchSyncTimerId = null;
+    const state33 = getState();
+    if (!state33.queueDispatchSyncTimerId) return;
+    window.clearTimeout(state33.queueDispatchSyncTimerId);
+    state33.queueDispatchSyncTimerId = null;
   }
   function queueListRenderKey() {
-    const state32 = getState();
+    const state33 = getState();
     return JSON.stringify({
-      summary: state32.queue.summary || {},
-      running: (state32.queue.running || []).map((task) => [
+      summary: state33.queue.summary || {},
+      running: (state33.queue.running || []).map((task) => [
         task.task_id,
         task.status,
         task.viewed_at,
@@ -40226,7 +40316,7 @@ ${galleryText}`;
         task.started_at,
         task.attempts
       ]),
-      waiting: (state32.queue.waiting || []).map((task) => [
+      waiting: (state33.queue.waiting || []).map((task) => [
         task.task_id,
         task.status,
         task.prompt,
@@ -40236,11 +40326,11 @@ ${galleryText}`;
     });
   }
   function queueItemTitleText(task, position = null) {
-    const bridge39 = getLegacyBridge();
+    const bridge40 = getLegacyBridge();
     const queueTask = task;
-    const prefix = position ? `#${position}` : bridge39.methods.formatTaskStatus(task) || translate("taskStatus.task");
+    const prefix = position ? `#${position}` : bridge40.methods.formatTaskStatus(task) || translate("taskStatus.task");
     const mode = taskModeLabel(task);
-    const count = formatTranslation("taskCard.count", { count: bridge39.methods.taskTotalCount(task) });
+    const count = formatTranslation("taskCard.count", { count: bridge40.methods.taskTotalCount(task) });
     const size = queueTask.output_size || task.params?.size || "";
     return [prefix, mode, count, size].filter(Boolean).join(" \xB7 ");
   }
@@ -40250,7 +40340,7 @@ ${galleryText}`;
     return "";
   }
   async function promoteQueueTask(taskId) {
-    const bridge39 = getLegacyBridge();
+    const bridge40 = getLegacyBridge();
     if (!taskId) return;
     invalidateQueueRequests();
     try {
@@ -40258,9 +40348,9 @@ ${galleryText}`;
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.detail || translate("queue.promoteFailed"));
       applyQueueState(data);
-      await bridge39.methods.refreshTasks();
+      await bridge40.methods.refreshTasks();
     } catch (error) {
-      bridge39.methods.setStatus(errorMessage5(error, translate("queue.promoteFailed")), "error");
+      bridge40.methods.setStatus(errorMessage5(error, translate("queue.promoteFailed")), "error");
     }
   }
   function moveQueueTask(taskId, direction) {
@@ -40278,11 +40368,11 @@ ${galleryText}`;
     void reorderQueue(nextIds);
   }
   function deleteQueuedTask(button, taskId) {
-    const bridge39 = getLegacyBridge();
+    const bridge40 = getLegacyBridge();
     if (!taskId) return;
-    const task = bridge39.state.queue.waiting.find((item) => item.task_id === taskId);
+    const task = bridge40.state.queue.waiting.find((item) => item.task_id === taskId);
     const title = task ? queueItemTitleText(task, task.queue_position || null) : taskId;
-    bridge39.methods.openConfirmPopover(button, {
+    bridge40.methods.openConfirmPopover(button, {
       title: translate("queue.deleteWaitingTitleConfirm"),
       message: translate("queue.deleteWaitingMessage"),
       detail: title,
@@ -40293,39 +40383,39 @@ ${galleryText}`;
     });
   }
   async function performDeleteQueuedTask(taskId) {
-    const bridge39 = getLegacyBridge();
-    const state32 = bridge39.state;
+    const bridge40 = getLegacyBridge();
+    const state33 = bridge40.state;
     invalidateQueueRequests();
     try {
       const response = await fetch(`/api/queue/${encodeURIComponent(taskId)}`, { method: "DELETE" });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.detail || translate("queue.deleteQueuedFailed"));
-      state32.tasks = state32.tasks.filter((item) => item.task_id !== taskId);
-      if (state32.selectedTaskId === taskId) {
-        state32.selectedTaskId = state32.tasks[0]?.task_id || null;
+      state33.tasks = state33.tasks.filter((item) => item.task_id !== taskId);
+      if (state33.selectedTaskId === taskId) {
+        state33.selectedTaskId = state33.tasks[0]?.task_id || null;
       }
       applyQueueState({
-        ...state32.queue,
-        waiting: state32.queue.waiting.filter((item) => item.task_id !== taskId),
+        ...state33.queue,
+        waiting: state33.queue.waiting.filter((item) => item.task_id !== taskId),
         summary: {
-          ...state32.queue.summary || {},
-          waiting_count: Math.max(0, Number(state32.queue.summary?.waiting_count || 0) - 1)
+          ...state33.queue.summary || {},
+          waiting_count: Math.max(0, Number(state33.queue.summary?.waiting_count || 0) - 1)
         }
       });
       await refreshQueue();
-      await bridge39.methods.refreshTasks();
-      bridge39.methods.renderPreview();
-      bridge39.methods.setStatus(translate("queue.queuedDeleted"), "ok");
+      await bridge40.methods.refreshTasks();
+      bridge40.methods.renderPreview();
+      bridge40.methods.setStatus(translate("queue.queuedDeleted"), "ok");
     } catch (error) {
-      bridge39.methods.setStatus(errorMessage5(error, translate("queue.deleteQueuedFailed")), "error");
+      bridge40.methods.setStatus(errorMessage5(error, translate("queue.deleteQueuedFailed")), "error");
     }
   }
   function cancelRunningTask(button, taskId) {
-    const bridge39 = getLegacyBridge();
+    const bridge40 = getLegacyBridge();
     if (!taskId) return;
-    const task = bridge39.state.queue.running.find((item) => item.task_id === taskId);
+    const task = bridge40.state.queue.running.find((item) => item.task_id === taskId);
     const title = task ? queueItemTitleText(task) : taskId;
-    bridge39.methods.openConfirmPopover(button, {
+    bridge40.methods.openConfirmPopover(button, {
       title: translate("queue.cancelRunningTitleConfirm"),
       message: translate("queue.cancelRunningMessage"),
       detail: title,
@@ -40336,31 +40426,31 @@ ${galleryText}`;
     });
   }
   async function performCancelRunningTask(taskId) {
-    const bridge39 = getLegacyBridge();
-    const state32 = bridge39.state;
+    const bridge40 = getLegacyBridge();
+    const state33 = bridge40.state;
     invalidateQueueRequests();
     try {
       const response = await fetch(`/api/queue/${encodeURIComponent(taskId)}`, { method: "DELETE" });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.detail || translate("queue.cancelRunningFailed"));
       applyQueueState({
-        ...state32.queue,
-        running: state32.queue.running.filter((item) => item.task_id !== taskId),
+        ...state33.queue,
+        running: state33.queue.running.filter((item) => item.task_id !== taskId),
         summary: {
-          ...state32.queue.summary || {},
-          running_count: Math.max(0, Number(state32.queue.summary?.running_count || 0) - 1)
+          ...state33.queue.summary || {},
+          running_count: Math.max(0, Number(state33.queue.summary?.running_count || 0) - 1)
         }
       });
       await refreshQueue();
-      await bridge39.methods.refreshTasks();
-      bridge39.methods.renderPreview();
-      bridge39.methods.setStatus(translate("queue.runningCancelled"), "ok");
+      await bridge40.methods.refreshTasks();
+      bridge40.methods.renderPreview();
+      bridge40.methods.setStatus(translate("queue.runningCancelled"), "ok");
     } catch (error) {
-      bridge39.methods.setStatus(errorMessage5(error, translate("queue.cancelRunningFailed")), "error");
+      bridge40.methods.setStatus(errorMessage5(error, translate("queue.cancelRunningFailed")), "error");
     }
   }
   async function reorderQueue(taskIds) {
-    const bridge39 = getLegacyBridge();
+    const bridge40 = getLegacyBridge();
     invalidateQueueRequests();
     try {
       const response = await fetch(`/api/queue/reorder`, {
@@ -40371,9 +40461,9 @@ ${galleryText}`;
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.detail || translate("queue.reorderFailed"));
       applyQueueState(data);
-      await bridge39.methods.refreshTasks();
+      await bridge40.methods.refreshTasks();
     } catch (error) {
-      bridge39.methods.setStatus(errorMessage5(error, translate("queue.reorderFailed")), "error");
+      bridge40.methods.setStatus(errorMessage5(error, translate("queue.reorderFailed")), "error");
       await refreshQueue();
     }
   }
@@ -40398,7 +40488,7 @@ ${galleryText}`;
     getState().queueDragTaskId = null;
   }
   function applyQueueTasks(queue) {
-    const bridge39 = getLegacyBridge();
+    const bridge40 = getLegacyBridge();
     const tasks = [
       ...Array.isArray(queue?.waiting) ? queue.waiting : [],
       ...Array.isArray(queue?.running) ? queue.running : []
@@ -40407,37 +40497,37 @@ ${galleryText}`;
     const needsTaskReconcile = activeTasksNeedQueueReconcile(queueTaskIds);
     if (!tasks.length) {
       if (needsTaskReconcile) {
-        void bridge39.methods.refreshTasks();
+        void bridge40.methods.refreshTasks();
       }
       return;
     }
     let changed = false;
     tasks.forEach((task) => {
-      const previousTask = bridge39.state.tasks.find((item) => String(item.task_id) === String(task.task_id));
-      bridge39.methods.notifyTaskUpdate?.(previousTask, task);
-      changed = bridge39.methods.updateTaskInState(task) || changed;
-      if (String(task.task_id) === String(bridge39.state.selectedTaskId) && bridge39.methods.taskHasViewableUpdate(task)) {
-        void bridge39.methods.markTaskViewed(task.task_id);
+      const previousTask = bridge40.state.tasks.find((item) => String(item.task_id) === String(task.task_id));
+      bridge40.methods.notifyTaskUpdate?.(previousTask, task);
+      changed = bridge40.methods.updateTaskInState(task) || changed;
+      if (String(task.task_id) === String(bridge40.state.selectedTaskId) && bridge40.methods.taskHasViewableUpdate(task)) {
+        void bridge40.methods.markTaskViewed(task.task_id);
       }
     });
     if (!changed) {
       if (needsTaskReconcile) {
-        void bridge39.methods.refreshTasks();
+        void bridge40.methods.refreshTasks();
       }
       return;
     }
-    bridge39.methods.cleanupSessionSelections();
-    bridge39.methods.renderTasks();
-    bridge39.methods.renderArchiveButton();
-    bridge39.methods.renderArchiveModal();
-    bridge39.methods.renderPreview();
+    bridge40.methods.cleanupSessionSelections();
+    bridge40.methods.renderTasks();
+    bridge40.methods.renderArchiveButton();
+    bridge40.methods.renderArchiveModal();
+    bridge40.methods.renderPreview();
     if (needsTaskReconcile) {
-      void bridge39.methods.refreshTasks();
+      void bridge40.methods.refreshTasks();
     }
   }
   function activeTasksNeedQueueReconcile(queueTaskIds) {
-    const bridge39 = getLegacyBridge();
-    return bridge39.state.tasks.some((task) => {
+    const bridge40 = getLegacyBridge();
+    return bridge40.state.tasks.some((task) => {
       const taskId = String(task?.task_id || "");
       if (!taskId || queueTaskIds.has(taskId) || task?.local_pending) return false;
       const status = String(task?.status || "");
@@ -40983,18 +41073,18 @@ ${galleryText}`;
     return !getLegacyBridge().state.taskNotificationSeenKeys.has(taskNotificationSeenKey(nextTask, status));
   }
   function openTaskNotificationCenter() {
-    const state32 = getLegacyBridge().state;
-    state32.taskNotificationCenterOpen = true;
-    state32.taskNotifications = state32.taskNotifications.map((notification) => ({
+    const state33 = getLegacyBridge().state;
+    state33.taskNotificationCenterOpen = true;
+    state33.taskNotifications = state33.taskNotifications.map((notification) => ({
       ...notification,
       unread: false
     }));
     renderTaskNotifications();
   }
   function closeTaskNotificationCenter() {
-    const state32 = getLegacyBridge().state;
-    if (!state32.taskNotificationCenterOpen) return;
-    state32.taskNotificationCenterOpen = false;
+    const state33 = getLegacyBridge().state;
+    if (!state33.taskNotificationCenterOpen) return;
+    state33.taskNotificationCenterOpen = false;
     renderTaskNotifications();
   }
   function toggleTaskNotificationCenter() {
@@ -41005,37 +41095,37 @@ ${galleryText}`;
     openTaskNotificationCenter();
   }
   function renderTaskNotifications() {
-    const bridge39 = getLegacyBridge();
-    const state32 = bridge39.state;
-    const els43 = bridge39.els;
-    const unreadCount = state32.taskNotifications.filter((notification) => notification.unread).length;
-    state32.taskNotificationUnreadCount = unreadCount;
+    const bridge40 = getLegacyBridge();
+    const state33 = bridge40.state;
+    const els44 = bridge40.els;
+    const unreadCount = state33.taskNotifications.filter((notification) => notification.unread).length;
+    state33.taskNotificationUnreadCount = unreadCount;
     const unreadLabel = unreadCount > 0 ? formatTranslation("notifications.unread", { count: unreadCount }) : translate("notifications.title");
-    if (els43.taskNotificationBadge) {
-      els43.taskNotificationBadge.textContent = "";
-      els43.taskNotificationBadge.setAttribute("aria-hidden", "true");
-      els43.taskNotificationBadge.classList.toggle("hidden", unreadCount === 0);
+    if (els44.taskNotificationBadge) {
+      els44.taskNotificationBadge.textContent = "";
+      els44.taskNotificationBadge.setAttribute("aria-hidden", "true");
+      els44.taskNotificationBadge.classList.toggle("hidden", unreadCount === 0);
     }
-    if (els43.taskNotificationButton) {
-      els43.taskNotificationButton.classList.toggle("has-unread", unreadCount > 0);
-      els43.taskNotificationButton.setAttribute("aria-label", unreadLabel);
-      els43.taskNotificationButton.title = unreadLabel;
-      els43.taskNotificationButton.setAttribute("aria-expanded", state32.taskNotificationCenterOpen ? "true" : "false");
+    if (els44.taskNotificationButton) {
+      els44.taskNotificationButton.classList.toggle("has-unread", unreadCount > 0);
+      els44.taskNotificationButton.setAttribute("aria-label", unreadLabel);
+      els44.taskNotificationButton.title = unreadLabel;
+      els44.taskNotificationButton.setAttribute("aria-expanded", state33.taskNotificationCenterOpen ? "true" : "false");
     }
-    if (els43.taskNotificationUnreadSummary) {
-      els43.taskNotificationUnreadSummary.textContent = formatTranslation("notifications.unreadSummary", { count: unreadCount });
-      els43.taskNotificationUnreadSummary.classList.toggle("hidden", unreadCount === 0);
+    if (els44.taskNotificationUnreadSummary) {
+      els44.taskNotificationUnreadSummary.textContent = formatTranslation("notifications.unreadSummary", { count: unreadCount });
+      els44.taskNotificationUnreadSummary.classList.toggle("hidden", unreadCount === 0);
     }
-    if (els43.taskNotificationCenter) {
-      els43.taskNotificationCenter.classList.toggle("hidden", !state32.taskNotificationCenterOpen);
-      els43.taskNotificationCenter.setAttribute("aria-hidden", state32.taskNotificationCenterOpen ? "false" : "true");
+    if (els44.taskNotificationCenter) {
+      els44.taskNotificationCenter.classList.toggle("hidden", !state33.taskNotificationCenterOpen);
+      els44.taskNotificationCenter.setAttribute("aria-hidden", state33.taskNotificationCenterOpen ? "false" : "true");
     }
-    if (!els43.taskNotificationList) return;
-    if (!state32.taskNotifications.length) {
-      els43.taskNotificationList.innerHTML = `<div class="task-notification-empty">${translate("notifications.empty")}</div>`;
+    if (!els44.taskNotificationList) return;
+    if (!state33.taskNotifications.length) {
+      els44.taskNotificationList.innerHTML = `<div class="task-notification-empty">${translate("notifications.empty")}</div>`;
       return;
     }
-    els43.taskNotificationList.innerHTML = state32.taskNotifications.map((notification) => taskNotificationItemHtml(notification)).join("");
+    els44.taskNotificationList.innerHTML = state33.taskNotifications.map((notification) => taskNotificationItemHtml(notification)).join("");
   }
   async function requestSystemNotificationPermission() {
     if (typeof Notification === "undefined") {
@@ -41056,23 +41146,23 @@ ${galleryText}`;
     return true;
   }
   function bindTaskNotificationEvents() {
-    const els43 = getLegacyBridge().els;
-    els43.taskNotificationButton?.addEventListener("click", (event) => {
+    const els44 = getLegacyBridge().els;
+    els44.taskNotificationButton?.addEventListener("click", (event) => {
       event.stopPropagation();
       toggleTaskNotificationCenter();
     });
-    els43.taskNotificationClearButton?.addEventListener("click", (event) => {
+    els44.taskNotificationClearButton?.addEventListener("click", (event) => {
       event.stopPropagation();
       clearTaskNotifications();
     });
-    els43.taskNotificationList?.addEventListener("click", (event) => {
+    els44.taskNotificationList?.addEventListener("click", (event) => {
       const item = eventTargetElement4(event)?.closest("[data-task-notification-id]");
       if (!(item instanceof HTMLElement)) return;
       const notification = notificationById(item.dataset.taskNotificationId);
       if (notification) void openNotificationTask(notification);
     });
-    els43.taskNotificationInApp?.addEventListener("change", handleTaskNotificationInAppChange);
-    els43.taskNotificationSystem?.addEventListener("change", (event) => {
+    els44.taskNotificationInApp?.addEventListener("change", handleTaskNotificationInAppChange);
+    els44.taskNotificationSystem?.addEventListener("change", (event) => {
       void handleTaskNotificationSystemChange(event);
     });
     document.addEventListener("click", handleTaskNotificationDocumentClick);
@@ -41081,9 +41171,9 @@ ${galleryText}`;
   function handleTaskNotificationInAppChange(event) {
     const input = event.currentTarget;
     if (!(input instanceof HTMLInputElement)) return;
-    const state32 = getLegacyBridge().state;
-    state32.taskNotificationSettings = {
-      ...state32.taskNotificationSettings,
+    const state33 = getLegacyBridge().state;
+    state33.taskNotificationSettings = {
+      ...state33.taskNotificationSettings,
       inApp: input.checked
     };
     persistTaskNotificationSettings();
@@ -41091,40 +41181,40 @@ ${galleryText}`;
   async function handleTaskNotificationSystemChange(event) {
     const input = event.currentTarget;
     if (!(input instanceof HTMLInputElement)) return;
-    const state32 = getLegacyBridge().state;
+    const state33 = getLegacyBridge().state;
     if (!input.checked) {
-      state32.taskNotificationSettings = { ...state32.taskNotificationSettings, system: false };
+      state33.taskNotificationSettings = { ...state33.taskNotificationSettings, system: false };
       persistTaskNotificationSettings();
       return;
     }
     const granted = await requestSystemNotificationPermission();
-    state32.taskNotificationSettings = { ...state32.taskNotificationSettings, system: granted };
+    state33.taskNotificationSettings = { ...state33.taskNotificationSettings, system: granted };
     input.checked = granted;
     persistTaskNotificationSettings();
   }
   function handleTaskNotificationDocumentClick(event) {
     const target = event.target;
-    const els43 = getLegacyBridge().els;
+    const els44 = getLegacyBridge().els;
     if (!(target instanceof Node)) return;
-    if (els43.taskNotificationCenter?.contains(target) || els43.taskNotificationButton?.contains(target)) return;
+    if (els44.taskNotificationCenter?.contains(target) || els44.taskNotificationButton?.contains(target)) return;
     closeTaskNotificationCenter();
   }
   function handleTaskNotificationKeydown(event) {
     if (event.key === "Escape") closeTaskNotificationCenter();
   }
   function addTaskNotification(notification) {
-    const state32 = getLegacyBridge().state;
-    state32.taskNotifications = [notification, ...state32.taskNotifications].slice(0, MAX_TASK_NOTIFICATIONS);
+    const state33 = getLegacyBridge().state;
+    state33.taskNotifications = [notification, ...state33.taskNotifications].slice(0, MAX_TASK_NOTIFICATIONS);
     renderTaskNotifications();
   }
   function clearTaskNotifications() {
-    const state32 = getLegacyBridge().state;
-    state32.taskNotifications = [];
+    const state33 = getLegacyBridge().state;
+    state33.taskNotifications = [];
     renderTaskNotifications();
   }
   function showTaskNotificationToast(notification) {
-    const bridge39 = getLegacyBridge();
-    const region = bridge39.els.taskNotificationToastRegion;
+    const bridge40 = getLegacyBridge();
+    const region = bridge40.els.taskNotificationToastRegion;
     if (!region) return;
     const toast = document.createElement("button");
     toast.type = "button";
@@ -41138,9 +41228,9 @@ ${galleryText}`;
     region.prepend(toast);
     const timerId = window.setTimeout(() => {
       toast.remove();
-      bridge39.state.taskNotificationToastTimerIds = bridge39.state.taskNotificationToastTimerIds.filter((id) => id !== timerId);
+      bridge40.state.taskNotificationToastTimerIds = bridge40.state.taskNotificationToastTimerIds.filter((id) => id !== timerId);
     }, TASK_NOTIFICATION_TOAST_MS);
-    bridge39.state.taskNotificationToastTimerIds.push(timerId);
+    bridge40.state.taskNotificationToastTimerIds.push(timerId);
   }
   function sendSystemTaskNotification(notification) {
     const settings = getLegacyBridge().state.taskNotificationSettings;
@@ -41155,8 +41245,8 @@ ${galleryText}`;
     };
   }
   async function openNotificationTask(notification) {
-    const bridge39 = getLegacyBridge();
-    const task = bridge39.state.tasks.find((item) => String(item.task_id) === String(notification.task_id));
+    const bridge40 = getLegacyBridge();
+    const task = bridge40.state.tasks.find((item) => String(item.task_id) === String(notification.task_id));
     markTaskNotificationRead(notification.id);
     closeTaskNotificationCenter();
     if (!task) {
@@ -41165,7 +41255,7 @@ ${galleryText}`;
     }
     window.focus();
     try {
-      const selectTask3 = bridge39.methods.selectTask;
+      const selectTask3 = bridge40.methods.selectTask;
       if (typeof selectTask3 !== "function") throw new Error("selectTask is unavailable");
       await selectTask3(task.task_id);
     } catch {
@@ -41173,8 +41263,8 @@ ${galleryText}`;
     }
   }
   function markTaskNotificationRead(notificationId) {
-    const state32 = getLegacyBridge().state;
-    state32.taskNotifications = state32.taskNotifications.map((notification) => notification.id === notificationId ? { ...notification, unread: false } : notification);
+    const state33 = getLegacyBridge().state;
+    state33.taskNotifications = state33.taskNotifications.map((notification) => notification.id === notificationId ? { ...notification, unread: false } : notification);
     renderTaskNotifications();
   }
   function notificationById(notificationId) {
@@ -41233,8 +41323,8 @@ ${galleryText}`;
     return notification.message;
   }
   function firstTaskThumbnailUrl(task) {
-    const bridge39 = getLegacyBridge();
-    const urls = bridge39.methods.taskThumbnailUrls?.(task);
+    const bridge40 = getLegacyBridge();
+    const urls = bridge40.methods.taskThumbnailUrls?.(task);
     if (Array.isArray(urls) && urls[0]) return String(urls[0]);
     if (Array.isArray(task.thumbnail_urls) && task.thumbnail_urls[0]) return String(task.thumbnail_urls[0]);
     const output = Array.isArray(task.outputs) ? task.outputs.find((record) => record?.status === "completed") : null;
@@ -41283,26 +41373,26 @@ ${galleryText}`;
     return `${task.task_id}:${status}:${revision}`;
   }
   function rememberTaskNotification(task, status) {
-    const state32 = getLegacyBridge().state;
-    state32.taskNotificationSeenKeys.add(taskNotificationSeenKey(task, status));
-    while (state32.taskNotificationSeenKeys.size > MAX_SEEN_TASK_NOTIFICATION_KEYS) {
-      const firstKey = state32.taskNotificationSeenKeys.values().next().value;
+    const state33 = getLegacyBridge().state;
+    state33.taskNotificationSeenKeys.add(taskNotificationSeenKey(task, status));
+    while (state33.taskNotificationSeenKeys.size > MAX_SEEN_TASK_NOTIFICATION_KEYS) {
+      const firstKey = state33.taskNotificationSeenKeys.values().next().value;
       if (typeof firstKey !== "string") break;
-      state32.taskNotificationSeenKeys.delete(firstKey);
+      state33.taskNotificationSeenKeys.delete(firstKey);
     }
     persistTaskNotificationSeenKeys();
   }
   function restoreTaskNotificationSettings() {
-    const state32 = getLegacyBridge().state;
-    state32.taskNotificationSettings = defaultTaskNotificationSettings();
+    const state33 = getLegacyBridge().state;
+    state33.taskNotificationSettings = defaultTaskNotificationSettings();
     try {
       const stored = JSON.parse(localStorage.getItem(TASK_NOTIFICATION_SETTINGS_KEY) || "{}");
-      state32.taskNotificationSettings = {
+      state33.taskNotificationSettings = {
         inApp: stored.inApp !== false,
         system: stored.system === true && typeof Notification !== "undefined" && Notification.permission === "granted"
       };
     } catch {
-      state32.taskNotificationSettings = defaultTaskNotificationSettings();
+      state33.taskNotificationSettings = defaultTaskNotificationSettings();
     }
     persistTaskNotificationSettings();
     syncTaskNotificationSettingsInputs();
@@ -41318,22 +41408,22 @@ ${galleryText}`;
     syncTaskNotificationSettingsInputs();
   }
   function syncTaskNotificationSettingsInputs() {
-    const bridge39 = getLegacyBridge();
-    const settings = bridge39.state.taskNotificationSettings;
-    if (bridge39.els.taskNotificationInApp instanceof HTMLInputElement) {
-      bridge39.els.taskNotificationInApp.checked = settings.inApp;
+    const bridge40 = getLegacyBridge();
+    const settings = bridge40.state.taskNotificationSettings;
+    if (bridge40.els.taskNotificationInApp instanceof HTMLInputElement) {
+      bridge40.els.taskNotificationInApp.checked = settings.inApp;
     }
-    if (bridge39.els.taskNotificationSystem instanceof HTMLInputElement) {
-      bridge39.els.taskNotificationSystem.checked = settings.system;
+    if (bridge40.els.taskNotificationSystem instanceof HTMLInputElement) {
+      bridge40.els.taskNotificationSystem.checked = settings.system;
     }
   }
   function restoreTaskNotificationSeenKeys() {
-    const state32 = getLegacyBridge().state;
+    const state33 = getLegacyBridge().state;
     try {
       const stored = JSON.parse(localStorage.getItem(TASK_NOTIFICATION_SEEN_KEY) || "[]");
-      state32.taskNotificationSeenKeys = new Set(Array.isArray(stored) ? stored.filter((key) => typeof key === "string") : []);
+      state33.taskNotificationSeenKeys = new Set(Array.isArray(stored) ? stored.filter((key) => typeof key === "string") : []);
     } catch {
-      state32.taskNotificationSeenKeys = /* @__PURE__ */ new Set();
+      state33.taskNotificationSeenKeys = /* @__PURE__ */ new Set();
     }
   }
   function persistTaskNotificationSeenKeys() {
@@ -41774,13 +41864,13 @@ ${galleryText}`;
   function compressedTaskImageState(states) {
     if (states.includes("failed")) return "failed";
     if (states.includes("running")) return "running";
-    if (states.length && states.every((state32) => state32 === "completed")) return "completed";
+    if (states.length && states.every((state33) => state33 === "completed")) return "completed";
     if (states.includes("queued")) return "queued";
     return "waiting";
   }
   function taskImageStatusCounts2(states) {
-    return states.reduce((counts, state32) => {
-      counts[state32] = (counts[state32] || 0) + 1;
+    return states.reduce((counts, state33) => {
+      counts[state33] = (counts[state33] || 0) + 1;
       return counts;
     }, { completed: 0, failed: 0, running: 0, queued: 0, waiting: 0 });
   }
@@ -42956,10 +43046,135 @@ ${galleryText}`;
     });
   }
 
-  // codex_image/webui/frontend/src/tasks.ts
+  // codex_image/webui/frontend/src/brand-result-actions.ts
   var bridge35 = getLegacyBridge();
   var state29 = bridge35.state;
   var els38 = bridge35.els;
+  var observer = null;
+  var bound = false;
+  function t(key, fallback) {
+    const value = translate(key);
+    return value && value !== key ? value : fallback;
+  }
+  function brandingForCard(card) {
+    const taskId = card.dataset.previewTaskId || state29.previewTask?.task_id || "";
+    const outputUrl = String(card.dataset.previewOutputUrl || "");
+    if (!taskId || !outputUrl) return null;
+    const task = (state29.tasks || []).find((item) => String(item.task_id) === String(taskId)) || state29.previewTask;
+    if (!task || !Array.isArray(task.outputs)) return null;
+    const byUrl = task.outputs.find((o) => o && (o.url === outputUrl || `/outputs/${o.file}` === outputUrl));
+    const output = byUrl || task.outputs.find((o, i) => previewSlotIndex(card) === i);
+    if (!output || !output.branding) return null;
+    return { index: Number(output.index) || previewSlotIndex(card) + 1, branding: output.branding };
+  }
+  function previewSlotIndex(card) {
+    const siblings = Array.from(els38.previewGrid?.querySelectorAll(".preview-card[data-preview-card-key]") || []);
+    return Math.max(0, siblings.indexOf(card));
+  }
+  function brandingBadgeForTask() {
+    const task = state29.previewTask;
+    const status = String(task?.branding_status || "");
+    if (status === "running" || status === "pending") {
+      return `<span class="brand-badge brand-badge-pending">${t("brand.processing", "\u54C1\u724C\u5904\u7406\u4E2D")}</span>`;
+    }
+    if (status === "failed" || status === "partial_failed") {
+      return `<span class="brand-badge brand-badge-failed">${t("brand.failed", "\u54C1\u724C\u5408\u6210\u5931\u8D25")}</span>`;
+    }
+    return "";
+  }
+  function applyBrandCardDecoration(card) {
+    const old = card.querySelector(".brand-card-actions");
+    if (old) old.remove();
+    const result = brandingForCard(card);
+    const badge = brandingBadgeForTask();
+    const task = state29.previewTask;
+    const brandingEnabled = !!task?.branding_status && task.branding_status !== "disabled";
+    if (!result && !brandingEnabled) return;
+    const branding = result?.branding;
+    const completed = branding && branding.status === "completed";
+    const brandedDownloadUrl = completed ? `/api/tasks/${task.task_id}/outputs/${result.index}/branding/download` : "";
+    const block = document.createElement("div");
+    block.className = "brand-card-actions prompt-action-row";
+    block.innerHTML = `
+    ${badge}
+    ${completed ? `<button type="button" class="brand-toggle" data-brand-toggle="" aria-pressed="true">${t("brand.branded", "\u54C1\u724C\u7248")}</button>` : ""}
+    ${completed ? `<a class="brand-download-link" href="${brandedDownloadUrl}" download="" data-brand-download="">${t("brand.downloadBranded", "\u4E0B\u8F7D\u54C1\u724C\u7248")}</a>` : ""}
+    ${task?.branding_status === "failed" || task?.branding_status === "partial_failed" ? `<button type="button" class="brand-recompose" data-brand-recompose-task="${task.task_id}">${t("brand.recompose", "\u91CD\u65B0\u5408\u6210")}</button>` : ""}
+  `;
+    card.appendChild(block);
+    if (completed) {
+      wireToggle(card, branding);
+      wireDownload(brandedDownloadUrl, block);
+    }
+    const recompose = block.querySelector("[data-brand-recompose-task]");
+    if (recompose) recompose.addEventListener("click", onRecompose);
+  }
+  function wireToggle(card, branding) {
+    const toggle = card.querySelector("[data-brand-toggle]");
+    const img = card.querySelector("img[data-lightbox-url]");
+    const rawDownload = card.querySelector("[data-download-output-url]");
+    if (!toggle || !img) return;
+    const rawUrl = String(card.dataset.previewOutputUrl || "");
+    const brandedUrl = branding.url || (branding.file ? `/outputs/${branding.file}` : rawUrl);
+    let branded = true;
+    const apply = () => {
+      const url = branded ? brandedUrl : rawUrl;
+      img.src = url;
+      img.dataset.lightboxUrl = url;
+      if (rawDownload) rawDownload.href = url;
+      toggle.textContent = branded ? t("brand.branded", "\u54C1\u724C\u7248") : t("brand.raw", "\u539F\u59CB\u5E95\u56FE");
+      toggle.setAttribute("aria-pressed", String(branded));
+    };
+    apply();
+    toggle.addEventListener("click", (event) => {
+      event.preventDefault();
+      branded = !branded;
+      apply();
+    });
+  }
+  function wireDownload(url, block) {
+    const link = block.querySelector("[data-brand-download]");
+    if (link) link.href = url;
+  }
+  async function onRecompose(event) {
+    const button = event.currentTarget;
+    const taskId = button.dataset.brandRecomposeTask || "";
+    if (!taskId) return;
+    button.disabled = true;
+    const original = button.textContent;
+    button.textContent = t("brand.recomposing", "\u5408\u6210\u4E2D\u2026");
+    try {
+      const response = await fetch(`/api/tasks/${taskId}/branding/recompose`, { method: "POST" });
+      if (!response.ok) throw new Error(`recompose failed: ${response.status}`);
+    } catch (error) {
+      button.disabled = false;
+      button.textContent = original;
+      console.error(error);
+    }
+  }
+  function decorateAllCards() {
+    if (!els38.previewGrid) return;
+    if (decorateAllCardsPending) return;
+    decorateAllCardsPending = true;
+    window.requestAnimationFrame(() => {
+      decorateAllCardsPending = false;
+      const cards = els38.previewGrid.querySelectorAll(".preview-card[data-preview-card-key]");
+      cards.forEach(applyBrandCardDecoration);
+    });
+  }
+  var decorateAllCardsPending = false;
+  function initBrandResultActionsFeature() {
+    if (bound || !els38.previewGrid) return;
+    bound = true;
+    observer = new MutationObserver(() => decorateAllCards());
+    observer.observe(els38.previewGrid, { childList: true, subtree: false, attributes: true, attributeFilter: ["data-preview-output-url"] });
+    decorateAllCards();
+  }
+
+  // codex_image/webui/frontend/src/tasks.ts
+  var bridge36 = getLegacyBridge();
+  var state30 = bridge36.state;
+  var els39 = bridge36.els;
   function legacyMethod41(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
@@ -42985,26 +43200,26 @@ ${galleryText}`;
     return String(query || "").trim().toLowerCase();
   }
   async function refreshTasks({ migrateLegacyArchives = false } = {}) {
-    const requestSeq = ++state29.tasksRequestSeq;
+    const requestSeq = ++state30.tasksRequestSeq;
     const response = await fetch("/api/tasks/recent?limit=50");
     const data = await response.json();
-    if (requestSeq !== state29.tasksRequestSeq) return;
+    if (requestSeq !== state30.tasksRequestSeq) return;
     await applyTasksSnapshot(data.tasks || [], { migrateLegacyArchives, requestSeq });
   }
-  async function applyTasksSnapshot(tasks, { migrateLegacyArchives = false, requestSeq = state29.tasksRequestSeq } = {}) {
-    const previousLocalPendingTasks = state29.tasks.filter((task) => task?.local_pending);
-    const pendingTask = state29.pendingTaskId ? state29.tasks.find((task) => task.task_id === state29.pendingTaskId) : null;
-    state29.tasks = Array.isArray(tasks) ? tasks : [];
-    if (pendingTask?.local_pending && !state29.tasks.some((task) => task.task_id === pendingTask.task_id)) {
-      state29.tasks.unshift(pendingTask);
+  async function applyTasksSnapshot(tasks, { migrateLegacyArchives = false, requestSeq = state30.tasksRequestSeq } = {}) {
+    const previousLocalPendingTasks = state30.tasks.filter((task) => task?.local_pending);
+    const pendingTask = state30.pendingTaskId ? state30.tasks.find((task) => task.task_id === state30.pendingTaskId) : null;
+    state30.tasks = Array.isArray(tasks) ? tasks : [];
+    if (pendingTask?.local_pending && !state30.tasks.some((task) => task.task_id === pendingTask.task_id)) {
+      state30.tasks.unshift(pendingTask);
     }
-    const retainedTasks = new Set(state29.tasks);
+    const retainedTasks = new Set(state30.tasks);
     previousLocalPendingTasks.forEach((task) => {
       if (!retainedTasks.has(task)) revokeTaskUploadPreviewUrls3(task);
     });
     if (migrateLegacyArchives) {
       await migrateLegacyArchivedTasks2();
-      if (requestSeq !== state29.tasksRequestSeq) return;
+      if (requestSeq !== state30.tasksRequestSeq) return;
     }
     cleanupSessionSelections2();
     renderTasks8();
@@ -43014,7 +43229,7 @@ ${galleryText}`;
   }
   async function applyTaskUpdate(task) {
     if (!updateTaskInState4(task)) return;
-    if (String(task.task_id) === String(state29.selectedTaskId) && taskHasViewableUpdate2(task)) {
+    if (String(task.task_id) === String(state30.selectedTaskId) && taskHasViewableUpdate2(task)) {
       void markTaskViewed2(task.task_id);
     }
     cleanupSessionSelections2();
@@ -43024,12 +43239,12 @@ ${galleryText}`;
     await renderSelectedTaskPreview();
   }
   function currentTaskSearchQuery() {
-    return String(els38.taskSearch?.value || "").trim();
+    return String(els39.taskSearch?.value || "").trim();
   }
   function activeOrSelectedTask(task) {
     const taskId = String(task?.task_id || "");
     const status = String(task?.status || "");
-    return Boolean(taskId && (String(state29.selectedTaskId || "") === taskId || task?.local_pending || ["submitting", "queued", "running"].includes(status)));
+    return Boolean(taskId && (String(state30.selectedTaskId || "") === taskId || task?.local_pending || ["submitting", "queued", "running"].includes(status)));
   }
   function historyTaskSummaryToSidebarTask(task) {
     const size = String(task.size || "");
@@ -43061,13 +43276,13 @@ ${galleryText}`;
     };
   }
   function mergeTaskSearchHistoryResults(tasks, query) {
-    const previousResultIds = new Set((state29.taskSearchHistoryResultIds || []).map(String));
+    const previousResultIds = new Set((state30.taskSearchHistoryResultIds || []).map(String));
     const nextTasks = tasks.map(historyTaskSummaryToSidebarTask).filter((task) => task.task_id);
     const nextById = new Map(nextTasks.map((task) => [String(task.task_id), task]));
     const nextIds = new Set(nextById.keys());
     const merged = [];
     const seen = /* @__PURE__ */ new Set();
-    state29.tasks.forEach((task) => {
+    state30.tasks.forEach((task) => {
       const taskId = String(task?.task_id || "");
       if (!taskId) return;
       if (previousResultIds.has(taskId) && !nextIds.has(taskId) && !activeOrSelectedTask(task)) {
@@ -43085,21 +43300,21 @@ ${galleryText}`;
       if (seen.has(String(task.task_id))) return;
       merged.push(task);
     });
-    state29.tasks = merged;
-    state29.taskSearchHistoryResultIds = Array.from(nextIds);
-    state29.taskSearchHistoryResultQuery = normalizedTaskSearchResultQuery(query);
-    state29.tasksRenderKey = null;
+    state30.tasks = merged;
+    state30.taskSearchHistoryResultIds = Array.from(nextIds);
+    state30.taskSearchHistoryResultQuery = normalizedTaskSearchResultQuery(query);
+    state30.tasksRenderKey = null;
   }
   function clearTaskSearchHistoryResults() {
-    const previousResultIds = new Set((state29.taskSearchHistoryResultIds || []).map(String));
+    const previousResultIds = new Set((state30.taskSearchHistoryResultIds || []).map(String));
     if (!previousResultIds.size) return;
-    state29.tasks = state29.tasks.filter((task) => {
+    state30.tasks = state30.tasks.filter((task) => {
       const taskId = String(task?.task_id || "");
       return !previousResultIds.has(taskId) || activeOrSelectedTask(task);
     });
-    state29.taskSearchHistoryResultIds = [];
-    state29.taskSearchHistoryResultQuery = "";
-    state29.tasksRenderKey = null;
+    state30.taskSearchHistoryResultIds = [];
+    state30.taskSearchHistoryResultQuery = "";
+    state30.tasksRenderKey = null;
   }
   async function fetchTaskSearchHistoryResults(query, requestSeq) {
     const params = new URLSearchParams();
@@ -43109,14 +43324,14 @@ ${galleryText}`;
     const response = await fetch(`/api/task-history/tasks?${params.toString()}`);
     const data = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(data.detail || "Task history search failed");
-    if (requestSeq !== state29.taskSearchHistoryRequestSeq || currentTaskSearchQuery() !== query) return;
+    if (requestSeq !== state30.taskSearchHistoryRequestSeq || currentTaskSearchQuery() !== query) return;
     mergeTaskSearchHistoryResults(Array.isArray(data.tasks) ? data.tasks : [], query);
     renderTasks8({ preserveScroll: true });
   }
   async function syncTaskSearchHistoryResults2() {
     window.clearTimeout(taskSearchHistoryTimerId);
     const query = currentTaskSearchQuery();
-    const requestSeq = ++state29.taskSearchHistoryRequestSeq;
+    const requestSeq = ++state30.taskSearchHistoryRequestSeq;
     if (!query) {
       clearTaskSearchHistoryResults();
       renderTasks8({ preserveScroll: true });
@@ -43124,24 +43339,24 @@ ${galleryText}`;
     }
     taskSearchHistoryTimerId = window.setTimeout(() => {
       void fetchTaskSearchHistoryResults(query, requestSeq).catch((error) => {
-        if (requestSeq !== state29.taskSearchHistoryRequestSeq) return;
+        if (requestSeq !== state30.taskSearchHistoryRequestSeq) return;
         console.warn(error);
       });
     }, TASK_SEARCH_HISTORY_DEBOUNCE_MS);
   }
   async function renderSelectedTaskPreview(requestSeq = null) {
-    const selectedTask = state29.tasks.find((item) => String(item.task_id) === String(state29.selectedTaskId));
+    const selectedTask = state30.tasks.find((item) => String(item.task_id) === String(state30.selectedTaskId));
     if (selectedTask?.summary_only) {
       try {
         const detailedTask = await ensureSelectedTaskDetail(selectedTask.task_id);
-        if (requestSeq !== null && requestSeq !== state29.tasksRequestSeq) return;
+        if (requestSeq !== null && requestSeq !== state30.tasksRequestSeq) return;
         if (detailedTask) {
           renderPreview6(detailedTask);
           return;
         }
       } catch (error) {
         console.warn(error);
-        if (requestSeq !== null && requestSeq !== state29.tasksRequestSeq) return;
+        if (requestSeq !== null && requestSeq !== state30.tasksRequestSeq) return;
       }
     }
     renderPreview6();
@@ -43156,9 +43371,9 @@ ${galleryText}`;
   }
 
   // codex_image/webui/frontend/src/task-selection.ts
-  var bridge36 = getLegacyBridge();
-  var state30 = bridge36.state;
-  var els39 = bridge36.els;
+  var bridge37 = getLegacyBridge();
+  var state31 = bridge37.state;
+  var els40 = bridge37.els;
   var taskSelectionInitialized = false;
   var HISTORY_TASK_REUSE_HANDOFF_KEY = "codex-image-history-task-reuse-handoff";
   var selectedTaskDetailRequestSeq = 0;
@@ -43222,12 +43437,12 @@ ${galleryText}`;
   }
   function selectedTaskInputRestoreCurrent(taskId, restoreSeq) {
     if (restoreSeq == null) return true;
-    return state30.taskInputRestoreSeq === restoreSeq && String(state30.selectedTaskId) === String(taskId);
+    return state31.taskInputRestoreSeq === restoreSeq && String(state31.selectedTaskId) === String(taskId);
   }
   function applySelectedTaskRequestPreview(task) {
     const requestPayload = taskRequestPreviewPayload2(task);
-    if (requestPayload && els39.requestJson) {
-      els39.requestJson.textContent = JSON.stringify(requestPayload, null, 2);
+    if (requestPayload && els40.requestJson) {
+      els40.requestJson.textContent = JSON.stringify(requestPayload, null, 2);
     }
   }
   function applyTaskInputRestoreSources(sources, taskId, restoreSeq) {
@@ -43235,8 +43450,8 @@ ${galleryText}`;
       revokeUploadPreviewUrls2(sources);
       return false;
     }
-    revokeUploadPreviewUrls2(state30.images);
-    state30.images = sources.filter(Boolean);
+    revokeUploadPreviewUrls2(state31.images);
+    state31.images = sources.filter(Boolean);
     renderImageStrip6();
     updateRequestPreview12();
     return true;
@@ -43274,25 +43489,25 @@ ${galleryText}`;
     if (!response.ok) throw new Error(data.detail || translate("notifications.taskMissing"));
     return data.task;
   }
-  async function ensureSelectedTaskDetail2(taskId = state30.selectedTaskId) {
+  async function ensureSelectedTaskDetail2(taskId = state31.selectedTaskId) {
     const normalizedTaskId = String(taskId || "").trim();
     if (!normalizedTaskId) return null;
-    const task = state30.tasks.find((item) => String(item.task_id) === normalizedTaskId);
+    const task = state31.tasks.find((item) => String(item.task_id) === normalizedTaskId);
     if (!task) return null;
     if (!task.summary_only) return task;
     const detailSeq = ++selectedTaskDetailRequestSeq;
     const fullTask = await loadFullTaskDetail(normalizedTaskId);
     if (detailSeq !== selectedTaskDetailRequestSeq) return null;
-    if (String(state30.selectedTaskId) !== normalizedTaskId) return null;
+    if (String(state31.selectedTaskId) !== normalizedTaskId) return null;
     return replaceSelectedTaskDetail(normalizedTaskId, fullTask);
   }
   function replaceSelectedTaskDetail(taskId, task) {
     if (!task?.task_id) return task;
-    const index = state30.tasks.findIndex((item) => String(item.task_id) === String(taskId));
+    const index = state31.tasks.findIndex((item) => String(item.task_id) === String(taskId));
     if (index >= 0) {
-      state30.tasks.splice(index, 1, task);
+      state31.tasks.splice(index, 1, task);
     } else {
-      state30.tasks.unshift(task);
+      state31.tasks.unshift(task);
     }
     return task;
   }
@@ -43301,13 +43516,13 @@ ${galleryText}`;
     const restoreSeq = options.restoreSeq;
     const referenceFiles = Array.isArray(task?.reference_files) ? task.reference_files : [];
     if (!selectedTaskInputRestoreCurrent(taskId, restoreSeq)) return false;
-    state30.referenceFiles = [];
+    state31.referenceFiles = [];
     legacyMethod42("renderReferenceFiles");
     if (!referenceFiles.length) {
       updateRequestPreview12();
       return true;
     }
-    state30.referenceFiles = referenceFiles.map((item) => ({
+    state31.referenceFiles = referenceFiles.map((item) => ({
       kind: "asset",
       id: String(item?.id || item?.reference_file_id || ""),
       filename: String(item?.filename || ""),
@@ -43404,11 +43619,11 @@ ${galleryText}`;
   }
   async function selectTask2(taskId) {
     closePromptPopover8();
-    state30.selectedTaskId = taskId;
-    let task = state30.tasks.find((item) => String(item.task_id) === String(taskId));
+    state31.selectedTaskId = taskId;
+    let task = state31.tasks.find((item) => String(item.task_id) === String(taskId));
     if (!task) return;
     if (task.summary_only) {
-      const detailSeq = ++state30.taskInputRestoreSeq;
+      const detailSeq = ++state31.taskInputRestoreSeq;
       updateTaskSelectionVisuals3(taskId);
       setStatus21(translate("status.loadingHistoryInputs"), "");
       try {
@@ -43421,7 +43636,7 @@ ${galleryText}`;
         return;
       }
     }
-    const restoreSeq = ++state30.taskInputRestoreSeq;
+    const restoreSeq = ++state31.taskInputRestoreSeq;
     void markTaskViewed3(taskId);
     applyTaskToFormWithOutputLock(task);
     await restoreTaskReferenceFiles(task, { taskId, restoreSeq });
@@ -43431,8 +43646,8 @@ ${galleryText}`;
       await restoreTaskInputs(task, { taskId, restoreSeq });
     } catch (error) {
       if (!selectedTaskInputRestoreCurrent(taskId, restoreSeq)) return;
-      revokeUploadPreviewUrls2(state30.images);
-      state30.images = [];
+      revokeUploadPreviewUrls2(state31.images);
+      state31.images = [];
       renderImageStrip6();
       setStatus21(error.message, "error");
       return;
@@ -43455,9 +43670,9 @@ ${galleryText}`;
         task = await loadFullTaskDetail(taskId);
       }
       closePromptPopover8();
-      state30.selectedTaskId = taskId;
+      state31.selectedTaskId = taskId;
       replaceSelectedTaskDetail(taskId, task);
-      const restoreSeq = ++state30.taskInputRestoreSeq;
+      const restoreSeq = ++state31.taskInputRestoreSeq;
       applyTaskToFormWithOutputLock(task);
       await restoreTaskReferenceFiles(task, { taskId, restoreSeq });
       if (!selectedTaskInputRestoreCurrent(taskId, restoreSeq)) return;
@@ -43466,8 +43681,8 @@ ${galleryText}`;
         await restoreTaskInputs(task, { taskId, restoreSeq });
       } catch (error) {
         if (!selectedTaskInputRestoreCurrent(taskId, restoreSeq)) return;
-        revokeUploadPreviewUrls2(state30.images);
-        state30.images = [];
+        revokeUploadPreviewUrls2(state31.images);
+        state31.images = [];
         renderImageStrip6();
         setStatus21(error.message || translate("referenceCollector.addFailed"), "error");
         return;
@@ -43492,8 +43707,8 @@ ${galleryText}`;
   }
 
   // codex_image/webui/frontend/src/overlay-popovers.ts
-  var bridge37 = getLegacyBridge();
-  var els40 = bridge37.els;
+  var bridge38 = getLegacyBridge();
+  var els41 = bridge38.els;
   var overlayPopoversInitialized = false;
   var overlayPopoverEventsBound = false;
   var confirmPopoverEl = null;
@@ -43819,8 +44034,8 @@ ${galleryText}`;
         closeConfirmPopover4();
       }
     }
-    if (!els40.compressionPopover || els40.compressionPopover.classList.contains("hidden")) return;
-    if (els40.compressionPopover.contains(target) || els40.outputFormatField?.contains(target)) return;
+    if (!els41.compressionPopover || els41.compressionPopover.classList.contains("hidden")) return;
+    if (els41.compressionPopover.contains(target) || els41.outputFormatField?.contains(target)) return;
     closeCompressionPopover2();
   }
   function handleDocumentKeydown(event) {
@@ -43885,9 +44100,9 @@ ${galleryText}`;
   var SIDEBAR_MAX_WIDTH = 520;
   var SIDEBAR_DEFAULT_WIDTH = 347;
   var COMPACT_SHELL_MAX_WIDTH = 1180;
-  var bridge38 = getLegacyBridge();
-  var state31 = bridge38.state;
-  var els41 = bridge38.els;
+  var bridge39 = getLegacyBridge();
+  var state32 = bridge39.state;
+  var els42 = bridge39.els;
   var shellUiInitialized = false;
   var shellUiEventsBound = false;
   var sidebarResizeFrameId = null;
@@ -43955,8 +44170,8 @@ ${galleryText}`;
     legacyMethod44("updateRequestPreview");
   }
   function handleShellLocaleChange() {
-    if (!els41.statusText) return;
-    const current = String(els41.statusText.textContent || "").trim();
+    if (!els42.statusText) return;
+    const current = String(els42.statusText.textContent || "").trim();
     const waitingLabels = [translate("status.waiting", "zh-CN"), translate("status.waiting", "en")];
     if (waitingLabels.includes(current)) {
       setStatus22(translate("status.waiting"), "");
@@ -43965,33 +44180,33 @@ ${galleryText}`;
   function bindShellUiEvents() {
     if (shellUiEventsBound) return;
     shellUiEventsBound = true;
-    els41.themeSwitcher?.addEventListener("click", (event) => {
+    els42.themeSwitcher?.addEventListener("click", (event) => {
       const button = event.target.closest("[data-theme-option]");
       if (!button) return;
       applyThemePreference(button.dataset.themeOption || "system");
     });
-    state31.themeSystemQuery = window.matchMedia?.("(prefers-color-scheme: dark)");
-    state31.themeSystemQuery?.addEventListener?.("change", handleThemeSystemChange);
+    state32.themeSystemQuery = window.matchMedia?.("(prefers-color-scheme: dark)");
+    state32.themeSystemQuery?.addEventListener?.("change", handleThemeSystemChange);
     document.addEventListener(LOCALE_CHANGE_EVENT, handleShellLocaleChange);
-    if (els41.copyJsonButton) {
-      els41.copyJsonButton.addEventListener("click", copyJson);
+    if (els42.copyJsonButton) {
+      els42.copyJsonButton.addEventListener("click", copyJson);
     }
-    els41.newTaskButton?.addEventListener("click", resetForm);
-    els41.sidebarResizeHandle?.addEventListener("pointerdown", startSidebarResize);
-    els41.sidebarResizeHandle?.addEventListener("keydown", handleSidebarResizeKeydown);
-    els41.sidebarResizeHandle?.addEventListener("dblclick", resetSidebarWidth);
+    els42.newTaskButton?.addEventListener("click", resetForm);
+    els42.sidebarResizeHandle?.addEventListener("pointerdown", startSidebarResize);
+    els42.sidebarResizeHandle?.addEventListener("keydown", handleSidebarResizeKeydown);
+    els42.sidebarResizeHandle?.addEventListener("dblclick", resetSidebarWidth);
     syncSidebarResizeHandleAria();
   }
   function normalizeThemePreference(value) {
     return THEME_OPTIONS.has(value) ? value : "system";
   }
-  function resolveEffectiveTheme(preference = state31.themePreference) {
+  function resolveEffectiveTheme(preference = state32.themePreference) {
     if (preference === "dark" || preference === "light") return preference;
     return window.matchMedia?.("(prefers-color-scheme: dark)")?.matches ? "dark" : "light";
   }
   function updateThemeSwitcher() {
-    els41.themeSwitcher?.querySelectorAll("[data-theme-option]").forEach((button) => {
-      const active = button.dataset.themeOption === state31.themePreference;
+    els42.themeSwitcher?.querySelectorAll("[data-theme-option]").forEach((button) => {
+      const active = button.dataset.themeOption === state32.themePreference;
       button.classList.toggle("active", active);
       button.setAttribute("aria-pressed", active ? "true" : "false");
     });
@@ -44009,16 +44224,16 @@ ${galleryText}`;
     });
   }
   function applyThemePreference(preference, { persist = true } = {}) {
-    state31.themePreference = normalizeThemePreference(preference);
-    const effectiveTheme = resolveEffectiveTheme(state31.themePreference);
+    state32.themePreference = normalizeThemePreference(preference);
+    const effectiveTheme = resolveEffectiveTheme(state32.themePreference);
     if (document.documentElement.dataset.theme !== effectiveTheme) {
       lockThemeTransitions();
     }
     document.documentElement.dataset.theme = effectiveTheme;
-    document.documentElement.dataset.themePreference = state31.themePreference;
+    document.documentElement.dataset.themePreference = state32.themePreference;
     if (persist) {
       try {
-        localStorage.setItem(THEME_STORAGE_KEY, state31.themePreference);
+        localStorage.setItem(THEME_STORAGE_KEY, state32.themePreference);
       } catch {
       }
     }
@@ -44034,7 +44249,7 @@ ${galleryText}`;
     applyThemePreference(saved, { persist: false });
   }
   function handleThemeSystemChange() {
-    if (state31.themePreference === "system") {
+    if (state32.themePreference === "system") {
       applyThemePreference("system", { persist: false });
     }
   }
@@ -44058,7 +44273,7 @@ ${galleryText}`;
     return Math.min(sidebarMaxWidth(), Math.max(SIDEBAR_MIN_WIDTH, width));
   }
   function sidebarWidthFromCss() {
-    const widthOwner = els41.sidebar || document.documentElement;
+    const widthOwner = els42.sidebar || document.documentElement;
     const inlineWidth = Number.parseInt(widthOwner.style.getPropertyValue("--sidebar-width") || "", 10);
     if (!Number.isNaN(inlineWidth)) return clampSidebarWidth(inlineWidth);
     const tokenWidth = Number.parseInt(getComputedStyle(widthOwner).getPropertyValue("--sidebar-width") || "", 10);
@@ -44068,7 +44283,7 @@ ${galleryText}`;
     return sidebarWidthFromCss() ?? SIDEBAR_DEFAULT_WIDTH;
   }
   function syncSidebarResizeHandleAria(width = null) {
-    const handle = els41.sidebarResizeHandle;
+    const handle = els42.sidebarResizeHandle;
     if (!handle) return;
     const currentWidth = width !== null ? width : currentSidebarWidth();
     handle.setAttribute("aria-valuemin", String(SIDEBAR_MIN_WIDTH));
@@ -44077,7 +44292,7 @@ ${galleryText}`;
   }
   function applySidebarWidth(width, { persist = true } = {}) {
     const nextWidth = clampSidebarWidth(width);
-    (els41.sidebar || document.documentElement).style.setProperty("--sidebar-width", `${nextWidth}px`);
+    (els42.sidebar || document.documentElement).style.setProperty("--sidebar-width", `${nextWidth}px`);
     syncSidebarResizeHandleAria(nextWidth);
     if (persist) {
       try {
@@ -44109,48 +44324,48 @@ ${galleryText}`;
     applySidebarWidth(width, { persist: true });
   }
   function startSidebarResize(event) {
-    if (!els41.sidebar || event.button !== 0) return;
+    if (!els42.sidebar || event.button !== 0) return;
     event.preventDefault();
     const currentWidth = currentSidebarWidth();
-    state31.sidebarResize = {
+    state32.sidebarResize = {
       pointerId: event.pointerId,
       startX: event.clientX,
       startWidth: currentWidth,
       lastWidth: currentWidth
     };
-    els41.sidebar.classList.add("resizing");
-    if (els41.sidebarResizeShield) {
-      els41.sidebarResizeShield.hidden = false;
+    els42.sidebar.classList.add("resizing");
+    if (els42.sidebarResizeShield) {
+      els42.sidebarResizeShield.hidden = false;
     }
-    els41.sidebarResizeHandle?.setPointerCapture?.(event.pointerId);
+    els42.sidebarResizeHandle?.setPointerCapture?.(event.pointerId);
     window.addEventListener("pointermove", updateSidebarResize);
     window.addEventListener("pointerup", finishSidebarResize);
     window.addEventListener("pointercancel", finishSidebarResize);
   }
   function updateSidebarResize(event) {
-    const resize = state31.sidebarResize;
+    const resize = state32.sidebarResize;
     if (!resize || event.pointerId !== resize.pointerId) return;
     event.preventDefault();
     resize.lastWidth = resize.startWidth + event.clientX - resize.startX;
     scheduleSidebarResizeWidth(resize.lastWidth);
   }
   function finishSidebarResize(event) {
-    const resize = state31.sidebarResize;
+    const resize = state32.sidebarResize;
     if (!resize || event.pointerId !== resize.pointerId) return;
     const nextWidth = resize.lastWidth ?? resize.startWidth;
-    state31.sidebarResize = null;
-    els41.sidebar?.classList.remove("resizing");
-    if (els41.sidebarResizeShield) {
-      els41.sidebarResizeShield.hidden = true;
+    state32.sidebarResize = null;
+    els42.sidebar?.classList.remove("resizing");
+    if (els42.sidebarResizeShield) {
+      els42.sidebarResizeShield.hidden = true;
     }
-    els41.sidebarResizeHandle?.releasePointerCapture?.(event.pointerId);
+    els42.sidebarResizeHandle?.releasePointerCapture?.(event.pointerId);
     window.removeEventListener("pointermove", updateSidebarResize);
     window.removeEventListener("pointerup", finishSidebarResize);
     window.removeEventListener("pointercancel", finishSidebarResize);
     flushSidebarResizeWidth(nextWidth);
   }
   function handleSidebarResizeKeydown(event) {
-    if (!els41.sidebar) return;
+    if (!els42.sidebar) return;
     const step = event.shiftKey ? 32 : 16;
     const currentWidth = currentSidebarWidth();
     if (event.key === "ArrowLeft") {
@@ -44168,9 +44383,9 @@ ${galleryText}`;
     }
   }
   function updateDocumentTitle2() {
-    const summary = state31.queue.summary || {};
-    const waitingCount = Number(summary.waiting_count ?? state31.queue.waiting.length ?? 0);
-    const runningCount = Number(summary.running_count ?? state31.queue.running.length ?? 0);
+    const summary = state32.queue.summary || {};
+    const waitingCount = Number(summary.waiting_count ?? state32.queue.waiting.length ?? 0);
+    const runningCount = Number(summary.running_count ?? state32.queue.running.length ?? 0);
     const total = waitingCount + runningCount;
     let status = "";
     if (runningCount > 0) {
@@ -44178,7 +44393,7 @@ ${galleryText}`;
     } else if (waitingCount > 0) {
       status = formatTranslation("document.queuedWaiting", { count: waitingCount });
     } else {
-      const selected = state31.tasks.find((item) => String(item.task_id) === String(state31.selectedTaskId));
+      const selected = state32.tasks.find((item) => String(item.task_id) === String(state32.selectedTaskId));
       status = selected ? formatTaskStatus4(selected) : "";
     }
     const defaultTitle = getLegacyBridge().constants.defaultDocumentTitle;
@@ -44186,9 +44401,9 @@ ${galleryText}`;
     document.title = webAppDocumentTitle(status, fullTitle);
   }
   function setStatus22(message, type) {
-    if (!els41.statusText) return;
-    els41.statusText.textContent = message;
-    els41.statusText.className = `status-text ${type || ""}`;
+    if (!els42.statusText) return;
+    els42.statusText.textContent = message;
+    els42.statusText.className = `status-text ${type || ""}`;
   }
   function resetForm() {
     const outputSettingsLocked = Boolean(legacyMethod44("isOutputSettingsLocked"));
@@ -44197,30 +44412,30 @@ ${galleryText}`;
     closeArchiveModal4();
     closeGallery4();
     closeImageEditor3();
-    state31.selectedTaskId = null;
-    state31.mode = "generate";
-    revokeUploadPreviewUrls3(state31.images);
-    state31.images = [];
+    state32.selectedTaskId = null;
+    state32.mode = "generate";
+    revokeUploadPreviewUrls3(state32.images);
+    state32.images = [];
     legacyMethod44("clearReferenceFiles", { silent: true });
-    state31.batchMode = false;
-    state31.batchSelectedTaskIds = [];
-    state31.batchSelectionAnchorTaskId = null;
+    state32.batchMode = false;
+    state32.batchSelectedTaskIds = [];
+    state32.batchSelectionAnchorTaskId = null;
     finishBatchMarqueeSelection2();
     setPromptText3("");
     if (!outputSettingsLocked) {
-      if (els41.customSizeToggle) els41.customSizeToggle.checked = false;
-      if (els41.nInput) els41.nInput.value = "1";
-      if (els41.resolution) els41.resolution.value = "standard";
-      if (els41.ratio) els41.ratio.value = "1:1";
-      if (els41.orientation) els41.orientation.value = "square";
-      els41.size.value = "1024x1024";
-      els41.quality.value = "auto";
-      els41.outputFormat.value = "png";
-      els41.moderation.value = "auto";
-      els41.compression.value = "80";
-      if (els41.promptFidelity) els41.promptFidelity.value = "strict";
-      if (els41.webSearch) els41.webSearch.checked = false;
-      [els41.nInput, els41.resolution, els41.ratio, els41.orientation, els41.quality, els41.outputFormat, els41.moderation, els41.promptFidelity, els41.webSearch].forEach((sel) => {
+      if (els42.customSizeToggle) els42.customSizeToggle.checked = false;
+      if (els42.nInput) els42.nInput.value = "1";
+      if (els42.resolution) els42.resolution.value = "standard";
+      if (els42.ratio) els42.ratio.value = "1:1";
+      if (els42.orientation) els42.orientation.value = "square";
+      els42.size.value = "1024x1024";
+      els42.quality.value = "auto";
+      els42.outputFormat.value = "png";
+      els42.moderation.value = "auto";
+      els42.compression.value = "80";
+      if (els42.promptFidelity) els42.promptFidelity.value = "strict";
+      if (els42.webSearch) els42.webSearch.checked = false;
+      [els42.nInput, els42.resolution, els42.ratio, els42.orientation, els42.quality, els42.outputFormat, els42.moderation, els42.promptFidelity, els42.webSearch].forEach((sel) => {
         if (sel) sel.dispatchEvent(new Event("change"));
       });
       updateSizeFromPreset2();
@@ -44237,8 +44452,8 @@ ${galleryText}`;
     setStatus22(translate("status.waiting"), "");
   }
   async function copyJson() {
-    if (!els41.requestJson) return;
-    await navigator.clipboard.writeText(els41.requestJson.textContent);
+    if (!els42.requestJson) return;
+    await navigator.clipboard.writeText(els42.requestJson.textContent);
     setStatus22(translate("status.jsonCopied"), "ok");
   }
   function initShellUiFeature() {
@@ -44273,31 +44488,31 @@ ${galleryText}`;
   var appVersionInitialized = false;
   var payload = null;
   var onboardingAutoShown = false;
-  function els42() {
+  function els43() {
     return getLegacyBridge().els;
   }
   function setModalHidden(hidden) {
-    const modal = els42().versionModal;
+    const modal = els43().versionModal;
     if (!modal) return;
     modal.classList.toggle("hidden", hidden);
     modal.setAttribute("aria-hidden", hidden ? "true" : "false");
   }
   function renderAppVersion(statusText) {
-    const versionInfo = els42().versionInfo;
-    const versionLabel = els42().versionLabel;
-    const badge = els42().versionUpdateBadge;
-    const current = els42().versionCurrent;
-    const latest = els42().versionLatest;
-    const source = els42().versionSource;
-    const onboardingNotice = els42().versionOnboardingNotice;
-    const onboardingBody = els42().versionOnboardingBody;
-    const releaseLink = els42().versionReleaseLink;
-    const standardDownloadLink = els42().versionStandardDownloadLink;
-    const updateButton = els42().versionUpdateButton;
-    const continuePortableButton = els42().versionContinuePortableButton;
-    const dismissOnboardingButton = els42().versionDismissOnboardingButton;
-    const modalStatus = els42().versionModalStatus;
-    const panel = els42().versionModal?.querySelector(".version-modal-panel");
+    const versionInfo = els43().versionInfo;
+    const versionLabel = els43().versionLabel;
+    const badge = els43().versionUpdateBadge;
+    const current = els43().versionCurrent;
+    const latest = els43().versionLatest;
+    const source = els43().versionSource;
+    const onboardingNotice = els43().versionOnboardingNotice;
+    const onboardingBody = els43().versionOnboardingBody;
+    const releaseLink = els43().versionReleaseLink;
+    const standardDownloadLink = els43().versionStandardDownloadLink;
+    const updateButton = els43().versionUpdateButton;
+    const continuePortableButton = els43().versionContinuePortableButton;
+    const dismissOnboardingButton = els43().versionDismissOnboardingButton;
+    const modalStatus = els43().versionModalStatus;
+    const panel = els43().versionModal?.querySelector(".version-modal-panel");
     const currentLabel = payload?.current_version_label || "...";
     const latestLabel = payload?.latest_version_label || currentLabel;
     const updateAvailable = Boolean(payload?.update_available);
@@ -44382,7 +44597,7 @@ ${galleryText}`;
     }
   }
   async function openUpdater() {
-    const updateButton = els42().versionUpdateButton;
+    const updateButton = els43().versionUpdateButton;
     if (updateButton) updateButton.disabled = true;
     try {
       const response = await fetch("/api/app-version/open-updater", { method: "POST" });
@@ -44405,24 +44620,24 @@ ${galleryText}`;
     }
   }
   function bindAppVersionEvents() {
-    els42().versionInfo?.addEventListener("click", () => {
+    els43().versionInfo?.addEventListener("click", () => {
       renderAppVersion();
       setModalHidden(false);
     });
-    els42().versionModalClose?.addEventListener("click", () => setModalHidden(true));
-    els42().versionModal?.addEventListener("click", (event) => {
-      if (event.target === els42().versionModal) setModalHidden(true);
+    els43().versionModalClose?.addEventListener("click", () => setModalHidden(true));
+    els43().versionModal?.addEventListener("click", (event) => {
+      if (event.target === els43().versionModal) setModalHidden(true);
     });
-    els42().versionUpdateButton?.addEventListener("click", () => {
+    els43().versionUpdateButton?.addEventListener("click", () => {
       void openUpdater();
     });
-    els42().versionStandardDownloadLink?.addEventListener("click", () => {
+    els43().versionStandardDownloadLink?.addEventListener("click", () => {
       if (payload?.post_update_onboarding) void dismissOnboarding(false);
     });
-    els42().versionContinuePortableButton?.addEventListener("click", () => {
+    els43().versionContinuePortableButton?.addEventListener("click", () => {
       void dismissOnboarding(true);
     });
-    els42().versionDismissOnboardingButton?.addEventListener("click", () => {
+    els43().versionDismissOnboardingButton?.addEventListener("click", () => {
       void dismissOnboarding(true);
     });
     document.addEventListener("keydown", (event) => {
@@ -44644,6 +44859,7 @@ ${galleryText}`;
   initImageStripFeature();
   initGalleryCategoriesFeature();
   initRecentAssetsFeature();
+  initSidebarDrawerFeature();
   initQuickGalleryFeature();
   initGalleryGridFeature();
   initGalleryItemActionsFeature();
@@ -44673,6 +44889,7 @@ ${galleryText}`;
   initTaskNotificationsFeature();
   initTaskDerivedFeature();
   initTaskPreviewFeature();
+  initBrandResultActionsFeature();
   initTaskFeature();
   initTaskSelectionFeature();
   initOverlayPopoversFeature();

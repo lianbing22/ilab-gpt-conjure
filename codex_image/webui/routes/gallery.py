@@ -162,7 +162,7 @@ def register_gallery_routes(app: FastAPI, ctx: WebUIContext) -> None:
         return FileResponse(
             path,
             media_type=str(item.get("mime_type") or "application/octet-stream"),
-            headers={"Cache-Control": "no-store"},
+            headers={"Cache-Control": "public, max-age=31536000, immutable"},
         )
 
     @app.get("/api/reference-assets/recent")
@@ -189,4 +189,25 @@ def register_gallery_routes(app: FastAPI, ctx: WebUIContext) -> None:
             raise HTTPException(status_code=400, detail="Invalid reference asset id") from exc
         except FileNotFoundError as exc:
             raise HTTPException(status_code=404, detail=f"Reference asset not found: {asset_id}") from exc
-        return FileResponse(path, media_type=str(item.get("mime_type") or _guess_mime_type(path.name)))
+        return FileResponse(
+            path,
+            media_type=str(item.get("mime_type") or _guess_mime_type(path.name)),
+            headers={"Cache-Control": "public, max-age=31536000, immutable"},
+        )
+
+    @app.get("/api/reference-assets/{asset_id}/thumbnail")
+    def get_reference_asset_thumbnail(asset_id: str) -> Response:
+        try:
+            ctx.reference_asset_storage.read_item(asset_id)
+            thumbnail_path = ctx.reference_asset_storage.get_or_create_thumbnail(asset_id)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail="Invalid reference asset id") from exc
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail=f"Reference asset not found: {asset_id}") from exc
+        if thumbnail_path is None:
+            raise HTTPException(status_code=404, detail="Thumbnail unavailable")
+        return FileResponse(
+            thumbnail_path,
+            media_type="image/jpeg",
+            headers={"Cache-Control": "public, max-age=31536000, immutable"},
+        )

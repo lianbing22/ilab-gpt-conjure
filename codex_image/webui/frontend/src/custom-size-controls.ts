@@ -280,10 +280,9 @@ export function updateSizeFromPreset(event: any = null): void {
 
 export function populateCustomSizeFromCurrentPreset(): void {
   if (!els.customWidth || !els.customHeight) return;
-  const [width, height] = sizeForPreset(els.resolution?.value, els.ratio?.value).split("x");
-  if (!width || !height) return;
-  els.customWidth.value = width;
-  els.customHeight.value = height;
+  // Use fixed default custom dimensions instead of inheriting the active preset ratio.
+  els.customWidth.value = "1440";
+  els.customHeight.value = "2560";
 }
 
 export function sizeControlName(target: any): string | null {

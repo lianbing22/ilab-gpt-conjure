@@ -55,10 +55,11 @@ function renderRecentAssets() {
   els.recentAssetDock.classList.toggle("hidden", !items.length);
   els.recentAssetList.innerHTML = visibleItems.map((item: any) => {
     const name = recentAssetName(item);
+    const previewSrc = escapeHtml(item.thumbnail_url || item.image_url);
     return `
     <div class="recent-asset-button" title="${escapeHtml(name)}">
       <button class="recent-asset-use" type="button" data-reference-asset-id="${escapeHtml(item.id)}" aria-label="${escapeHtml(formatTranslation("recentAssets.use", { name }))}">
-        <img src="${escapeHtml(item.image_url)}" alt="${escapeHtml(name)}" loading="lazy" decoding="async">
+        <img src="${previewSrc}" alt="${escapeHtml(name)}" loading="lazy" decoding="async">
         <span>${escapeHtml(name)}</span>
       </button>
       <button class="recent-asset-delete" type="button" data-reference-asset-delete="${escapeHtml(item.id)}" aria-label="${escapeHtml(formatTranslation("recentAssets.delete", { name }))}">×</button>

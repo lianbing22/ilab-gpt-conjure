@@ -415,14 +415,13 @@ class WebUISettingsTests(unittest.TestCase):
                 last_refresh=None,
                 raw={},
             )
-            with patch("codex_image.webui.startup_auth.load_auth_state", return_value=auth_state), patch(
-                "codex_image.webui.auth_routing.load_auth_state", return_value=auth_state
-            ):
+            with patch("codex_image.webui.auth_routing.load_auth_state", return_value=auth_state):
                 app = create_app(output_root=root / "tasks", auth_settings_path=settings_path, auto_start_queue=False)
                 response = TestClient(app).get("/api/auth")
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["selected_source"], "codex")
+        # 业务变更：默认强制 API 直连，legacy 设置回退后选 api 而非 codex。
+        self.assertEqual(response.json()["selected_source"], "api")
     def test_api_settings_routes_persist_secret_without_echoing_it(self) -> None:
         from codex_image.webui.app import create_app
 

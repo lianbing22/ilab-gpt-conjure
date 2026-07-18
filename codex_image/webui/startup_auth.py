@@ -5,18 +5,13 @@ import json
 from pathlib import Path
 from typing import Any
 
-from codex_image.auth import load_auth_state
-
 AUTH_SOURCES = {"codex", "api"}
 LEGACY_AUTH_SOURCES = {"auto", "cock" + "pit"}
 
 
 def detect_startup_auth_source() -> str:
-    try:
-        state = load_auth_state()
-    except Exception:
-        return "api"
-    return "codex" if getattr(state, "access_token", "") else "api"
+    # 默认强制走 API 直连，避免同事各自配置 Codex 登录态。
+    return "api"
 
 
 def _read_existing_source(path: Path) -> str:

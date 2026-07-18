@@ -190,7 +190,7 @@ def _color_palette_css(settings: dict[str, Any]) -> str:
         swatches.append((slug, name, color))
 
     lines = [
-        "/* iLab GPT CONJURE color palette.",
+        "/* 阿泰生图 color palette.",
         "   Load this file from Photoshop's Swatches panel. */",
         ":root {",
     ]

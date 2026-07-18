@@ -384,9 +384,20 @@ class WebUIRefactorContractTests(unittest.TestCase):
                 ("/api/reference-assets/recent", "GET"),
                 ("/api/reference-assets/{asset_id}", "DELETE"),
                 ("/api/reference-assets/{asset_id}/image", "GET"),
+                ("/api/reference-assets/{asset_id}/thumbnail", "GET"),
                 ("/api/reference-files/recent", "GET"),
                 ("/api/generate", "POST"),
                 ("/api/edit", "POST"),
+                ("/api/brand/assets", "GET"),
+                ("/api/brand/assets", "POST"),
+                ("/api/brand/assets/{asset_id}", "DELETE"),
+                ("/api/brand/assets/{asset_id}/image", "GET"),
+                ("/api/brand/templates", "GET"),
+                ("/api/brand/templates", "POST"),
+                ("/api/brand/templates/{template_id}", "GET"),
+                ("/api/brand/templates/{template_id}/archive", "POST"),
+                ("/api/tasks/{task_id}/branding/recompose", "POST"),
+                ("/api/tasks/{task_id}/outputs/{output_index}/branding/download", "GET"),
             }
             self.assertEqual(expected_surface, route_surface)
 

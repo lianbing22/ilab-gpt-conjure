@@ -8095,6 +8095,51 @@ body.lightbox-open {
   animation: waiting-bar 1.4s ease-in-out infinite;
 }
 
+
+/* Brand overlay result actions (step 3-J) */
+.brand-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-top: 1px solid var(--border-subtle, rgba(0,0,0,0.08));
+  background: var(--surface-elevated, rgba(255,255,255,0.04));
+  font-size: 12px;
+}
+.brand-badge {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+.brand-badge-pending { background: rgba(250, 204, 21, 0.18); color: var(--warning, #b45309); }
+.brand-badge-failed  { background: rgba(239, 68, 68, 0.18); color: var(--danger, #b91c1c); }
+.brand-toggle {
+  border: 1px solid var(--border-strong, rgba(0,0,0,0.2));
+  background: transparent;
+  color: inherit;
+  padding: 3px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.brand-toggle[aria-pressed="true"] {
+  background: var(--primary, #2563eb);
+  color: #fff;
+  border-color: transparent;
+}
+.brand-download-link,
+.brand-recompose {
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--primary, #2563eb);
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 3px 6px;
+}
+.brand-recompose:disabled { opacity: 0.6; cursor: progress; }
+
 /* source: styles/72-queue-modals.css */
 .queue-drawer {
   position: fixed;
@@ -10538,6 +10583,14 @@ body.lightbox-open {
 }
 
 /* source: styles/80-utilities-responsive.css */
+/* Hamburger toggle: hidden on desktop by default. sidebar-drawer.ts removes the
+   `hidden` attribute on init (so non-JS mobile users don't see a dead button), so
+   CSS must keep it hidden on wide viewports — the @media(max-width:1180px) block
+   below overrides this to inline-flex only on narrow screens. */
+.sidebar-drawer-toggle {
+  display: none;
+}
+
 /* JSON */
 #requestJson {
   margin: 0;
@@ -11371,6 +11424,48 @@ button:disabled {
     min-height: 64px;
     margin: 0;
     padding: 0;
+    gap: 8px;
+    /* 移动端顶部栏：logo 区可收缩，按钮区固定不挤 */
+    flex-wrap: nowrap;
+  }
+
+  /* logo + 文字标题：紧凑排列，允许文字收缩 */
+  .brand-lockup {
+    min-width: 0;
+    flex: 0 1 auto;
+    gap: 8px;
+  }
+
+  /* ≤480px 极窄屏：隐藏副标题，主标题保留但可省略号 */
+  @media (max-width: 480px) {
+    .brand-title {
+      display: block;
+      min-width: 0;
+    }
+
+    .brand-lockup {
+      gap: 6px;
+    }
+  }
+
+  .brand-subtitle {
+    display: none;
+  }
+
+  .brand-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  /* 按钮组：固定不收缩，紧凑排列 */
+  .brand-actions {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
 
   .brand-mark {
@@ -11454,6 +11549,81 @@ button:disabled {
     width: 100vw;
     max-width: 100%;
   }
+
+  /* 汉堡菜单按钮：仅窄屏显示（桌面态永远隐藏）。
+     JS 会移除 hidden 属性（见 sidebar-drawer.ts），所以必须用 CSS 在 PC 端强制隐藏，
+     否则按钮会以默认 inline-block 显示出来。 */
+  .sidebar-drawer-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    padding: 0;
+    margin-left: 4px;
+    border: 1px solid var(--line, #d0d0d0);
+    border-radius: 10px;
+    background: var(--surface, #fff);
+    color: var(--text, #111);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .sidebar-drawer-toggle:active {
+    background: var(--surface-hover, #f0f0f0);
+  }
+
+  /* 抽屉遮罩（默认隐藏，JS 控制） */
+  .sidebar-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 7999;
+    background: rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .sidebar-drawer-backdrop:not([hidden]) {
+    opacity: 1;
+  }
+
+  /* 抽屉打开态：侧边栏变固定全高面板，恢复被隐藏的内容 */
+  .sidebar.sidebar-drawer-open {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: min(340px, 85vw);
+    height: 100vh;
+    height: 100dvh;
+    min-height: 100dvh;
+    flex: none;
+    z-index: 8000;
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: none;
+    border-right: 1px solid var(--line);
+    border-bottom: none;
+    transform: translateX(-100%);
+    transition: transform 0.22s ease;
+    overflow-y: auto;
+  }
+  .sidebar.sidebar-drawer-open.is-open {
+    transform: translateX(0);
+  }
+  .sidebar.sidebar-drawer-open .sidebar-header {
+    display: flex;
+    height: auto;
+    padding: 12px 14px;
+  }
+  .sidebar.sidebar-drawer-open .sidebar-search,
+  .sidebar.sidebar-drawer-open .sidebar-content,
+  .sidebar.sidebar-drawer-open .sidebar-footer,
+  .sidebar.sidebar-drawer-open .task-active-list {
+    display: revert;
+  }
+  .sidebar.sidebar-drawer-open .sidebar-content {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
 }
 
 @container workspace (max-width: 1100px) {
@@ -11524,6 +11694,83 @@ button:disabled {
 }
 
 @container workspace (max-width: 520px) {
+  .image-input-workspace,
+  .controls-col .image-input-workspace {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto;
+  }
+}
+
+/* ===== Mobile (narrow viewport) refinements: stack prompt/settings, fix drawer heights ===== */
+@media (max-width: 520px) {
+  /* 提示词区：操作按钮移到下方，输入框占满宽度 */
+  .prompt-heading,
+  .prompt-compose,
+  .prompt-template-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* 输出设置：内部网格单栏，field-pair 堆叠 */
+  .settings-grid,
+  .settings-grid.is-size-transitioning {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .field-pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* 比例按钮组换行，避免横向溢出 */
+  .ratio-group {
+    flex-wrap: wrap;
+  }
+}
+
+/* 抽屉高度：100vh 在移动端会被浏览器地址栏遮挡，改用 100dvh（保留 vh 兜底） */
+.resource-sheet,
+.queue-drawer {
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* ===== @media 兜底：镜像 @container workspace 规则 =====
+   原因：微信内置浏览器（X5 / 旧 WebKit 内核）对 CSS 容器查询支持不完善，
+   @container workspace (max-width: Npx) 在真实手机上可能完全不触发，
+   导致 dashboard 保持桌面双列布局，在 375px 屏幕上两列被压缩重叠 → 布局失控。
+   解决：在窄视口（手机）下用 @media 镜像同样的堆叠规则。
+   @media 基于视口宽度，手机视口=main-wrapper 宽度，故两者等价；
+   桌面端视口>1180px 不会触发，不影响原有容器查询行为。 */
+
+@media (max-width: 899px) {
+  .dashboard {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+  }
+
+  .controls-col {
+    max-width: none;
+    height: auto;
+    min-height: auto;
+    overflow: visible;
+  }
+
+  .preview-col {
+    height: auto;
+    min-height: 260px;
+    overflow: visible;
+  }
+
+  .preview-panel {
+    height: auto;
+    max-height: none;
+    min-height: 260px;
+  }
+
+  .field-pair {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
   .image-input-workspace,
   .controls-col .image-input-workspace {
     grid-template-columns: minmax(0, 1fr);

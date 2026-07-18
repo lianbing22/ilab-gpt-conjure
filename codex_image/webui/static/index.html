@@ -2,12 +2,12 @@
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#457B66" />
-    <title>iLab GPT CONJURE</title>
+    <title>阿泰生图</title>
     <link rel="icon" type="image/svg+xml" href="/static/brand/favicon.svg" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <script src="/static/pwa.js?v=pwa-1" defer></script>
+    <script src="/static/pwa.js?v=runtime-pwa" defer></script>
     <script>
       (() => {
         const THEME_STORAGE_KEY = "codex-image-theme-preference";
@@ -113,14 +113,14 @@
         });
       })();
     </script>
-    <link rel="stylesheet" href="/static/styles.css?v=runtime-568" />
+    <link rel="stylesheet" href="/static/styles.css?v=runtime-mobile1" />
   </head>
   <body>
     <div class="layout-container">
       <!-- Left Sidebar -->
       <aside id="sidebar" class="sidebar">
         <div class="sidebar-header">
-          <div class="brand" aria-label="iLab GPT CONJURE">
+          <div class="brand" aria-label="阿泰生图">
             <div class="brand-lockup">
               <div class="brand-mark brand-mark-rabbit" aria-hidden="true">
                 <svg class="brand-rabbit-logo" width="31" height="31" viewBox="0 0 24 24" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -140,16 +140,21 @@
                 </svg>
               </div>
               <div class="brand-title">
-                <div class="brand-name">iLab GPT</div>
-                <div class="brand-subtitle">CONJURE</div>
+                <div class="brand-name">阿泰生图</div>
+                <div class="brand-subtitle">AI创新工作室</div>
               </div>
             </div>
             <div class="brand-actions">
               <button id="newTaskButton" class="primary-button brand-new-button" type="button" aria-label="新建对话" data-i18n-attr="aria-label:app.newTaskAria">
                 <svg class="brand-new-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/>
+                  <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.3" strokecap="round"/>
                 </svg>
                 <span data-i18n="app.newTask">新建</span>
+              </button>
+              <button id="sidebarDrawerToggle" class="sidebar-drawer-toggle" type="button" aria-label="打开任务列表" aria-expanded="false" aria-controls="sidebar" hidden>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
               </button>
             </div>
           </div>
@@ -297,6 +302,7 @@
         ></div>
       </aside>
       <div id="sidebarResizeShield" class="sidebar-resize-shield" hidden></div>
+      <div id="sidebarDrawerBackdrop" class="sidebar-drawer-backdrop" hidden></div>
 
       <!-- Main Area -->
       <div class="main-wrapper">
@@ -318,12 +324,12 @@
               <button class="theme-option" data-theme-option="light" type="button" aria-pressed="false" data-i18n="theme.light">浅色</button>
               <button class="theme-option" data-theme-option="dark" type="button" aria-pressed="false" data-i18n="theme.dark">深色</button>
             </div>
-            <a id="githubLink" class="queue-button github-link" href="https://github.com/kadevin/ilab-gpt-conjure" target="_blank" rel="noreferrer" aria-label="GitHub" title="GitHub">
+            <a id="githubLink" class="queue-button github-link" href="https://github.com/kadevin/ilab-gpt-conjure" target="_blank" rel="noreferrer" aria-label="GitHub" title="GitHub" aria-hidden="true" style="display:none">
               <svg class="github-link-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <path fill="currentColor" d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.1c-3.4.7-4.1-1.5-4.1-1.5-.5-1.4-1.3-1.8-1.3-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.3 11.3 0 0 1 6 0C16.8 4.7 17.8 5 17.8 5c.6 1.6.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.8c0 .3.2.7.8.6A12 12 0 0 0 12 .5Z"/>
               </svg>
             </a>
-            <div class="auth-source-switcher" aria-label="授权来源" data-i18n-attr="aria-label:auth.label">
+            <div class="auth-source-switcher" aria-label="授权来源" data-i18n-attr="aria-label:auth.label" style="display:none">
               <div id="authSourceDetail" class="auth-source-detail" data-i18n="auth.checking">授权检查中</div>
               <div id="authSourceGroup" class="auth-source-group">
                 <button class="auth-source-button active" data-auth-source="codex" type="button">Codex</button>
@@ -527,9 +533,9 @@
                   </div>
                 </div>
                 <div id="settingsGrid" class="settings-grid">
-                <div id="modeSettingsSlot" class="mode-settings-slot full-width">
+                <div id="modeSettingsSlot" class="mode-settings-slot full-width" style="min-height:0">
                   <div id="modeSpecificSettings" class="mode-specific-settings mode-transition">
-                    <div class="model-tool-row">
+                    <div class="model-tool-row" style="display:none !important">
                       <label id="mainModelField" class="field main-model-field">
                         <span data-i18n="output.mainModel">主模型</span>
                         <div
@@ -557,7 +563,7 @@
                         </div>
                       </label>
 
-                      <div id="apiDirectSettingsNotice" class="field api-direct-settings-notice mode-transition mode-collapsed hidden" role="note" aria-hidden="true">
+                      <div id="apiDirectSettingsNotice" class="field api-direct-settings-notice mode-transition mode-collapsed hidden" role="note" aria-hidden="true" style="display:none !important">
                         <span data-i18n="output.apiDirect">API 直连</span>
                         <div class="api-direct-settings-control">
                           <div class="api-direct-settings-header">
@@ -574,7 +580,7 @@
                         </div>
                       </div>
 
-                      <div id="webSearchField" class="field web-search-field">
+                      <div id="webSearchField" class="field web-search-field" style="display:none !important">
                         <span data-i18n="output.webSearch">联网搜索</span>
                         <label class="web-search-toggle" title="先联网搜索并用于本次生成" data-i18n-attr="title:output.webSearchTitle">
                           <input id="webSearch" type="checkbox" />
@@ -630,13 +636,13 @@
                 <div class="field orientation-field">
                   <span data-i18n="output.orientation">方向</span>
                   <div class="radio-group" id="orientationGroup">
-                    <button class="radio-btn active" data-val="square" type="button">
+                    <button class="radio-btn" data-val="square" type="button">
                       <svg class="orientation-option-icon orientation-option-icon-square" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
                         <rect x="5" y="5" width="10" height="10" rx="2"></rect>
                       </svg>
                       <span data-i18n="output.square">方形</span>
                     </button>
-                    <button class="radio-btn" data-val="portrait" type="button">
+                    <button class="radio-btn active" data-val="portrait" type="button">
                       <svg class="orientation-option-icon orientation-option-icon-portrait" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
                         <rect x="6.5" y="3" width="7" height="14" rx="2"></rect>
                       </svg>
@@ -650,8 +656,8 @@
                     </button>
                   </div>
                   <select id="orientation" class="hidden">
-                    <option value="square" selected data-i18n="output.square">方形</option>
-                    <option value="portrait" data-i18n="output.portrait">竖图</option>
+                    <option value="square" data-i18n="output.square">方形</option>
+                    <option value="portrait" selected data-i18n="output.portrait">竖图</option>
                     <option value="landscape" data-i18n="output.landscape">横图</option>
                   </select>
                 </div>
@@ -677,14 +683,14 @@
                     </div>
                     <div class="custom-measure-row custom-size-row">
                       <label class="custom-measure-label" for="customWidth" data-i18n="output.width">宽度</label>
-                      <input id="customWidth" class="control custom-size-input" type="number" min="16" max="3840" step="16" value="1024" aria-label="宽度" data-i18n-attr="aria-label:output.width" />
+                      <input id="customWidth" class="control custom-size-input" type="number" min="16" max="3840" step="16" value="1440" aria-label="宽度" data-i18n-attr="aria-label:output.width" />
                       <button id="swapCustomSizeButton" class="custom-size-icon-button custom-size-swap" type="button" aria-label="交换宽高" title="交换宽高" data-i18n-attr="aria-label:output.swapSize;title:output.swapSize">
                         <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                           <path d="M16 3l4 4-4 4M20 7H4M8 21l-4-4 4-4M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                       </button>
                       <label class="custom-measure-label" for="customHeight" data-i18n="output.height">高度</label>
-                      <input id="customHeight" class="control custom-size-input" type="number" min="16" max="3840" step="16" value="1024" aria-label="高度" data-i18n-attr="aria-label:output.height" />
+                      <input id="customHeight" class="control custom-size-input" type="number" min="16" max="3840" step="16" value="2560" aria-label="高度" data-i18n-attr="aria-label:output.height" />
                     </div>
                     <p id="customSizeHint" class="custom-size-hint" data-i18n="output.customSizeHint">单位 px · 16-3840 · 16倍数 · ≤3:1</p>
                   </div>
@@ -733,27 +739,27 @@
                 <div class="field full-width ratio-field">
                   <span data-i18n="output.ratio">比例</span>
                   <div class="radio-group ratio-group" id="ratioGroup">
-                    <button class="radio-btn active" data-val="1:1" type="button">1:1</button>
+                    <button class="radio-btn" data-val="1:1" type="button">1:1</button>
                     <button class="radio-btn" data-val="4:5" type="button">4:5</button>
                     <button class="radio-btn" data-val="5:4" type="button">5:4</button>
                     <button class="radio-btn" data-val="3:4" type="button">3:4</button>
                     <button class="radio-btn" data-val="4:3" type="button">4:3</button>
                     <button class="radio-btn" data-val="2:3" type="button">2:3</button>
                     <button class="radio-btn" data-val="3:2" type="button">3:2</button>
-                    <button class="radio-btn" data-val="9:16" type="button">9:16</button>
+                    <button class="radio-btn active" data-val="9:16" type="button">9:16</button>
                     <button class="radio-btn" data-val="16:9" type="button">16:9</button>
                     <button class="radio-btn" data-val="9:21" type="button">9:21</button>
                     <button class="radio-btn" data-val="21:9" type="button">21:9</button>
                   </div>
                   <select id="ratio" class="hidden">
-                    <option value="1:1" selected>1:1</option>
+                    <option value="1:1">1:1</option>
                     <option value="4:5">4:5</option>
                     <option value="5:4">5:4</option>
                     <option value="3:4">3:4</option>
                     <option value="4:3">4:3</option>
                     <option value="2:3">2:3</option>
                     <option value="3:2">3:2</option>
-                    <option value="9:16">9:16</option>
+                    <option value="9:16" selected>9:16</option>
                     <option value="16:9">16:9</option>
                     <option value="9:21">9:21</option>
                     <option value="21:9">21:9</option>
@@ -764,16 +770,16 @@
                   <div class="field quality-field">
                     <span data-i18n="output.quality">质量</span>
                     <div class="radio-group">
-                      <button class="radio-btn active" data-val="auto" type="button" data-i18n="output.qualityAuto">自动</button>
+                      <button class="radio-btn" data-val="auto" type="button" data-i18n="output.qualityAuto">自动</button>
                       <button class="radio-btn" data-val="low" type="button" data-i18n="output.qualityLow">低</button>
                       <button class="radio-btn" data-val="medium" type="button" data-i18n="output.qualityMedium">中</button>
-                      <button class="radio-btn" data-val="high" type="button" data-i18n="output.qualityHigh">高</button>
+                      <button class="radio-btn active" data-val="high" type="button" data-i18n="output.qualityHigh">高</button>
                     </div>
                     <select id="quality" class="hidden">
                       <option value="auto" data-i18n="output.qualityAuto">自动</option>
                       <option value="low" data-i18n="output.qualityLow">低</option>
                       <option value="medium" data-i18n="output.qualityMedium">中</option>
-                      <option value="high" data-i18n="output.qualityHigh">高</option>
+                      <option value="high" selected data-i18n="output.qualityHigh">高</option>
                     </select>
                   </div>
 
@@ -1221,7 +1227,7 @@
           </ul>
         </div>
         <div class="version-modal-actions">
-          <a id="versionReleaseLink" class="ghost-button text-sm" href="https://github.com/kadevin/ilab-gpt-conjure/releases" target="_blank" rel="noreferrer" data-i18n="version.release">查看发布页</a>
+          <a id="versionReleaseLink" class="ghost-button text-sm hidden" href="https://github.com/kadevin/ilab-gpt-conjure/releases" target="_blank" rel="noreferrer" data-i18n="version.release" aria-hidden="true" style="display:none !important">查看发布页</a>
           <a id="versionStandardDownloadLink" class="run-button text-sm hidden" href="https://github.com/kadevin/ilab-gpt-conjure/releases" target="_blank" rel="noreferrer" data-i18n="version.standardDownload">下载标准版</a>
           <button id="versionUpdateButton" class="run-button" type="button" disabled data-i18n="version.openUpdater">启动更新器</button>
           <button id="versionContinuePortableButton" class="ghost-button text-sm hidden" type="button" data-i18n="version.continuePortable">继续使用便携版</button>
@@ -1435,7 +1441,7 @@
     </div>
 
     <div id="taskNotificationToastRegion" class="task-notification-toast-region" aria-live="polite"></div>
-  <script src="/static/app.js?v=runtime-568"></script>
+  <script src="/static/app.js?v=runtime-mobile1"></script>
     <script>
       (() => {
         document.querySelectorAll(".radio-group").forEach((group) => {

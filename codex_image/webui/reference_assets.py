@@ -10,6 +10,7 @@ from typing import Any
 
 from .schemas import DEFAULT_WEBUI_INPUT_ROOT, DEFAULT_WEBUI_REFERENCE_ASSET_SUBDIR
 from .storage_utils import _guess_mime_type, _safe_filename, utc_now
+from .thumbnails import THUMBNAIL_EXTENSION, create_image_thumbnail, thumbnail_needs_refresh
 
 REFERENCE_ASSET_SUFFIXES = {".png", ".jpg", ".webp", ".gif"}
 MAX_REFERENCE_ASSETS = 50
@@ -107,6 +108,19 @@ class ReferenceAssetStorage:
         if path is None:
             raise FileNotFoundError(asset_id)
         return path
+
+    def thumbnail_path(self, asset_id: str) -> Path:
+        self._validate_asset_id(asset_id)
+        return self._shard_path(asset_id) / f"{asset_id}-thumb.{THUMBNAIL_EXTENSION}"
+
+    def get_or_create_thumbnail(self, asset_id: str) -> Path | None:
+        source = self.image_path(asset_id)
+        thumbnail = self.thumbnail_path(asset_id)
+        if thumbnail_needs_refresh(source, thumbnail):
+            created = create_image_thumbnail(source, thumbnail)
+            if created is None:
+                return None
+        return thumbnail if thumbnail.is_file() else None
 
     def _touch_metadata(self, metadata: dict[str, Any]) -> dict[str, Any]:
         asset_id = str(metadata.get("id") or "")

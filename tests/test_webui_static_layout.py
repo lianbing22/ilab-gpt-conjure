@@ -710,7 +710,7 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         html = Path("codex_image/webui/static/index.html").read_text(encoding="utf-8")
         styles = Path("codex_image/webui/static/styles.css").read_text(encoding="utf-8")
 
-        self.assertIn("<title>iLab GPT CONJURE</title>", html)
+        self.assertIn("<title>阿泰生图</title>", html)
         self.assertIn('<link rel="icon" type="image/svg+xml" href="/static/brand/favicon.svg" />', html)
         self.assertNotIn('<link rel="icon" href="data:," />', html)
         self.assertIn('<div class="brand-lockup">', html)
@@ -719,9 +719,9 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         self.assertIn('class="brand-rabbit-fill"', html)
         self.assertIn('class="brand-rabbit-cutout"', html)
         self.assertIn('class="brand-rabbit-spark"', html)
-        self.assertIn('<div class="brand-name">iLab GPT</div>', html)
-        self.assertIn('<div class="brand-subtitle">CONJURE</div>', html)
-        self.assertIn('aria-label="iLab GPT CONJURE"', html)
+        self.assertIn('<div class="brand-name">阿泰生图</div>', html)
+        self.assertIn('<div class="brand-subtitle">AI创新工作室</div>', html)
+        self.assertIn('aria-label="阿泰生图"', html)
         self.assertNotIn("GPT-image-2 Studio", html)
         favicon_path = Path("codex_image/webui/static/brand/favicon.svg")
         self.assertTrue(favicon_path.exists())
@@ -1023,11 +1023,11 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
             Path("Start WebUI.bat").read_text(encoding="utf-8"),
         ]
 
-        self.assertIn('FastAPI(title="iLab GPT CONJURE"', app_source)
-        self.assertIn("<title>iLab GPT CONJURE</title><h1>iLab GPT CONJURE</h1>", app_source)
+        self.assertIn('FastAPI(title="阿泰生图"', app_source)
+        self.assertIn("<title>阿泰生图</title><h1>阿泰生图</h1>", app_source)
         self.assertNotIn("GPT-image-2 Studio", app_source)
         for source in launcher_sources:
-            self.assertIn("iLab GPT CONJURE", source)
+            self.assertIn("阿泰生图", source)
             self.assertNotIn("GPT-image-2 Studio", source)
     def test_output_size_controls_match_gpt_image_2_ratios(self) -> None:
         html = Path("codex_image/webui/static/index.html").read_text(encoding="utf-8")
@@ -2817,8 +2817,8 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
                 if (els.size.value !== "custom") {
                   throw new Error(`expected custom size mode, got ${els.size.value}`);
                 }
-                if (els.customWidth.value !== "1344" || els.customHeight.value !== "2016") {
-                  throw new Error(`expected 2k portrait preset dimensions, got ${els.customWidth.value}x${els.customHeight.value}`);
+                if (els.customWidth.value !== "1440" || els.customHeight.value !== "2560") {
+                  throw new Error(`expected fixed default custom dimensions, got ${els.customWidth.value}x${els.customHeight.value}`);
                 }
                 if (customSizeUpdated !== 1) throw new Error("expected one custom size update");
                 if (pixelPreviewArg !== "custom") throw new Error(`expected custom pixel preview, got ${pixelPreviewArg}`);

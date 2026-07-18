@@ -187,6 +187,42 @@ class NoCacheStaticFiles(StaticFiles):
         return response
 
 
+def _static_asset_version(static_path: Path) -> str:
+    """Build a cache-busting version tag from the bundled asset mtimes.
+
+    Includes app.js/styles.css (critical bundles) and pwa.js (controls service-worker
+    activation). Returns an empty string if none exist (fallback to the hardcoded value).
+    """
+    versions: list[str] = []
+    for name in ("app.js", "styles.css", "pwa.js"):
+        asset = static_path / name
+        try:
+            versions.append(f"{name.split('.')[0]}{int(asset.stat().st_mtime)}")
+        except OSError:
+            continue
+    return "-".join(versions)
+
+
+def _serve_html_with_asset_version(html_path: Path) -> Response:
+    """Serve an HTML file with bundled asset URLs rewritten to carry a content-based version.
+
+    The HTML ships with a placeholder `?v=runtime-XXX` query on /static/app.js and
+    /static/styles.css. Because those assets are served with a long immutable cache,
+    the version tag must change whenever the bundle changes — otherwise browsers and
+    in-app webviews (e.g. WeChat) keep serving stale JS/CSS. We replace the placeholder
+    with a tag derived from the assets' mtimes so it updates automatically on redeploy.
+    """
+    static_dir = html_path.parent
+    version = _static_asset_version(static_dir)
+    try:
+        html = html_path.read_text(encoding="utf-8")
+    except OSError:
+        return FileResponse(html_path, headers={"Cache-Control": "no-store"})
+    if version:
+        html = re.sub(r"\?v=runtime-[A-Za-z0-9_-]+", f"?v={version}", html)
+    return HTMLResponse(html, headers={"Cache-Control": "no-store"})
+
+
 def create_app(
     *,
     input_root: Path | str | None = None,
@@ -249,7 +285,7 @@ def create_app(
     make_client = client_factory or (lambda: _client_for_auth_source(auth_settings.read_source(), api_settings=api_settings))
     check_auth = auth_checker or (lambda: bool(_auth_status(auth_settings.read_source(), api_settings=api_settings)["auth_available"]))
 
-    app = FastAPI(title="iLab GPT CONJURE", lifespan=queue_lifespan)
+    app = FastAPI(title="阿泰生图", lifespan=queue_lifespan)
     ctx = WebUIContext(
         app=app,
         storage=storage,
@@ -300,9 +336,9 @@ def create_app(
     def index() -> Response:
         index_path = static_path / "index.html"
         if index_path.exists():
-            return FileResponse(index_path, headers={"Cache-Control": "no-store"})
+            return _serve_html_with_asset_version(index_path)
         return HTMLResponse(
-            "<!doctype html><title>iLab GPT CONJURE</title><h1>iLab GPT CONJURE</h1>",
+            "<!doctype html><title>阿泰生图</title><h1>阿泰生图</h1>",
             headers={"Cache-Control": "no-store"},
         )
 
@@ -310,9 +346,9 @@ def create_app(
     def history() -> Response:
         history_path = static_path / "history.html"
         if history_path.exists():
-            return FileResponse(history_path, headers={"Cache-Control": "no-store"})
+            return _serve_html_with_asset_version(history_path)
         return HTMLResponse(
-            "<!doctype html><title>History - iLab GPT CONJURE</title><h1>History</h1>",
+            "<!doctype html><title>History - 阿泰生图</title><h1>History</h1>",
             headers={"Cache-Control": "no-store"},
         )
 

@@ -66,7 +66,13 @@ def _gallery_ref_response(item: dict[str, Any]) -> dict[str, Any]:
 def _reference_asset_response(item: dict[str, Any]) -> dict[str, Any]:
     asset_id = str(item.get("id") or "")
     enriched = dict(item)
-    enriched["image_url"] = f"/api/reference-assets/{quote(asset_id, safe='')}/image" if asset_id else ""
+    if asset_id:
+        encoded = quote(asset_id, safe="")
+        enriched["image_url"] = f"/api/reference-assets/{encoded}/image"
+        enriched["thumbnail_url"] = f"/api/reference-assets/{encoded}/thumbnail"
+    else:
+        enriched["image_url"] = ""
+        enriched["thumbnail_url"] = ""
     return enriched
 
 
@@ -184,6 +190,7 @@ def _input_sources(
             "filename": item.get("filename"),
             "mime_type": item.get("mime_type"),
             "image_url": item.get("image_url", ""),
+            "thumbnail_url": item.get("thumbnail_url", ""),
             "missing": bool(item.get("missing")),
         }
         for item in (reference_assets or [])

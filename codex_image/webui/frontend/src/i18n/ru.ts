@@ -124,7 +124,7 @@ export const RU_DICTIONARY: TranslationDictionary = {
     "footer.archiveCount": "Архив {count}",
     "footer.historyLibrary": "История",
     "historyLibrary.openFull": "Открыть полную библиотеку истории",
-    "history.documentTitle": "История - iLab GPT CONJURE",
+    "history.documentTitle": "История - 阿泰生图",
     "history.back": "Вернуться к генератору",
     "history.title": "История",
     "history.loading": "Загрузка",
