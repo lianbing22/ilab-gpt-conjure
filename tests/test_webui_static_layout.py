@@ -1111,7 +1111,14 @@ class WebUIStaticLayoutTests(WebUIStaticTestCase):
         self.assertNotIn('id="gallerySearch"', html)
         self.assertNotIn('id="galleryButtons"', html)
         self.assertNotIn("gallery-picker-row", html)
-        self.assertRegex(html, r'<div class="panel-heading">\s*<h2[^>]*>素材与参考（可选）</h2>\s*</div>')
+        self.assertRegex(
+            html,
+            r'<div class="panel-heading">\s*'
+            r'<h2 id="mobileMaterialsTitle"[^>]*>素材与参考（可选）</h2>\s*'
+            r'<span id="mobileMaterialSummary"[^>]*>未选择</span>\s*'
+            r'<button id="mobileMaterialsToggle"[^>]*aria-controls="mobileMaterialsContent"[^>]*></button>\s*</div>\s*'
+            r'<div id="mobileMaterialsContent"',
+        )
         self.assertRegex(html, r'<div class="image-input-footer">[\s\S]*<div class="image-input-actions">[\s\S]*<button id="clearImagesButton"')
         self.assertRegex(html, r'<div class="image-input-footer">[\s\S]*id="recentAssetDock"[\s\S]*id="recentAssetList"')
         self.assertRegex(html, r'<div class="image-gallery-column">[\s\S]*id="quickGalleryDock"[\s\S]*id="galleryManagePanel"')

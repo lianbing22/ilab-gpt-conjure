@@ -1,3 +1,5 @@
+import { formatTranslation, LOCALE_CHANGE_EVENT, translate } from "./i18n";
+
 let initialized = false;
 
 function selectedLabel(select: HTMLSelectElement | null, fallback: string): string {
@@ -14,14 +16,17 @@ export function initMobileWorkspaceFeature(): void {
   const outputToggle = document.querySelector<HTMLButtonElement>("#mobileOutputSettingsToggle");
   const advancedToggle = document.querySelector<HTMLButtonElement>("#mobileAdvancedSettingsToggle");
   const imagePanel = document.querySelector<HTMLElement>(".image-panel");
-  const imageHeading = imagePanel?.querySelector<HTMLElement>(".panel-heading");
+  const materialsToggle = document.querySelector<HTMLButtonElement>("#mobileMaterialsToggle");
   const previewGrid = document.querySelector<HTMLElement>("#previewGrid");
   const navActions = document.querySelector<HTMLElement>(".nav-actions");
   const topNav = document.querySelector<HTMLElement>(".top-nav");
   const notificationCenter = document.querySelector<HTMLElement>("#taskNotificationCenter");
   const sidebar = document.querySelector<HTMLElement>(".sidebar");
+  const sidebarFooter = sidebar?.querySelector<HTMLElement>(".sidebar-footer");
+  const versionInfo = document.querySelector<HTMLElement>("#versionInfo");
   const navPlaceholder = document.createComment("mobile-nav-placeholder");
   const notificationPlaceholder = document.createComment("mobile-notification-placeholder");
+  const versionPlaceholder = document.createComment("mobile-version-placeholder");
   const mobileQuery = window.matchMedia("(max-width: 520px)");
 
   const setExpanded = (expanded: boolean): void => {
@@ -54,8 +59,25 @@ export function initMobileWorkspaceFeature(): void {
   };
 
   const syncPreviewState = (): void => {
-    const hasPreview = Boolean(previewGrid?.querySelector(".preview-card, [data-preview-status-card]"));
+    const hasPreview = Boolean(
+      previewGrid?.querySelector(".preview-card, [data-preview-status-card], .waiting-preview, .error-preview"),
+    );
     dashboard?.classList.toggle("mobile-has-preview", hasPreview);
+  };
+
+  const syncMaterialSummary = (): void => {
+    const summary = document.querySelector<HTMLElement>("#mobileMaterialSummary");
+    const imageThumbItems = document.querySelector<HTMLElement>("#imageThumbItems");
+    const referenceFileSelection = document.querySelector<HTMLElement>("#referenceFileSelection");
+    const imageCount = imageThumbItems?.children.length || 0;
+    const fileCount = Array.from(referenceFileSelection?.children || []).filter((item) => {
+      const element = item as HTMLElement;
+      return !element.hidden && !element.classList.contains("hidden");
+    }).length;
+    const brandCount = document.querySelectorAll("#brandMaterialPicker [aria-checked=\"true\"]").length;
+    const count = imageCount + fileCount + brandCount;
+    const text = count ? formatTranslation("batch.selectedCount", { count }) : translate("brand.notSelected");
+    if (summary && summary.textContent !== text) summary.textContent = text;
   };
 
   const relocateNav = (): void => {
@@ -65,6 +87,10 @@ export function initMobileWorkspaceFeature(): void {
       if (notificationCenter?.parentNode === topNav) topNav.insertBefore(notificationPlaceholder, notificationCenter);
       navActions.classList.add("mobile-drawer-tools");
       sidebar.appendChild(navActions);
+      if (versionInfo && sidebarFooter) {
+        if (versionInfo.parentNode === sidebarFooter) sidebarFooter.insertBefore(versionPlaceholder, versionInfo);
+        navActions.appendChild(versionInfo);
+      }
       if (notificationCenter) {
         notificationCenter.classList.add("mobile-drawer-notifications");
         sidebar.appendChild(notificationCenter);
@@ -79,30 +105,45 @@ export function initMobileWorkspaceFeature(): void {
         notificationPlaceholder.parentNode.insertBefore(notificationCenter, notificationPlaceholder);
       }
     }
+    if (versionInfo && versionPlaceholder.parentNode) {
+      versionPlaceholder.parentNode.insertBefore(versionInfo, versionPlaceholder);
+    }
   };
 
   outputToggle?.addEventListener("click", () => setExpanded(!outputPanel?.classList.contains("mobile-settings-expanded")));
   advancedToggle?.addEventListener("click", () => setAdvanced(!outputPanel?.classList.contains("mobile-advanced-expanded")));
-  imageHeading?.setAttribute("role", "button");
-  imageHeading?.setAttribute("tabindex", "0");
-  imageHeading?.setAttribute("aria-expanded", "false");
-  const toggleReference = (): void => {
-    const expanded = !imagePanel?.classList.contains("mobile-reference-expanded");
-    imagePanel?.classList.toggle("mobile-reference-expanded", expanded);
-    imageHeading?.setAttribute("aria-expanded", String(expanded));
+  const setMaterialsExpanded = (expanded: boolean): void => {
+    imagePanel?.classList.toggle("mobile-materials-expanded", expanded);
+    materialsToggle?.setAttribute("aria-expanded", String(expanded));
   };
-  imageHeading?.addEventListener("click", toggleReference);
-  imageHeading?.addEventListener("keydown", (event) => {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    event.preventDefault();
-    toggleReference();
+  materialsToggle?.addEventListener("click", () => {
+    setMaterialsExpanded(!imagePanel?.classList.contains("mobile-materials-expanded"));
   });
+
+  const syncMaterialDisclosure = (): void => {
+    if (!mobileQuery.matches) setMaterialsExpanded(false);
+  };
+
+  const syncMobileLayout = (): void => {
+    syncMaterialDisclosure();
+    relocateNav();
+  };
 
   document.addEventListener("input", syncSummary);
   document.addEventListener("change", syncSummary);
+  document.addEventListener("input", syncMaterialSummary);
+  document.addEventListener("change", syncMaterialSummary);
+  document.addEventListener(LOCALE_CHANGE_EVENT, syncMaterialSummary);
   previewGrid && new MutationObserver(syncPreviewState).observe(previewGrid, { childList: true, subtree: true });
-  mobileQuery.addEventListener("change", relocateNav);
+  imagePanel && new MutationObserver(syncMaterialSummary).observe(imagePanel, {
+    attributes: true,
+    attributeFilter: ["aria-checked", "class", "hidden"],
+    childList: true,
+    subtree: true,
+  });
+  mobileQuery.addEventListener("change", syncMobileLayout);
   syncSummary();
+  syncMaterialSummary();
   syncPreviewState();
-  relocateNav();
+  syncMobileLayout();
 }

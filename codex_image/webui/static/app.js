@@ -196,6 +196,7 @@
       apiDirectSettingsButton: document.querySelector("#apiDirectSettingsButton"),
       queueButton: document.querySelector("#queueButton"),
       queueStatusText: document.querySelector("#queueStatusText"),
+      mobileTaskBadge: document.querySelector("#mobileTaskBadge"),
       taskNotificationButton: document.querySelector("#taskNotificationButton"),
       taskNotificationBadge: document.querySelector("#taskNotificationBadge"),
       taskNotificationCenter: document.querySelector("#taskNotificationCenter"),
@@ -37198,6 +37199,11 @@ ${galleryText}`;
   // codex_image/webui/frontend/src/sidebar-drawer.ts
   var initialized3 = false;
   var drawerTrigger = null;
+  function taskCenterOpenLabel() {
+    const openLabel = translate("sidebar.openTaskCenter");
+    const queueLabel = document.getElementById("queueButton")?.getAttribute("aria-label")?.trim();
+    return queueLabel ? `${openLabel} \xB7 ${queueLabel}` : openLabel;
+  }
   function isMobileLayout() {
     return window.matchMedia("(max-width: 1180px)").matches;
   }
@@ -37220,7 +37226,7 @@ ${galleryText}`;
     } else {
       sidebar.classList.remove("is-open");
       toggle.setAttribute("aria-expanded", "false");
-      toggle.setAttribute("aria-label", translate("sidebar.openTaskCenter"));
+      toggle.setAttribute("aria-label", taskCenterOpenLabel());
       sidebar.removeAttribute("role");
       sidebar.removeAttribute("aria-modal");
       sidebar.removeAttribute("aria-label");
@@ -37265,7 +37271,7 @@ ${galleryText}`;
       if (backdrop) backdrop.hidden = true;
       if (toggle) {
         toggle.setAttribute("aria-expanded", "false");
-        toggle.setAttribute("aria-label", translate("sidebar.openTaskCenter"));
+        toggle.setAttribute("aria-label", taskCenterOpenLabel());
       }
       document.body.classList.remove("mobile-task-drawer-open");
     }
@@ -37329,14 +37335,17 @@ ${galleryText}`;
     const outputToggle = document.querySelector("#mobileOutputSettingsToggle");
     const advancedToggle = document.querySelector("#mobileAdvancedSettingsToggle");
     const imagePanel = document.querySelector(".image-panel");
-    const imageHeading = imagePanel?.querySelector(".panel-heading");
+    const materialsToggle = document.querySelector("#mobileMaterialsToggle");
     const previewGrid = document.querySelector("#previewGrid");
     const navActions = document.querySelector(".nav-actions");
     const topNav = document.querySelector(".top-nav");
     const notificationCenter = document.querySelector("#taskNotificationCenter");
     const sidebar = document.querySelector(".sidebar");
+    const sidebarFooter = sidebar?.querySelector(".sidebar-footer");
+    const versionInfo = document.querySelector("#versionInfo");
     const navPlaceholder = document.createComment("mobile-nav-placeholder");
     const notificationPlaceholder = document.createComment("mobile-notification-placeholder");
+    const versionPlaceholder = document.createComment("mobile-version-placeholder");
     const mobileQuery = window.matchMedia("(max-width: 520px)");
     const setExpanded = (expanded) => {
       outputPanel?.classList.toggle("mobile-settings-expanded", expanded);
@@ -37365,8 +37374,24 @@ ${galleryText}`;
       set("#mobileSummaryQuantity", `${quantity?.value || "1"} \u5F20`);
     };
     const syncPreviewState = () => {
-      const hasPreview = Boolean(previewGrid?.querySelector(".preview-card, [data-preview-status-card]"));
+      const hasPreview = Boolean(
+        previewGrid?.querySelector(".preview-card, [data-preview-status-card], .waiting-preview, .error-preview")
+      );
       dashboard?.classList.toggle("mobile-has-preview", hasPreview);
+    };
+    const syncMaterialSummary = () => {
+      const summary = document.querySelector("#mobileMaterialSummary");
+      const imageThumbItems = document.querySelector("#imageThumbItems");
+      const referenceFileSelection = document.querySelector("#referenceFileSelection");
+      const imageCount = imageThumbItems?.children.length || 0;
+      const fileCount = Array.from(referenceFileSelection?.children || []).filter((item) => {
+        const element2 = item;
+        return !element2.hidden && !element2.classList.contains("hidden");
+      }).length;
+      const brandCount = document.querySelectorAll('#brandMaterialPicker [aria-checked="true"]').length;
+      const count = imageCount + fileCount + brandCount;
+      const text = count ? formatTranslation("batch.selectedCount", { count }) : translate("brand.notSelected");
+      if (summary && summary.textContent !== text) summary.textContent = text;
     };
     const relocateNav = () => {
       if (!navActions || !topNav || !sidebar) return;
@@ -37375,6 +37400,10 @@ ${galleryText}`;
         if (notificationCenter?.parentNode === topNav) topNav.insertBefore(notificationPlaceholder, notificationCenter);
         navActions.classList.add("mobile-drawer-tools");
         sidebar.appendChild(navActions);
+        if (versionInfo && sidebarFooter) {
+          if (versionInfo.parentNode === sidebarFooter) sidebarFooter.insertBefore(versionPlaceholder, versionInfo);
+          navActions.appendChild(versionInfo);
+        }
         if (notificationCenter) {
           notificationCenter.classList.add("mobile-drawer-notifications");
           sidebar.appendChild(notificationCenter);
@@ -37389,30 +37418,43 @@ ${galleryText}`;
           notificationPlaceholder.parentNode.insertBefore(notificationCenter, notificationPlaceholder);
         }
       }
+      if (versionInfo && versionPlaceholder.parentNode) {
+        versionPlaceholder.parentNode.insertBefore(versionInfo, versionPlaceholder);
+      }
     };
     outputToggle?.addEventListener("click", () => setExpanded(!outputPanel?.classList.contains("mobile-settings-expanded")));
     advancedToggle?.addEventListener("click", () => setAdvanced(!outputPanel?.classList.contains("mobile-advanced-expanded")));
-    imageHeading?.setAttribute("role", "button");
-    imageHeading?.setAttribute("tabindex", "0");
-    imageHeading?.setAttribute("aria-expanded", "false");
-    const toggleReference = () => {
-      const expanded = !imagePanel?.classList.contains("mobile-reference-expanded");
-      imagePanel?.classList.toggle("mobile-reference-expanded", expanded);
-      imageHeading?.setAttribute("aria-expanded", String(expanded));
+    const setMaterialsExpanded = (expanded) => {
+      imagePanel?.classList.toggle("mobile-materials-expanded", expanded);
+      materialsToggle?.setAttribute("aria-expanded", String(expanded));
     };
-    imageHeading?.addEventListener("click", toggleReference);
-    imageHeading?.addEventListener("keydown", (event) => {
-      if (event.key !== "Enter" && event.key !== " ") return;
-      event.preventDefault();
-      toggleReference();
+    materialsToggle?.addEventListener("click", () => {
+      setMaterialsExpanded(!imagePanel?.classList.contains("mobile-materials-expanded"));
     });
+    const syncMaterialDisclosure = () => {
+      if (!mobileQuery.matches) setMaterialsExpanded(false);
+    };
+    const syncMobileLayout = () => {
+      syncMaterialDisclosure();
+      relocateNav();
+    };
     document.addEventListener("input", syncSummary);
     document.addEventListener("change", syncSummary);
+    document.addEventListener("input", syncMaterialSummary);
+    document.addEventListener("change", syncMaterialSummary);
+    document.addEventListener(LOCALE_CHANGE_EVENT, syncMaterialSummary);
     previewGrid && new MutationObserver(syncPreviewState).observe(previewGrid, { childList: true, subtree: true });
-    mobileQuery.addEventListener("change", relocateNav);
+    imagePanel && new MutationObserver(syncMaterialSummary).observe(imagePanel, {
+      attributes: true,
+      attributeFilter: ["aria-checked", "class", "hidden"],
+      childList: true,
+      subtree: true
+    });
+    mobileQuery.addEventListener("change", syncMobileLayout);
     syncSummary();
+    syncMaterialSummary();
     syncPreviewState();
-    relocateNav();
+    syncMobileLayout();
   }
 
   // codex_image/webui/frontend/src/task-list-render.ts
@@ -40543,10 +40585,19 @@ ${galleryText}`;
     const text = dispatchPending ? formatTranslation("queue.dispatching", { waiting: waitingCount }) : total ? formatTranslation("queue.runningWaiting", { running: runningCount, waiting: waitingCount }) : translate("queue.empty");
     const label = total ? formatTranslation("queue.statusLabel", { text, channelText }) : translate("queue.emptyAria");
     if (els45.queueStatusText) els45.queueStatusText.textContent = text;
+    if (els45.mobileTaskBadge) {
+      els45.mobileTaskBadge.textContent = total > 99 ? "99+" : String(total);
+      els45.mobileTaskBadge.classList.toggle("hidden", total === 0);
+    }
     if (els45.queueButton) {
       els45.queueButton.setAttribute("aria-label", label);
       els45.queueButton.title = total ? translate("queue.jumpTitle") : translate("queue.emptyTitle");
       els45.queueButton.classList.toggle("has-queue", total > 0 || dispatchPending);
+    }
+    const sidebar = document.querySelector(".sidebar");
+    const sidebarDrawerToggle = document.querySelector("#sidebarDrawerToggle");
+    if (sidebarDrawerToggle && !sidebar?.classList.contains("is-open")) {
+      sidebarDrawerToggle.setAttribute("aria-label", `${translate("sidebar.openTaskCenter")} \xB7 ${label}`);
     }
   }
   function jumpToActiveTaskGroup() {

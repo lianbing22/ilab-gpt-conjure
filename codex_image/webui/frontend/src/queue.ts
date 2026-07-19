@@ -218,10 +218,19 @@ export function renderQueueStatusChip({
     ? formatTranslation("queue.statusLabel", { text, channelText })
     : translate("queue.emptyAria");
   if (els.queueStatusText) els.queueStatusText.textContent = text;
+  if (els.mobileTaskBadge) {
+    els.mobileTaskBadge.textContent = total > 99 ? "99+" : String(total);
+    els.mobileTaskBadge.classList.toggle("hidden", total === 0);
+  }
   if (els.queueButton) {
     els.queueButton.setAttribute("aria-label", label);
     els.queueButton.title = total ? translate("queue.jumpTitle") : translate("queue.emptyTitle");
     els.queueButton.classList.toggle("has-queue", total > 0 || dispatchPending);
+  }
+  const sidebar = document.querySelector(".sidebar");
+  const sidebarDrawerToggle = document.querySelector<HTMLButtonElement>("#sidebarDrawerToggle");
+  if (sidebarDrawerToggle && !sidebar?.classList.contains("is-open")) {
+    sidebarDrawerToggle.setAttribute("aria-label", `${translate("sidebar.openTaskCenter")} · ${label}`);
   }
 }
 

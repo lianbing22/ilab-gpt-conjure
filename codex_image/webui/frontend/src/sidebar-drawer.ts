@@ -6,6 +6,12 @@ import { translate } from "./i18n";
 let initialized = false;
 let drawerTrigger: HTMLElement | null = null;
 
+function taskCenterOpenLabel(): string {
+  const openLabel = translate("sidebar.openTaskCenter");
+  const queueLabel = document.getElementById("queueButton")?.getAttribute("aria-label")?.trim();
+  return queueLabel ? `${openLabel} · ${queueLabel}` : openLabel;
+}
+
 function isMobileLayout(): boolean {
   return window.matchMedia("(max-width: 1180px)").matches;
 }
@@ -30,7 +36,7 @@ function setDrawerOpen(open: boolean): void {
   } else {
     sidebar.classList.remove("is-open");
     toggle.setAttribute("aria-expanded", "false");
-    toggle.setAttribute("aria-label", translate("sidebar.openTaskCenter"));
+    toggle.setAttribute("aria-label", taskCenterOpenLabel());
     sidebar.removeAttribute("role");
     sidebar.removeAttribute("aria-modal");
     sidebar.removeAttribute("aria-label");
@@ -82,7 +88,7 @@ function handleResize(): void {
     if (backdrop) backdrop.hidden = true;
     if (toggle) {
       toggle.setAttribute("aria-expanded", "false");
-      toggle.setAttribute("aria-label", translate("sidebar.openTaskCenter"));
+      toggle.setAttribute("aria-label", taskCenterOpenLabel());
     }
     document.body.classList.remove("mobile-task-drawer-open");
   }

@@ -33,6 +33,7 @@ export function createWebUIElements(): WebUIElements {
   apiDirectSettingsButton: document.querySelector("#apiDirectSettingsButton"),
   queueButton: document.querySelector("#queueButton"),
   queueStatusText: document.querySelector("#queueStatusText"),
+  mobileTaskBadge: document.querySelector("#mobileTaskBadge"),
   taskNotificationButton: document.querySelector("#taskNotificationButton"),
   taskNotificationBadge: document.querySelector("#taskNotificationBadge"),
   taskNotificationCenter: document.querySelector("#taskNotificationCenter"),

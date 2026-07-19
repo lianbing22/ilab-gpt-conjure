@@ -146,12 +146,14 @@
             </div>
             <div class="brand-actions">
               <button id="sidebarDrawerToggle" class="sidebar-drawer-toggle" type="button" aria-label="打开任务中心" aria-expanded="false" aria-controls="sidebar" data-i18n-attr="aria-label:sidebar.openTaskCenter" hidden>
-                <svg class="sidebar-menu-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <svg class="sidebar-menu-icon sidebar-history-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2"/>
+                  <path d="M12 7v5l3.5 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
                 <svg class="sidebar-close-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
                   <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                 </svg>
+                <span id="mobileTaskBadge" class="mobile-task-badge hidden" aria-hidden="true"></span>
               </button>
             </div>
           </div>
@@ -438,9 +440,12 @@
             <!-- Image Input -->
             <section class="panel image-panel">
               <div class="panel-heading">
-                <h2 data-i18n="imageInput.materialsTitle">素材与参考（可选）</h2>
+                <h2 id="mobileMaterialsTitle" data-i18n="imageInput.materialsTitle">素材与参考（可选）</h2>
+                <span id="mobileMaterialSummary" class="mobile-material-summary" aria-live="polite">未选择</span>
+                <button id="mobileMaterialsToggle" class="mobile-materials-toggle" type="button" aria-expanded="false" aria-controls="mobileMaterialsContent" aria-labelledby="mobileMaterialsTitle mobileMaterialSummary"></button>
               </div>
 
+              <div id="mobileMaterialsContent" class="mobile-materials-content">
               <div class="material-section reference-material-section">
                 <div class="material-section-header">
                   <strong data-i18n="imageInput.referenceImages">参考图片</strong>
@@ -530,6 +535,7 @@
                   </button>
                 </div>
                 <div id="brandMaterialList" class="brand-material-list" role="list" aria-label="品牌素材层" data-i18n-attr="aria-label:brand.layers"></div>
+              </div>
               </div>
             </section>
 

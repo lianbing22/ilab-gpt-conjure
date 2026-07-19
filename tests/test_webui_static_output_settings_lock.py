@@ -14,7 +14,10 @@ class OutputSettingsLockFrontendContractTests(WebUIStaticTestCase):
         zh_cn = Path("codex_image/webui/frontend/src/i18n/zh-cn.ts").read_text(encoding="utf-8")
         en = Path("codex_image/webui/frontend/src/i18n/en.ts").read_text(encoding="utf-8")
 
-        self.assertIn('<h2 data-i18n="imageInput.materialsTitle">素材与参考（可选）</h2>', html)
+        self.assertIn(
+            '<h2 id="mobileMaterialsTitle" data-i18n="imageInput.materialsTitle">素材与参考（可选）</h2>',
+            html,
+        )
         self.assertIn('data-i18n="output.lock.adoptTask">使用此任务参数</button>', html)
         self.assertIn('"imageInput.materialsTitle": "素材与参考（可选）"', zh_cn)
         self.assertIn('"output.lock.adoptTask": "使用此任务参数"', zh_cn)
