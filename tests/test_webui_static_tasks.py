@@ -793,6 +793,9 @@ class WebUIStaticTaskTests(WebUIStaticTestCase):
         script = self._frontend_script_source()
         harness = "\n".join(
             [
+                self._extract_javascript_function(script, "outputFileUrl"),
+                self._extract_javascript_function(script, "completedBrandingUrl"),
+                self._extract_javascript_function(script, "taskDisplayOutputUrl"),
                 self._extract_javascript_function(script, "taskOutputUrls"),
                 self._extract_javascript_function(script, "taskDeletedOutputIndexes"),
                 self._extract_javascript_function(script, "taskSelectedOutputIndexes"),
@@ -920,6 +923,31 @@ class WebUIStaticTaskTests(WebUIStaticTestCase):
                 }
                 if (!taskOutputSelected(prunedTask, 3) || taskOutputSelected(prunedTask, 2)) {
                   throw new Error("selected output indexes should be parsed and ignore deleted slots");
+                }
+                const brandedTask = {
+                  status: "completed",
+                  output_urls: ["/outputs/task-image-1.png"],
+                  outputs: [{
+                    index: 1,
+                    status: "completed",
+                    url: "/outputs/task-image-1.png",
+                    branding: {
+                      status: "completed",
+                      url: "/outputs/task-brand-1-deadbeef.png",
+                      thumbnail_url: "/outputs/task-brand-1-deadbeef-thumb.jpg",
+                      request_hash: "deadbeef",
+                    },
+                  }],
+                };
+                const brandedUrl = taskOutputUrls(brandedTask).join("|");
+                if (brandedUrl !== "/outputs/task-brand-1-deadbeef.png") {
+                  throw new Error(`completed branding should replace the display URL, got ${brandedUrl}`);
+                }
+                if (!taskOutputRecordMatchesUrl(brandedTask.outputs[0], brandedUrl)) {
+                  throw new Error("branded URL should still match its raw output record");
+                }
+                if (taskOutputIndexFromUrl(brandedUrl) !== 1) {
+                  throw new Error("branded URL should retain its output index");
                 }
                 """,
             ]
@@ -1389,6 +1417,7 @@ class WebUIStaticTaskTests(WebUIStaticTestCase):
         for function_name in [
             "renderPreview",
             "previewStructureKey",
+            "previewBrandingKey",
             "previewPromptKey",
             "renderOutputPreview",
             "bindPreviewRetryButtons",
@@ -1405,6 +1434,9 @@ class WebUIStaticTaskTests(WebUIStaticTestCase):
             self.assertRegex(source, rf"\nfunction {function_name}\(")
             self.assertNotRegex(task_source, rf"\nfunction {function_name}\(")
         self.assertIn("Object.assign(getLegacyBridge().methods", source)
+        self.assertLess(source.index("state.previewTask = selected || null;"), source.index("state.previewRenderKey === nextPreviewKey"))
+        self.assertIn("branding.status || \"\"", source)
+        self.assertIn("branding.request_hash || \"\"", source)
     def test_task_derived_feature_has_typescript_source_contract(self) -> None:
         source = self._task_derived_source()
         task_source = self._task_source()
@@ -1421,6 +1453,9 @@ class WebUIStaticTaskTests(WebUIStaticTestCase):
         self.assertIn("return parseTaskSizeDimensions(taskRequestedSize(task)) || parseTaskSizeDimensions(taskOutputSize(task));", source)
         self.assertNotIn('String(task?.output_size || task?.params?.size || task?.request?.size || "")', source)
         for function_name in [
+            "completedBrandingUrl",
+            "completedBrandingThumbnailUrl",
+            "taskDisplayOutputUrl",
             "taskThumbnailUrls",
             "taskOutputUrls",
             "taskOutputRecordsByIndex",
@@ -1438,6 +1473,18 @@ class WebUIStaticTaskTests(WebUIStaticTestCase):
             self.assertRegex(source, rf"\nfunction {function_name}\(")
             self.assertNotRegex(task_source, rf"\nfunction {function_name}\(")
         self.assertIn("Object.assign(getLegacyBridge().methods", source)
+        self.assertIn("return completedBrandingUrl(record) || String(fallbackUrl || \"\").trim();", source)
+        self.assertIn("completedBrandingThumbnailUrl(record)", source)
+
+    def test_brand_result_actions_keep_raw_output_as_explicit_fallback(self) -> None:
+        source = Path("codex_image/webui/frontend/src/brand-result-actions.ts").read_text(encoding="utf-8")
+
+        self.assertIn("const previewTask = state.previewTask;", source)
+        self.assertIn("o?.branding?.url === outputUrl", source)
+        self.assertIn("const rawUrl = String(output.url || (output.file ? `/outputs/${output.file}` : \"\")).trim();", source)
+        self.assertIn("wireToggle(card, branding, result.rawUrl);", source)
+        self.assertIn("function wireToggle(card: HTMLElement, branding: any, rawOutputUrl: string): void", source)
+        self.assertIn("const rawUrl = rawOutputUrl || String(card.dataset.previewOutputUrl || \"\");", source)
     def test_task_selection_feature_has_typescript_source_contract(self) -> None:
         task_selection_source = self._task_selection_source()
         legacy_source = self._bootstrap_source()
@@ -1901,6 +1948,9 @@ class WebUIStaticTaskTests(WebUIStaticTestCase):
         script = self._frontend_script_source()
         harness = "\n".join(
             [
+                self._extract_javascript_function(script, "outputFileUrl"),
+                self._extract_javascript_function(script, "completedBrandingUrl"),
+                self._extract_javascript_function(script, "taskDisplayOutputUrl"),
                 self._extract_javascript_function(script, "positiveInt"),
                 self._extract_javascript_function(script, "nonnegativeInt"),
                 self._extract_javascript_function(script, "taskOutputRecordIsDeleted"),

@@ -32,12 +32,14 @@ def _placements() -> dict[str, dict[str, PlacementConfig]]:
             width_ratio=0.18,
             margin_x_ratio=0.04,
             margin_y_ratio=0.04,
+            scrim_policy="never",
         ),
         "slogan": PlacementConfig(
             anchor="bottom-center",
             width_ratio=0.35,
             margin_x_ratio=0.0,
             margin_y_ratio=0.02,
+            scrim_policy="auto",
         ),
     }
     return {layout: dict(elements) for layout in ("square", "portrait", "landscape")}

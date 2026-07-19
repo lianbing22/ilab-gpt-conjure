@@ -81,6 +81,9 @@ function renderPreview(task: any = null) {
   const visibleSelectedTask = selectedTask && !isTaskArchived(selectedTask.task_id) ? selectedTask : null;
   const selected = task || visibleSelectedTask || state.tasks.find((item: any) => !isTaskArchived(item.task_id)) || selectedTask || state.tasks[0];
   const status = taskPreviewStatus(selected);
+  // Keep the richest selected task available to brand controls even when the
+  // visible URL structure has not changed since the previous render.
+  state.previewTask = selected || null;
   updatePreviewDownloadActions(selected);
   const nextPreviewKey = previewStructureKey(selected);
   if (state.previewRenderKey === nextPreviewKey) {
@@ -141,21 +144,33 @@ function previewStructureKey(task: any) {
   const taskId = String(task.task_id || "");
   const status = taskPreviewStatus(task);
   const outputUrls = taskOutputUrls(task).join("|");
+  const branding = previewBrandingKey(task);
   const selectedIndexes = taskSelectedOutputIndexes(task).join(",");
   const size = task.params?.size || task.output_size || currentSize();
   if (status === "failed" || status === "partial_failed") {
-    return ["failed", taskId, status, outputUrls, selectedIndexes, taskFailureMessage(task), taskRetryStateText(task), canRetryFailedTask(task), canAcceptTaskSuccesses(task)].join("|");
+    return ["failed", taskId, status, outputUrls, branding, selectedIndexes, taskFailureMessage(task), taskRetryStateText(task), canRetryFailedTask(task), canAcceptTaskSuccesses(task)].join("|");
   }
   if (status === "submitting" || status === "queued") {
-    return ["waiting", taskId, status, outputUrls, selectedIndexes, taskGeneratedCount(task, 0), taskTotalCount(task), size, task.last_error || task.error || "", taskRetryStateText(task)].join("|");
+    return ["waiting", taskId, status, outputUrls, branding, selectedIndexes, taskGeneratedCount(task, 0), taskTotalCount(task), size, task.last_error || task.error || "", taskRetryStateText(task)].join("|");
   }
   if (status === "running") {
-    return ["running", taskId, outputUrls, selectedIndexes, taskGeneratedCount(task, 0), taskTotalCount(task), size, task.mode || "", taskRetryStateText(task), taskRunningFailureKey(task)].join("|");
+    return ["running", taskId, outputUrls, branding, selectedIndexes, taskGeneratedCount(task, 0), taskTotalCount(task), size, task.mode || "", taskRetryStateText(task), taskRunningFailureKey(task)].join("|");
   }
   if (outputUrls) {
-    return ["output", taskId, status, outputUrls, selectedIndexes, previewPromptKey(task)].join("|");
+    return ["output", taskId, status, outputUrls, branding, selectedIndexes, previewPromptKey(task)].join("|");
   }
   return ["empty", taskId, status].join("|");
+}
+
+function previewBrandingKey(task: any) {
+  if (!Array.isArray(task?.outputs)) return String(task?.branding_status || "");
+  return [
+    task?.branding_status || "",
+    ...task.outputs.map((output: any) => {
+      const branding = output?.branding || {};
+      return [output?.index || "", branding.status || "", branding.url || branding.file || "", branding.request_hash || ""].join(":");
+    }),
+  ].join("|");
 }
 
 function previewPromptKey(task: any) {

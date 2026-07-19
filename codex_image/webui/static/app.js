@@ -41937,6 +41937,19 @@ ${galleryText}`;
     if (!task?.task_id || outputIndex === null) return "";
     return `/api/tasks/${encodeURIComponent(task.task_id)}/outputs/${outputIndex}/thumbnail`;
   }
+  function completedBrandingUrl(record) {
+    const branding = record?.branding;
+    if (!branding || branding.status !== "completed") return "";
+    return String(branding.url || outputFileUrl2(branding.file) || "").trim();
+  }
+  function completedBrandingThumbnailUrl(record) {
+    const branding = record?.branding;
+    if (!branding || branding.status !== "completed") return "";
+    return String(branding.thumbnail_url || outputFileUrl2(branding.thumbnail_file) || "").trim();
+  }
+  function taskDisplayOutputUrl(record, fallbackUrl) {
+    return completedBrandingUrl(record) || String(fallbackUrl || "").trim();
+  }
   function taskThumbnailUrls2(task) {
     if (!task) return [];
     const deletedIndexes = taskDeletedOutputIndexes(task);
@@ -41958,7 +41971,7 @@ ${galleryText}`;
         if (!record || typeof record !== "object" || taskOutputRecordIsDeleted(record)) return;
         const index = positiveInt(record.index) || fallbackIndex + 1;
         if (deletedIndexes.has(index) || record.status !== "completed") return;
-        const recordUrl = record.thumbnail_url || outputFileUrl2(record.thumbnail_file) || (record.url || record.file ? taskThumbnailRoute(task, index) : "");
+        const recordUrl = completedBrandingThumbnailUrl(record) || record.thumbnail_url || outputFileUrl2(record.thumbnail_file) || (record.url || record.file ? taskThumbnailRoute(task, index) : "");
         pushUrl(recordUrl, index);
       });
       if (urls.length) return urls;
@@ -41973,14 +41986,21 @@ ${galleryText}`;
     if (!task) return [];
     const deletedIndexes = taskDeletedOutputIndexes(task);
     if (Array.isArray(task.output_urls) && task.output_urls.length) {
-      return task.output_urls.filter((url, fallbackIndex) => {
+      const urls = [];
+      task.output_urls.forEach((url, fallbackIndex) => {
         const record = Array.isArray(task?.outputs) ? task.outputs.find((item) => taskOutputRecordMatchesUrl(item, url)) : null;
         const index = positiveInt(record?.index) || taskOutputIndexFromUrl(url) || fallbackIndex + 1;
-        return !deletedIndexes.has(index) && !taskOutputRecordIsDeleted(record);
+        if (deletedIndexes.has(index) || taskOutputRecordIsDeleted(record)) return;
+        const displayUrl = taskDisplayOutputUrl(record, url);
+        if (displayUrl && !urls.includes(displayUrl)) urls.push(displayUrl);
       });
+      return urls;
     }
     const singleIndex = taskOutputIndexFromUrl(task.output_url) || 1;
-    if (task.output_url && !deletedIndexes.has(singleIndex)) return [task.output_url];
+    if (task.output_url && !deletedIndexes.has(singleIndex)) {
+      const record = Array.isArray(task?.outputs) ? task.outputs.find((item) => taskOutputRecordMatchesUrl(item, task.output_url)) : null;
+      return [taskDisplayOutputUrl(record, task.output_url)];
+    }
     return [];
   }
   function taskDeletedOutputIndexes(task) {
@@ -42023,6 +42043,7 @@ ${galleryText}`;
   function taskOutputRecordMatchesUrl(record, url) {
     if (!record || typeof record !== "object") return false;
     if (record.url && String(record.url) === String(url)) return true;
+    if (completedBrandingUrl(record) === String(url)) return true;
     const recordIndex = positiveInt(record.index);
     const urlIndex = taskOutputIndexFromUrl(url);
     return recordIndex !== null && urlIndex !== null && recordIndex === urlIndex;
@@ -42138,7 +42159,7 @@ ${galleryText}`;
     return records;
   }
   function taskOutputIndexFromUrl(url) {
-    const match = String(url || "").match(/-image-(\d+)(?=\.[a-z0-9]+(?:[?#].*)?$|$)/i);
+    const match = String(url || "").match(/-(?:image|brand)-(\d+)(?=-[a-f0-9]{8,}|\.[a-z0-9]+(?:[?#].*)?$|$)/i);
     return positiveInt(match?.[1]);
   }
   function compressTaskImageBlockStates2(states) {
@@ -42391,7 +42412,7 @@ ${galleryText}`;
     return 1;
   }
   function taskOutputIndex(task, url, visibleIndex) {
-    const output = Array.isArray(task?.outputs) ? task.outputs.find((item) => item?.status === "completed" && item?.url === url) : null;
+    const output = Array.isArray(task?.outputs) ? task.outputs.find((item) => item?.status === "completed" && taskOutputRecordMatchesUrl(item, url)) : null;
     const value = Number.parseInt(output?.index ?? "", 10);
     if (!Number.isNaN(value) && value > 0) return value;
     return visibleIndex + 1;
@@ -42425,6 +42446,8 @@ ${galleryText}`;
       taskVisibleCompletedCount,
       taskOutputRecordIsDeleted,
       taskOutputRecordMatchesUrl,
+      completedBrandingUrl,
+      completedBrandingThumbnailUrl,
       taskOutputRecordHasDisplayableImage,
       taskOutputRecordsByIndex,
       taskOutputIndexFromUrl,
@@ -42566,6 +42589,7 @@ ${galleryText}`;
     const visibleSelectedTask = selectedTask && !isTaskArchived4(selectedTask.task_id) ? selectedTask : null;
     const selected = task || visibleSelectedTask || state28.tasks.find((item) => !isTaskArchived4(item.task_id)) || selectedTask || state28.tasks[0];
     const status = taskPreviewStatus(selected);
+    state28.previewTask = selected || null;
     updatePreviewDownloadActions(selected);
     const nextPreviewKey = previewStructureKey(selected);
     if (state28.previewRenderKey === nextPreviewKey) {
@@ -42624,21 +42648,32 @@ ${galleryText}`;
     const taskId = String(task.task_id || "");
     const status = taskPreviewStatus(task);
     const outputUrls = taskOutputUrls3(task).join("|");
+    const branding = previewBrandingKey(task);
     const selectedIndexes = taskSelectedOutputIndexes2(task).join(",");
     const size = task.params?.size || task.output_size || currentSize2();
     if (status === "failed" || status === "partial_failed") {
-      return ["failed", taskId, status, outputUrls, selectedIndexes, taskFailureMessage2(task), taskRetryStateText4(task), canRetryFailedTask3(task), canAcceptTaskSuccesses3(task)].join("|");
+      return ["failed", taskId, status, outputUrls, branding, selectedIndexes, taskFailureMessage2(task), taskRetryStateText4(task), canRetryFailedTask3(task), canAcceptTaskSuccesses3(task)].join("|");
     }
     if (status === "submitting" || status === "queued") {
-      return ["waiting", taskId, status, outputUrls, selectedIndexes, taskGeneratedCount2(task, 0), taskTotalCount2(task), size, task.last_error || task.error || "", taskRetryStateText4(task)].join("|");
+      return ["waiting", taskId, status, outputUrls, branding, selectedIndexes, taskGeneratedCount2(task, 0), taskTotalCount2(task), size, task.last_error || task.error || "", taskRetryStateText4(task)].join("|");
     }
     if (status === "running") {
-      return ["running", taskId, outputUrls, selectedIndexes, taskGeneratedCount2(task, 0), taskTotalCount2(task), size, task.mode || "", taskRetryStateText4(task), taskRunningFailureKey(task)].join("|");
+      return ["running", taskId, outputUrls, branding, selectedIndexes, taskGeneratedCount2(task, 0), taskTotalCount2(task), size, task.mode || "", taskRetryStateText4(task), taskRunningFailureKey(task)].join("|");
     }
     if (outputUrls) {
-      return ["output", taskId, status, outputUrls, selectedIndexes, previewPromptKey(task)].join("|");
+      return ["output", taskId, status, outputUrls, branding, selectedIndexes, previewPromptKey(task)].join("|");
     }
     return ["empty", taskId, status].join("|");
+  }
+  function previewBrandingKey(task) {
+    if (!Array.isArray(task?.outputs)) return String(task?.branding_status || "");
+    return [
+      task?.branding_status || "",
+      ...task.outputs.map((output) => {
+        const branding = output?.branding || {};
+        return [output?.index || "", branding.status || "", branding.url || branding.file || "", branding.request_hash || ""].join(":");
+      })
+    ].join("|");
   }
   function previewPromptKey(task) {
     const revisedPrompts = Array.isArray(task?.revised_prompts) ? task.revised_prompts.join("") : "";
@@ -43350,12 +43385,15 @@ ${galleryText}`;
     const taskId = card.dataset.previewTaskId || state29.previewTask?.task_id || "";
     const outputUrl = String(card.dataset.previewOutputUrl || "");
     if (!taskId || !outputUrl) return null;
-    const task = (state29.tasks || []).find((item) => String(item.task_id) === String(taskId)) || state29.previewTask;
+    const previewTask = state29.previewTask;
+    const previewHasDetails = String(previewTask?.task_id || "") === String(taskId) && Array.isArray(previewTask?.outputs);
+    const task = (previewHasDetails ? previewTask : null) || (state29.tasks || []).find((item) => String(item.task_id) === String(taskId));
     if (!task || !Array.isArray(task.outputs)) return null;
-    const byUrl = task.outputs.find((o) => o && (o.url === outputUrl || `/outputs/${o.file}` === outputUrl));
+    const byUrl = task.outputs.find((o) => o && (o.url === outputUrl || `/outputs/${o.file}` === outputUrl || o?.branding?.url === outputUrl || `/outputs/${o?.branding?.file || ""}` === outputUrl));
     const output = byUrl || task.outputs.find((o, i) => previewSlotIndex(card) === i);
     if (!output || !output.branding) return null;
-    return { index: Number(output.index) || previewSlotIndex(card) + 1, branding: output.branding, task };
+    const rawUrl = String(output.url || (output.file ? `/outputs/${output.file}` : "")).trim();
+    return { index: Number(output.index) || previewSlotIndex(card) + 1, branding: output.branding, rawUrl, task };
   }
   function previewSlotIndex(card) {
     const siblings = Array.from(els38.previewGrid?.querySelectorAll(".preview-card[data-preview-card-key]") || []);
@@ -43422,20 +43460,29 @@ ${galleryText}`;
     }
     card.appendChild(block);
     if (completed) {
-      wireToggle(card, branding);
+      wireToggle(card, branding, result.rawUrl);
       wireDownload(brandedDownloadUrl, block);
     }
     const recompose = block.querySelector("[data-brand-recompose-task]");
     if (recompose) recompose.addEventListener("click", onRecompose);
   }
-  function wireToggle(card, branding) {
+  function wireToggle(card, branding, rawOutputUrl) {
     const toggle = card.querySelector("[data-brand-toggle]");
     const img = card.querySelector("img[data-lightbox-url]");
     const rawDownload = card.querySelector("[data-download-output-url]");
     if (!toggle || !img) return;
-    const rawUrl = String(card.dataset.previewOutputUrl || "");
+    const rawUrl = rawOutputUrl || String(card.dataset.previewOutputUrl || "");
     const brandedUrl = branding.url || (branding.file ? `/outputs/${branding.file}` : rawUrl);
-    let branded = true;
+    let branded = String(img.dataset.lightboxUrl || img.src || "") === brandedUrl;
+    const sync = () => {
+      const url = branded ? brandedUrl : rawUrl;
+      toggle.textContent = branded ? t("brand.branded", "\u54C1\u724C\u7248") : t("brand.raw", "\u539F\u59CB\u5E95\u56FE");
+      toggle.setAttribute("aria-pressed", String(branded));
+      if (branded) return;
+      img.src = url;
+      img.dataset.lightboxUrl = url;
+      if (rawDownload) rawDownload.href = url;
+    };
     const apply = () => {
       const url = branded ? brandedUrl : rawUrl;
       img.src = url;
@@ -43444,7 +43491,7 @@ ${galleryText}`;
       toggle.textContent = branded ? t("brand.branded", "\u54C1\u724C\u7248") : t("brand.raw", "\u539F\u59CB\u5E95\u56FE");
       toggle.setAttribute("aria-pressed", String(branded));
     };
-    apply();
+    sync();
     toggle.addEventListener("click", (event) => {
       event.preventDefault();
       branded = !branded;

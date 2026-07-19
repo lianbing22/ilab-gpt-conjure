@@ -189,6 +189,16 @@ class BrandingService:
             for element in ("logo", "slogan")
             if element in elements
         }
+        scrim = {
+            element: bool((elements.get(element) or {}).get("scrim"))
+            for element in ("logo", "slogan")
+            if element in elements
+        }
+        scrim_policies = {
+            element: str((elements.get(element) or {}).get("scrim_policy") or "auto")
+            for element in ("logo", "slogan")
+            if element in elements
+        }
         enabled_layers = list(asset_tones.keys())
 
         record = {
@@ -202,6 +212,8 @@ class BrandingService:
             "request_hash": request_hash,
             "compositor_version": COMPOSITOR_VERSION,
             "asset_tones": asset_tones,
+            "scrim": scrim,
+            "scrim_policies": scrim_policies,
             "layout": report.get("layout"),
             "completed_at": utc_now(),
             "error": None,

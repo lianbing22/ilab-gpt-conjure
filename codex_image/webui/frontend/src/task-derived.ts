@@ -201,6 +201,22 @@ function taskThumbnailRoute(task: any, index: any) {
   return `/api/tasks/${encodeURIComponent(task.task_id)}/outputs/${outputIndex}/thumbnail`;
 }
 
+function completedBrandingUrl(record: any): string {
+  const branding = record?.branding;
+  if (!branding || branding.status !== "completed") return "";
+  return String(branding.url || outputFileUrl(branding.file) || "").trim();
+}
+
+function completedBrandingThumbnailUrl(record: any): string {
+  const branding = record?.branding;
+  if (!branding || branding.status !== "completed") return "";
+  return String(branding.thumbnail_url || outputFileUrl(branding.thumbnail_file) || "").trim();
+}
+
+function taskDisplayOutputUrl(record: any, fallbackUrl: any): string {
+  return completedBrandingUrl(record) || String(fallbackUrl || "").trim();
+}
+
 function taskThumbnailUrls(task: any) {
   if (!task) return [];
   const deletedIndexes = taskDeletedOutputIndexes(task);
@@ -224,7 +240,10 @@ function taskThumbnailUrls(task: any) {
       if (!record || typeof record !== "object" || taskOutputRecordIsDeleted(record)) return;
       const index = positiveInt(record.index) || fallbackIndex + 1;
       if (deletedIndexes.has(index) || record.status !== "completed") return;
-      const recordUrl = record.thumbnail_url || outputFileUrl(record.thumbnail_file) || (record.url || record.file ? taskThumbnailRoute(task, index) : "");
+      const recordUrl = completedBrandingThumbnailUrl(record)
+        || record.thumbnail_url
+        || outputFileUrl(record.thumbnail_file)
+        || (record.url || record.file ? taskThumbnailRoute(task, index) : "");
       pushUrl(recordUrl, index);
     });
     if (urls.length) return urls;
@@ -241,16 +260,25 @@ function taskOutputUrls(task: any) {
   if (!task) return [];
   const deletedIndexes = taskDeletedOutputIndexes(task);
   if (Array.isArray(task.output_urls) && task.output_urls.length) {
-    return task.output_urls.filter((url: any, fallbackIndex: any) => {
+    const urls: string[] = [];
+    task.output_urls.forEach((url: any, fallbackIndex: any) => {
       const record = Array.isArray(task?.outputs)
         ? task.outputs.find((item: any) => taskOutputRecordMatchesUrl(item, url))
         : null;
       const index = positiveInt(record?.index) || taskOutputIndexFromUrl(url) || fallbackIndex + 1;
-      return !deletedIndexes.has(index) && !taskOutputRecordIsDeleted(record);
+      if (deletedIndexes.has(index) || taskOutputRecordIsDeleted(record)) return;
+      const displayUrl = taskDisplayOutputUrl(record, url);
+      if (displayUrl && !urls.includes(displayUrl)) urls.push(displayUrl);
     });
+    return urls;
   }
   const singleIndex = taskOutputIndexFromUrl(task.output_url) || 1;
-  if (task.output_url && !deletedIndexes.has(singleIndex)) return [task.output_url];
+  if (task.output_url && !deletedIndexes.has(singleIndex)) {
+    const record = Array.isArray(task?.outputs)
+      ? task.outputs.find((item: any) => taskOutputRecordMatchesUrl(item, task.output_url))
+      : null;
+    return [taskDisplayOutputUrl(record, task.output_url)];
+  }
   return [];
 }
 
@@ -298,6 +326,7 @@ function taskOutputRecordIsDeleted(record: any) {
 function taskOutputRecordMatchesUrl(record: any, url: any) {
   if (!record || typeof record !== "object") return false;
   if (record.url && String(record.url) === String(url)) return true;
+  if (completedBrandingUrl(record) === String(url)) return true;
   const recordIndex = positiveInt(record.index);
   const urlIndex = taskOutputIndexFromUrl(url);
   return recordIndex !== null && urlIndex !== null && recordIndex === urlIndex;
@@ -422,7 +451,7 @@ function taskOutputRecordsByIndex(task: any) {
 }
 
 function taskOutputIndexFromUrl(url: any) {
-  const match = String(url || "").match(/-image-(\d+)(?=\.[a-z0-9]+(?:[?#].*)?$|$)/i);
+  const match = String(url || "").match(/-(?:image|brand)-(\d+)(?=-[a-f0-9]{8,}|\.[a-z0-9]+(?:[?#].*)?$|$)/i);
   return positiveInt(match?.[1]);
 }
 
@@ -724,7 +753,7 @@ function taskTotalCount(task: any) {
 
 function taskOutputIndex(task: any, url: any, visibleIndex: any) {
   const output = Array.isArray(task?.outputs)
-    ? task.outputs.find((item: any) => item?.status === "completed" && item?.url === url)
+    ? task.outputs.find((item: any) => item?.status === "completed" && taskOutputRecordMatchesUrl(item, url))
     : null;
   const value = Number.parseInt(output?.index ?? "", 10);
   if (!Number.isNaN(value) && value > 0) return value;
@@ -761,6 +790,8 @@ export function initTaskDerivedFeature() {
     taskVisibleCompletedCount,
     taskOutputRecordIsDeleted,
     taskOutputRecordMatchesUrl,
+    completedBrandingUrl,
+    completedBrandingThumbnailUrl,
     taskOutputRecordHasDisplayableImage,
     taskOutputRecordsByIndex,
     taskOutputIndexFromUrl,

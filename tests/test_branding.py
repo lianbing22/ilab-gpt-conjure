@@ -43,11 +43,13 @@ def _default_template(
     width_ratio_logo: float = 0.16,
     width_ratio_slogan: float = 0.30,
     margin: float = 0.035,
+    logo_scrim_policy: str = "auto",
+    slogan_scrim_policy: str = "auto",
 ) -> BrandTemplate:
     placements = {
         layout: {
-            "logo": PlacementConfig(anchor_logo, width_ratio_logo, margin, margin),
-            "slogan": PlacementConfig(anchor_slogan, width_ratio_slogan, margin, margin),
+            "logo": PlacementConfig(anchor_logo, width_ratio_logo, margin, margin, logo_scrim_policy),
+            "slogan": PlacementConfig(anchor_slogan, width_ratio_slogan, margin, margin, slogan_scrim_policy),
         }
         for layout in ("square", "portrait", "landscape")
     }
@@ -282,6 +284,20 @@ class ComposeTests(unittest.TestCase):
 
         elements = report["elements"]
         self.assertTrue(elements["logo"]["scrim"])
+        self.assertTrue(elements["slogan"]["scrim"])
+
+    def test_logo_never_policy_keeps_transparent_mark_on_ambiguous_background(self) -> None:
+        canvas = _solid((512, 512), (128, 128, 128))
+        logo = _solid((100, 60), (235, 235, 235), mode="RGBA")
+        slogan = _solid((300, 60), (235, 235, 235), mode="RGBA")
+        template = _default_template(logo_scrim_policy="never")
+
+        _, report = compose_with_report(canvas, logo=logo, slogan=slogan, template=template)
+
+        elements = report["elements"]
+        self.assertEqual(elements["logo"]["scrim_policy"], "never")
+        self.assertFalse(elements["logo"]["scrim"])
+        self.assertEqual(elements["slogan"]["scrim_policy"], "auto")
         self.assertTrue(elements["slogan"]["scrim"])
 
     def test_forced_theme_mode_skips_scrim_and_samples(self) -> None:

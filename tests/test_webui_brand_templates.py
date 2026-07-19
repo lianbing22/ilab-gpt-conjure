@@ -67,6 +67,21 @@ class BrandTemplateStoreTests(unittest.TestCase):
             self.assertEqual(store.get("metro-standard", 1).status, "archived")
             self.assertEqual(store.get("metro-standard", 2).status, "active")
 
+    def test_legacy_recipe_defaults_scrim_policy_to_auto(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            store = self._store(Path(tmp))
+            published = store.publish(_template())
+            stored = json.loads(store.path.read_text(encoding="utf-8"))
+            for layout in stored["versions"][0]["recipe"]["placements"].values():
+                for placement in layout.values():
+                    placement.pop("scrim_policy", None)
+            store.path.write_text(json.dumps(stored), encoding="utf-8")
+
+            reloaded = self._store(Path(tmp)).get_brand_template(published.template_id, published.version)
+
+            self.assertEqual(reloaded.placements["square"]["logo"].scrim_policy, "auto")
+            self.assertEqual(reloaded.placements["square"]["slogan"].scrim_policy, "auto")
+
     def test_v2_hash_matches_authoritative_stored_recipe(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             store = self._store(Path(tmp))

@@ -42,6 +42,10 @@ class PlacementConfig:
     margin_x_ratio: float
     # Vertical margin as a fraction of canvas height (0-1).
     margin_y_ratio: float
+    # Whether the compositor may add a contrast backdrop behind this element.
+    # ``auto`` preserves legacy behavior; ``never`` keeps approved brand marks
+    # transparent over the generated image.
+    scrim_policy: Literal["auto", "never"] = "auto"
 
 
 @dataclass(frozen=True)

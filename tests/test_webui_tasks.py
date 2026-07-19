@@ -180,12 +180,22 @@ class WebUITaskTests(unittest.TestCase):
                         }
                     ],
                     "outputs": [
-                        {"index": 1, "status": "completed", "url": output_url(task_id, 1), "thumbnail_url": "/thumb-1.jpg"},
+                        {
+                            "index": 1,
+                            "status": "completed",
+                            "url": output_url(task_id, 1),
+                            "thumbnail_url": "/thumb-1.jpg",
+                            "branding": {
+                                "status": "completed",
+                                "thumbnail_url": "/brand-thumb-1.jpg",
+                            },
+                        },
                         {"index": 2, "status": "completed", "url": output_url(task_id, 2), "thumbnail_url": "/thumb-2.jpg"},
                     ],
                     "generated_count": 2,
                     "failed_count": 0,
                     "total_count": 2,
+                    "branding_status": "completed",
                 },
             )
 
@@ -197,7 +207,9 @@ class WebUITaskTests(unittest.TestCase):
         self.assertEqual(task["task_id"], task_id)
         self.assertEqual(task["prompt"], "sidebar card prompt")
         self.assertEqual(task["output_size"], "1152x2048")
-        self.assertEqual(task["thumbnail_urls"], [f"/api/tasks/{task_id}/outputs/1/thumbnail"])
+        self.assertEqual(task["thumbnail_urls"], ["/brand-thumb-1.jpg"])
+        self.assertEqual(task["branding_status"], "completed")
+        self.assertEqual(task["branding_thumbnail_url"], "/brand-thumb-1.jpg")
         self.assertEqual(task["input_thumbnail_urls"], ["/api/reference-assets/asset-1/image"])
         self.assertEqual(task["generated_count"], 2)
         self.assertTrue(task["summary_only"])

@@ -16,7 +16,7 @@ from codex_image.branding.placement import classify_layout, compute_placement
 
 # Bumped whenever the compositing algorithm changes so request hashes can
 # invalidate cached outputs across releases.
-COMPOSITOR_VERSION = "pillow-compositor-v1"
+COMPOSITOR_VERSION = "pillow-compositor-v2"
 
 # Default luminance midpoint used to decide tone / scrim necessity.
 _DEFAULT_THRESHOLD = 128.0
@@ -121,8 +121,21 @@ def compose_with_report(
     # image, so each helper returns the (possibly new) canvas + a scrim flag.
     element_reports: dict[str, object] = {}
     for element, image in element_images.items():
-        canvas, used_scrim = _paste_element(canvas, image, boxes[element], luminance[element], forced_tone is not None)
-        element_reports[element] = {"box": boxes[element], "luminance": luminance[element], "scrim": used_scrim}
+        placement = placements[element]
+        canvas, used_scrim = _paste_element(
+            canvas,
+            image,
+            boxes[element],
+            luminance[element],
+            forced_tone is not None,
+            placement.scrim_policy,
+        )
+        element_reports[element] = {
+            "box": boxes[element],
+            "luminance": luminance[element],
+            "scrim": used_scrim,
+            "scrim_policy": placement.scrim_policy,
+        }
 
     report = {
         "layout": layout,
@@ -193,6 +206,7 @@ def _paste_element(
     box: tuple[int, int, int, int],
     region_luminance: float,
     tone_forced: bool,
+    scrim_policy: str = "auto",
 ) -> tuple[Image.Image, bool]:
     """Resize, optionally scrim, and alpha-composite one element onto canvas.
 
@@ -215,7 +229,7 @@ def _paste_element(
         element = element.resize((w, h), Image.Resampling.LANCZOS)
 
     used_scrim = False
-    if not tone_forced and tone_is_ambiguous(region_luminance, _DEFAULT_THRESHOLD):
+    if scrim_policy == "auto" and not tone_forced and tone_is_ambiguous(region_luminance, _DEFAULT_THRESHOLD):
         used_scrim = True
         tone = choose_asset_tone(region_luminance, _DEFAULT_THRESHOLD)
         # Dark ink (dark-assets on bright bg) reads better on a light scrim;
@@ -323,11 +337,20 @@ def compose_with_assets(
     for element in enabled_elements:
         element_tone = _element_tone(luminance[element])
         element_asset = assets[element_tone][element]
-        canvas, used_scrim = _paste_element(canvas, element_asset, boxes[element], luminance[element], forced_tone is not None)
+        placement = placements[element]
+        canvas, used_scrim = _paste_element(
+            canvas,
+            element_asset,
+            boxes[element],
+            luminance[element],
+            forced_tone is not None,
+            placement.scrim_policy,
+        )
         element_reports[element] = {
             "box": boxes[element],
             "luminance": luminance[element],
             "scrim": used_scrim,
+            "scrim_policy": placement.scrim_policy,
             "chosen_tone": element_tone,
         }
 

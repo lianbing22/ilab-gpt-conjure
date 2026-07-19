@@ -57,8 +57,10 @@ def test_default_package_places_exact_assets_at_vi_positions(tmp_path: Path) -> 
 
     assert template.placements["square"]["logo"].anchor == "top-left"
     assert template.placements["square"]["logo"].width_ratio == 0.18
+    assert template.placements["square"]["logo"].scrim_policy == "never"
     assert template.placements["square"]["slogan"].anchor == "bottom-center"
     assert template.placements["square"]["slogan"].width_ratio == 0.35
+    assert template.placements["square"]["slogan"].scrim_policy == "auto"
 
     assets = {}
     for tone, ids in template.asset_variants.items():

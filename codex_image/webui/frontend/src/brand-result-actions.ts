@@ -33,17 +33,26 @@ function t(key: string, fallback: string): string {
 }
 
 /** Read outputs[].branding for the card's output index from the preview task. */
-function brandingForCard(card: HTMLElement): { index: number; branding: any; task: any } | null {
+function brandingForCard(card: HTMLElement): { index: number; branding: any; rawUrl: string; task: any } | null {
   const taskId = card.dataset.previewTaskId || state.previewTask?.task_id || "";
   const outputUrl = String(card.dataset.previewOutputUrl || "");
   if (!taskId || !outputUrl) return null;
-  const task = (state.tasks || []).find((item: any) => String(item.task_id) === String(taskId)) || state.previewTask;
+  const previewTask = state.previewTask;
+  const previewHasDetails = String(previewTask?.task_id || "") === String(taskId) && Array.isArray(previewTask?.outputs);
+  const task = (previewHasDetails ? previewTask : null)
+    || (state.tasks || []).find((item: any) => String(item.task_id) === String(taskId));
   if (!task || !Array.isArray(task.outputs)) return null;
   // Match the output by its url/file; fall back to the card's slot index.
-  const byUrl = task.outputs.find((o: any) => o && (o.url === outputUrl || `/outputs/${o.file}` === outputUrl));
+  const byUrl = task.outputs.find((o: any) => o && (
+    o.url === outputUrl
+    || `/outputs/${o.file}` === outputUrl
+    || o?.branding?.url === outputUrl
+    || `/outputs/${o?.branding?.file || ""}` === outputUrl
+  ));
   const output = byUrl || task.outputs.find((o: any, i: number) => previewSlotIndex(card) === i);
   if (!output || !output.branding) return null;
-  return { index: Number(output.index) || previewSlotIndex(card) + 1, branding: output.branding, task };
+  const rawUrl = String(output.url || (output.file ? `/outputs/${output.file}` : "")).trim();
+  return { index: Number(output.index) || previewSlotIndex(card) + 1, branding: output.branding, rawUrl, task };
 }
 
 function previewSlotIndex(card: HTMLElement): number {
@@ -129,7 +138,7 @@ function applyBrandCardDecoration(card: HTMLElement): void {
   card.appendChild(block);
 
   if (completed) {
-    wireToggle(card, branding);
+    wireToggle(card, branding, result.rawUrl);
     wireDownload(brandedDownloadUrl, block);
   }
   const recompose = block.querySelector<HTMLButtonElement>("[data-brand-recompose-task]");
@@ -137,14 +146,23 @@ function applyBrandCardDecoration(card: HTMLElement): void {
 }
 
 /** Toggle the card's main image + existing download link between branded/raw. */
-function wireToggle(card: HTMLElement, branding: any): void {
+function wireToggle(card: HTMLElement, branding: any, rawOutputUrl: string): void {
   const toggle = card.querySelector<HTMLButtonElement>("[data-brand-toggle]");
   const img = card.querySelector<HTMLImageElement>("img[data-lightbox-url]");
   const rawDownload = card.querySelector<HTMLAnchorElement>("[data-download-output-url]");
   if (!toggle || !img) return;
-  const rawUrl = String(card.dataset.previewOutputUrl || "");
+  const rawUrl = rawOutputUrl || String(card.dataset.previewOutputUrl || "");
   const brandedUrl = branding.url || (branding.file ? `/outputs/${branding.file}` : rawUrl);
-  let branded = true;
+  let branded = String(img.dataset.lightboxUrl || img.src || "") === brandedUrl;
+  const sync = () => {
+    const url = branded ? brandedUrl : rawUrl;
+    toggle.textContent = branded ? t("brand.branded", "品牌版") : t("brand.raw", "原始底图");
+    toggle.setAttribute("aria-pressed", String(branded));
+    if (branded) return;
+    img.src = url;
+    img.dataset.lightboxUrl = url;
+    if (rawDownload) rawDownload.href = url;
+  };
   const apply = () => {
     const url = branded ? brandedUrl : rawUrl;
     img.src = url;
@@ -153,7 +171,7 @@ function wireToggle(card: HTMLElement, branding: any): void {
     toggle.textContent = branded ? t("brand.branded", "品牌版") : t("brand.raw", "原始底图");
     toggle.setAttribute("aria-pressed", String(branded));
   };
-  apply();
+  sync();
   toggle.addEventListener("click", (event) => {
     event.preventDefault();
     branded = !branded;

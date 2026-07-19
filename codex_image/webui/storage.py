@@ -524,7 +524,8 @@ def _sidebar_task_card(metadata: dict[str, Any]) -> dict[str, Any]:
     params = metadata.get("params") if isinstance(metadata.get("params"), dict) else {}
     size = _sidebar_display_size(metadata, params)
     requested_size = _sidebar_requested_size(params) or size
-    thumbnail_url = _first_sidebar_thumbnail_url(metadata)
+    branding_thumbnail_url = _first_sidebar_branding_thumbnail_url(metadata)
+    thumbnail_url = branding_thumbnail_url or _first_sidebar_thumbnail_url(metadata)
     card = {
         "task_id": task_id,
         "summary_only": True,
@@ -562,6 +563,8 @@ def _sidebar_task_card(metadata: dict[str, Any]) -> dict[str, Any]:
         "last_error": metadata.get("last_error") or metadata.get("error") or "",
         "error": metadata.get("error") or "",
         "retrying_failed_slots": metadata.get("retrying_failed_slots") if isinstance(metadata.get("retrying_failed_slots"), list) else [],
+        "branding_status": metadata.get("branding_status") or "",
+        "branding_thumbnail_url": branding_thumbnail_url,
         "input_thumbnail_urls": _sidebar_input_thumbnail_urls(metadata),
         "thumbnail_urls": [thumbnail_url] if thumbnail_url else [],
     }
@@ -668,6 +671,22 @@ def _first_sidebar_thumbnail_url(metadata: dict[str, Any]) -> str:
     output_file = metadata.get("output_file")
     if task_id and output_file:
         return f"/api/tasks/{task_id}/outputs/1/thumbnail"
+    return ""
+
+
+def _first_sidebar_branding_thumbnail_url(metadata: dict[str, Any]) -> str:
+    outputs = metadata.get("outputs")
+    if not isinstance(outputs, list):
+        return ""
+    for output in outputs:
+        if not isinstance(output, dict):
+            continue
+        branding = output.get("branding")
+        if not isinstance(branding, dict) or branding.get("status") != "completed":
+            continue
+        thumbnail_url = branding.get("thumbnail_url") or _output_file_url(branding.get("thumbnail_file"))
+        if thumbnail_url:
+            return str(thumbnail_url)
     return ""
 
 

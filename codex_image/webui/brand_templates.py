@@ -80,6 +80,7 @@ def _brand_template_from_recipe(recipe: dict[str, Any]) -> BrandTemplate:
                 width_ratio=float(cfg.get("width_ratio") or 0.0),
                 margin_x_ratio=float(cfg.get("margin_x_ratio") or 0.0),
                 margin_y_ratio=float(cfg.get("margin_y_ratio") or 0.0),
+                scrim_policy="never" if cfg.get("scrim_policy") == "never" else "auto",
             )
             for element, cfg in elements.items()
             if isinstance(cfg, dict)
