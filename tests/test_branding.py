@@ -318,6 +318,17 @@ class ComposeTests(unittest.TestCase):
         self.assertEqual(report["elements"], {})
         self.assertEqual(composed.getpixel((0, 0)), (10, 20, 30, 255))
 
+    def test_compose_with_report_supports_logo_only(self) -> None:
+        canvas = _solid((512, 512), (255, 255, 255))
+        logo = _solid((100, 60), (220, 30, 30), mode="RGBA")
+        template = _default_template()
+
+        composed, report = compose_with_report(canvas, logo=logo, slogan=None, template=template)
+
+        self.assertIn("logo", report["elements"])
+        self.assertNotIn("slogan", report["elements"])
+        self.assertEqual(composed.getpixel((60, 30))[:3], (220, 30, 30))
+
 
 class ComputeRequestHashTests(unittest.TestCase):
     def test_stable_for_identical_inputs(self) -> None:
@@ -343,6 +354,12 @@ class ComputeRequestHashTests(unittest.TestCase):
         a = compute_request_hash(b"raw", template, b"logo", b"slogan-a")
         b = compute_request_hash(b"raw", template, b"logo", b"slogan-b")
         self.assertNotEqual(a, b)
+
+    def test_optional_element_presence_changes_hash(self) -> None:
+        template = _default_template()
+        logo_only = compute_request_hash(b"raw", template, b"logo", None)
+        both = compute_request_hash(b"raw", template, b"logo", b"slogan")
+        self.assertNotEqual(logo_only, both)
 
     def test_changes_when_template_changes(self) -> None:
         a = compute_request_hash(b"raw", _default_template(anchor_logo="top-left"), b"logo", b"slogan")

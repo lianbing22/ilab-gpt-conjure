@@ -93,6 +93,7 @@ const bridgeMethods: LegacyMethods = {
   missingReferenceAssetInputs: proxy("missingReferenceAssetInputs"),
   normalizeApiImagesConcurrency: proxy("normalizeApiImagesConcurrency"),
   normalizeApiSettings: proxy("normalizeApiSettings"),
+  normalizeBrandLayerSelections: proxy("normalizeBrandLayerSelections"),
   normalizeHexColor: proxy("normalizeHexColor"),
   notifyTaskUpdate: proxy("notifyTaskUpdate"),
   openAddToGallery: proxy("openAddToGallery"),

@@ -33,7 +33,7 @@ function t(key: string, fallback: string): string {
 }
 
 /** Read outputs[].branding for the card's output index from the preview task. */
-function brandingForCard(card: HTMLElement): { index: number; branding: any } | null {
+function brandingForCard(card: HTMLElement): { index: number; branding: any; task: any } | null {
   const taskId = card.dataset.previewTaskId || state.previewTask?.task_id || "";
   const outputUrl = String(card.dataset.previewOutputUrl || "");
   if (!taskId || !outputUrl) return null;
@@ -43,7 +43,7 @@ function brandingForCard(card: HTMLElement): { index: number; branding: any } | 
   const byUrl = task.outputs.find((o: any) => o && (o.url === outputUrl || `/outputs/${o.file}` === outputUrl));
   const output = byUrl || task.outputs.find((o: any, i: number) => previewSlotIndex(card) === i);
   if (!output || !output.branding) return null;
-  return { index: Number(output.index) || previewSlotIndex(card) + 1, branding: output.branding };
+  return { index: Number(output.index) || previewSlotIndex(card) + 1, branding: output.branding, task };
 }
 
 function previewSlotIndex(card: HTMLElement): number {
@@ -51,8 +51,7 @@ function previewSlotIndex(card: HTMLElement): number {
   return Math.max(0, siblings.indexOf(card));
 }
 
-function brandingBadgeForTask(): string {
-  const task = state.previewTask;
+function brandingBadgeForTask(task: any): string {
   const status = String(task?.branding_status || "");
   if (status === "running" || status === "pending") {
     return `<span class="brand-badge brand-badge-pending">${t("brand.processing", "品牌处理中")}</span>`;
@@ -63,15 +62,43 @@ function brandingBadgeForTask(): string {
   return "";
 }
 
+function templateName(templateId: string): string {
+  const template = (state.brandTemplates || []).find((item: any) => String(item?.template_id || "") === templateId);
+  return String(template?.name || templateId);
+}
+
+function layerTemplateId(source: any, layer: "logo" | "slogan"): string {
+  return String(source?.layers?.[layer]?.template_id || "");
+}
+
+function brandingLayerSummaryForTask(task: any, resultBranding?: any): string {
+  const request = task?.request || {};
+  const params = task?.params || {};
+  const brandingRequest = params.branding_request || {};
+  const logoId = layerTemplateId(resultBranding, "logo")
+    || layerTemplateId(brandingRequest, "logo")
+    || String(request.branding_logo_template_id || brandingRequest.branding_logo_template_id || brandingRequest.logo_template_id || "");
+  const sloganId = layerTemplateId(resultBranding, "slogan")
+    || layerTemplateId(brandingRequest, "slogan")
+    || String(request.branding_slogan_template_id || brandingRequest.branding_slogan_template_id || brandingRequest.slogan_template_id || "");
+  const legacyId = String(request.branding_template_id || brandingRequest.branding_template_id || brandingRequest.template_id || "");
+  const appliedLogoId = logoId || (!logoId && !sloganId ? legacyId : "");
+  const appliedSloganId = sloganId || (!logoId && !sloganId ? legacyId : "");
+  const parts = [];
+  if (appliedLogoId) parts.push(`${templateName(appliedLogoId)} Logo`);
+  if (appliedSloganId) parts.push(t("brand.sloganMaterialName", "品牌口号与业务落款"));
+  return parts.join(" · ");
+}
+
 function applyBrandCardDecoration(card: HTMLElement): void {
   // Remove a previous decoration so re-renders stay clean.
   const old = card.querySelector(".brand-card-actions");
   if (old) old.remove();
 
   const result = brandingForCard(card);
-  const badge = brandingBadgeForTask();
+  const task = result?.task || state.previewTask;
+  const badge = brandingBadgeForTask(task);
   // Only inject the actions block when branding is relevant to this task.
-  const task = state.previewTask;
   const brandingEnabled = !!task?.branding_status && task.branding_status !== "disabled";
   if (!result && !brandingEnabled) return;
 
@@ -83,6 +110,7 @@ function applyBrandCardDecoration(card: HTMLElement): void {
 
   const block = document.createElement("div");
   block.className = "brand-card-actions prompt-action-row";
+  const layerSummary = brandingLayerSummaryForTask(task, branding);
   block.innerHTML = `
     ${badge}
     ${completed ? `<button type="button" class="brand-toggle" data-brand-toggle="" aria-pressed="true">${t("brand.branded", "品牌版")}</button>` : ""}
@@ -90,6 +118,14 @@ function applyBrandCardDecoration(card: HTMLElement): void {
     ${(task?.branding_status === "failed" || task?.branding_status === "partial_failed")
       ? `<button type="button" class="brand-recompose" data-brand-recompose-task="${task.task_id}">${t("brand.recompose", "重新合成")}</button>` : ""}
   `;
+  if (layerSummary) {
+    const summary = document.createElement("span");
+    summary.className = "brand-layer-summary";
+    summary.textContent = layerSummary;
+    const badgeElement = block.querySelector(".brand-badge");
+    if (badgeElement) badgeElement.after(summary);
+    else block.prepend(summary);
+  }
   card.appendChild(block);
 
   if (completed) {

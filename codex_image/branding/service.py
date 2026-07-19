@@ -26,18 +26,18 @@ from __future__ import annotations
 import io
 import json
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 
 from PIL import Image
 
 from ..webui.brand_assets import BrandAssetStorage
-from ..webui.brand_templates import BrandTemplateStore
+from ..webui.brand_templates import BrandTemplateStore, template_supports_layer
 from ..webui.storage import TaskStorage
 from ..webui.storage_utils import utc_now
 from .compositor import COMPOSITOR_VERSION, compose_with_assets, compute_request_hash
-from .models import BrandTemplate
+from .models import BrandTemplate, content_hash
 
 logger = logging.getLogger(__name__)
 
@@ -93,13 +93,9 @@ class BrandingService:
         if not outputs:
             return BrandingOutcome(task_id, "skipped", 0, 0, 0)
 
-        template_version = branding_request.get("template_version")
         try:
-            template = self.template_store.get_brand_template(
-                str(branding_request.get("template_id") or ""),
-                int(template_version) if template_version is not None else None,
-            )
-        except (KeyError, ValueError, TypeError):
+            template, branding_sources = self._resolve_branding_template(branding_request)
+        except (KeyError, ValueError, TypeError, FileNotFoundError):
             self._record_task_status(task_id, metadata, "failed", error="branding_template_missing")
             return BrandingOutcome(task_id, "failed", 0, len(outputs), len(outputs))
 
@@ -114,7 +110,7 @@ class BrandingService:
         for output in outputs:
             index = _positive_int(output.get("index")) or 0
             try:
-                branding_record = self._brand_one(task_id, metadata, output, template)
+                branding_record = self._brand_one(task_id, metadata, output, template, branding_sources)
                 per_output_results.append((index, branding_record))
                 branded += 1
             except Exception as exc:  # never let one output abort the rest
@@ -150,6 +146,7 @@ class BrandingService:
         metadata: dict[str, Any],
         output: dict[str, Any],
         template: BrandTemplate,
+        branding_sources: dict[str, Any],
     ) -> dict[str, Any]:
         """Composite one raw output. Returns the branding record to store."""
         raw_path = self._resolve_raw_path(output)
@@ -187,10 +184,14 @@ class BrandingService:
         thumbnail_rel = self._write_branded_thumbnail(task_id, output, composed_bytes, request_hash)
 
         elements = report.get("elements") if isinstance(report.get("elements"), dict) else {}
-        logo_tone = (elements.get("logo") or {}).get("chosen_tone")
-        slogan_tone = (elements.get("slogan") or {}).get("chosen_tone")
+        asset_tones = {
+            element: (elements.get(element) or {}).get("chosen_tone")
+            for element in ("logo", "slogan")
+            if element in elements
+        }
+        enabled_layers = list(asset_tones.keys())
 
-        return {
+        record = {
             "status": "completed",
             "file": branded_rel,
             "url": f"/outputs/{branded_rel}",
@@ -200,13 +201,123 @@ class BrandingService:
             "template_version": template.version,
             "request_hash": request_hash,
             "compositor_version": COMPOSITOR_VERSION,
-            "asset_tones": {"logo": logo_tone, "slogan": slogan_tone},
+            "asset_tones": asset_tones,
             "layout": report.get("layout"),
             "completed_at": utc_now(),
             "error": None,
         }
+        if branding_sources.get("mode") == "layers":
+            record["mode"] = "layers"
+            record["layers"] = {
+                element: branding_sources["layers"][element]
+                for element in enabled_layers
+                if element in branding_sources.get("layers", {})
+            }
+        return record
 
     # ------------------------------------------------------------- helpers
+
+    def _resolve_branding_template(self, branding_request: dict[str, Any]) -> tuple[BrandTemplate, dict[str, Any]]:
+        """Resolve a frozen legacy or layer request into one internal template."""
+        if branding_request.get("mode") == "layers":
+            return self._resolve_layer_template(branding_request)
+
+        template_version = branding_request.get("template_version")
+        template_id = str(branding_request.get("template_id") or "")
+        stored_version = self.template_store.get(
+            template_id,
+            int(template_version) if template_version is not None else None,
+        )
+        template = self.template_store.get_brand_template(stored_version.template_id, stored_version.version)
+        if content_hash(template) != stored_version.content_hash:
+            raise ValueError(
+                f"stored brand template content hash mismatch: {stored_version.template_id}@{stored_version.version}"
+            )
+        frozen_hash = str(branding_request.get("template_content_hash") or "").strip()
+        accepted_hashes = {stored_version.content_hash, *stored_version.legacy_content_hashes}
+        if stored_version.version != 1:
+            # Old publish() hashed the caller's template before stamping the
+            # store-owned version. All published customer templates originated
+            # at v1, so retain that deterministic recovery path for stores that
+            # were migrated before legacy hashes started being recorded.
+            accepted_hashes.add(content_hash(replace(template, version=1)))
+        if frozen_hash and frozen_hash not in accepted_hashes:
+            raise ValueError(
+                f"brand template content hash mismatch: {stored_version.template_id}@{stored_version.version}"
+            )
+        return template, {"mode": "legacy"}
+
+    def _resolve_layer_template(self, branding_request: dict[str, Any]) -> tuple[BrandTemplate, dict[str, Any]]:
+        layers = branding_request.get("layers") if isinstance(branding_request.get("layers"), dict) else {}
+        selected: dict[str, tuple[BrandTemplate, str]] = {}
+        for element in ("logo", "slogan"):
+            layer = layers.get(element)
+            if not isinstance(layer, dict):
+                continue
+            template_id = str(layer.get("template_id") or "").strip()
+            if not template_id:
+                continue
+            version = layer.get("template_version")
+            if version is None:
+                raise ValueError(f"brand template version missing: {template_id}")
+            frozen_hash = str(layer.get("template_content_hash") or "").strip()
+            if not frozen_hash:
+                raise ValueError(f"brand template content hash missing: {template_id}@{version}")
+            stored_version = self.template_store.get(template_id, int(version))
+            if stored_version.content_hash != frozen_hash:
+                raise ValueError(f"brand template content hash mismatch: {template_id}@{version}")
+            if (
+                stored_version.recipe.get("theme_mode") != "auto"
+                or stored_version.recipe.get("variant_policy") != "per-element"
+            ):
+                raise ValueError(f"brand template is incompatible with layered branding: {template_id}@{version}")
+            if not template_supports_layer(stored_version.recipe, element):
+                raise ValueError(f"brand template does not provide a complete {element} layer: {template_id}@{version}")
+            template = self.template_store.get_brand_template(
+                stored_version.template_id,
+                stored_version.version,
+            )
+            if content_hash(template) != stored_version.content_hash:
+                raise ValueError(f"stored brand template content hash mismatch: {template_id}@{version}")
+            selected[element] = (template, stored_version.content_hash)
+        if not selected:
+            raise KeyError("no branding layers")
+
+        placements: dict[str, dict[str, Any]] = {}
+        asset_variants: dict[str, dict[str, str]] = {"light-assets": {}, "dark-assets": {}}
+        sources: dict[str, dict[str, Any]] = {}
+        id_parts: list[str] = []
+        for element in ("logo", "slogan"):
+            if element not in selected:
+                continue
+            source_template, stored_hash = selected[element]
+            id_parts.append(f"{element}:{source_template.id}@{source_template.version}")
+            sources[element] = {
+                "template_id": source_template.id,
+                "template_version": source_template.version,
+                "template_content_hash": stored_hash,
+            }
+            for layout, source_placements in source_template.placements.items():
+                if element not in source_placements:
+                    continue
+                placements.setdefault(layout, {})[element] = source_placements[element]
+            for tone in ("light-assets", "dark-assets"):
+                tone_assets = source_template.asset_variants.get(tone) or {}  # type: ignore[call-overload]
+                asset_id = str(tone_assets.get(element) or "")
+                if not asset_id:
+                    raise FileNotFoundError(f"brand asset missing: {tone}/{element}")
+                asset_variants[tone][element] = asset_id
+
+        template = BrandTemplate(
+            id="layers:" + "|".join(id_parts),
+            version=1,
+            name="Layered branding",
+            theme_mode="auto",
+            variant_policy="per-element",
+            placements=placements,  # type: ignore[arg-type]
+            asset_variants=asset_variants,  # type: ignore[arg-type]
+        )
+        return template, {"mode": "layers", "layers": sources}
 
     def _resolve_raw_path(self, output: dict[str, Any]) -> Path | None:
         filename = str(output.get("file") or "").strip()
@@ -226,13 +337,16 @@ class BrandingService:
         return path
 
     def _load_asset_variants(self, template: BrandTemplate) -> dict[str, dict[str, Image.Image]]:
-        """Load both tone variants (light/dark) for logo + slogan from storage."""
+        """Load both tone variants (light/dark) for enabled overlay elements."""
         variants = template.asset_variants or {}
+        enabled_elements = [element for element in ("logo", "slogan") if any(element in p for p in template.placements.values())]
+        if not enabled_elements:
+            raise FileNotFoundError("brand placement missing")
         assets: dict[str, dict[str, Image.Image]] = {}
         for tone in ("light-assets", "dark-assets"):
             ids = variants.get(tone) or {}  # type: ignore[call-overload]
             element_images: dict[str, Image.Image] = {}
-            for element in ("logo", "slogan"):
+            for element in enabled_elements:
                 asset_id = str(ids.get(element) or "")
                 if not asset_id:
                     raise FileNotFoundError(f"brand asset missing: {tone}/{element}")
@@ -250,8 +364,10 @@ class BrandingService:
         assets: dict[str, dict[str, Image.Image]],
     ) -> str:
         raw_bytes = raw_path.read_bytes()
-        logo_bytes = _image_to_png_bytes(assets["dark-assets"]["logo"])
-        slogan_bytes = _image_to_png_bytes(assets["dark-assets"]["slogan"])
+        logo = (assets.get("dark-assets") or {}).get("logo")
+        slogan = (assets.get("dark-assets") or {}).get("slogan")
+        logo_bytes = _image_to_png_bytes(logo) if logo is not None else None
+        slogan_bytes = _image_to_png_bytes(slogan) if slogan is not None else None
         return compute_request_hash(raw_bytes, template, logo_bytes, slogan_bytes)
 
     def _write_branded_thumbnail(

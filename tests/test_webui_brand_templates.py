@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
 
-from codex_image.branding.models import BrandTemplate, PlacementConfig
+from codex_image.branding.models import BrandTemplate, PlacementConfig, content_hash
 
 
 def _template(
@@ -66,6 +67,37 @@ class BrandTemplateStoreTests(unittest.TestCase):
             self.assertEqual(store.get("metro-standard", 1).status, "archived")
             self.assertEqual(store.get("metro-standard", 2).status, "active")
 
+    def test_v2_hash_matches_authoritative_stored_recipe(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            store = self._store(Path(tmp))
+            store.publish(_template(version=41, width_ratio_logo=0.16))
+            v2 = store.publish(_template(version=99, width_ratio_logo=0.20))
+
+            rebuilt = store.get_brand_template("metro-standard", 2)
+
+            self.assertEqual(v2.version, 2)
+            self.assertEqual(v2.recipe["version"], 2)
+            self.assertEqual(rebuilt.version, 2)
+            self.assertEqual(v2.content_hash, content_hash(rebuilt))
+
+    def test_initialization_migrates_legacy_v2_content_hash(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            store = self._store(root)
+            store.publish(_template(width_ratio_logo=0.16))
+            store.publish(_template(width_ratio_logo=0.20))
+            stored_data = json.loads(store.path.read_text(encoding="utf-8"))
+            legacy_hash = content_hash(_template(version=1, width_ratio_logo=0.20))
+            stored_data["versions"][1]["content_hash"] = legacy_hash
+            store.path.write_text(json.dumps(stored_data), encoding="utf-8")
+
+            migrated_store = self._store(root)
+            migrated = migrated_store.get("metro-standard", 2)
+            rebuilt = migrated_store.get_brand_template("metro-standard", 2)
+
+            self.assertNotEqual(migrated.content_hash, legacy_hash)
+            self.assertEqual(migrated.content_hash, content_hash(rebuilt))
+
     def test_unchanged_recipe_is_idempotent(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             store = self._store(Path(tmp))
@@ -74,6 +106,17 @@ class BrandTemplateStoreTests(unittest.TestCase):
 
             self.assertEqual(first.version, second.version)
             self.assertEqual(first.content_hash, second.content_hash)
+
+    def test_idempotency_ignores_caller_version(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            store = self._store(Path(tmp))
+            first = store.publish(_template(version=41))
+            second = store.publish(_template(version=99))
+
+            rebuilt = store.get_brand_template("metro-standard", 1)
+            self.assertEqual(first.version, 1)
+            self.assertEqual(second.version, 1)
+            self.assertEqual(first.content_hash, content_hash(rebuilt))
 
     def test_published_version_is_immutable_round_trip(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

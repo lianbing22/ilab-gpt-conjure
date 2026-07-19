@@ -7,6 +7,7 @@ from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 
 from codex_image.client import DEFAULT_MAIN_MODEL, image_model_supports_input_fidelity
 from codex_image.webui.context import WebUIContext
+from codex_image.webui.brand_templates import template_supports_layer
 from codex_image.webui.executor import (
     _file_to_data_url,
     _instructions_for_transport,
@@ -52,20 +53,65 @@ PROVIDER_REFERENCE_FILES_UNSUPPORTED_DETAIL = {
 }
 
 
-def _freeze_branding_request(ctx: WebUIContext, branding_template_id: str | None) -> dict[str, Any] | None:
+def _clean_template_id(template_id: str | None) -> str:
+    return str(template_id or "").strip()
+
+
+def _freeze_branding_request(
+    ctx: WebUIContext,
+    branding_template_id: str | None,
+    *,
+    branding_logo_template_id: str | None = None,
+    branding_slogan_template_id: str | None = None,
+) -> dict[str, Any] | None:
     """Resolve a brand template id into an immutable request snapshot.
 
     Returns None when branding is not requested or the store is absent. Raises
     HTTPException(404) if the caller named a template that doesn't exist, so the
     submit fails fast rather than silently branding nothing.
     """
-    if not branding_template_id:
+    logo_template_id = _clean_template_id(branding_logo_template_id)
+    slogan_template_id = _clean_template_id(branding_slogan_template_id)
+    legacy_template_id = _clean_template_id(branding_template_id)
+    if not legacy_template_id and not logo_template_id and not slogan_template_id:
         return None
     store = ctx.brand_template_store
     if store is None:
         raise HTTPException(status_code=503, detail="Branding is not enabled")
+    if logo_template_id or slogan_template_id:
+        active_versions = {version.template_id: version for version in store.list_active()}
+        layers: dict[str, Any] = {}
+        for element, template_id in (("logo", logo_template_id), ("slogan", slogan_template_id)):
+            if not template_id:
+                continue
+            version = active_versions.get(template_id)
+            if version is None:
+                raise HTTPException(status_code=404, detail="Brand template not found")
+            if version.recipe.get("theme_mode") != "auto" or version.recipe.get("variant_policy") != "per-element":
+                raise HTTPException(
+                    status_code=400,
+                    detail=(
+                        f"Brand template '{template_id}' is incompatible with layered branding: "
+                        "theme_mode must be 'auto' and variant_policy must be 'per-element'."
+                    ),
+                )
+            if not template_supports_layer(version.recipe, element):
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Brand template '{template_id}' does not provide a complete {element} layer.",
+                )
+            layers[element] = {
+                "template_id": version.template_id,
+                "template_version": version.version,
+                "template_content_hash": version.content_hash,
+            }
+        return {
+            "enabled": True,
+            "mode": "layers",
+            "layers": layers,
+        }
     try:
-        version = store.get(branding_template_id)  # latest active version
+        version = store.get(legacy_template_id)  # legacy behavior: latest version
     except KeyError as exc:
         raise HTTPException(status_code=404, detail="Brand template not found") from exc
     return {
@@ -172,6 +218,8 @@ def register_generation_routes(app: FastAPI, ctx: WebUIContext) -> None:
         reference_images: list[UploadFile] | None = File(None),
         reference_files: list[UploadFile] | None = File(None),
         branding_template_id: str | None = Form(None),
+        branding_logo_template_id: str | None = Form(None),
+        branding_slogan_template_id: str | None = Form(None),
     ) -> dict[str, Any]:
         if not ctx.auth_checker():
             raise HTTPException(status_code=401, detail="Codex auth is not available")
@@ -293,7 +341,12 @@ def register_generation_routes(app: FastAPI, ctx: WebUIContext) -> None:
             params["api_images_concurrency"] = effective_api_images_concurrency
         # Freeze the brand request at enqueue time so a template published
         # later (or a re-published asset) doesn't change what this run composes.
-        branding_request = _freeze_branding_request(ctx, branding_template_id)
+        branding_request = _freeze_branding_request(
+            ctx,
+            branding_template_id,
+            branding_logo_template_id=branding_logo_template_id,
+            branding_slogan_template_id=branding_slogan_template_id,
+        )
         if branding_request is not None:
             params["branding_request"] = branding_request
         metadata = _write_queued_metadata(
@@ -355,6 +408,8 @@ def register_generation_routes(app: FastAPI, ctx: WebUIContext) -> None:
         mask: UploadFile | None = File(None),
         reference_files: list[UploadFile] | None = File(None),
         branding_template_id: str | None = Form(None),
+        branding_logo_template_id: str | None = Form(None),
+        branding_slogan_template_id: str | None = Form(None),
     ) -> dict[str, Any]:
         if not ctx.auth_checker():
             raise HTTPException(status_code=401, detail="Codex auth is not available")
@@ -487,7 +542,12 @@ def register_generation_routes(app: FastAPI, ctx: WebUIContext) -> None:
             params["api_provider_name"] = effective_api_provider_name
         if auth_source == "api":
             params["api_images_concurrency"] = effective_api_images_concurrency
-        branding_request = _freeze_branding_request(ctx, branding_template_id)
+        branding_request = _freeze_branding_request(
+            ctx,
+            branding_template_id,
+            branding_logo_template_id=branding_logo_template_id,
+            branding_slogan_template_id=branding_slogan_template_id,
+        )
         if branding_request is not None:
             params["branding_request"] = branding_request
         metadata = _write_queued_metadata(

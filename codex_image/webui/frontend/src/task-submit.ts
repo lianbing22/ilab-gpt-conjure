@@ -66,6 +66,8 @@ function referenceFileUploads(...args: any[]) { return legacyMethod("referenceFi
 function storedReferenceFileInputs(...args: any[]) { return legacyMethod("storedReferenceFileInputs", ...args); }
 function missingReferenceFileInputs(...args: any[]) { return legacyMethod("missingReferenceFileInputs", ...args); }
 function renderPreview(...args: any[]) { return legacyMethod("renderPreview", ...args); }
+function renderBrandMaterials(...args: any[]) { return legacyMethod("renderBrandMaterials", ...args); }
+function normalizeBrandLayerSelections(...args: any[]) { return legacyMethod("normalizeBrandLayerSelections", ...args); }
 
 const REFERENCE_FILE_ERROR_KEYS: Record<string, string> = {
   reference_file_empty: "referenceFiles.errorEmpty",
@@ -110,6 +112,55 @@ function referenceFileMetadata(source: any) {
     family: source.family,
     missing: Boolean(source.missing),
   };
+}
+
+function taskBrandingField(task: any, key: string): string {
+  const request = task?.request || {};
+  const params = task?.params || {};
+  const brandingRequest = params.branding_request || {};
+  return String(request[key] || brandingRequest[key] || "");
+}
+
+function taskBrandingLayerTemplateId(task: any, layer: "logo" | "slogan"): string {
+  return String(task?.params?.branding_request?.layers?.[layer]?.template_id || "");
+}
+
+export function restoreBrandingSelectionFromTask(task: any): void {
+  const logoId = taskBrandingLayerTemplateId(task, "logo")
+    || taskBrandingField(task, "branding_logo_template_id")
+    || taskBrandingField(task, "logo_template_id");
+  const sloganId = taskBrandingLayerTemplateId(task, "slogan")
+    || taskBrandingField(task, "branding_slogan_template_id")
+    || taskBrandingField(task, "slogan_template_id");
+  const legacyId = taskBrandingField(task, "branding_template_id")
+    || String(task?.branding_template_id || task?.params?.branding_template_id || "");
+  const restoredLogoId = logoId || (!logoId && !sloganId ? legacyId : "");
+  const restoredSloganId = sloganId || (!logoId && !sloganId ? legacyId : "");
+  state.selectedBrandingLogoTemplateId = restoredLogoId;
+  state.selectedBrandingSloganTemplateId = restoredSloganId;
+  state.brandingLogoEnabled = Boolean(restoredLogoId);
+  state.brandingSloganEnabled = Boolean(restoredSloganId);
+  state.selectedBrandingTemplateId = restoredLogoId || restoredSloganId || "";
+  normalizeBrandLayerSelections();
+  renderBrandMaterials();
+}
+
+export function appendBrandingPreviewFields(payload: Record<string, any>): void {
+  if (state.brandingLogoEnabled && state.selectedBrandingLogoTemplateId) {
+    payload.branding_logo_template_id = state.selectedBrandingLogoTemplateId;
+  }
+  if (state.brandingSloganEnabled && state.selectedBrandingSloganTemplateId) {
+    payload.branding_slogan_template_id = state.selectedBrandingSloganTemplateId;
+  }
+}
+
+function appendBrandingFormFields(form: FormData): void {
+  if (state.brandingLogoEnabled && state.selectedBrandingLogoTemplateId) {
+    form.append("branding_logo_template_id", state.selectedBrandingLogoTemplateId);
+  }
+  if (state.brandingSloganEnabled && state.selectedBrandingSloganTemplateId) {
+    form.append("branding_slogan_template_id", state.selectedBrandingSloganTemplateId);
+  }
 }
 
 export function applyTaskOutputParams(task: any): void {
@@ -159,6 +210,7 @@ function applyTaskToForm(task: any, options?: ApplyTaskToFormOptions) {
   setMode(task.mode || "generate");
   setPromptWithGalleryRefs(task.prompt || "", task.gallery_refs || []);
   if (!options?.preserveOutputSettings) applyTaskOutputParams(task);
+  if (typeof restoreBrandingSelectionFromTask === "function") restoreBrandingSelectionFromTask(task);
   updatePromptCount();
   updateRequestPreview();
 }
@@ -195,8 +247,8 @@ function buildPreviewRequest() {
     reference_asset_ids: assets.map((source: any) => source.id),
     reference_files: fileUploads.map((source: any) => source.filename),
     reference_file_ids: storedFiles.map((source: any) => source.id),
-    branding_template_id: state.selectedBrandingTemplateId || null,
   };
+  appendBrandingPreviewFields(payload);
   if (isApi) {
     const apiMode = currentApiMode();
     const action = state.mode === "edit" || uploads.length || assets.length || galleries.length ? "edit" : "generate";
@@ -370,9 +422,7 @@ async function runTask() {
   assets.forEach((source: any) => form.append("reference_asset_ids", source.id));
   fileUploads.forEach((source: any) => form.append("reference_files", source.file));
   storedFiles.forEach((source: any) => form.append("reference_file_ids", source.id));
-  if (state.selectedBrandingTemplateId) {
-    form.append("branding_template_id", state.selectedBrandingTemplateId);
-  }
+  appendBrandingFormFields(form);
 
   if (state.mode === "generate") {
     uploads.forEach((source: any) => form.append("reference_images", source.file));
@@ -431,5 +481,8 @@ export function initTaskSubmitFeature() {
     createPendingTask,
     addQueuedTask,
     runTask,
+    restoreBrandingSelectionFromTask,
+    appendBrandingPreviewFields,
+    appendBrandingFormFields,
   });
 }

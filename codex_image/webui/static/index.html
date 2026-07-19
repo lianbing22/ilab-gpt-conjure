@@ -113,7 +113,7 @@
         });
       })();
     </script>
-    <link rel="stylesheet" href="/static/styles.css?v=runtime-570" />
+    <link rel="stylesheet" href="/static/styles.css?v=runtime-571" />
   </head>
   <body>
     <div class="layout-container">
@@ -525,12 +525,11 @@
                     <strong data-i18n="brand.materialsTitle">品牌素材</strong>
                     <span data-i18n="brand.materialsHint">生成后原样叠加，不会被 AI 重绘</span>
                   </div>
-                  <button id="brandMaterialOpenButton" class="ghost-button text-sm brand-material-open-button" type="button" aria-controls="brandMaterialDrawer" aria-expanded="false" aria-label="查看全部素材" data-i18n-attr="aria-label:brand.viewAll">
+                  <button id="brandMaterialOpenButton" class="sr-only" type="button" tabindex="-1" aria-hidden="true" aria-controls="brandMaterialDrawer" aria-expanded="false" aria-label="查看全部素材" data-i18n-attr="aria-label:brand.viewAll">
                     <span data-i18n="brand.viewAll">查看全部素材</span>
-                    <span aria-hidden="true">→</span>
                   </button>
                 </div>
-                <div id="brandMaterialList" class="brand-material-list" role="radiogroup" aria-label="选择品牌套件" data-i18n-attr="aria-label:brand.materialsChoose"></div>
+                <div id="brandMaterialList" class="brand-material-list" role="list" aria-label="品牌素材层" data-i18n-attr="aria-label:brand.layers"></div>
               </div>
             </section>
 
@@ -914,11 +913,11 @@
       </div>
     </div>
 
-    <div id="brandMaterialDrawer" class="resource-sheet brand-material-drawer" role="dialog" aria-modal="true" aria-hidden="true" aria-label="品牌素材">
+    <div id="brandMaterialDrawer" class="resource-sheet brand-material-drawer" role="dialog" aria-modal="true" aria-hidden="true" aria-label="品牌素材" data-i18n-attr="aria-label:brand.drawerTitle">
       <div class="resource-sheet-header brand-material-drawer-header">
         <div>
-          <h2 data-i18n="brand.drawerTitle">品牌素材</h2>
-          <p data-i18n="brand.drawerSummary">选择一套生成后自动叠加的品牌规范</p>
+          <h2 id="brandMaterialDrawerTitle" data-i18n="brand.drawerTitle">品牌素材</h2>
+          <p id="brandMaterialDrawerSummary" data-i18n="brand.drawerSummary">选择一套生成后自动叠加的品牌规范</p>
         </div>
         <button id="brandMaterialDrawerClose" class="ghost-button drawer-close-button" type="button" aria-label="关闭品牌素材" title="关闭">
           <svg class="drawer-close-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -931,8 +930,8 @@
           <span class="sr-only" data-i18n="brand.search">搜索品牌套件</span>
           <input id="brandMaterialSearch" class="control" type="search" autocomplete="off" placeholder="搜索品牌套件" data-i18n-attr="placeholder:brand.search" />
         </label>
-        <div class="brand-material-filter-row" aria-label="品牌素材筛选">
-          <span class="brand-material-filter active" data-i18n="brand.all">全部</span>
+        <div class="brand-material-filter-row" aria-label="品牌素材筛选" data-i18n-attr="aria-label:brand.filter">
+          <span id="brandMaterialFilterLabel" class="brand-material-filter active" data-i18n="brand.all">全部</span>
         </div>
         <div id="brandMaterialDrawerList" class="brand-material-drawer-list" role="radiogroup" aria-label="选择品牌套件" data-i18n-attr="aria-label:brand.materialsChoose"></div>
         <div id="brandMaterialDrawerEmpty" class="brand-material-drawer-empty hidden" data-i18n="brand.empty">没有找到匹配的品牌套件</div>
@@ -1508,7 +1507,7 @@
     </div>
 
     <div id="taskNotificationToastRegion" class="task-notification-toast-region" aria-live="polite"></div>
-  <script src="/static/app.js?v=runtime-570"></script>
+  <script src="/static/app.js?v=runtime-571"></script>
     <script>
       (() => {
         document.querySelectorAll(".radio-group").forEach((group) => {

@@ -277,10 +277,11 @@ class WebUIStaticI18nTests(WebUIStaticTestCase):
         html = Path("codex_image/webui/static/index.html").read_text(encoding="utf-8")
 
         for key in (
-            "app.newTask",
+            "app.newTaskFull",
             "queue.empty",
             "theme.system",
-            "imageInput.referenceTitle",
+            "imageInput.materialsTitle",
+            "imageInput.referenceImages",
             "prompt.title",
             "prompt.run",
             "outputSettings.title",

@@ -59,6 +59,45 @@ class WebUIGenerationTests(unittest.TestCase):
         image.save(buffer, format="PNG")
         return buffer.getvalue()
 
+    def _publish_brand_template(
+        self,
+        ctx: Any,
+        template_id: str,
+        *,
+        theme_mode: str = "auto",
+        variant_policy: str = "per-element",
+    ):
+        from codex_image.branding.models import BrandTemplate, PlacementConfig
+
+        ids = {}
+        for element in ("logo", "slogan"):
+            for tone in ("light-assets", "dark-assets"):
+                asset = ctx.brand_asset_storage.create_or_touch(
+                    f"{template_id}-{element}-{tone}.png",
+                    self._png_bytes((200, 80)) if element == "slogan" else self._png_bytes((100, 60)),
+                    "image/png",
+                )
+                ids[(tone, element)] = asset.id
+        template = BrandTemplate(
+            id=template_id,
+            version=1,
+            name=template_id,
+            theme_mode=theme_mode,
+            variant_policy=variant_policy,
+            placements={
+                layout: {
+                    "logo": PlacementConfig("top-left", 0.16, 0.035, 0.035),
+                    "slogan": PlacementConfig("bottom-right", 0.30, 0.035, 0.035),
+                }
+                for layout in ("square", "portrait", "landscape")
+            },
+            asset_variants={
+                "light-assets": {"logo": ids[("light-assets", "logo")], "slogan": ids[("light-assets", "slogan")]},
+                "dark-assets": {"logo": ids[("dark-assets", "logo")], "slogan": ids[("dark-assets", "slogan")]},
+            },
+        )
+        return ctx.brand_template_store.publish(template)
+
     def test_generate_route_persists_task_and_passes_parameters(self) -> None:
         from codex_image.webui.app import create_app
 
@@ -738,3 +777,235 @@ class WebUIGenerationTests(unittest.TestCase):
         self.assertTrue(branding["request_hash"])
         self.assertEqual(branding["template_id"], "metro")
         self.assertEqual(len(fake.generate_calls), 1)  # one generation, branding is pure post-process
+
+    def test_generate_freezes_layer_branding_and_ignores_legacy_template_id(self) -> None:
+        from codex_image.webui.app import create_app
+
+        fake = FakeImageClient()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            app = create_app(
+                output_root=root,
+                client_factory=lambda: fake,
+                auth_checker=lambda: True,
+                auth_settings_path=root / "auth-settings.json",
+                auto_start_queue=False,
+            )
+            client = TestClient(app)
+            ctx = app.state.ctx
+            self._publish_brand_template(ctx, "legacy")
+            logo_version = self._publish_brand_template(ctx, "logo-layer")
+            slogan_version = self._publish_brand_template(ctx, "slogan-layer")
+
+            response = client.post(
+                "/api/generate",
+                data={
+                    "prompt": "branded",
+                    "size": "1024x1024",
+                    "quality": "low",
+                    "branding_template_id": "legacy",
+                    "branding_logo_template_id": "logo-layer",
+                    "branding_slogan_template_id": "slogan-layer",
+                },
+            )
+
+        self.assertEqual(response.status_code, 200)
+        frozen = response.json()["task"]["params"]["branding_request"]
+        self.assertEqual(frozen["mode"], "layers")
+        self.assertNotIn("template_id", frozen)
+        self.assertEqual(frozen["layers"]["logo"]["template_id"], "logo-layer")
+        self.assertEqual(frozen["layers"]["logo"]["template_version"], logo_version.version)
+        self.assertEqual(frozen["layers"]["slogan"]["template_id"], "slogan-layer")
+        self.assertEqual(frozen["layers"]["slogan"]["template_content_hash"], slogan_version.content_hash)
+
+    def test_generate_rejects_non_active_layer_template_id(self) -> None:
+        from codex_image.webui.app import create_app
+
+        fake = FakeImageClient()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            app = create_app(
+                output_root=root,
+                client_factory=lambda: fake,
+                auth_checker=lambda: True,
+                auth_settings_path=root / "auth-settings.json",
+                auto_start_queue=False,
+            )
+            client = TestClient(app)
+            ctx = app.state.ctx
+            archived = self._publish_brand_template(ctx, "archived-layer")
+            ctx.brand_template_store.archive("archived-layer", archived.version)
+
+            response = client.post(
+                "/api/generate",
+                data={
+                    "prompt": "branded",
+                    "size": "1024x1024",
+                    "quality": "low",
+                    "branding_logo_template_id": "archived-layer",
+                },
+            )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_generate_rejects_layer_templates_with_incompatible_tone_policy(self) -> None:
+        from codex_image.webui.app import create_app
+
+        fake = FakeImageClient()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            app = create_app(
+                output_root=root,
+                client_factory=lambda: fake,
+                auth_checker=lambda: True,
+                auth_settings_path=root / "auth-settings.json",
+                auto_start_queue=False,
+            )
+            client = TestClient(app)
+            ctx = app.state.ctx
+            self._publish_brand_template(ctx, "forced-layer", theme_mode="dark-assets")
+            self._publish_brand_template(ctx, "unified-layer", variant_policy="unified")
+
+            for template_id in ("forced-layer", "unified-layer"):
+                with self.subTest(template_id=template_id):
+                    response = client.post(
+                        "/api/generate",
+                        data={
+                            "prompt": "branded",
+                            "size": "1024x1024",
+                            "quality": "low",
+                            "branding_logo_template_id": template_id,
+                        },
+                    )
+
+                    self.assertEqual(response.status_code, 400)
+                    self.assertIn("incompatible with layered branding", response.json()["detail"])
+
+    def test_generate_rejects_layer_templates_missing_required_assets_or_placements(self) -> None:
+        from codex_image.webui.app import create_app
+
+        fake = FakeImageClient()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            app = create_app(
+                output_root=root,
+                client_factory=lambda: fake,
+                auth_checker=lambda: True,
+                auth_settings_path=root / "auth-settings.json",
+                auto_start_queue=False,
+            )
+            client = TestClient(app)
+            ctx = app.state.ctx
+            self._publish_brand_template(ctx, "missing-logo-asset")
+            self._publish_brand_template(ctx, "missing-slogan-placement")
+            stored_data = json.loads(ctx.brand_template_store.path.read_text(encoding="utf-8"))
+            for record in stored_data["versions"]:
+                if record.get("template_id") == "missing-logo-asset":
+                    record["recipe"]["asset_variants"]["dark-assets"].pop("logo")
+                if record.get("template_id") == "missing-slogan-placement":
+                    record["recipe"]["placements"]["portrait"].pop("slogan")
+            ctx.brand_template_store.path.write_text(json.dumps(stored_data), encoding="utf-8")
+
+            cases = (
+                ("branding_logo_template_id", "missing-logo-asset", "logo"),
+                ("branding_slogan_template_id", "missing-slogan-placement", "slogan"),
+            )
+            for field, template_id, layer in cases:
+                with self.subTest(layer=layer):
+                    response = client.post(
+                        "/api/generate",
+                        data={
+                            "prompt": "branded",
+                            "size": "1024x1024",
+                            "quality": "low",
+                            field: template_id,
+                        },
+                    )
+
+                    self.assertEqual(response.status_code, 400)
+                    self.assertIn(f"complete {layer} layer", response.json()["detail"])
+
+    def test_generate_accepts_layer_after_legacy_v2_hash_migration(self) -> None:
+        from dataclasses import replace
+
+        from codex_image.branding.models import content_hash
+        from codex_image.webui.app import create_app
+        from codex_image.webui.brand_templates import BrandTemplateStore
+
+        fake = FakeImageClient()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            app = create_app(
+                output_root=root,
+                client_factory=lambda: fake,
+                auth_checker=lambda: True,
+                auth_settings_path=root / "auth-settings.json",
+                auto_start_queue=False,
+            )
+            client = TestClient(app)
+            ctx = app.state.ctx
+            self._publish_brand_template(ctx, "legacy-v2")
+            v1_template = ctx.brand_template_store.get_brand_template("legacy-v2", 1)
+            v2_input = replace(v1_template, name="legacy v2 changed")
+            v2 = ctx.brand_template_store.publish(v2_input)
+            stored_data = json.loads(ctx.brand_template_store.path.read_text(encoding="utf-8"))
+            legacy_hash = content_hash(v2_input)
+            for record in stored_data["versions"]:
+                if record.get("template_id") == "legacy-v2" and record.get("version") == 2:
+                    record["content_hash"] = legacy_hash
+                    break
+            ctx.brand_template_store.path.write_text(json.dumps(stored_data), encoding="utf-8")
+
+            migrated_store = BrandTemplateStore(ctx.brand_template_store.path)
+            ctx.brand_template_store = migrated_store
+            migrated = migrated_store.get("legacy-v2", 2)
+            response = client.post(
+                "/api/generate",
+                data={
+                    "prompt": "branded",
+                    "size": "1024x1024",
+                    "quality": "low",
+                    "branding_logo_template_id": "legacy-v2",
+                },
+            )
+
+        self.assertEqual(v2.version, 2)
+        self.assertNotEqual(migrated.content_hash, legacy_hash)
+        self.assertEqual(response.status_code, 200)
+        frozen = response.json()["task"]["params"]["branding_request"]["layers"]["logo"]
+        self.assertEqual(frozen["template_version"], 2)
+        self.assertEqual(frozen["template_content_hash"], migrated.content_hash)
+
+    def test_edit_freezes_logo_only_layer_branding(self) -> None:
+        from codex_image.webui.app import create_app
+
+        fake = FakeImageClient()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            app = create_app(
+                output_root=root,
+                client_factory=lambda: fake,
+                auth_checker=lambda: True,
+                auth_settings_path=root / "auth-settings.json",
+                auto_start_queue=False,
+            )
+            client = TestClient(app)
+            ctx = app.state.ctx
+            logo_version = self._publish_brand_template(ctx, "logo-layer")
+
+            response = client.post(
+                "/api/edit",
+                data={
+                    "prompt": "branded edit",
+                    "size": "1024x1024",
+                    "quality": "low",
+                    "branding_logo_template_id": "logo-layer",
+                },
+                files={"images": ("input.png", self._png_bytes((64, 64)), "image/png")},
+            )
+
+        self.assertEqual(response.status_code, 200)
+        frozen = response.json()["task"]["params"]["branding_request"]
+        self.assertEqual(frozen["mode"], "layers")
+        self.assertEqual(set(frozen["layers"].keys()), {"logo"})
+        self.assertEqual(frozen["layers"]["logo"]["template_version"], logo_version.version)

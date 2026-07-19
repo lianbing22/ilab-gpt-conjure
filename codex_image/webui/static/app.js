@@ -331,6 +331,8 @@
       brandMaterialList: document.querySelector("#brandMaterialList"),
       brandMaterialOpenButton: document.querySelector("#brandMaterialOpenButton"),
       brandMaterialDrawer: document.querySelector("#brandMaterialDrawer"),
+      brandMaterialDrawerTitle: document.querySelector("#brandMaterialDrawerTitle"),
+      brandMaterialDrawerSummary: document.querySelector("#brandMaterialDrawerSummary"),
       brandMaterialDrawerClose: document.querySelector("#brandMaterialDrawerClose"),
       brandMaterialDrawerBackdrop: document.querySelector("#brandMaterialDrawerBackdrop"),
       brandMaterialDrawerCancel: document.querySelector("#brandMaterialDrawerCancel"),
@@ -338,6 +340,7 @@
       brandMaterialDrawerList: document.querySelector("#brandMaterialDrawerList"),
       brandMaterialDrawerEmpty: document.querySelector("#brandMaterialDrawerEmpty"),
       brandMaterialSearch: document.querySelector("#brandMaterialSearch"),
+      brandMaterialFilterLabel: document.querySelector("#brandMaterialFilterLabel"),
       galleryManagePanel: document.querySelector("#galleryManagePanel"),
       galleryManageButton: document.querySelector("#galleryManageButton"),
       galleryDrawer: document.querySelector("#galleryDrawer"),
@@ -1080,11 +1083,21 @@
     "brand.materialsTitle": "Brand assets",
     "brand.materialsHint": "Applied after generation without AI redrawing",
     "brand.materialsChoose": "Choose a brand package",
+    "brand.layers": "Brand asset layers",
+    "brand.logoLayer": "Logo",
+    "brand.sloganLayer": "Slogan and business signature",
+    "brand.sloganMaterialName": "Brand slogan and business signature",
+    "brand.logoHint": "Choose the logo overlay to apply after generation",
+    "brand.sloganHint": "Choose the slogan and business signature overlay to apply after generation",
+    "brand.enabled": "On",
+    "brand.disabled": "Off",
+    "brand.notSelected": "Not selected",
     "brand.materialsNone": "None",
     "brand.viewAll": "View all kits",
     "brand.drawerTitle": "Brand assets",
     "brand.drawerSummary": "Choose one brand kit to apply after generation",
     "brand.search": "Search brand kits",
+    "brand.filter": "Brand asset filter",
     "brand.all": "All",
     "brand.empty": "No matching brand kits",
     "brand.confirm": "Confirm",
@@ -10833,11 +10846,21 @@
     "brand.materialsTitle": "\u54C1\u724C\u7D20\u6750",
     "brand.materialsHint": "\u751F\u6210\u540E\u539F\u6837\u53E0\u52A0\uFF0C\u4E0D\u4F1A\u88AB AI \u91CD\u7ED8",
     "brand.materialsChoose": "\u9009\u62E9\u54C1\u724C\u5957\u4EF6",
+    "brand.layers": "\u54C1\u724C\u7D20\u6750\u5C42",
+    "brand.logoLayer": "Logo",
+    "brand.sloganLayer": "\u53E3\u53F7\u4E0E\u4E1A\u52A1\u843D\u6B3E",
+    "brand.sloganMaterialName": "\u54C1\u724C\u53E3\u53F7\u4E0E\u4E1A\u52A1\u843D\u6B3E",
+    "brand.logoHint": "\u9009\u62E9\u751F\u6210\u540E\u53E0\u52A0\u7684 Logo",
+    "brand.sloganHint": "\u9009\u62E9\u751F\u6210\u540E\u53E0\u52A0\u7684\u53E3\u53F7\u4E0E\u4E1A\u52A1\u843D\u6B3E",
+    "brand.enabled": "\u5DF2\u5F00\u542F",
+    "brand.disabled": "\u5DF2\u5173\u95ED",
+    "brand.notSelected": "\u672A\u9009\u62E9",
     "brand.materialsNone": "\u4E0D\u6DFB\u52A0",
     "brand.viewAll": "\u67E5\u770B\u5168\u90E8\u7D20\u6750",
     "brand.drawerTitle": "\u54C1\u724C\u7D20\u6750",
     "brand.drawerSummary": "\u9009\u62E9\u4E00\u5957\u751F\u6210\u540E\u81EA\u52A8\u53E0\u52A0\u7684\u54C1\u724C\u89C4\u8303",
     "brand.search": "\u641C\u7D22\u54C1\u724C\u5957\u4EF6",
+    "brand.filter": "\u54C1\u724C\u7D20\u6750\u7B5B\u9009",
     "brand.all": "\u5168\u90E8",
     "brand.empty": "\u6CA1\u6709\u627E\u5230\u5339\u914D\u7684\u54C1\u724C\u5957\u4EF6",
     "brand.confirm": "\u786E\u8BA4\u4F7F\u7528",
@@ -13698,7 +13721,12 @@
       selectedPromptTemplateId: null,
       recentAssets: [],
       brandTemplates: [],
+      brandTemplatesLoaded: false,
       selectedBrandingTemplateId: "",
+      brandingLogoEnabled: false,
+      brandingSloganEnabled: false,
+      selectedBrandingLogoTemplateId: "",
+      selectedBrandingSloganTemplateId: "",
       collectedReferences: [],
       galleryCategories: defaultGalleryCategories(),
       activeGalleryCategory: "portrait",
@@ -13861,6 +13889,7 @@
     missingReferenceAssetInputs: proxy("missingReferenceAssetInputs"),
     normalizeApiImagesConcurrency: proxy("normalizeApiImagesConcurrency"),
     normalizeApiSettings: proxy("normalizeApiSettings"),
+    normalizeBrandLayerSelections: proxy("normalizeBrandLayerSelections"),
     normalizeHexColor: proxy("normalizeHexColor"),
     notifyTaskUpdate: proxy("notifyTaskUpdate"),
     openAddToGallery: proxy("openAddToGallery"),
@@ -33631,16 +33660,16 @@ ${hint}` : hint;
   }
   function renderPromptTemplateList() {
     if (!els15.promptTemplateList) return;
-    const templates = promptTemplatesForDisplay();
+    const templates2 = promptTemplatesForDisplay();
     if (els15.promptTemplateSummary) {
       els15.promptTemplateSummary.className = "prompt-template-summary";
-      els15.promptTemplateSummary.textContent = templates.length ? formatTranslation("templates.availableCount", { count: templates.length }) : translate("templates.noMatch");
+      els15.promptTemplateSummary.textContent = templates2.length ? formatTranslation("templates.availableCount", { count: templates2.length }) : translate("templates.noMatch");
     }
-    if (!templates.length) {
+    if (!templates2.length) {
       els15.promptTemplateList.innerHTML = `<div class="prompt-template-empty">${translate("templates.empty")}</div>`;
       return;
     }
-    els15.promptTemplateList.innerHTML = templates.map((template) => `
+    els15.promptTemplateList.innerHTML = templates2.map((template) => `
     <button class="prompt-template-card" type="button" data-prompt-template-id="${escapeHtml10(template.id)}">
       ${template.thumbnail_url ? `<span class="prompt-template-card-thumb"><img src="${escapeHtml10(template.thumbnail_url)}" alt="" loading="lazy" decoding="async"></span>` : ""}
       <span class="prompt-template-card-title">${escapeHtml10(promptTemplateCardTitle(template))}</span>
@@ -39696,6 +39725,12 @@ ${galleryText}`;
   function renderPreview4(...args) {
     return legacyMethod36("renderPreview", ...args);
   }
+  function renderBrandMaterials(...args) {
+    return legacyMethod36("renderBrandMaterials", ...args);
+  }
+  function normalizeBrandLayerSelections(...args) {
+    return legacyMethod36("normalizeBrandLayerSelections", ...args);
+  }
   var REFERENCE_FILE_ERROR_KEYS = {
     reference_file_empty: "referenceFiles.errorEmpty",
     reference_file_type_unsupported: "referenceFiles.errorUnsupported",
@@ -39731,6 +39766,45 @@ ${galleryText}`;
       family: source.family,
       missing: Boolean(source.missing)
     };
+  }
+  function taskBrandingField(task, key) {
+    const request = task?.request || {};
+    const params = task?.params || {};
+    const brandingRequest = params.branding_request || {};
+    return String(request[key] || brandingRequest[key] || "");
+  }
+  function taskBrandingLayerTemplateId(task, layer) {
+    return String(task?.params?.branding_request?.layers?.[layer]?.template_id || "");
+  }
+  function restoreBrandingSelectionFromTask(task) {
+    const logoId = taskBrandingLayerTemplateId(task, "logo") || taskBrandingField(task, "branding_logo_template_id") || taskBrandingField(task, "logo_template_id");
+    const sloganId = taskBrandingLayerTemplateId(task, "slogan") || taskBrandingField(task, "branding_slogan_template_id") || taskBrandingField(task, "slogan_template_id");
+    const legacyId = taskBrandingField(task, "branding_template_id") || String(task?.branding_template_id || task?.params?.branding_template_id || "");
+    const restoredLogoId = logoId || (!logoId && !sloganId ? legacyId : "");
+    const restoredSloganId = sloganId || (!logoId && !sloganId ? legacyId : "");
+    state24.selectedBrandingLogoTemplateId = restoredLogoId;
+    state24.selectedBrandingSloganTemplateId = restoredSloganId;
+    state24.brandingLogoEnabled = Boolean(restoredLogoId);
+    state24.brandingSloganEnabled = Boolean(restoredSloganId);
+    state24.selectedBrandingTemplateId = restoredLogoId || restoredSloganId || "";
+    normalizeBrandLayerSelections();
+    renderBrandMaterials();
+  }
+  function appendBrandingPreviewFields(payload2) {
+    if (state24.brandingLogoEnabled && state24.selectedBrandingLogoTemplateId) {
+      payload2.branding_logo_template_id = state24.selectedBrandingLogoTemplateId;
+    }
+    if (state24.brandingSloganEnabled && state24.selectedBrandingSloganTemplateId) {
+      payload2.branding_slogan_template_id = state24.selectedBrandingSloganTemplateId;
+    }
+  }
+  function appendBrandingFormFields(form) {
+    if (state24.brandingLogoEnabled && state24.selectedBrandingLogoTemplateId) {
+      form.append("branding_logo_template_id", state24.selectedBrandingLogoTemplateId);
+    }
+    if (state24.brandingSloganEnabled && state24.selectedBrandingSloganTemplateId) {
+      form.append("branding_slogan_template_id", state24.selectedBrandingSloganTemplateId);
+    }
   }
   function applyTaskOutputParams(task) {
     const params = task.params || {};
@@ -39774,6 +39848,7 @@ ${galleryText}`;
     setMode5(task.mode || "generate");
     setPromptWithGalleryRefs2(task.prompt || "", task.gallery_refs || []);
     if (!options?.preserveOutputSettings) applyTaskOutputParams(task);
+    if (typeof restoreBrandingSelectionFromTask === "function") restoreBrandingSelectionFromTask(task);
     updatePromptCount6();
     updateRequestPreview11();
   }
@@ -39808,9 +39883,9 @@ ${galleryText}`;
       gallery_image_ids: galleries.map((source) => source.id),
       reference_asset_ids: assets.map((source) => source.id),
       reference_files: fileUploads.map((source) => source.filename),
-      reference_file_ids: storedFiles.map((source) => source.id),
-      branding_template_id: state24.selectedBrandingTemplateId || null
+      reference_file_ids: storedFiles.map((source) => source.id)
     };
+    appendBrandingPreviewFields(payload2);
     if (isApi) {
       const apiMode = currentApiMode4();
       const action = state24.mode === "edit" || uploads.length || assets.length || galleries.length ? "edit" : "generate";
@@ -39976,9 +40051,7 @@ ${galleryText}`;
     assets.forEach((source) => form.append("reference_asset_ids", source.id));
     fileUploads.forEach((source) => form.append("reference_files", source.file));
     storedFiles.forEach((source) => form.append("reference_file_ids", source.id));
-    if (state24.selectedBrandingTemplateId) {
-      form.append("branding_template_id", state24.selectedBrandingTemplateId);
-    }
+    appendBrandingFormFields(form);
     if (state24.mode === "generate") {
       uploads.forEach((source) => form.append("reference_images", source.file));
     } else {
@@ -40030,7 +40103,10 @@ ${galleryText}`;
       buildPreviewRequest: buildPreviewRequest2,
       createPendingTask,
       addQueuedTask,
-      runTask
+      runTask,
+      restoreBrandingSelectionFromTask,
+      appendBrandingPreviewFields,
+      appendBrandingFormFields
     });
   }
 
@@ -43279,14 +43355,13 @@ ${galleryText}`;
     const byUrl = task.outputs.find((o) => o && (o.url === outputUrl || `/outputs/${o.file}` === outputUrl));
     const output = byUrl || task.outputs.find((o, i) => previewSlotIndex(card) === i);
     if (!output || !output.branding) return null;
-    return { index: Number(output.index) || previewSlotIndex(card) + 1, branding: output.branding };
+    return { index: Number(output.index) || previewSlotIndex(card) + 1, branding: output.branding, task };
   }
   function previewSlotIndex(card) {
     const siblings = Array.from(els38.previewGrid?.querySelectorAll(".preview-card[data-preview-card-key]") || []);
     return Math.max(0, siblings.indexOf(card));
   }
-  function brandingBadgeForTask() {
-    const task = state29.previewTask;
+  function brandingBadgeForTask(task) {
     const status = String(task?.branding_status || "");
     if (status === "running" || status === "pending") {
       return `<span class="brand-badge brand-badge-pending">${t("brand.processing", "\u54C1\u724C\u5904\u7406\u4E2D")}</span>`;
@@ -43296,12 +43371,33 @@ ${galleryText}`;
     }
     return "";
   }
+  function templateName(templateId) {
+    const template = (state29.brandTemplates || []).find((item) => String(item?.template_id || "") === templateId);
+    return String(template?.name || templateId);
+  }
+  function layerTemplateId(source, layer) {
+    return String(source?.layers?.[layer]?.template_id || "");
+  }
+  function brandingLayerSummaryForTask(task, resultBranding) {
+    const request = task?.request || {};
+    const params = task?.params || {};
+    const brandingRequest = params.branding_request || {};
+    const logoId = layerTemplateId(resultBranding, "logo") || layerTemplateId(brandingRequest, "logo") || String(request.branding_logo_template_id || brandingRequest.branding_logo_template_id || brandingRequest.logo_template_id || "");
+    const sloganId = layerTemplateId(resultBranding, "slogan") || layerTemplateId(brandingRequest, "slogan") || String(request.branding_slogan_template_id || brandingRequest.branding_slogan_template_id || brandingRequest.slogan_template_id || "");
+    const legacyId = String(request.branding_template_id || brandingRequest.branding_template_id || brandingRequest.template_id || "");
+    const appliedLogoId = logoId || (!logoId && !sloganId ? legacyId : "");
+    const appliedSloganId = sloganId || (!logoId && !sloganId ? legacyId : "");
+    const parts = [];
+    if (appliedLogoId) parts.push(`${templateName(appliedLogoId)} Logo`);
+    if (appliedSloganId) parts.push(t("brand.sloganMaterialName", "\u54C1\u724C\u53E3\u53F7\u4E0E\u4E1A\u52A1\u843D\u6B3E"));
+    return parts.join(" \xB7 ");
+  }
   function applyBrandCardDecoration(card) {
     const old = card.querySelector(".brand-card-actions");
     if (old) old.remove();
     const result = brandingForCard(card);
-    const badge = brandingBadgeForTask();
-    const task = state29.previewTask;
+    const task = result?.task || state29.previewTask;
+    const badge = brandingBadgeForTask(task);
     const brandingEnabled = !!task?.branding_status && task.branding_status !== "disabled";
     if (!result && !brandingEnabled) return;
     const branding = result?.branding;
@@ -43309,12 +43405,21 @@ ${galleryText}`;
     const brandedDownloadUrl = completed ? `/api/tasks/${task.task_id}/outputs/${result.index}/branding/download` : "";
     const block = document.createElement("div");
     block.className = "brand-card-actions prompt-action-row";
+    const layerSummary = brandingLayerSummaryForTask(task, branding);
     block.innerHTML = `
     ${badge}
     ${completed ? `<button type="button" class="brand-toggle" data-brand-toggle="" aria-pressed="true">${t("brand.branded", "\u54C1\u724C\u7248")}</button>` : ""}
     ${completed ? `<a class="brand-download-link" href="${brandedDownloadUrl}" download="" data-brand-download="">${t("brand.downloadBranded", "\u4E0B\u8F7D\u54C1\u724C\u7248")}</a>` : ""}
     ${task?.branding_status === "failed" || task?.branding_status === "partial_failed" ? `<button type="button" class="brand-recompose" data-brand-recompose-task="${task.task_id}">${t("brand.recompose", "\u91CD\u65B0\u5408\u6210")}</button>` : ""}
   `;
+    if (layerSummary) {
+      const summary = document.createElement("span");
+      summary.className = "brand-layer-summary";
+      summary.textContent = layerSummary;
+      const badgeElement = block.querySelector(".brand-badge");
+      if (badgeElement) badgeElement.after(summary);
+      else block.prepend(summary);
+    }
     card.appendChild(block);
     if (completed) {
       wireToggle(card, branding);
@@ -43388,71 +43493,195 @@ ${galleryText}`;
   // codex_image/webui/frontend/src/brand-materials.ts
   var state30 = getLegacyBridge().state;
   var els39 = getLegacyBridge().els;
+  var BRAND_LAYERS = ["logo", "slogan"];
+  var BRAND_LAYOUTS = ["square", "portrait", "landscape"];
+  var BRAND_TONES = ["light-assets", "dark-assets"];
   var brandMaterialsInitialized = false;
+  var activeDrawerLayer = "logo";
   var draftTemplateId = "";
   var drawerQuery = "";
   var lastDrawerTrigger = null;
+  var themeObserver = null;
   function legacyMethod41(name, ...args) {
     return getLegacyBridge().methods[name]?.(...args);
   }
   function escapeHtml20(value) {
     return legacyMethod41("escapeHtml", value) || "";
   }
-  function previewAssetId(template) {
-    return String(template?.recipe?.asset_variants?.["dark-assets"]?.logo || "");
+  function templates() {
+    return Array.isArray(state30.brandTemplates) ? state30.brandTemplates : [];
   }
-  function templateOptions() {
-    const templates = Array.isArray(state30.brandTemplates) ? state30.brandTemplates : [];
+  function layerEnabled(layer) {
+    return layer === "logo" ? Boolean(state30.brandingLogoEnabled) : Boolean(state30.brandingSloganEnabled);
+  }
+  function setLayerEnabled(layer, enabled) {
+    if (layer === "logo") {
+      state30.brandingLogoEnabled = enabled;
+    } else {
+      state30.brandingSloganEnabled = enabled;
+    }
+  }
+  function selectedTemplateId(layer) {
+    return layer === "logo" ? String(state30.selectedBrandingLogoTemplateId || "") : String(state30.selectedBrandingSloganTemplateId || "");
+  }
+  function setSelectedTemplateId(layer, templateId) {
+    if (layer === "logo") {
+      state30.selectedBrandingLogoTemplateId = templateId;
+    } else {
+      state30.selectedBrandingSloganTemplateId = templateId;
+    }
+    state30.selectedBrandingTemplateId = state30.selectedBrandingLogoTemplateId || state30.selectedBrandingSloganTemplateId || "";
+  }
+  function effectivePreviewTone() {
+    return document.documentElement.dataset.theme === "dark" ? "light-assets" : "dark-assets";
+  }
+  function previewAssetId(template, layer) {
+    const variants = template?.recipe?.asset_variants || {};
+    return String(variants?.[effectivePreviewTone()]?.[layer] || variants?.["dark-assets"]?.[layer] || variants?.["light-assets"]?.[layer] || "");
+  }
+  function placementSignature(template, layer) {
+    const placements = template?.recipe?.placements || {};
+    const layerPlacements = {};
+    Object.keys(placements).sort().forEach((layout) => {
+      const cfg = placements?.[layout]?.[layer];
+      if (cfg) layerPlacements[layout] = cfg;
+    });
+    return JSON.stringify(layerPlacements);
+  }
+  function templateSupportsLayer(template, layer) {
+    const recipe = template?.recipe || {};
+    const variants = recipe.asset_variants || {};
+    const placements = recipe.placements || {};
+    const hasAssets = BRAND_TONES.every((tone) => String(variants?.[tone]?.[layer] || "").trim());
+    const hasPlacements = BRAND_LAYOUTS.every((layout) => {
+      const placement = placements?.[layout]?.[layer];
+      return placement && Number(placement.width_ratio || 0) > 0;
+    });
+    return hasAssets && hasPlacements;
+  }
+  function sloganMaterialSignature(template) {
+    const variants = template?.recipe?.asset_variants || {};
     return [
-      { template_id: "", name: translate("brand.materialsNone"), preview_id: "" },
-      ...templates.map((template) => ({
-        template_id: String(template.template_id || ""),
-        name: String(template.name || template.template_id || ""),
-        preview_id: previewAssetId(template)
-      }))
-    ];
+      String(variants?.["light-assets"]?.slogan || ""),
+      String(variants?.["dark-assets"]?.slogan || ""),
+      placementSignature(template, "slogan")
+    ].join("|");
+  }
+  function layerOptions(layer) {
+    const seen = /* @__PURE__ */ new Set();
+    const options = [];
+    for (const template of templates()) {
+      const templateId = String(template.template_id || "");
+      if (!templateId || !templateSupportsLayer(template, layer)) continue;
+      const previewId = previewAssetId(template, layer);
+      if (layer === "slogan") {
+        const key = sloganMaterialSignature(template);
+        if (seen.has(key)) continue;
+        seen.add(key);
+      }
+      options.push({
+        template_id: templateId,
+        name: layer === "slogan" ? translate("brand.sloganMaterialName") : String(template.name || templateId),
+        preview_id: previewId,
+        layer
+      });
+    }
+    return options;
+  }
+  function firstTemplateId(layer) {
+    return layerOptions(layer)[0]?.template_id || "";
+  }
+  function canonicalTemplateId(layer, templateId) {
+    const options = layerOptions(layer);
+    if (options.some((option) => option.template_id === templateId)) return templateId;
+    if (layer !== "slogan" || !templateId) return "";
+    const source = templates().find((template) => String(template?.template_id || "") === templateId);
+    if (!source) return "";
+    const signature = sloganMaterialSignature(source);
+    const canonical = options.find((option) => {
+      const template = templates().find((item) => String(item?.template_id || "") === option.template_id);
+      return template && sloganMaterialSignature(template) === signature;
+    });
+    return canonical?.template_id || "";
+  }
+  function findOption(layer, templateId) {
+    const canonicalId = canonicalTemplateId(layer, templateId);
+    return layerOptions(layer).find((option) => option.template_id === canonicalId) || null;
+  }
+  function layerLabel(layer) {
+    return translate(layer === "logo" ? "brand.logoLayer" : "brand.sloganLayer");
+  }
+  function layerHint(layer) {
+    return translate(layer === "logo" ? "brand.logoHint" : "brand.sloganHint");
   }
   function previewHtml(option, large = false) {
-    if (!option.preview_id) {
-      return `<span class="brand-material-none-mark" aria-hidden="true">\u2014</span>`;
+    if (!option?.preview_id) {
+      return `<span class="brand-material-none-mark" aria-hidden="true">-</span>`;
     }
     const sizeClass = large ? " brand-material-drawer-preview" : "";
     return `<span class="brand-material-preview${sizeClass}"><img src="/api/brand/assets/${encodeURIComponent(option.preview_id)}/image" alt="" loading="lazy" decoding="async"></span>`;
   }
-  function optionHtml(option, selected) {
+  function layerRowHtml(layer) {
+    const enabled = layerEnabled(layer);
+    const selected = findOption(layer, selectedTemplateId(layer));
+    const currentName = selected?.name || translate("brand.notSelected");
+    const statusKey = enabled ? "brand.enabled" : "brand.disabled";
+    const drawerExpanded = activeDrawerLayer === layer && Boolean(els39.brandMaterialDrawer?.classList.contains("open"));
     return `
-    <button class="brand-material-option${selected ? " active" : ""}" type="button"
-      role="radio" aria-checked="${selected ? "true" : "false"}"
-      data-brand-template-id="${escapeHtml20(option.template_id)}">
-      ${previewHtml(option)}
-      <span class="brand-material-name">${escapeHtml20(option.name)}</span>
-      <span class="brand-material-check" aria-hidden="true">\u2713</span>
-    </button>
+    <div class="brand-material-row" role="listitem" data-brand-layer="${layer}">
+      <button class="brand-material-toggle" type="button" role="switch"
+        aria-checked="${enabled ? "true" : "false"}"
+        aria-label="${escapeHtml20(layerLabel(layer))}"
+        data-brand-layer-toggle="${layer}">
+        <span class="brand-material-switch-knob" aria-hidden="true"></span>
+      </button>
+      <button class="brand-material-select-row" type="button"
+        data-brand-layer-open="${layer}"
+        aria-controls="brandMaterialDrawer"
+        aria-expanded="${drawerExpanded ? "true" : "false"}"
+        aria-label="${escapeHtml20(`${layerLabel(layer)} ${currentName}`)}">
+        ${previewHtml(selected)}
+        <span class="brand-material-row-copy">
+          <strong>${escapeHtml20(layerLabel(layer))}</strong>
+          <span>${escapeHtml20(currentName)}</span>
+        </span>
+        <span class="brand-material-row-state">${escapeHtml20(translate(statusKey))}</span>
+        <span class="brand-material-arrow" aria-hidden="true">></span>
+      </button>
+    </div>
   `;
   }
-  function quickOptions(options) {
-    const visible = options.slice(0, 4);
-    const selected = options.find((option) => option.template_id === state30.selectedBrandingTemplateId);
-    if (selected && !visible.includes(selected)) visible[visible.length - 1] = selected;
-    return visible;
+  function normalizeBrandLayerSelections2() {
+    if (!state30.brandTemplatesLoaded) return;
+    for (const layer of BRAND_LAYERS) {
+      const selected = selectedTemplateId(layer);
+      const canonicalId = canonicalTemplateId(layer, selected);
+      if (canonicalId) {
+        setSelectedTemplateId(layer, canonicalId);
+      } else if (selected) {
+        setSelectedTemplateId(layer, "");
+        setLayerEnabled(layer, false);
+      }
+    }
   }
-  function renderBrandMaterials() {
+  function renderBrandMaterials2() {
     if (!els39.brandMaterialPicker || !els39.brandMaterialList) return;
-    const templates = Array.isArray(state30.brandTemplates) ? state30.brandTemplates : [];
-    els39.brandMaterialPicker.classList.toggle("hidden", templates.length === 0);
-    if (!templates.length) {
+    const hasTemplates = templates().length > 0;
+    els39.brandMaterialPicker.classList.toggle("hidden", !hasTemplates);
+    if (!hasTemplates) {
       els39.brandMaterialList.replaceChildren();
       renderBrandMaterialDrawer();
       return;
     }
-    const options = quickOptions(templateOptions());
-    els39.brandMaterialList.innerHTML = options.map((option) => optionHtml(option, option.template_id === state30.selectedBrandingTemplateId)).join("");
+    normalizeBrandLayerSelections2();
+    els39.brandMaterialList.innerHTML = BRAND_LAYERS.map(layerRowHtml).join("");
     renderBrandMaterialDrawer();
   }
   function filteredDrawerOptions() {
     const query = drawerQuery.trim().toLocaleLowerCase();
-    if (!query) return templateOptions();
-    return templateOptions().filter((option) => String(option.name || "").toLocaleLowerCase().includes(query));
+    const options = layerOptions(activeDrawerLayer);
+    if (!query) return options;
+    return options.filter((option) => String(option.name || "").toLocaleLowerCase().includes(query));
   }
   function drawerOptionHtml(option) {
     const selected = option.template_id === draftTemplateId;
@@ -43474,23 +43703,48 @@ ${galleryText}`;
     const options = filteredDrawerOptions();
     els39.brandMaterialDrawerList.innerHTML = options.map(drawerOptionHtml).join("");
     els39.brandMaterialDrawerEmpty?.classList.toggle("hidden", options.length > 0);
+    if (els39.brandMaterialDrawerTitle) {
+      els39.brandMaterialDrawerTitle.textContent = layerLabel(activeDrawerLayer);
+    }
+    if (els39.brandMaterialDrawerSummary) {
+      els39.brandMaterialDrawerSummary.textContent = layerHint(activeDrawerLayer);
+    }
+    if (els39.brandMaterialFilterLabel) {
+      els39.brandMaterialFilterLabel.textContent = layerLabel(activeDrawerLayer);
+    }
     if (els39.brandMaterialDrawerConfirm) {
-      const selected = templateOptions().find((option) => option.template_id === draftTemplateId);
+      const selected = findOption(activeDrawerLayer, draftTemplateId);
       els39.brandMaterialDrawerConfirm.textContent = selected?.template_id ? `${translate("brand.confirmUse")} ${selected.name}` : translate("brand.confirmNone");
     }
   }
-  function selectBrandTemplate(templateId) {
+  function ensureLayerSelection(layer) {
+    const selected = selectedTemplateId(layer);
+    setSelectedTemplateId(layer, canonicalTemplateId(layer, selected) || firstTemplateId(layer));
+  }
+  function selectBrandLayerTemplate(layer, templateId) {
     const cleanId = String(templateId || "");
-    const exists = !cleanId || state30.brandTemplates.some((template) => template.template_id === cleanId);
-    state30.selectedBrandingTemplateId = exists ? cleanId : "";
-    draftTemplateId = state30.selectedBrandingTemplateId;
-    renderBrandMaterials();
+    setSelectedTemplateId(layer, canonicalTemplateId(layer, cleanId));
+    renderBrandMaterials2();
     legacyMethod41("updateRequestPreview");
   }
-  function openBrandMaterialDrawer(trigger) {
+  function setBrandLayerEnabled(layer, enabled) {
+    setLayerEnabled(layer, enabled);
+    if (enabled) ensureLayerSelection(layer);
+    renderBrandMaterials2();
+    legacyMethod41("updateRequestPreview");
+  }
+  function layerOpenButton(layer) {
+    return els39.brandMaterialList?.querySelector?.(`[data-brand-layer-open="${layer}"]`);
+  }
+  function setLayerOpenButtonExpanded(layer, expanded) {
+    layerOpenButton(layer)?.setAttribute("aria-expanded", String(expanded));
+  }
+  function openBrandMaterialDrawer(trigger, layer = "logo") {
     legacyMethod41("closePromptTemplateDrawer", { restoreFocus: false });
     legacyMethod41("closeGallery", { restoreFocus: false });
-    draftTemplateId = String(state30.selectedBrandingTemplateId || "");
+    setLayerOpenButtonExpanded(activeDrawerLayer, false);
+    activeDrawerLayer = layer;
+    draftTemplateId = selectedTemplateId(layer) || firstTemplateId(layer);
     drawerQuery = "";
     lastDrawerTrigger = trigger || (document.activeElement instanceof HTMLElement ? document.activeElement : null);
     if (els39.brandMaterialSearch) els39.brandMaterialSearch.value = "";
@@ -43498,7 +43752,7 @@ ${galleryText}`;
     els39.brandMaterialDrawer?.classList.add("open");
     els39.brandMaterialDrawer?.setAttribute("aria-hidden", "false");
     els39.brandMaterialDrawerBackdrop?.classList.remove("hidden");
-    els39.brandMaterialOpenButton?.setAttribute("aria-expanded", "true");
+    setLayerOpenButtonExpanded(activeDrawerLayer, true);
     document.body.classList.add("brand-material-drawer-open");
     window.setTimeout(() => els39.brandMaterialSearch?.focus?.({ preventScroll: true }), 0);
   }
@@ -43507,15 +43761,16 @@ ${galleryText}`;
     els39.brandMaterialDrawer?.classList.remove("open");
     els39.brandMaterialDrawer?.setAttribute("aria-hidden", "true");
     els39.brandMaterialDrawerBackdrop?.classList.add("hidden");
-    els39.brandMaterialOpenButton?.setAttribute("aria-expanded", "false");
+    setLayerOpenButtonExpanded(activeDrawerLayer, false);
     document.body.classList.remove("brand-material-drawer-open");
-    draftTemplateId = String(state30.selectedBrandingTemplateId || "");
+    draftTemplateId = selectedTemplateId(activeDrawerLayer);
     if (restoreFocus) {
-      (lastDrawerTrigger || els39.brandMaterialOpenButton)?.focus?.({ preventScroll: true });
+      const currentTrigger = layerOpenButton(activeDrawerLayer);
+      (currentTrigger || (lastDrawerTrigger?.isConnected ? lastDrawerTrigger : null) || els39.brandMaterialOpenButton)?.focus?.({ preventScroll: true });
     }
   }
   function confirmBrandMaterialDrawer() {
-    selectBrandTemplate(draftTemplateId);
+    selectBrandLayerTemplate(activeDrawerLayer, draftTemplateId);
     closeBrandMaterialDrawer();
   }
   async function refreshBrandTemplates() {
@@ -43524,21 +43779,26 @@ ${galleryText}`;
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || "brand_templates_load_failed");
       state30.brandTemplates = Array.isArray(data.templates) ? data.templates : [];
-      if (state30.selectedBrandingTemplateId && !state30.brandTemplates.some((template) => template.template_id === state30.selectedBrandingTemplateId)) {
-        state30.selectedBrandingTemplateId = "";
-      }
     } catch {
       state30.brandTemplates = [];
-      state30.selectedBrandingTemplateId = "";
     }
-    draftTemplateId = String(state30.selectedBrandingTemplateId || "");
-    renderBrandMaterials();
+    state30.brandTemplatesLoaded = true;
+    normalizeBrandLayerSelections2();
+    draftTemplateId = selectedTemplateId(activeDrawerLayer);
+    renderBrandMaterials2();
   }
   function handleBrandMaterialClick(event) {
     const target = event.target instanceof Element ? event.target : null;
-    const button = target?.closest("[data-brand-template-id]");
-    if (!button) return;
-    selectBrandTemplate(button.dataset.brandTemplateId || "");
+    const toggle = target?.closest("[data-brand-layer-toggle]");
+    if (toggle) {
+      const layer2 = toggle.dataset.brandLayerToggle;
+      setBrandLayerEnabled(layer2, !layerEnabled(layer2));
+      return;
+    }
+    const opener = target?.closest("[data-brand-layer-open]");
+    if (!opener) return;
+    const layer = opener.dataset.brandLayerOpen;
+    openBrandMaterialDrawer(opener, layer);
   }
   function handleDrawerMaterialClick(event) {
     const target = event.target instanceof Element ? event.target : null;
@@ -43578,7 +43838,7 @@ ${galleryText}`;
     if (brandMaterialsInitialized) return;
     brandMaterialsInitialized = true;
     els39.brandMaterialList?.addEventListener("click", handleBrandMaterialClick);
-    els39.brandMaterialOpenButton?.addEventListener("click", (event) => openBrandMaterialDrawer(event.currentTarget));
+    els39.brandMaterialOpenButton?.addEventListener("click", (event) => openBrandMaterialDrawer(event.currentTarget, "logo"));
     els39.brandMaterialDrawerList?.addEventListener("click", handleDrawerMaterialClick);
     els39.brandMaterialDrawerClose?.addEventListener("click", () => closeBrandMaterialDrawer());
     els39.brandMaterialDrawerCancel?.addEventListener("click", () => closeBrandMaterialDrawer());
@@ -43586,13 +43846,26 @@ ${galleryText}`;
     els39.brandMaterialDrawerBackdrop?.addEventListener("click", () => closeBrandMaterialDrawer());
     els39.brandMaterialSearch?.addEventListener("input", handleDrawerSearch);
     document.addEventListener("keydown", handleDrawerKeydown);
-    document.addEventListener(LOCALE_CHANGE_EVENT, renderBrandMaterials);
+    document.addEventListener(LOCALE_CHANGE_EVENT, renderBrandMaterials2);
+    themeObserver = new MutationObserver(renderBrandMaterials2);
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
     Object.assign(getLegacyBridge().methods, {
       refreshBrandTemplates,
-      renderBrandMaterials,
-      selectBrandTemplate,
+      renderBrandMaterials: renderBrandMaterials2,
+      normalizeBrandLayerSelections: normalizeBrandLayerSelections2,
+      selectBrandTemplate: (templateId) => {
+        for (const layer of BRAND_LAYERS) {
+          setSelectedTemplateId(layer, String(templateId || ""));
+          setLayerEnabled(layer, Boolean(templateId));
+        }
+        renderBrandMaterials2();
+        legacyMethod41("updateRequestPreview");
+      },
+      selectBrandLayerTemplate,
+      setBrandLayerEnabled,
       openBrandMaterialDrawer,
-      closeBrandMaterialDrawer
+      closeBrandMaterialDrawer,
+      confirmBrandMaterialDrawer
     });
   }
 

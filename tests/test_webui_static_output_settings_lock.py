@@ -9,17 +9,17 @@ from tests.webui_helpers import WebUIStaticTestCase
 
 
 class OutputSettingsLockFrontendContractTests(WebUIStaticTestCase):
-    def test_optional_reference_title_and_task_adoption_copy_are_explicit(self) -> None:
+    def test_optional_materials_title_and_task_adoption_copy_are_explicit(self) -> None:
         html = Path("codex_image/webui/static/index.html").read_text(encoding="utf-8")
         zh_cn = Path("codex_image/webui/frontend/src/i18n/zh-cn.ts").read_text(encoding="utf-8")
         en = Path("codex_image/webui/frontend/src/i18n/en.ts").read_text(encoding="utf-8")
 
-        self.assertIn('<h2 data-i18n="imageInput.referenceTitle">参考输入（可选）</h2>', html)
+        self.assertIn('<h2 data-i18n="imageInput.materialsTitle">素材与参考（可选）</h2>', html)
         self.assertIn('data-i18n="output.lock.adoptTask">使用此任务参数</button>', html)
-        self.assertIn('"imageInput.referenceTitle": "参考输入（可选）"', zh_cn)
+        self.assertIn('"imageInput.materialsTitle": "素材与参考（可选）"', zh_cn)
         self.assertIn('"output.lock.adoptTask": "使用此任务参数"', zh_cn)
         self.assertIn('使用后不改变系统通道', zh_cn)
-        self.assertIn('"imageInput.referenceTitle": "Reference input (optional)"', en)
+        self.assertIn('"imageInput.materialsTitle": "Materials & references (optional)"', en)
         self.assertIn('does not change the system channel', en)
 
     def test_summary_model_keeps_four_visible_outputs_and_mode_specific_details(self) -> None:

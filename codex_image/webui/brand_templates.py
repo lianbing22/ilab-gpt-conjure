@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import json
 import threading
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
 from typing import Any, Literal
 
@@ -25,6 +25,8 @@ from ..branding.models import BrandTemplate, content_hash
 from .storage_utils import utc_now
 
 TemplateStatus = Literal["active", "archived"]
+LAYER_LAYOUTS = ("square", "portrait", "landscape")
+LAYER_TONES = ("light-assets", "dark-assets")
 
 
 @dataclass(frozen=True)
@@ -40,12 +42,22 @@ class BrandTemplateVersion:
     archived_at: str
     # The recipe itself, stored verbatim so content_hash stays verifiable.
     recipe: dict[str, Any]
+    # Hashes emitted by the pre-authoritative-version publisher. Retained so
+    # already-queued legacy tasks can recover across the one-time migration.
+    legacy_content_hashes: tuple[str, ...] = field(default_factory=tuple)
 
 
 def _recipe_from_brand_template(template: BrandTemplate) -> dict[str, Any]:
     """Serialize a BrandTemplate into a stable JSON-able recipe dict."""
     raw = asdict(template)
     return raw
+
+
+def _recipes_equal_ignoring_version(left: dict[str, Any], right: dict[str, Any]) -> bool:
+    """Compare template semantics while ignoring store-assigned versions."""
+    return {key: value for key, value in left.items() if key != "version"} == {
+        key: value for key, value in right.items() if key != "version"
+    }
 
 
 def _brand_template_from_recipe(recipe: dict[str, Any]) -> BrandTemplate:
@@ -83,12 +95,38 @@ def _brand_template_from_recipe(recipe: dict[str, Any]) -> BrandTemplate:
     )
 
 
+def template_supports_layer(recipe: dict[str, Any], layer: str) -> bool:
+    """Return whether a stored recipe can visibly render ``layer`` in every layout."""
+    if layer not in {"logo", "slogan"}:
+        return False
+    variants = recipe.get("asset_variants")
+    placements = recipe.get("placements")
+    if not isinstance(variants, dict) or not isinstance(placements, dict):
+        return False
+    for tone in LAYER_TONES:
+        tone_assets = variants.get(tone)
+        if not isinstance(tone_assets, dict) or not str(tone_assets.get(layer) or "").strip():
+            return False
+    for layout in LAYER_LAYOUTS:
+        layout_placements = placements.get(layout)
+        placement = layout_placements.get(layer) if isinstance(layout_placements, dict) else None
+        if not isinstance(placement, dict):
+            return False
+        try:
+            if float(placement.get("width_ratio") or 0.0) <= 0:
+                return False
+        except (TypeError, ValueError):
+            return False
+    return True
+
+
 class BrandTemplateStore:
     """Append-only, immutable-versioned template store backed by one JSON file."""
 
     def __init__(self, path: Path | str) -> None:
         self.path = Path(path)
         self._lock = threading.Lock()
+        self._migrate_legacy_content_hashes()
 
     # ------------------------------------------------------------- internals
 
@@ -131,6 +169,52 @@ class BrandTemplateStore:
                 except FileNotFoundError:
                     pass
 
+    def _migrate_legacy_content_hashes(self) -> None:
+        """Repair hashes written before recipes were stamped authoritatively."""
+        with self._lock:
+            versions = self._read_all()
+            changed = False
+            for record in versions:
+                recipe = record.get("recipe") if isinstance(record, dict) else None
+                if not isinstance(recipe, dict):
+                    continue
+                try:
+                    header_version = int(record.get("version") or 0)
+                    recipe_version = int(recipe.get("version") or 0)
+                except (TypeError, ValueError):
+                    continue
+                if (
+                    str(record.get("template_id") or "") != str(recipe.get("id") or "")
+                    or header_version != recipe_version
+                ):
+                    # Identity drift is store corruption, not a legacy hash.
+                    # Never re-sign the recipe under a different record header.
+                    continue
+                try:
+                    authoritative_hash = content_hash(_brand_template_from_recipe(recipe))
+                except Exception:
+                    # Preserve existing read-time tolerance for malformed records.
+                    continue
+                if str(record.get("content_hash") or "") == authoritative_hash:
+                    continue
+                previous_hash = str(record.get("content_hash") or "").strip()
+                legacy_hashes = [
+                    str(value).strip()
+                    for value in (record.get("legacy_content_hashes") or [])
+                    if str(value).strip()
+                ]
+                if previous_hash and previous_hash not in legacy_hashes:
+                    legacy_hashes.append(previous_hash)
+                record["legacy_content_hashes"] = legacy_hashes
+                record["content_hash"] = authoritative_hash
+                changed = True
+            if changed:
+                try:
+                    self._write_all(versions)
+                except OSError:
+                    # A read-only/corrupt store must not make initialization fail.
+                    return
+
     @staticmethod
     def _to_record(v: dict[str, Any]) -> BrandTemplateVersion:
         return BrandTemplateVersion(
@@ -142,6 +226,11 @@ class BrandTemplateStore:
             created_at=str(v.get("created_at") or ""),
             archived_at=str(v.get("archived_at") or ""),
             recipe=v.get("recipe") if isinstance(v.get("recipe"), dict) else {},
+            legacy_content_hashes=tuple(
+                str(value).strip()
+                for value in (v.get("legacy_content_hashes") or [])
+                if str(value).strip()
+            ),
         )
 
     # ------------------------------------------------------------------ read
@@ -183,38 +272,44 @@ class BrandTemplateStore:
 
     def get_brand_template(self, template_id: str, version: int | None = None) -> BrandTemplate:
         """Convenience: return the reconstructed :class:`BrandTemplate`."""
-        return _brand_template_from_recipe(self.get(template_id, version).recipe)
+        record = self.get(template_id, version)
+        template = _brand_template_from_recipe(record.recipe)
+        if template.id != record.template_id or template.version != record.version:
+            raise ValueError(
+                "brand template identity mismatch: "
+                f"record={record.template_id}@{record.version}, recipe={template.id}@{template.version}"
+            )
+        return template
 
     # ---------------------------------------------------------------- write
 
     def publish(self, template: BrandTemplate) -> BrandTemplateVersion:
         """Publish ``template`` as a new immutable version.
 
-        The incoming ``template.version`` is treated as a *floor*: the store
-        assigns the next version number for ``template.id`` (existing versions
-        are never overwritten). ``content_hash`` is computed from the recipe so
-        callers can verify the exact bytes later.
+        The store assigns the authoritative next version for ``template.id``;
+        the caller-provided version is ignored for semantic idempotency.
+        ``content_hash`` is computed only after that authoritative version is
+        stamped, so it always matches the stored recipe exactly.
         """
-        recipe = _recipe_from_brand_template(template)
-        recipe_hash = content_hash(template)
-        now = utc_now()
+        incoming_recipe = _recipe_from_brand_template(template)
 
         with self._lock:
             versions = self._read_all()
             existing = [v for v in versions if str(v.get("template_id")) == template.id]
-            next_version = (max((int(v.get("version") or 0) for v in existing), default=0) + 1) if existing else 1
 
-            # If the latest version has identical content, return it idempotently
-            # instead of creating a duplicate.
+            # Version is store-owned metadata, so caller version changes alone
+            # never publish a duplicate recipe.
             if existing:
                 latest = max(existing, key=lambda v: int(v.get("version") or 0))
-                if latest.get("content_hash") == recipe_hash:
+                latest_recipe = latest.get("recipe") if isinstance(latest.get("recipe"), dict) else {}
+                if _recipes_equal_ignoring_version(latest_recipe, incoming_recipe):
                     return self._to_record(latest)
 
-            # Stamp the recipe with the authoritative version before hashing is
-            # already done; keep the stored recipe's version in sync with the
-            # assigned version so reconstruction round-trips.
-            recipe = {**recipe, "version": next_version}
+            next_version = max((int(v.get("version") or 0) for v in existing), default=0) + 1
+            authoritative_template = replace(template, version=next_version)
+            recipe = _recipe_from_brand_template(authoritative_template)
+            recipe_hash = content_hash(authoritative_template)
+            now = utc_now()
             record = {
                 "template_id": template.id,
                 "version": next_version,
