@@ -9,7 +9,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from codex_image.version import APP_VERSION, APP_VERSION_TAG
+from codex_image.version import APP_RELEASE_HISTORY, APP_VERSION, APP_VERSION_TAG
 
 UPDATE_NOTICE_FILENAME = "update-notice.json"
 POST_UPDATE_ONBOARDING_FILENAME = "post-update-onboarding.json"
@@ -214,6 +214,15 @@ def app_version_payload(output_root: Path) -> dict[str, Any]:
         "server_time": datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
         "app_version": APP_VERSION,
         "app_version_label": APP_VERSION_TAG,
+        "release_history": [
+            {
+                "version": release["version"],
+                "version_label": release["version_label"],
+                "released_at": release["released_at"],
+                "change_ids": list(release["change_ids"]),
+            }
+            for release in APP_RELEASE_HISTORY
+        ],
     }
 
 

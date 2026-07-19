@@ -265,6 +265,46 @@
   width: min(520px, 94vw);
 }
 
+.version-popover-layer {
+  display: block;
+  padding: 0;
+  background: transparent;
+  backdrop-filter: none;
+}
+
+.version-popover-panel {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  width: min(440px, calc(100vw - 24px));
+  max-height: min(680px, calc(100dvh - 24px));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
+  border-radius: 8px;
+  box-shadow: 0 20px 54px rgba(19, 39, 32, 0.24);
+}
+
+.version-popover-panel > .modal-heading {
+  flex: 0 0 auto;
+  align-items: center;
+  margin: 0;
+  padding: 16px 16px 12px 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.version-popover-panel > .modal-heading > div {
+  min-width: 0;
+}
+
+.version-popover-panel > .modal-heading .drawer-close-button {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  flex: 0 0 44px;
+}
+
 .system-settings-modal-panel {
   width: min(624px, calc(100vw - 60px));
   max-height: min(760px, calc(100vh - var(--system-settings-modal-top, 30px) - 30px));
@@ -325,34 +365,151 @@
 
 .version-detail-grid {
   display: grid;
-  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  flex: 0 0 auto;
+  margin: 0 18px;
+  border-bottom: 1px solid var(--line);
 }
 
 .version-detail-row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  min-height: 38px;
-  padding: 0 12px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--surface-soft);
+  min-width: 0;
+  min-height: 58px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 3px;
+  padding: 9px 12px;
+  border-right: 1px solid var(--line);
   color: var(--muted);
-  font-size: 13px;
+  font-size: 11px;
+}
+
+.version-detail-row:first-child {
+  padding-left: 0;
+}
+
+.version-detail-row:last-child {
+  padding-right: 0;
+  border-right: 0;
 }
 
 .version-detail-row strong {
+  max-width: 100%;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.version-history {
+  flex: 1 1 auto;
+  min-height: 150px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 14px 18px 18px;
+}
+
+.version-history h3 {
+  margin: 0 0 12px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.version-release-history {
+  position: relative;
+}
+
+.version-release-item {
+  position: relative;
+  padding: 0 0 16px 20px;
+}
+
+.version-release-item:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  bottom: -8px;
+  left: 4px;
+  width: 1px;
+  background: var(--line);
+}
+
+.version-release-item::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: 0;
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 35%, transparent);
+}
+
+.version-release-item:last-child {
+  padding-bottom: 0;
+}
+
+.version-release-heading {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+
+.version-release-heading strong {
   color: var(--text);
   font-size: 14px;
-  font-weight: 650;
+}
+
+.version-release-heading time {
+  min-width: 0;
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.version-current-badge {
+  flex: 0 0 auto;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  color: var(--primary-strong);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.version-release-item ul {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding-left: 16px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.version-release-item li::marker {
+  color: var(--muted);
+}
+
+.version-history-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
 }
 
 .version-onboarding {
-  margin-top: 12px;
+  flex: 0 0 auto;
+  margin: 0 18px 12px;
   padding: 12px 14px;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 6px;
   background: var(--primary-light);
   color: var(--text-secondary);
   font-size: 13px;
@@ -387,11 +544,14 @@
 }
 
 .version-modal-actions {
+  flex: 0 0 auto;
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 10px;
-  margin-top: 16px;
+  margin-top: 0;
+  padding: 12px 18px;
+  border-top: 1px solid var(--line);
 }
 
 .version-modal-actions .run-button,

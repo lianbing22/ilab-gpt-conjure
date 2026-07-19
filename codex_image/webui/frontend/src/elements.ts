@@ -23,6 +23,7 @@ export function createWebUIElements(): WebUIElements {
   versionCurrent: document.querySelector("#versionCurrent"),
   versionLatest: document.querySelector("#versionLatest"),
   versionSource: document.querySelector("#versionSource"),
+  versionReleaseHistory: document.querySelector("#versionReleaseHistory"),
   versionOnboardingNotice: document.querySelector("#versionOnboardingNotice"),
   versionOnboardingBody: document.querySelector("#versionOnboardingBody"),
   versionReleaseLink: document.querySelector("#versionReleaseLink"),

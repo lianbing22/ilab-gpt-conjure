@@ -512,6 +512,14 @@ body.mobile-task-drawer-open {
 }
 
 @media (max-width: 1180px) {
+  .brand-actions .version-info.compact-header-version {
+    min-height: 44px;
+    margin: 0;
+    padding: 4px 6px;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+
   .workspace-title {
     display: none;
   }
@@ -633,6 +641,39 @@ body.mobile-task-drawer-open {
 }
 
 @media (max-width: 520px) {
+  .version-popover-layer {
+    background: var(--overlay-subtle);
+    backdrop-filter: blur(2px);
+  }
+
+  .version-popover-panel {
+    top: auto !important;
+    right: 0;
+    bottom: 0;
+    left: 0 !important;
+    width: 100%;
+    max-height: 72dvh;
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+    border-radius: 8px 8px 0 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .version-popover-panel > .modal-heading {
+    padding-top: 10px;
+    padding-bottom: 8px;
+  }
+
+  .version-history {
+    min-height: 120px;
+  }
+
+  .version-modal-actions .run-button,
+  .version-modal-actions .ghost-button {
+    min-height: 44px;
+  }
+
   html {
     min-height: 100%;
     overflow-x: hidden;

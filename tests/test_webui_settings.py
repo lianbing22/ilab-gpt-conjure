@@ -131,6 +131,7 @@ class WebUISettingsTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         payload = response.json()
+        self.assertEqual(APP_VERSION, "0.1.0")
         self.assertEqual(payload["current_version"], APP_VERSION)
         self.assertEqual(payload["current_version_label"], f"v{APP_VERSION}")
         self.assertEqual(payload["source"], "source")
@@ -139,6 +140,23 @@ class WebUISettingsTests(unittest.TestCase):
         self.assertFalse(payload["update_available"])
         self.assertFalse(payload["updater_available"])
         self.assertIsNone(payload["post_update_onboarding"])
+        self.assertEqual(
+            payload["release_history"],
+            [
+                {
+                    "version": "0.1.0",
+                    "version_label": "v0.1.0",
+                    "released_at": "2026-07-19",
+                    "change_ids": ["brand_templates", "brand_preview", "mobile_workspace", "task_center"],
+                },
+                {
+                    "version": "0.0.1",
+                    "version_label": "v0.0.1",
+                    "released_at": "2026-07-18",
+                    "change_ids": ["brand_launch", "core_workflow"],
+                },
+            ],
+        )
 
     def test_app_version_reports_standard_app_version_and_download_notice(self) -> None:
         from codex_image.webui.app import create_app

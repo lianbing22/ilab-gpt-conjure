@@ -10,7 +10,15 @@ interface PostUpdateOnboarding {
   standard_download_url?: string;
 }
 
+interface ReleaseHistoryItem {
+  version?: string;
+  version_label?: string;
+  released_at?: string;
+  change_ids?: string[];
+}
+
 interface AppVersionPayload {
+  current_version?: string;
   current_version_label?: string;
   latest_version_label?: string;
   source?: "portable" | "standard_app" | "source" | string;
@@ -19,21 +27,134 @@ interface AppVersionPayload {
   standard_download_url?: string | null;
   updater_available?: boolean;
   post_update_onboarding?: PostUpdateOnboarding | null;
+  release_history?: ReleaseHistoryItem[];
 }
 
 let appVersionInitialized = false;
 let payload: AppVersionPayload | null = null;
 let onboardingAutoShown = false;
+let popoverPositionFrame = 0;
 
 function els() {
   return getLegacyBridge().els;
 }
 
-function setModalHidden(hidden: boolean): void {
+function versionPopoverIsOpen(): boolean {
+  return !(els().versionModal as HTMLElement | null)?.classList.contains("hidden");
+}
+
+function positionVersionPopover(): void {
+  popoverPositionFrame = 0;
+  const modal = els().versionModal as HTMLElement | null;
+  const panel = modal?.querySelector<HTMLElement>(".version-popover-panel") || null;
+  const trigger = els().versionInfo as HTMLElement | null;
+  if (!modal || !panel || !trigger || !versionPopoverIsOpen()) return;
+  if (window.matchMedia("(max-width: 520px)").matches) {
+    panel.style.removeProperty("left");
+    panel.style.removeProperty("top");
+    panel.style.removeProperty("width");
+    return;
+  }
+  const margin = 12;
+  const gap = 12;
+  const triggerRect = trigger.getBoundingClientRect();
+  const viewportWidth = document.documentElement.clientWidth;
+  const viewportHeight = document.documentElement.clientHeight;
+  const preferredLeft = triggerRect.right + gap;
+  const availableRight = viewportWidth - preferredLeft - margin;
+  panel.style.removeProperty("width");
+  let panelRect = panel.getBoundingClientRect();
+  if (availableRight >= 300 && panelRect.width > availableRight) {
+    panel.style.width = `${Math.floor(availableRight)}px`;
+    panelRect = panel.getBoundingClientRect();
+  }
+  const fallbackLeft = triggerRect.left - panelRect.width - gap;
+  const left = preferredLeft + panelRect.width <= viewportWidth - margin
+    ? preferredLeft
+    : Math.max(margin, fallbackLeft);
+  const top = Math.min(
+    Math.max(margin, triggerRect.bottom - panelRect.height),
+    Math.max(margin, viewportHeight - panelRect.height - margin),
+  );
+  panel.style.left = `${Math.round(left)}px`;
+  panel.style.top = `${Math.round(top)}px`;
+}
+
+function scheduleVersionPopoverPosition(): void {
+  if (!versionPopoverIsOpen() || popoverPositionFrame) return;
+  popoverPositionFrame = window.requestAnimationFrame(positionVersionPopover);
+}
+
+function setModalHidden(hidden: boolean, restoreFocus = hidden): void {
   const modal = els().versionModal as HTMLElement | null;
   if (!modal) return;
+  const wasHidden = modal.classList.contains("hidden");
   modal.classList.toggle("hidden", hidden);
   modal.setAttribute("aria-hidden", hidden ? "true" : "false");
+  const versionInfo = els().versionInfo as HTMLButtonElement | null;
+  versionInfo?.setAttribute("aria-expanded", hidden ? "false" : "true");
+  if (!hidden) {
+    scheduleVersionPopoverPosition();
+  } else {
+    const panel = modal.querySelector<HTMLElement>(".version-popover-panel");
+    panel?.style.removeProperty("left");
+    panel?.style.removeProperty("top");
+    panel?.style.removeProperty("width");
+    if (!wasHidden && restoreFocus) versionInfo?.focus({ preventScroll: true });
+  }
+}
+
+function openVersionPopover(): void {
+  renderAppVersion();
+  setModalHidden(false, false);
+  window.requestAnimationFrame(() => {
+    positionVersionPopover();
+    (els().versionModalClose as HTMLButtonElement | null)?.focus({ preventScroll: true });
+  });
+}
+
+function renderReleaseHistory(): void {
+  const container = els().versionReleaseHistory as HTMLElement | null;
+  if (!container) return;
+  container.replaceChildren();
+  const releases = payload?.release_history || [];
+  if (!releases.length) {
+    const empty = document.createElement("p");
+    empty.className = "version-history-empty";
+    empty.textContent = payload ? translate("version.historyEmpty") : translate("version.loading");
+    container.appendChild(empty);
+    return;
+  }
+  releases.forEach((release) => {
+    const item = document.createElement("article");
+    item.className = "version-release-item";
+    const heading = document.createElement("div");
+    heading.className = "version-release-heading";
+    const title = document.createElement("strong");
+    title.textContent = release.version_label || release.version || "";
+    heading.appendChild(title);
+    if (release.version && release.version === payload?.current_version) {
+      const current = document.createElement("span");
+      current.className = "version-current-badge";
+      current.textContent = translate("version.currentBadge");
+      heading.appendChild(current);
+    }
+    if (release.released_at) {
+      const date = document.createElement("time");
+      date.dateTime = release.released_at;
+      date.textContent = formatTranslation("version.releaseDate", { date: release.released_at });
+      heading.appendChild(date);
+    }
+    item.appendChild(heading);
+    const changes = document.createElement("ul");
+    (release.change_ids || []).forEach((changeId) => {
+      const change = document.createElement("li");
+      change.textContent = translate(`version.change.${changeId}`);
+      changes.appendChild(change);
+    });
+    item.appendChild(changes);
+    container.appendChild(item);
+  });
 }
 
 function renderAppVersion(statusText?: string): void {
@@ -83,6 +204,7 @@ function renderAppVersion(statusText?: string): void {
   if (source) {
     source.textContent = runtimeSourceLabel(payload?.source);
   }
+  renderReleaseHistory();
   if (releaseLink) {
     releaseLink.href = payload?.release_url || "https://github.com/kadevin/ilab-gpt-conjure/releases";
   }
@@ -148,7 +270,7 @@ async function refreshAppVersion(): Promise<void> {
   renderAppVersion();
   if (payload?.post_update_onboarding && !onboardingAutoShown) {
     onboardingAutoShown = true;
-    setModalHidden(false);
+    openVersionPopover();
   }
 }
 
@@ -178,12 +300,12 @@ async function dismissOnboarding(closeModal: boolean): Promise<void> {
 }
 
 function bindAppVersionEvents(): void {
-  (els().versionInfo as HTMLElement | null)?.addEventListener("click", () => {
-    renderAppVersion();
-    setModalHidden(false);
+  (els().versionInfo as HTMLElement | null)?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    openVersionPopover();
   });
   (els().versionModalClose as HTMLElement | null)?.addEventListener("click", () => setModalHidden(true));
-  (els().versionModal as HTMLElement | null)?.addEventListener("click", (event) => {
+  (els().versionModal as HTMLElement | null)?.addEventListener("pointerdown", (event) => {
     if (event.target === els().versionModal) setModalHidden(true);
   });
   (els().versionUpdateButton as HTMLElement | null)?.addEventListener("click", () => {
@@ -199,9 +321,18 @@ function bindAppVersionEvents(): void {
     void dismissOnboarding(true);
   });
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") setModalHidden(true);
+    if (event.key !== "Escape" || !versionPopoverIsOpen()) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    setModalHidden(true);
+  }, true);
+  document.addEventListener("pointermove", scheduleVersionPopoverPosition);
+  window.addEventListener("resize", scheduleVersionPopoverPosition);
+  window.addEventListener("scroll", scheduleVersionPopoverPosition, true);
+  document.addEventListener(LOCALE_CHANGE_EVENT, () => {
+    renderAppVersion();
+    scheduleVersionPopoverPosition();
   });
-  document.addEventListener(LOCALE_CHANGE_EVENT, () => renderAppVersion());
 }
 
 export function initAppVersionFeature(): void {

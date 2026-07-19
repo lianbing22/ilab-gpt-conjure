@@ -113,7 +113,7 @@
         });
       })();
     </script>
-    <link rel="stylesheet" href="/static/styles.css?v=runtime-573" />
+    <link rel="stylesheet" href="/static/styles.css?v=runtime-574" />
   </head>
   <body>
     <div class="layout-container">
@@ -290,6 +290,8 @@
             class="version-info"
             type="button"
             aria-label="版本信息"
+            aria-controls="versionModal"
+            aria-expanded="false"
             title="版本信息"
             data-i18n-attr="aria-label:footer.versionInfo;title:footer.versionInfo"
           >
@@ -1262,8 +1264,8 @@
       </div>
     </div>
 
-    <div id="versionModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-hidden="true" aria-label="版本与更新" data-i18n-attr="aria-label:version.title">
-      <div class="modal-panel version-modal-panel">
+    <div id="versionModal" class="modal-overlay version-popover-layer hidden" role="dialog" aria-modal="false" aria-hidden="true" aria-label="版本与更新" data-i18n-attr="aria-label:version.title">
+      <div class="modal-panel version-modal-panel version-popover-panel" tabindex="-1">
         <div class="modal-heading">
           <div>
             <h2 data-i18n="version.title">版本与更新</h2>
@@ -1289,6 +1291,10 @@
             <strong id="versionSource">...</strong>
           </div>
         </div>
+        <section class="version-history" aria-labelledby="versionHistoryTitle">
+          <h3 id="versionHistoryTitle" data-i18n="version.historyTitle">更新记录</h3>
+          <div id="versionReleaseHistory" class="version-release-history" aria-live="polite"></div>
+        </section>
         <div id="versionOnboardingNotice" class="version-onboarding hidden" role="status">
           <strong data-i18n="version.onboardingTitle">0.5.5 新增标准应用包</strong>
           <p id="versionOnboardingBody" data-i18n="version.onboardingBody">这次更新新增了 macOS DMG 和 Windows App ZIP。新用户建议使用标准包；当前便携包仍可继续使用。</p>
@@ -1513,7 +1519,7 @@
     </div>
 
     <div id="taskNotificationToastRegion" class="task-notification-toast-region" aria-live="polite"></div>
-  <script src="/static/app.js?v=runtime-573"></script>
+  <script src="/static/app.js?v=runtime-574"></script>
     <script>
       (() => {
         document.querySelectorAll(".radio-group").forEach((group) => {

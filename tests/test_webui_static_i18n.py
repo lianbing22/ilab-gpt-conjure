@@ -7,6 +7,27 @@ from tests.webui_helpers import WebUIStaticTestCase
 
 
 class WebUIStaticI18nTests(WebUIStaticTestCase):
+    def test_release_history_copy_exists_in_every_locale(self) -> None:
+        required_keys = (
+            "version.historyTitle",
+            "version.historyEmpty",
+            "version.currentBadge",
+            "version.releaseDate",
+            "version.change.brand_templates",
+            "version.change.brand_preview",
+            "version.change.mobile_workspace",
+            "version.change.task_center",
+            "version.change.brand_launch",
+            "version.change.core_workflow",
+        )
+        locale_paths = sorted(Path("codex_image/webui/frontend/src/i18n").glob("*.ts"))
+        locale_paths = [path for path in locale_paths if path.name not in {"types.ts", "dictionaries.ts"}]
+        self.assertEqual(13, len(locale_paths))
+        for path in locale_paths:
+            source = path.read_text(encoding="utf-8")
+            for key in required_keys:
+                self.assertIn(f'"{key}"', source, f"{path.name} is missing {key}")
+
     def test_mixed_upload_copy_is_localized_in_every_locale(self) -> None:
         expected = {
             "zh-cn.ts": ("点击、拖入或粘贴图片与文件", "点击、拖入或粘贴图片与文件", "添加输入", "支持图片与 Responses 参考文件"),

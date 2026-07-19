@@ -22,12 +22,14 @@ export function initMobileWorkspaceFeature(): void {
   const topNav = document.querySelector<HTMLElement>(".top-nav");
   const notificationCenter = document.querySelector<HTMLElement>("#taskNotificationCenter");
   const sidebar = document.querySelector<HTMLElement>(".sidebar");
+  const brandActions = sidebar?.querySelector<HTMLElement>(".brand-actions");
   const sidebarFooter = sidebar?.querySelector<HTMLElement>(".sidebar-footer");
   const versionInfo = document.querySelector<HTMLElement>("#versionInfo");
   const navPlaceholder = document.createComment("mobile-nav-placeholder");
   const notificationPlaceholder = document.createComment("mobile-notification-placeholder");
   const versionPlaceholder = document.createComment("mobile-version-placeholder");
   const mobileQuery = window.matchMedia("(max-width: 520px)");
+  const compactShellQuery = window.matchMedia("(max-width: 1180px)");
 
   const setExpanded = (expanded: boolean): void => {
     outputPanel?.classList.toggle("mobile-settings-expanded", expanded);
@@ -88,6 +90,7 @@ export function initMobileWorkspaceFeature(): void {
       navActions.classList.add("mobile-drawer-tools");
       sidebar.appendChild(navActions);
       if (versionInfo && sidebarFooter) {
+        versionInfo.classList.remove("compact-header-version");
         if (versionInfo.parentNode === sidebarFooter) sidebarFooter.insertBefore(versionPlaceholder, versionInfo);
         navActions.appendChild(versionInfo);
       }
@@ -105,7 +108,12 @@ export function initMobileWorkspaceFeature(): void {
         notificationPlaceholder.parentNode.insertBefore(notificationCenter, notificationPlaceholder);
       }
     }
-    if (versionInfo && versionPlaceholder.parentNode) {
+    if (versionInfo && compactShellQuery.matches && brandActions) {
+      if (versionInfo.parentNode === sidebarFooter) sidebarFooter?.insertBefore(versionPlaceholder, versionInfo);
+      versionInfo.classList.add("compact-header-version");
+      brandActions.insertBefore(versionInfo, brandActions.firstChild);
+    } else if (versionInfo && versionPlaceholder.parentNode) {
+      versionInfo.classList.remove("compact-header-version");
       versionPlaceholder.parentNode.insertBefore(versionInfo, versionPlaceholder);
     }
   };
@@ -142,6 +150,7 @@ export function initMobileWorkspaceFeature(): void {
     subtree: true,
   });
   mobileQuery.addEventListener("change", syncMobileLayout);
+  compactShellQuery.addEventListener("change", syncMobileLayout);
   syncSummary();
   syncMaterialSummary();
   syncPreviewState();

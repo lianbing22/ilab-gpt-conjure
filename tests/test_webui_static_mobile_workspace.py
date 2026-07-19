@@ -98,8 +98,14 @@ def test_mobile_workspace_relocates_version_info_and_history_entry_contract() ->
     assert 'sidebar-history-icon' in html
     assert 'mobile-version-placeholder' in source
     assert 'sidebarFooter' in source
+    assert 'brandActions' in source
+    assert 'const compactShellQuery = window.matchMedia("(max-width: 1180px)")' in source
+    assert 'if (versionInfo && compactShellQuery.matches && brandActions)' in source
+    assert 'brandActions.insertBefore(versionInfo, brandActions.firstChild)' in source
+    assert 'versionInfo.classList.add("compact-header-version")' in source
     assert 'navActions.appendChild(versionInfo)' in source
     assert 'versionPlaceholder.parentNode.insertBefore(versionInfo, versionPlaceholder)' in source
+    assert 'compactShellQuery.addEventListener("change", syncMobileLayout)' in source
 
 
 def test_mobile_queue_badge_and_closed_drawer_label_contract() -> None:
