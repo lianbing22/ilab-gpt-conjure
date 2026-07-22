@@ -162,7 +162,7 @@ function persistLocalePreference(): void {
 }
 
 export function restoreLocalePreference(): void {
-  const fallback = readLocalLocalePreference() || detectPreferredLocale();
+  const fallback = readLocalLocalePreference() || DEFAULT_LOCALE;
   setLocale(fallback, { persist: false });
   void readStoredLocalePreference()
     .then((storedLocale) => {

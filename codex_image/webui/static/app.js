@@ -13431,17 +13431,6 @@
     if (language.startsWith("hi")) return "hi";
     return null;
   }
-  function detectPreferredLocale(languages) {
-    const candidates = languages && languages.length ? languages : [
-      ...Array.from(navigator.languages || []),
-      navigator.language
-    ];
-    for (const language of candidates) {
-      const locale = localeFromLanguageTag(language);
-      if (locale) return locale;
-    }
-    return DEFAULT_LOCALE;
-  }
   function translate(key, locale = currentLocale) {
     return DICTIONARIES[locale]?.[key] ?? DICTIONARIES[DEFAULT_LOCALE][key] ?? key;
   }
@@ -13523,7 +13512,7 @@
     });
   }
   function restoreLocalePreference() {
-    const fallback = readLocalLocalePreference() || detectPreferredLocale();
+    const fallback = readLocalLocalePreference() || DEFAULT_LOCALE;
     setLocale(fallback, { persist: false });
     void readStoredLocalePreference().then((storedLocale) => {
       setLocale(storedLocale || fallback);

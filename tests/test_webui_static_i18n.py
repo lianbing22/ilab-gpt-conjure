@@ -116,18 +116,18 @@ class WebUIStaticI18nTests(WebUIStaticTestCase):
             source = (locale_dir / filename).read_text(encoding="utf-8")
             self.assertIn(f'"referenceFiles.familyDocument": "{translation}"', source)
 
-    def test_language_bootstrap_detects_browser_language_and_settings_select_replaces_top_nav(self) -> None:
+    def test_language_bootstrap_defaults_to_simplified_chinese_and_settings_select_replaces_top_nav(self) -> None:
         html = Path("codex_image/webui/static/index.html").read_text(encoding="utf-8")
         nav_actions = html[html.index('<div class="nav-actions">'):html.index('<div id="taskNotificationCenter"')]
         language_panel = html[html.index('<section id="systemSettingsLanguagePanel"'):html.index('</section>', html.index('<section id="systemSettingsLanguagePanel"'))]
 
         self.assertIn('const LOCALE_STORAGE_KEY = "codex-image-locale-preference";', html)
-        self.assertIn("function detectPreferredLocale", html)
         self.assertIn("async function readStoredLocalePreference", html)
         self.assertIn("function persistLocalePreference", html)
         self.assertIn('fetch("/api/settings")', html)
         self.assertIn('body: JSON.stringify({ locale: currentLocale })', html)
-        self.assertIn("navigator.languages", html)
+        self.assertIn("let locale = readLocalLocalePreference() || defaultLocale;", html)
+        self.assertNotIn("navigator.languages", html)
         self.assertIn('const valid = new Set(["zh-CN", "zh-TW", "zh-HK", "ja", "ko", "en", "es", "pt", "fr", "de", "ru", "it", "hi"]);', html)
         self.assertRegex(html, r"document\.documentElement\.lang = currentLocale;")
         self.assertRegex(html, r"document\.documentElement\.dataset\.locale = currentLocale;")
@@ -216,6 +216,7 @@ class WebUIStaticI18nTests(WebUIStaticTestCase):
         self.assertIn('const LOCALE_STORAGE_KEY = "codex-image-locale-preference";', source)
         self.assertIn('import { DEFAULT_LOCALE, DICTIONARIES, LOCALES } from "./i18n/dictionaries";', source)
         self.assertIn("export function detectPreferredLocale", source)
+        self.assertIn("const fallback = readLocalLocalePreference() || DEFAULT_LOCALE;", source)
         self.assertIn("async function readStoredLocalePreference", source)
         self.assertIn("function persistLocalePreference", source)
         self.assertIn('fetch("/api/settings")', source)

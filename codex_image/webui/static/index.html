@@ -52,16 +52,6 @@
           if (language.startsWith("hi")) return "hi";
           return null;
         }
-        function detectPreferredLocale(languages) {
-          const candidates = languages && languages.length
-            ? languages
-            : [...Array.from(navigator.languages || []), navigator.language];
-          for (const candidate of candidates) {
-            const locale = normalizeLocale(candidate);
-            if (locale) return locale;
-          }
-          return defaultLocale;
-        }
         function readLocalLocalePreference() {
           try {
             return normalizeLocale(localStorage.getItem(LOCALE_STORAGE_KEY));
@@ -99,12 +89,12 @@
             body: JSON.stringify({ locale: currentLocale })
           }).catch(() => {});
         }
-        let locale = readLocalLocalePreference() || detectPreferredLocale();
+        let locale = readLocalLocalePreference() || defaultLocale;
         try {
           const stored = localStorage.getItem(LOCALE_STORAGE_KEY);
           locale = normalizeLocale(stored) || locale;
         } catch {
-          locale = detectPreferredLocale();
+          locale = defaultLocale;
         }
         applyLocale(locale);
         void readStoredLocalePreference().then((storedLocale) => {
