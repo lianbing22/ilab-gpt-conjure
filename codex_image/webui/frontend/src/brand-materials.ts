@@ -95,13 +95,23 @@ function templateSupportsLayer(template: any, layer: BrandLayer): boolean {
   return hasAssets && hasPlacements;
 }
 
-function sloganMaterialSignature(template: any): string {
+function layerMaterialSignature(template: any, layer: BrandLayer): string {
   const variants = template?.recipe?.asset_variants || {};
   return [
-    String(variants?.["light-assets"]?.slogan || ""),
-    String(variants?.["dark-assets"]?.slogan || ""),
-    placementSignature(template, "slogan"),
+    String(variants?.["light-assets"]?.[layer] || ""),
+    String(variants?.["dark-assets"]?.[layer] || ""),
+    placementSignature(template, layer),
   ].join("|");
+}
+
+function materialOptionName(layer: BrandLayer, template: any, signature: string): string {
+  if (layer === "logo") return String(template.name || template.template_id || "");
+  const duplicateCount = templates().filter((candidate) => (
+    templateSupportsLayer(candidate, layer) && layerMaterialSignature(candidate, layer) === signature
+  )).length;
+  return duplicateCount > 1
+    ? translate("brand.sloganMaterialName")
+    : String(template.name || template.template_id || translate("brand.sloganMaterialName"));
 }
 
 function layerOptions(layer: BrandLayer): BrandMaterialOption[] {
@@ -111,14 +121,12 @@ function layerOptions(layer: BrandLayer): BrandMaterialOption[] {
     const templateId = String(template.template_id || "");
     if (!templateId || !templateSupportsLayer(template, layer)) continue;
     const previewId = previewAssetId(template, layer);
-    if (layer === "slogan") {
-      const key = sloganMaterialSignature(template);
-      if (seen.has(key)) continue;
-      seen.add(key);
-    }
+    const key = layerMaterialSignature(template, layer);
+    if (seen.has(key)) continue;
+    seen.add(key);
     options.push({
       template_id: templateId,
-      name: layer === "slogan" ? translate("brand.sloganMaterialName") : String(template.name || templateId),
+      name: materialOptionName(layer, template, key),
       preview_id: previewId,
       layer,
     });
@@ -133,13 +141,13 @@ function firstTemplateId(layer: BrandLayer): string {
 function canonicalTemplateId(layer: BrandLayer, templateId: string): string {
   const options = layerOptions(layer);
   if (options.some((option) => option.template_id === templateId)) return templateId;
-  if (layer !== "slogan" || !templateId) return "";
+  if (!templateId) return "";
   const source = templates().find((template) => String(template?.template_id || "") === templateId);
   if (!source) return "";
-  const signature = sloganMaterialSignature(source);
+  const signature = layerMaterialSignature(source, layer);
   const canonical = options.find((option) => {
     const template = templates().find((item) => String(item?.template_id || "") === option.template_id);
-    return template && sloganMaterialSignature(template) === signature;
+    return template && layerMaterialSignature(template, layer) === signature;
   });
   return canonical?.template_id || "";
 }
@@ -147,6 +155,14 @@ function canonicalTemplateId(layer: BrandLayer, templateId: string): string {
 function findOption(layer: BrandLayer, templateId: string): BrandMaterialOption | null {
   const canonicalId = canonicalTemplateId(layer, templateId);
   return layerOptions(layer).find((option) => option.template_id === canonicalId) || null;
+}
+
+export function brandMaterialName(layer: BrandLayer, templateId: string): string {
+  const option = findOption(layer, templateId);
+  if (option?.name) return option.name;
+  const template = templates().find((item) => String(item?.template_id || "") === templateId);
+  if (layer === "slogan") return translate("brand.sloganMaterialName");
+  return String(template?.name || templateId);
 }
 
 function layerLabel(layer: BrandLayer): string {

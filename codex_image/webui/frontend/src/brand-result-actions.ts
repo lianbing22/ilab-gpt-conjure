@@ -19,6 +19,7 @@
 
 import { getLegacyBridge } from "./state";
 import { translate } from "./i18n";
+import { brandMaterialName } from "./brand-materials";
 
 const bridge = getLegacyBridge();
 const state = bridge.state;
@@ -71,11 +72,6 @@ function brandingBadgeForTask(task: any): string {
   return "";
 }
 
-function templateName(templateId: string): string {
-  const template = (state.brandTemplates || []).find((item: any) => String(item?.template_id || "") === templateId);
-  return String(template?.name || templateId);
-}
-
 function layerTemplateId(source: any, layer: "logo" | "slogan"): string {
   return String(source?.layers?.[layer]?.template_id || "");
 }
@@ -94,8 +90,8 @@ function brandingLayerSummaryForTask(task: any, resultBranding?: any): string {
   const appliedLogoId = logoId || (!logoId && !sloganId ? legacyId : "");
   const appliedSloganId = sloganId || (!logoId && !sloganId ? legacyId : "");
   const parts = [];
-  if (appliedLogoId) parts.push(`${templateName(appliedLogoId)} Logo`);
-  if (appliedSloganId) parts.push(t("brand.sloganMaterialName", "品牌口号与业务落款"));
+  if (appliedLogoId) parts.push(`${brandMaterialName("logo", appliedLogoId)} Logo`);
+  if (appliedSloganId) parts.push(brandMaterialName("slogan", appliedSloganId));
   return parts.join(" · ");
 }
 

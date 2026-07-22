@@ -43562,10 +43562,399 @@ ${galleryText}`;
     });
   }
 
+  // codex_image/webui/frontend/src/brand-materials.ts
+  var state29 = getLegacyBridge().state;
+  var els38 = getLegacyBridge().els;
+  var BRAND_LAYERS = ["logo", "slogan"];
+  var BRAND_LAYOUTS = ["square", "portrait", "landscape"];
+  var BRAND_TONES = ["light-assets", "dark-assets"];
+  var brandMaterialsInitialized = false;
+  var activeDrawerLayer = "logo";
+  var draftTemplateId = "";
+  var drawerQuery = "";
+  var lastDrawerTrigger = null;
+  var themeObserver = null;
+  function legacyMethod41(name, ...args) {
+    return getLegacyBridge().methods[name]?.(...args);
+  }
+  function escapeHtml20(value) {
+    return legacyMethod41("escapeHtml", value) || "";
+  }
+  function templates() {
+    return Array.isArray(state29.brandTemplates) ? state29.brandTemplates : [];
+  }
+  function layerEnabled(layer) {
+    return layer === "logo" ? Boolean(state29.brandingLogoEnabled) : Boolean(state29.brandingSloganEnabled);
+  }
+  function setLayerEnabled(layer, enabled) {
+    if (layer === "logo") {
+      state29.brandingLogoEnabled = enabled;
+    } else {
+      state29.brandingSloganEnabled = enabled;
+    }
+  }
+  function selectedTemplateId(layer) {
+    return layer === "logo" ? String(state29.selectedBrandingLogoTemplateId || "") : String(state29.selectedBrandingSloganTemplateId || "");
+  }
+  function setSelectedTemplateId(layer, templateId) {
+    if (layer === "logo") {
+      state29.selectedBrandingLogoTemplateId = templateId;
+    } else {
+      state29.selectedBrandingSloganTemplateId = templateId;
+    }
+    state29.selectedBrandingTemplateId = state29.selectedBrandingLogoTemplateId || state29.selectedBrandingSloganTemplateId || "";
+  }
+  function effectivePreviewTone() {
+    return document.documentElement.dataset.theme === "dark" ? "light-assets" : "dark-assets";
+  }
+  function previewAssetId(template, layer) {
+    const variants = template?.recipe?.asset_variants || {};
+    return String(variants?.[effectivePreviewTone()]?.[layer] || variants?.["dark-assets"]?.[layer] || variants?.["light-assets"]?.[layer] || "");
+  }
+  function placementSignature(template, layer) {
+    const placements = template?.recipe?.placements || {};
+    const layerPlacements = {};
+    Object.keys(placements).sort().forEach((layout) => {
+      const cfg = placements?.[layout]?.[layer];
+      if (cfg) layerPlacements[layout] = cfg;
+    });
+    return JSON.stringify(layerPlacements);
+  }
+  function templateSupportsLayer(template, layer) {
+    const recipe = template?.recipe || {};
+    const variants = recipe.asset_variants || {};
+    const placements = recipe.placements || {};
+    const hasAssets = BRAND_TONES.every((tone) => String(variants?.[tone]?.[layer] || "").trim());
+    const hasPlacements = BRAND_LAYOUTS.every((layout) => {
+      const placement = placements?.[layout]?.[layer];
+      return placement && Number(placement.width_ratio || 0) > 0;
+    });
+    return hasAssets && hasPlacements;
+  }
+  function layerMaterialSignature(template, layer) {
+    const variants = template?.recipe?.asset_variants || {};
+    return [
+      String(variants?.["light-assets"]?.[layer] || ""),
+      String(variants?.["dark-assets"]?.[layer] || ""),
+      placementSignature(template, layer)
+    ].join("|");
+  }
+  function materialOptionName(layer, template, signature) {
+    if (layer === "logo") return String(template.name || template.template_id || "");
+    const duplicateCount = templates().filter((candidate) => templateSupportsLayer(candidate, layer) && layerMaterialSignature(candidate, layer) === signature).length;
+    return duplicateCount > 1 ? translate("brand.sloganMaterialName") : String(template.name || template.template_id || translate("brand.sloganMaterialName"));
+  }
+  function layerOptions(layer) {
+    const seen = /* @__PURE__ */ new Set();
+    const options = [];
+    for (const template of templates()) {
+      const templateId = String(template.template_id || "");
+      if (!templateId || !templateSupportsLayer(template, layer)) continue;
+      const previewId = previewAssetId(template, layer);
+      const key = layerMaterialSignature(template, layer);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      options.push({
+        template_id: templateId,
+        name: materialOptionName(layer, template, key),
+        preview_id: previewId,
+        layer
+      });
+    }
+    return options;
+  }
+  function firstTemplateId(layer) {
+    return layerOptions(layer)[0]?.template_id || "";
+  }
+  function canonicalTemplateId(layer, templateId) {
+    const options = layerOptions(layer);
+    if (options.some((option) => option.template_id === templateId)) return templateId;
+    if (!templateId) return "";
+    const source = templates().find((template) => String(template?.template_id || "") === templateId);
+    if (!source) return "";
+    const signature = layerMaterialSignature(source, layer);
+    const canonical = options.find((option) => {
+      const template = templates().find((item) => String(item?.template_id || "") === option.template_id);
+      return template && layerMaterialSignature(template, layer) === signature;
+    });
+    return canonical?.template_id || "";
+  }
+  function findOption(layer, templateId) {
+    const canonicalId = canonicalTemplateId(layer, templateId);
+    return layerOptions(layer).find((option) => option.template_id === canonicalId) || null;
+  }
+  function brandMaterialName(layer, templateId) {
+    const option = findOption(layer, templateId);
+    if (option?.name) return option.name;
+    const template = templates().find((item) => String(item?.template_id || "") === templateId);
+    if (layer === "slogan") return translate("brand.sloganMaterialName");
+    return String(template?.name || templateId);
+  }
+  function layerLabel(layer) {
+    return translate(layer === "logo" ? "brand.logoLayer" : "brand.sloganLayer");
+  }
+  function layerHint(layer) {
+    return translate(layer === "logo" ? "brand.logoHint" : "brand.sloganHint");
+  }
+  function previewHtml(option, large = false) {
+    if (!option?.preview_id) {
+      return `<span class="brand-material-none-mark" aria-hidden="true">-</span>`;
+    }
+    const sizeClass = large ? " brand-material-drawer-preview" : "";
+    return `<span class="brand-material-preview${sizeClass}"><img src="/api/brand/assets/${encodeURIComponent(option.preview_id)}/image" alt="" loading="lazy" decoding="async"></span>`;
+  }
+  function layerRowHtml(layer) {
+    const enabled = layerEnabled(layer);
+    const selected = findOption(layer, selectedTemplateId(layer));
+    const currentName = selected?.name || translate("brand.notSelected");
+    const statusKey = enabled ? "brand.enabled" : "brand.disabled";
+    const drawerExpanded = activeDrawerLayer === layer && Boolean(els38.brandMaterialDrawer?.classList.contains("open"));
+    return `
+    <div class="brand-material-row" role="listitem" data-brand-layer="${layer}">
+      <button class="brand-material-toggle" type="button" role="switch"
+        aria-checked="${enabled ? "true" : "false"}"
+        aria-label="${escapeHtml20(layerLabel(layer))}"
+        data-brand-layer-toggle="${layer}">
+        <span class="brand-material-switch-knob" aria-hidden="true"></span>
+      </button>
+      <button class="brand-material-select-row" type="button"
+        data-brand-layer-open="${layer}"
+        aria-controls="brandMaterialDrawer"
+        aria-expanded="${drawerExpanded ? "true" : "false"}"
+        aria-label="${escapeHtml20(`${layerLabel(layer)} ${currentName}`)}">
+        ${previewHtml(selected)}
+        <span class="brand-material-row-copy">
+          <strong>${escapeHtml20(layerLabel(layer))}</strong>
+          <span>${escapeHtml20(currentName)}</span>
+        </span>
+        <span class="brand-material-row-state">${escapeHtml20(translate(statusKey))}</span>
+        <span class="brand-material-arrow" aria-hidden="true">></span>
+      </button>
+    </div>
+  `;
+  }
+  function normalizeBrandLayerSelections2() {
+    if (!state29.brandTemplatesLoaded) return;
+    for (const layer of BRAND_LAYERS) {
+      const selected = selectedTemplateId(layer);
+      const canonicalId = canonicalTemplateId(layer, selected);
+      if (canonicalId) {
+        setSelectedTemplateId(layer, canonicalId);
+      } else if (selected) {
+        setSelectedTemplateId(layer, "");
+        setLayerEnabled(layer, false);
+      }
+    }
+  }
+  function renderBrandMaterials2() {
+    if (!els38.brandMaterialPicker || !els38.brandMaterialList) return;
+    const hasTemplates = templates().length > 0;
+    els38.brandMaterialPicker.classList.toggle("hidden", !hasTemplates);
+    if (!hasTemplates) {
+      els38.brandMaterialList.replaceChildren();
+      renderBrandMaterialDrawer();
+      return;
+    }
+    normalizeBrandLayerSelections2();
+    els38.brandMaterialList.innerHTML = BRAND_LAYERS.map(layerRowHtml).join("");
+    renderBrandMaterialDrawer();
+  }
+  function filteredDrawerOptions() {
+    const query = drawerQuery.trim().toLocaleLowerCase();
+    const options = layerOptions(activeDrawerLayer);
+    if (!query) return options;
+    return options.filter((option) => String(option.name || "").toLocaleLowerCase().includes(query));
+  }
+  function drawerOptionHtml(option) {
+    const selected = option.template_id === draftTemplateId;
+    return `
+    <button class="brand-material-drawer-option${selected ? " active" : ""}" type="button"
+      role="radio" aria-checked="${selected ? "true" : "false"}"
+      data-brand-drawer-template-id="${escapeHtml20(option.template_id)}">
+      <span class="brand-material-drawer-visual">${previewHtml(option, true)}</span>
+      <span class="brand-material-drawer-copy">
+        <strong>${escapeHtml20(option.name)}</strong>
+        <span>${selected ? escapeHtml20(translate("brand.selected")) : escapeHtml20(translate("brand.clickToSelect"))}</span>
+      </span>
+      <span class="brand-material-drawer-check" aria-hidden="true">\u2713</span>
+    </button>
+  `;
+  }
+  function renderBrandMaterialDrawer() {
+    if (!els38.brandMaterialDrawerList) return;
+    const options = filteredDrawerOptions();
+    els38.brandMaterialDrawerList.innerHTML = options.map(drawerOptionHtml).join("");
+    els38.brandMaterialDrawerEmpty?.classList.toggle("hidden", options.length > 0);
+    if (els38.brandMaterialDrawerTitle) {
+      els38.brandMaterialDrawerTitle.textContent = layerLabel(activeDrawerLayer);
+    }
+    if (els38.brandMaterialDrawerSummary) {
+      els38.brandMaterialDrawerSummary.textContent = layerHint(activeDrawerLayer);
+    }
+    if (els38.brandMaterialFilterLabel) {
+      els38.brandMaterialFilterLabel.textContent = layerLabel(activeDrawerLayer);
+    }
+    if (els38.brandMaterialDrawerConfirm) {
+      const selected = findOption(activeDrawerLayer, draftTemplateId);
+      els38.brandMaterialDrawerConfirm.textContent = selected?.template_id ? `${translate("brand.confirmUse")} ${selected.name}` : translate("brand.confirmNone");
+    }
+  }
+  function ensureLayerSelection(layer) {
+    const selected = selectedTemplateId(layer);
+    setSelectedTemplateId(layer, canonicalTemplateId(layer, selected) || firstTemplateId(layer));
+  }
+  function selectBrandLayerTemplate(layer, templateId) {
+    const cleanId = String(templateId || "");
+    setSelectedTemplateId(layer, canonicalTemplateId(layer, cleanId));
+    renderBrandMaterials2();
+    legacyMethod41("updateRequestPreview");
+  }
+  function setBrandLayerEnabled(layer, enabled) {
+    setLayerEnabled(layer, enabled);
+    if (enabled) ensureLayerSelection(layer);
+    renderBrandMaterials2();
+    legacyMethod41("updateRequestPreview");
+  }
+  function layerOpenButton(layer) {
+    return els38.brandMaterialList?.querySelector?.(`[data-brand-layer-open="${layer}"]`);
+  }
+  function setLayerOpenButtonExpanded(layer, expanded) {
+    layerOpenButton(layer)?.setAttribute("aria-expanded", String(expanded));
+  }
+  function openBrandMaterialDrawer(trigger, layer = "logo") {
+    legacyMethod41("closePromptTemplateDrawer", { restoreFocus: false });
+    legacyMethod41("closeGallery", { restoreFocus: false });
+    setLayerOpenButtonExpanded(activeDrawerLayer, false);
+    activeDrawerLayer = layer;
+    draftTemplateId = selectedTemplateId(layer) || firstTemplateId(layer);
+    drawerQuery = "";
+    lastDrawerTrigger = trigger || (document.activeElement instanceof HTMLElement ? document.activeElement : null);
+    if (els38.brandMaterialSearch) els38.brandMaterialSearch.value = "";
+    renderBrandMaterialDrawer();
+    els38.brandMaterialDrawer?.classList.add("open");
+    els38.brandMaterialDrawer?.setAttribute("aria-hidden", "false");
+    els38.brandMaterialDrawerBackdrop?.classList.remove("hidden");
+    setLayerOpenButtonExpanded(activeDrawerLayer, true);
+    document.body.classList.add("brand-material-drawer-open");
+    window.setTimeout(() => els38.brandMaterialSearch?.focus?.({ preventScroll: true }), 0);
+  }
+  function closeBrandMaterialDrawer(options = {}) {
+    const restoreFocus = options.restoreFocus !== false;
+    els38.brandMaterialDrawer?.classList.remove("open");
+    els38.brandMaterialDrawer?.setAttribute("aria-hidden", "true");
+    els38.brandMaterialDrawerBackdrop?.classList.add("hidden");
+    setLayerOpenButtonExpanded(activeDrawerLayer, false);
+    document.body.classList.remove("brand-material-drawer-open");
+    draftTemplateId = selectedTemplateId(activeDrawerLayer);
+    if (restoreFocus) {
+      const currentTrigger = layerOpenButton(activeDrawerLayer);
+      (currentTrigger || (lastDrawerTrigger?.isConnected ? lastDrawerTrigger : null) || els38.brandMaterialOpenButton)?.focus?.({ preventScroll: true });
+    }
+  }
+  function confirmBrandMaterialDrawer() {
+    selectBrandLayerTemplate(activeDrawerLayer, draftTemplateId);
+    closeBrandMaterialDrawer();
+  }
+  async function refreshBrandTemplates() {
+    try {
+      const response = await fetch("/api/brand/templates");
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.detail || "brand_templates_load_failed");
+      state29.brandTemplates = Array.isArray(data.templates) ? data.templates : [];
+    } catch {
+      state29.brandTemplates = [];
+    }
+    state29.brandTemplatesLoaded = true;
+    normalizeBrandLayerSelections2();
+    draftTemplateId = selectedTemplateId(activeDrawerLayer);
+    renderBrandMaterials2();
+  }
+  function handleBrandMaterialClick(event) {
+    const target = event.target instanceof Element ? event.target : null;
+    const toggle = target?.closest("[data-brand-layer-toggle]");
+    if (toggle) {
+      const layer2 = toggle.dataset.brandLayerToggle;
+      setBrandLayerEnabled(layer2, !layerEnabled(layer2));
+      return;
+    }
+    const opener = target?.closest("[data-brand-layer-open]");
+    if (!opener) return;
+    const layer = opener.dataset.brandLayerOpen;
+    openBrandMaterialDrawer(opener, layer);
+  }
+  function handleDrawerMaterialClick(event) {
+    const target = event.target instanceof Element ? event.target : null;
+    const button = target?.closest("[data-brand-drawer-template-id]");
+    if (!button) return;
+    draftTemplateId = String(button.dataset.brandDrawerTemplateId || "");
+    renderBrandMaterialDrawer();
+  }
+  function handleDrawerSearch(event) {
+    drawerQuery = event.target instanceof HTMLInputElement ? event.target.value : "";
+    renderBrandMaterialDrawer();
+  }
+  function handleDrawerKeydown(event) {
+    const drawer = els38.brandMaterialDrawer;
+    if (!drawer?.classList.contains("open")) return;
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeBrandMaterialDrawer();
+      return;
+    }
+    if (event.key !== "Tab") return;
+    const focusable = Array.from(
+      drawer.querySelectorAll("button:not(:disabled), input:not(:disabled), [tabindex]:not([tabindex='-1'])")
+    ).filter((node) => !node.hidden && node.offsetParent !== null);
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last?.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first?.focus();
+    }
+  }
+  function initBrandMaterialsFeature() {
+    if (brandMaterialsInitialized) return;
+    brandMaterialsInitialized = true;
+    els38.brandMaterialList?.addEventListener("click", handleBrandMaterialClick);
+    els38.brandMaterialOpenButton?.addEventListener("click", (event) => openBrandMaterialDrawer(event.currentTarget, "logo"));
+    els38.brandMaterialDrawerList?.addEventListener("click", handleDrawerMaterialClick);
+    els38.brandMaterialDrawerClose?.addEventListener("click", () => closeBrandMaterialDrawer());
+    els38.brandMaterialDrawerCancel?.addEventListener("click", () => closeBrandMaterialDrawer());
+    els38.brandMaterialDrawerConfirm?.addEventListener("click", confirmBrandMaterialDrawer);
+    els38.brandMaterialDrawerBackdrop?.addEventListener("click", () => closeBrandMaterialDrawer());
+    els38.brandMaterialSearch?.addEventListener("input", handleDrawerSearch);
+    document.addEventListener("keydown", handleDrawerKeydown);
+    document.addEventListener(LOCALE_CHANGE_EVENT, renderBrandMaterials2);
+    themeObserver = new MutationObserver(renderBrandMaterials2);
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    Object.assign(getLegacyBridge().methods, {
+      refreshBrandTemplates,
+      renderBrandMaterials: renderBrandMaterials2,
+      normalizeBrandLayerSelections: normalizeBrandLayerSelections2,
+      selectBrandTemplate: (templateId) => {
+        for (const layer of BRAND_LAYERS) {
+          setSelectedTemplateId(layer, String(templateId || ""));
+          setLayerEnabled(layer, Boolean(templateId));
+        }
+        renderBrandMaterials2();
+        legacyMethod41("updateRequestPreview");
+      },
+      selectBrandLayerTemplate,
+      setBrandLayerEnabled,
+      openBrandMaterialDrawer,
+      closeBrandMaterialDrawer,
+      confirmBrandMaterialDrawer
+    });
+  }
+
   // codex_image/webui/frontend/src/brand-result-actions.ts
   var bridge35 = getLegacyBridge();
-  var state29 = bridge35.state;
-  var els38 = bridge35.els;
+  var state30 = bridge35.state;
+  var els39 = bridge35.els;
   var observer = null;
   var bound = false;
   function t(key, fallback) {
@@ -43573,12 +43962,12 @@ ${galleryText}`;
     return value && value !== key ? value : fallback;
   }
   function brandingForCard(card) {
-    const taskId = card.dataset.previewTaskId || state29.previewTask?.task_id || "";
+    const taskId = card.dataset.previewTaskId || state30.previewTask?.task_id || "";
     const outputUrl = String(card.dataset.previewOutputUrl || "");
     if (!taskId || !outputUrl) return null;
-    const previewTask = state29.previewTask;
+    const previewTask = state30.previewTask;
     const previewHasDetails = String(previewTask?.task_id || "") === String(taskId) && Array.isArray(previewTask?.outputs);
-    const task = (previewHasDetails ? previewTask : null) || (state29.tasks || []).find((item) => String(item.task_id) === String(taskId));
+    const task = (previewHasDetails ? previewTask : null) || (state30.tasks || []).find((item) => String(item.task_id) === String(taskId));
     if (!task || !Array.isArray(task.outputs)) return null;
     const byUrl = task.outputs.find((o) => o && (o.url === outputUrl || `/outputs/${o.file}` === outputUrl || o?.branding?.url === outputUrl || `/outputs/${o?.branding?.file || ""}` === outputUrl));
     const output = byUrl || task.outputs.find((o, i) => previewSlotIndex(card) === i);
@@ -43587,7 +43976,7 @@ ${galleryText}`;
     return { index: Number(output.index) || previewSlotIndex(card) + 1, branding: output.branding, rawUrl, task };
   }
   function previewSlotIndex(card) {
-    const siblings = Array.from(els38.previewGrid?.querySelectorAll(".preview-card[data-preview-card-key]") || []);
+    const siblings = Array.from(els39.previewGrid?.querySelectorAll(".preview-card[data-preview-card-key]") || []);
     return Math.max(0, siblings.indexOf(card));
   }
   function brandingBadgeForTask(task) {
@@ -43599,10 +43988,6 @@ ${galleryText}`;
       return `<span class="brand-badge brand-badge-failed">${t("brand.failed", "\u54C1\u724C\u5408\u6210\u5931\u8D25")}</span>`;
     }
     return "";
-  }
-  function templateName(templateId) {
-    const template = (state29.brandTemplates || []).find((item) => String(item?.template_id || "") === templateId);
-    return String(template?.name || templateId);
   }
   function layerTemplateId(source, layer) {
     return String(source?.layers?.[layer]?.template_id || "");
@@ -43617,15 +44002,15 @@ ${galleryText}`;
     const appliedLogoId = logoId || (!logoId && !sloganId ? legacyId : "");
     const appliedSloganId = sloganId || (!logoId && !sloganId ? legacyId : "");
     const parts = [];
-    if (appliedLogoId) parts.push(`${templateName(appliedLogoId)} Logo`);
-    if (appliedSloganId) parts.push(t("brand.sloganMaterialName", "\u54C1\u724C\u53E3\u53F7\u4E0E\u4E1A\u52A1\u843D\u6B3E"));
+    if (appliedLogoId) parts.push(`${brandMaterialName("logo", appliedLogoId)} Logo`);
+    if (appliedSloganId) parts.push(brandMaterialName("slogan", appliedSloganId));
     return parts.join(" \xB7 ");
   }
   function applyBrandCardDecoration(card) {
     const old = card.querySelector(".brand-card-actions");
     if (old) old.remove();
     const result = brandingForCard(card);
-    const task = result?.task || state29.previewTask;
+    const task = result?.task || state30.previewTask;
     const badge = brandingBadgeForTask(task);
     const brandingEnabled = !!task?.branding_status && task.branding_status !== "disabled";
     if (!result && !brandingEnabled) return;
@@ -43710,401 +44095,22 @@ ${galleryText}`;
     }
   }
   function decorateAllCards() {
-    if (!els38.previewGrid) return;
+    if (!els39.previewGrid) return;
     if (decorateAllCardsPending) return;
     decorateAllCardsPending = true;
     window.requestAnimationFrame(() => {
       decorateAllCardsPending = false;
-      const cards = els38.previewGrid.querySelectorAll(".preview-card[data-preview-card-key]");
+      const cards = els39.previewGrid.querySelectorAll(".preview-card[data-preview-card-key]");
       cards.forEach(applyBrandCardDecoration);
     });
   }
   var decorateAllCardsPending = false;
   function initBrandResultActionsFeature() {
-    if (bound || !els38.previewGrid) return;
+    if (bound || !els39.previewGrid) return;
     bound = true;
     observer = new MutationObserver(() => decorateAllCards());
-    observer.observe(els38.previewGrid, { childList: true, subtree: false, attributes: true, attributeFilter: ["data-preview-output-url"] });
+    observer.observe(els39.previewGrid, { childList: true, subtree: false, attributes: true, attributeFilter: ["data-preview-output-url"] });
     decorateAllCards();
-  }
-
-  // codex_image/webui/frontend/src/brand-materials.ts
-  var state30 = getLegacyBridge().state;
-  var els39 = getLegacyBridge().els;
-  var BRAND_LAYERS = ["logo", "slogan"];
-  var BRAND_LAYOUTS = ["square", "portrait", "landscape"];
-  var BRAND_TONES = ["light-assets", "dark-assets"];
-  var brandMaterialsInitialized = false;
-  var activeDrawerLayer = "logo";
-  var draftTemplateId = "";
-  var drawerQuery = "";
-  var lastDrawerTrigger = null;
-  var themeObserver = null;
-  function legacyMethod41(name, ...args) {
-    return getLegacyBridge().methods[name]?.(...args);
-  }
-  function escapeHtml20(value) {
-    return legacyMethod41("escapeHtml", value) || "";
-  }
-  function templates() {
-    return Array.isArray(state30.brandTemplates) ? state30.brandTemplates : [];
-  }
-  function layerEnabled(layer) {
-    return layer === "logo" ? Boolean(state30.brandingLogoEnabled) : Boolean(state30.brandingSloganEnabled);
-  }
-  function setLayerEnabled(layer, enabled) {
-    if (layer === "logo") {
-      state30.brandingLogoEnabled = enabled;
-    } else {
-      state30.brandingSloganEnabled = enabled;
-    }
-  }
-  function selectedTemplateId(layer) {
-    return layer === "logo" ? String(state30.selectedBrandingLogoTemplateId || "") : String(state30.selectedBrandingSloganTemplateId || "");
-  }
-  function setSelectedTemplateId(layer, templateId) {
-    if (layer === "logo") {
-      state30.selectedBrandingLogoTemplateId = templateId;
-    } else {
-      state30.selectedBrandingSloganTemplateId = templateId;
-    }
-    state30.selectedBrandingTemplateId = state30.selectedBrandingLogoTemplateId || state30.selectedBrandingSloganTemplateId || "";
-  }
-  function effectivePreviewTone() {
-    return document.documentElement.dataset.theme === "dark" ? "light-assets" : "dark-assets";
-  }
-  function previewAssetId(template, layer) {
-    const variants = template?.recipe?.asset_variants || {};
-    return String(variants?.[effectivePreviewTone()]?.[layer] || variants?.["dark-assets"]?.[layer] || variants?.["light-assets"]?.[layer] || "");
-  }
-  function placementSignature(template, layer) {
-    const placements = template?.recipe?.placements || {};
-    const layerPlacements = {};
-    Object.keys(placements).sort().forEach((layout) => {
-      const cfg = placements?.[layout]?.[layer];
-      if (cfg) layerPlacements[layout] = cfg;
-    });
-    return JSON.stringify(layerPlacements);
-  }
-  function templateSupportsLayer(template, layer) {
-    const recipe = template?.recipe || {};
-    const variants = recipe.asset_variants || {};
-    const placements = recipe.placements || {};
-    const hasAssets = BRAND_TONES.every((tone) => String(variants?.[tone]?.[layer] || "").trim());
-    const hasPlacements = BRAND_LAYOUTS.every((layout) => {
-      const placement = placements?.[layout]?.[layer];
-      return placement && Number(placement.width_ratio || 0) > 0;
-    });
-    return hasAssets && hasPlacements;
-  }
-  function sloganMaterialSignature(template) {
-    const variants = template?.recipe?.asset_variants || {};
-    return [
-      String(variants?.["light-assets"]?.slogan || ""),
-      String(variants?.["dark-assets"]?.slogan || ""),
-      placementSignature(template, "slogan")
-    ].join("|");
-  }
-  function layerOptions(layer) {
-    const seen = /* @__PURE__ */ new Set();
-    const options = [];
-    for (const template of templates()) {
-      const templateId = String(template.template_id || "");
-      if (!templateId || !templateSupportsLayer(template, layer)) continue;
-      const previewId = previewAssetId(template, layer);
-      if (layer === "slogan") {
-        const key = sloganMaterialSignature(template);
-        if (seen.has(key)) continue;
-        seen.add(key);
-      }
-      options.push({
-        template_id: templateId,
-        name: layer === "slogan" ? translate("brand.sloganMaterialName") : String(template.name || templateId),
-        preview_id: previewId,
-        layer
-      });
-    }
-    return options;
-  }
-  function firstTemplateId(layer) {
-    return layerOptions(layer)[0]?.template_id || "";
-  }
-  function canonicalTemplateId(layer, templateId) {
-    const options = layerOptions(layer);
-    if (options.some((option) => option.template_id === templateId)) return templateId;
-    if (layer !== "slogan" || !templateId) return "";
-    const source = templates().find((template) => String(template?.template_id || "") === templateId);
-    if (!source) return "";
-    const signature = sloganMaterialSignature(source);
-    const canonical = options.find((option) => {
-      const template = templates().find((item) => String(item?.template_id || "") === option.template_id);
-      return template && sloganMaterialSignature(template) === signature;
-    });
-    return canonical?.template_id || "";
-  }
-  function findOption(layer, templateId) {
-    const canonicalId = canonicalTemplateId(layer, templateId);
-    return layerOptions(layer).find((option) => option.template_id === canonicalId) || null;
-  }
-  function layerLabel(layer) {
-    return translate(layer === "logo" ? "brand.logoLayer" : "brand.sloganLayer");
-  }
-  function layerHint(layer) {
-    return translate(layer === "logo" ? "brand.logoHint" : "brand.sloganHint");
-  }
-  function previewHtml(option, large = false) {
-    if (!option?.preview_id) {
-      return `<span class="brand-material-none-mark" aria-hidden="true">-</span>`;
-    }
-    const sizeClass = large ? " brand-material-drawer-preview" : "";
-    return `<span class="brand-material-preview${sizeClass}"><img src="/api/brand/assets/${encodeURIComponent(option.preview_id)}/image" alt="" loading="lazy" decoding="async"></span>`;
-  }
-  function layerRowHtml(layer) {
-    const enabled = layerEnabled(layer);
-    const selected = findOption(layer, selectedTemplateId(layer));
-    const currentName = selected?.name || translate("brand.notSelected");
-    const statusKey = enabled ? "brand.enabled" : "brand.disabled";
-    const drawerExpanded = activeDrawerLayer === layer && Boolean(els39.brandMaterialDrawer?.classList.contains("open"));
-    return `
-    <div class="brand-material-row" role="listitem" data-brand-layer="${layer}">
-      <button class="brand-material-toggle" type="button" role="switch"
-        aria-checked="${enabled ? "true" : "false"}"
-        aria-label="${escapeHtml20(layerLabel(layer))}"
-        data-brand-layer-toggle="${layer}">
-        <span class="brand-material-switch-knob" aria-hidden="true"></span>
-      </button>
-      <button class="brand-material-select-row" type="button"
-        data-brand-layer-open="${layer}"
-        aria-controls="brandMaterialDrawer"
-        aria-expanded="${drawerExpanded ? "true" : "false"}"
-        aria-label="${escapeHtml20(`${layerLabel(layer)} ${currentName}`)}">
-        ${previewHtml(selected)}
-        <span class="brand-material-row-copy">
-          <strong>${escapeHtml20(layerLabel(layer))}</strong>
-          <span>${escapeHtml20(currentName)}</span>
-        </span>
-        <span class="brand-material-row-state">${escapeHtml20(translate(statusKey))}</span>
-        <span class="brand-material-arrow" aria-hidden="true">></span>
-      </button>
-    </div>
-  `;
-  }
-  function normalizeBrandLayerSelections2() {
-    if (!state30.brandTemplatesLoaded) return;
-    for (const layer of BRAND_LAYERS) {
-      const selected = selectedTemplateId(layer);
-      const canonicalId = canonicalTemplateId(layer, selected);
-      if (canonicalId) {
-        setSelectedTemplateId(layer, canonicalId);
-      } else if (selected) {
-        setSelectedTemplateId(layer, "");
-        setLayerEnabled(layer, false);
-      }
-    }
-  }
-  function renderBrandMaterials2() {
-    if (!els39.brandMaterialPicker || !els39.brandMaterialList) return;
-    const hasTemplates = templates().length > 0;
-    els39.brandMaterialPicker.classList.toggle("hidden", !hasTemplates);
-    if (!hasTemplates) {
-      els39.brandMaterialList.replaceChildren();
-      renderBrandMaterialDrawer();
-      return;
-    }
-    normalizeBrandLayerSelections2();
-    els39.brandMaterialList.innerHTML = BRAND_LAYERS.map(layerRowHtml).join("");
-    renderBrandMaterialDrawer();
-  }
-  function filteredDrawerOptions() {
-    const query = drawerQuery.trim().toLocaleLowerCase();
-    const options = layerOptions(activeDrawerLayer);
-    if (!query) return options;
-    return options.filter((option) => String(option.name || "").toLocaleLowerCase().includes(query));
-  }
-  function drawerOptionHtml(option) {
-    const selected = option.template_id === draftTemplateId;
-    return `
-    <button class="brand-material-drawer-option${selected ? " active" : ""}" type="button"
-      role="radio" aria-checked="${selected ? "true" : "false"}"
-      data-brand-drawer-template-id="${escapeHtml20(option.template_id)}">
-      <span class="brand-material-drawer-visual">${previewHtml(option, true)}</span>
-      <span class="brand-material-drawer-copy">
-        <strong>${escapeHtml20(option.name)}</strong>
-        <span>${selected ? escapeHtml20(translate("brand.selected")) : escapeHtml20(translate("brand.clickToSelect"))}</span>
-      </span>
-      <span class="brand-material-drawer-check" aria-hidden="true">\u2713</span>
-    </button>
-  `;
-  }
-  function renderBrandMaterialDrawer() {
-    if (!els39.brandMaterialDrawerList) return;
-    const options = filteredDrawerOptions();
-    els39.brandMaterialDrawerList.innerHTML = options.map(drawerOptionHtml).join("");
-    els39.brandMaterialDrawerEmpty?.classList.toggle("hidden", options.length > 0);
-    if (els39.brandMaterialDrawerTitle) {
-      els39.brandMaterialDrawerTitle.textContent = layerLabel(activeDrawerLayer);
-    }
-    if (els39.brandMaterialDrawerSummary) {
-      els39.brandMaterialDrawerSummary.textContent = layerHint(activeDrawerLayer);
-    }
-    if (els39.brandMaterialFilterLabel) {
-      els39.brandMaterialFilterLabel.textContent = layerLabel(activeDrawerLayer);
-    }
-    if (els39.brandMaterialDrawerConfirm) {
-      const selected = findOption(activeDrawerLayer, draftTemplateId);
-      els39.brandMaterialDrawerConfirm.textContent = selected?.template_id ? `${translate("brand.confirmUse")} ${selected.name}` : translate("brand.confirmNone");
-    }
-  }
-  function ensureLayerSelection(layer) {
-    const selected = selectedTemplateId(layer);
-    setSelectedTemplateId(layer, canonicalTemplateId(layer, selected) || firstTemplateId(layer));
-  }
-  function selectBrandLayerTemplate(layer, templateId) {
-    const cleanId = String(templateId || "");
-    setSelectedTemplateId(layer, canonicalTemplateId(layer, cleanId));
-    renderBrandMaterials2();
-    legacyMethod41("updateRequestPreview");
-  }
-  function setBrandLayerEnabled(layer, enabled) {
-    setLayerEnabled(layer, enabled);
-    if (enabled) ensureLayerSelection(layer);
-    renderBrandMaterials2();
-    legacyMethod41("updateRequestPreview");
-  }
-  function layerOpenButton(layer) {
-    return els39.brandMaterialList?.querySelector?.(`[data-brand-layer-open="${layer}"]`);
-  }
-  function setLayerOpenButtonExpanded(layer, expanded) {
-    layerOpenButton(layer)?.setAttribute("aria-expanded", String(expanded));
-  }
-  function openBrandMaterialDrawer(trigger, layer = "logo") {
-    legacyMethod41("closePromptTemplateDrawer", { restoreFocus: false });
-    legacyMethod41("closeGallery", { restoreFocus: false });
-    setLayerOpenButtonExpanded(activeDrawerLayer, false);
-    activeDrawerLayer = layer;
-    draftTemplateId = selectedTemplateId(layer) || firstTemplateId(layer);
-    drawerQuery = "";
-    lastDrawerTrigger = trigger || (document.activeElement instanceof HTMLElement ? document.activeElement : null);
-    if (els39.brandMaterialSearch) els39.brandMaterialSearch.value = "";
-    renderBrandMaterialDrawer();
-    els39.brandMaterialDrawer?.classList.add("open");
-    els39.brandMaterialDrawer?.setAttribute("aria-hidden", "false");
-    els39.brandMaterialDrawerBackdrop?.classList.remove("hidden");
-    setLayerOpenButtonExpanded(activeDrawerLayer, true);
-    document.body.classList.add("brand-material-drawer-open");
-    window.setTimeout(() => els39.brandMaterialSearch?.focus?.({ preventScroll: true }), 0);
-  }
-  function closeBrandMaterialDrawer(options = {}) {
-    const restoreFocus = options.restoreFocus !== false;
-    els39.brandMaterialDrawer?.classList.remove("open");
-    els39.brandMaterialDrawer?.setAttribute("aria-hidden", "true");
-    els39.brandMaterialDrawerBackdrop?.classList.add("hidden");
-    setLayerOpenButtonExpanded(activeDrawerLayer, false);
-    document.body.classList.remove("brand-material-drawer-open");
-    draftTemplateId = selectedTemplateId(activeDrawerLayer);
-    if (restoreFocus) {
-      const currentTrigger = layerOpenButton(activeDrawerLayer);
-      (currentTrigger || (lastDrawerTrigger?.isConnected ? lastDrawerTrigger : null) || els39.brandMaterialOpenButton)?.focus?.({ preventScroll: true });
-    }
-  }
-  function confirmBrandMaterialDrawer() {
-    selectBrandLayerTemplate(activeDrawerLayer, draftTemplateId);
-    closeBrandMaterialDrawer();
-  }
-  async function refreshBrandTemplates() {
-    try {
-      const response = await fetch("/api/brand/templates");
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.detail || "brand_templates_load_failed");
-      state30.brandTemplates = Array.isArray(data.templates) ? data.templates : [];
-    } catch {
-      state30.brandTemplates = [];
-    }
-    state30.brandTemplatesLoaded = true;
-    normalizeBrandLayerSelections2();
-    draftTemplateId = selectedTemplateId(activeDrawerLayer);
-    renderBrandMaterials2();
-  }
-  function handleBrandMaterialClick(event) {
-    const target = event.target instanceof Element ? event.target : null;
-    const toggle = target?.closest("[data-brand-layer-toggle]");
-    if (toggle) {
-      const layer2 = toggle.dataset.brandLayerToggle;
-      setBrandLayerEnabled(layer2, !layerEnabled(layer2));
-      return;
-    }
-    const opener = target?.closest("[data-brand-layer-open]");
-    if (!opener) return;
-    const layer = opener.dataset.brandLayerOpen;
-    openBrandMaterialDrawer(opener, layer);
-  }
-  function handleDrawerMaterialClick(event) {
-    const target = event.target instanceof Element ? event.target : null;
-    const button = target?.closest("[data-brand-drawer-template-id]");
-    if (!button) return;
-    draftTemplateId = String(button.dataset.brandDrawerTemplateId || "");
-    renderBrandMaterialDrawer();
-  }
-  function handleDrawerSearch(event) {
-    drawerQuery = event.target instanceof HTMLInputElement ? event.target.value : "";
-    renderBrandMaterialDrawer();
-  }
-  function handleDrawerKeydown(event) {
-    const drawer = els39.brandMaterialDrawer;
-    if (!drawer?.classList.contains("open")) return;
-    if (event.key === "Escape") {
-      event.preventDefault();
-      closeBrandMaterialDrawer();
-      return;
-    }
-    if (event.key !== "Tab") return;
-    const focusable = Array.from(
-      drawer.querySelectorAll("button:not(:disabled), input:not(:disabled), [tabindex]:not([tabindex='-1'])")
-    ).filter((node) => !node.hidden && node.offsetParent !== null);
-    if (!focusable.length) return;
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault();
-      last?.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault();
-      first?.focus();
-    }
-  }
-  function initBrandMaterialsFeature() {
-    if (brandMaterialsInitialized) return;
-    brandMaterialsInitialized = true;
-    els39.brandMaterialList?.addEventListener("click", handleBrandMaterialClick);
-    els39.brandMaterialOpenButton?.addEventListener("click", (event) => openBrandMaterialDrawer(event.currentTarget, "logo"));
-    els39.brandMaterialDrawerList?.addEventListener("click", handleDrawerMaterialClick);
-    els39.brandMaterialDrawerClose?.addEventListener("click", () => closeBrandMaterialDrawer());
-    els39.brandMaterialDrawerCancel?.addEventListener("click", () => closeBrandMaterialDrawer());
-    els39.brandMaterialDrawerConfirm?.addEventListener("click", confirmBrandMaterialDrawer);
-    els39.brandMaterialDrawerBackdrop?.addEventListener("click", () => closeBrandMaterialDrawer());
-    els39.brandMaterialSearch?.addEventListener("input", handleDrawerSearch);
-    document.addEventListener("keydown", handleDrawerKeydown);
-    document.addEventListener(LOCALE_CHANGE_EVENT, renderBrandMaterials2);
-    themeObserver = new MutationObserver(renderBrandMaterials2);
-    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
-    Object.assign(getLegacyBridge().methods, {
-      refreshBrandTemplates,
-      renderBrandMaterials: renderBrandMaterials2,
-      normalizeBrandLayerSelections: normalizeBrandLayerSelections2,
-      selectBrandTemplate: (templateId) => {
-        for (const layer of BRAND_LAYERS) {
-          setSelectedTemplateId(layer, String(templateId || ""));
-          setLayerEnabled(layer, Boolean(templateId));
-        }
-        renderBrandMaterials2();
-        legacyMethod41("updateRequestPreview");
-      },
-      selectBrandLayerTemplate,
-      setBrandLayerEnabled,
-      openBrandMaterialDrawer,
-      closeBrandMaterialDrawer,
-      confirmBrandMaterialDrawer
-    });
   }
 
   // codex_image/webui/frontend/src/tasks.ts

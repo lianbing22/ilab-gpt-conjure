@@ -16,6 +16,43 @@ from codex_image.webui.brand_templates import BrandTemplateStore
 
 ROOT = Path(__file__).resolve().parents[1]
 
+EXPECTED_TEMPLATE_IDS = [
+    "hengtai-default",
+    "hengtai-default-vertical",
+    "hengtai-combined-brands-horizontal",
+    "hengtai-life",
+    "hengtai-life-vertical",
+    "hengtai-service",
+    "hengtai-service-vertical",
+    "hengtai-service-tod-horizontal",
+    "hengtai-service-tod-vertical",
+    "hengtai-service-residential-horizontal",
+    "hengtai-service-commercial-horizontal",
+    "hengtai-tech",
+    "hengtai-tech-vertical",
+    "hengtai-pr-vertical",
+    "hengtai-atai-home-horizontal",
+    "hengtai-atai-home-vertical",
+    "xiamen-metro-residential-horizontal",
+    "xiamen-metro-residential-vertical",
+    "xiamen-metro-commercial-horizontal",
+    "xiamen-metro-commercial-vertical",
+    "hengtai-slogan-mission",
+    "hengtai-slogan-tod",
+]
+
+VERTICAL_LOGO_TEMPLATE_IDS = {
+    "hengtai-default-vertical",
+    "hengtai-life-vertical",
+    "hengtai-service-vertical",
+    "hengtai-service-tod-vertical",
+    "hengtai-tech-vertical",
+    "hengtai-pr-vertical",
+    "hengtai-atai-home-vertical",
+    "xiamen-metro-residential-vertical",
+    "xiamen-metro-commercial-vertical",
+}
+
 
 def _register(source_data_root: Path) -> dict[str, object]:
     result = subprocess.run(
@@ -34,20 +71,59 @@ def _register(source_data_root: Path) -> dict[str, object]:
     return json.loads(result.stdout)
 
 
-def test_registration_is_idempotent_and_publishes_four_customer_choices(tmp_path: Path) -> None:
+def test_registration_is_idempotent_and_publishes_all_vi_choices(tmp_path: Path) -> None:
     first = _register(tmp_path)
     second = _register(tmp_path)
 
-    assert len(first["assets"]) == 10
-    assert [item["template_id"] for item in first["templates"]] == [
-        "hengtai-default",
-        "hengtai-life",
-        "hengtai-service",
-        "hengtai-tech",
-    ]
+    assert len(first["assets"]) == 46
+    assert [item["template_id"] for item in first["templates"]] == EXPECTED_TEMPLATE_IDS
     assert [(item["template_id"], item["version"]) for item in first["templates"]] == [
         (item["template_id"], item["version"]) for item in second["templates"]
     ]
+
+
+def test_registered_templates_have_complete_tone_pairs_and_vi_placements(tmp_path: Path) -> None:
+    _register(tmp_path)
+    store = BrandTemplateStore(tmp_path / "brand-templates.json")
+
+    assert {record.template_id for record in store.list_active()} == set(EXPECTED_TEMPLATE_IDS)
+    for template_id in EXPECTED_TEMPLATE_IDS:
+        template = store.get_brand_template(template_id)
+        assert set(template.asset_variants) == {"dark-assets", "light-assets"}
+        for tone in ("dark-assets", "light-assets"):
+            assert set(template.asset_variants[tone]) == {"logo", "slogan"}
+            assert all(template.asset_variants[tone].values())
+        for layout in ("square", "portrait", "landscape"):
+            logo = template.placements[layout]["logo"]
+            slogan = template.placements[layout]["slogan"]
+            expected_logo_width = 0.14 if template_id in VERTICAL_LOGO_TEMPLATE_IDS else 0.18
+            assert logo.width_ratio == expected_logo_width
+            assert logo.scrim_policy == "never"
+            assert slogan.width_ratio == 0.35
+            assert slogan.scrim_policy == "auto"
+
+
+def test_slogan_choices_keep_distinct_names_and_assets(tmp_path: Path) -> None:
+    _register(tmp_path)
+    store = BrandTemplateStore(tmp_path / "brand-templates.json")
+    default = store.get_brand_template("hengtai-default")
+    mission = store.get_brand_template("hengtai-slogan-mission")
+    tod = store.get_brand_template("hengtai-slogan-tod")
+
+    assert mission.name == "您的需求就是我们的目标"
+    assert tod.name == "您的幸福就是我们的目标｜恒泰服务·TOD"
+    assert mission.asset_variants["dark-assets"]["slogan"] != default.asset_variants["dark-assets"]["slogan"]
+    assert tod.asset_variants["dark-assets"]["slogan"] != mission.asset_variants["dark-assets"]["slogan"]
+
+
+def test_registration_manifest_excludes_unpaired_and_special_use_artwork() -> None:
+    script = (ROOT / "scripts" / "register-hengtai-brand.py").read_text(encoding="utf-8")
+
+    assert "白框" not in script
+    assert "小程序" not in script
+    assert "logo-03" not in script
+    assert "logo-05" not in script
+    assert ".ai" not in script.lower()
 
 
 def test_default_package_places_exact_assets_at_vi_positions(tmp_path: Path) -> None:
@@ -131,10 +207,10 @@ def test_frontend_brand_layer_contracts_cover_draft_dedupe_restore_and_results()
     assert "selectedBrandingLogoTemplateId" in state_defaults
     assert "selectedBrandingSloganTemplateId" in state_defaults
     assert 'document.documentElement.dataset.theme === "dark" ? "light-assets" : "dark-assets"' in module
-    assert 'if (layer === "slogan")' in module
     assert "seen.has(key)" in module
-    assert "placementSignature(template, \"slogan\")" in module
-    assert "sloganMaterialSignature" in module
+    assert "placementSignature(template, layer)" in module
+    assert "layerMaterialSignature" in module
+    assert "materialOptionName" in module
     assert "canonicalTemplateId" in module
     assert "normalizeBrandLayerSelections" in module
     assert "if (!state.brandTemplatesLoaded) return" in module
@@ -158,16 +234,16 @@ def test_frontend_brand_layer_contracts_cover_draft_dedupe_restore_and_results()
     assert "brand-layer-summary" in result_actions
     assert "summary.textContent = layerSummary" in result_actions
     assert '<span class="brand-layer-summary">${layerSummary}</span>' not in result_actions
-    assert 'parts.push(`${templateName(appliedLogoId)} Logo`)' in result_actions
-    assert 'parts.push(t("brand.sloganMaterialName"' in result_actions
-    assert 'templateName(appliedSloganId)' not in result_actions
+    assert 'brandMaterialName("logo", appliedLogoId)' in result_actions
+    assert 'brandMaterialName("slogan", appliedSloganId)' in result_actions
     assert '"brand.logoLayer": "Logo"' in en
     assert '"brand.sloganLayer": "Slogan and business signature"' in en
     assert '"brand.sloganMaterialName": "Brand slogan and business signature"' in en
     assert '"brand.logoLayer": "Logo"' in zh
     assert '"brand.sloganLayer": "口号与业务落款"' in zh
     assert '"brand.sloganMaterialName": "品牌口号与业务落款"' in zh
-    assert 'layer === "slogan" ? translate("brand.sloganMaterialName")' in module
+    assert 'duplicateCount > 1' in module
+    assert 'translate("brand.sloganMaterialName")' in module
 
 
 def test_frontend_brand_runtime_prunes_invalid_restore_and_refocuses_replaced_trigger() -> None:
