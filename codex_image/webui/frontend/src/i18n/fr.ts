@@ -271,6 +271,7 @@ export const FR_DICTIONARY: TranslationDictionary = {
     "version.historyEmpty": "Aucune note de version disponible",
     "version.currentBadge": "Actuelle",
     "version.releaseDate": "{date}",
+    "version.change.official_asset_library": "La bibliothèque officielle de logos, slogans et signatures commerciales a été enrichie avec davantage de marques, de lignes métier, de formats horizontaux et verticaux et de variantes inversées.",
     "version.change.brand_templates": "Ajout de modèles de marque sélectionnables et de la composition automatique des logos, slogans et autres éléments.",
     "version.change.brand_preview": "Les résultats de marque restent cohérents dans l’aperçu, l’historique, le zoom et le téléchargement, avec accès à l’image d’origine.",
     "version.change.mobile_workspace": "Compression de l’en-tête mobile, de la barre d’action, du résumé des éléments et de l’aperçu vide.",

@@ -281,6 +281,7 @@ export const ZH_TW_DICTIONARY: TranslationDictionary = {
     "version.historyEmpty": "暫無更新記錄",
     "version.currentBadge": "目前",
     "version.releaseDate": "{date}",
+    "version.change.official_asset_library": "擴充官方 Logo、Slogan 與商務簽名素材庫，新增多品牌、業務線、橫式／直式及反白版本。",
     "version.change.brand_templates": "新增可選擇的品牌範本，並支援 Logo、口號等品牌元素自動合成。",
     "version.change.brand_preview": "品牌結果在預覽、歷史任務、大圖和下載中保持一致，同時保留原始底圖切換。",
     "version.change.mobile_workspace": "壓縮行動版頂部、生成列、素材摘要和空預覽，讓核心創作流程更完整地呈現。",

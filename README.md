@@ -15,7 +15,7 @@
 
 <p align="center">
   <a href="https://github.com/lianbing22/ilab-gpt-conjure/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/lianbing22/ilab-gpt-conjure/actions/workflows/ci.yml/badge.svg?branch=main"></a>
-  <img alt="brand version v0.1.0" src="https://img.shields.io/badge/brand%20version-v0.1.0-2F6F5E?style=flat-square">
+  <img alt="brand version v0.1.1" src="https://img.shields.io/badge/brand%20version-v0.1.1-2F6F5E?style=flat-square">
   <img alt="Python 3.11+" src="https://img.shields.io/badge/Python-3.11%2B-3776AB?style=flat-square&logo=python&logoColor=white">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-6.x-3178C6?style=flat-square&logo=typescript&logoColor=white">
   <img alt="AGPL-3.0-only" src="https://img.shields.io/badge/license-AGPL--3.0--only-22C55E?style=flat-square">
@@ -91,7 +91,7 @@ flowchart LR
 - Logo/Slogan 素材、模板、合成和双版本结果链路。
 - 品牌处理的失败隔离、幂等与崩溃恢复。
 - 任务元数据的并发安全与原子写入。
-- 品牌版 `v0.1.0` 更新历史与已部署运行时。
+- 品牌版 `v0.1.1` 更新历史与已部署运行时。
 
 当前没有可公开的用户增长、付费或原生应用上架数据，因此不将响应式 Web/PWA 包装成 Android/iOS 原生产品。后续最小验证是记录手机端首次生成时长、完成率、品牌合成成功率和失败恢复率，而不是先重写一套原生客户端。
 

@@ -271,6 +271,7 @@ export const HI_DICTIONARY: TranslationDictionary = {
     "version.historyEmpty": "कोई रिलीज़ नोट उपलब्ध नहीं है",
     "version.currentBadge": "वर्तमान",
     "version.releaseDate": "{date}",
+    "version.change.official_asset_library": "आधिकारिक लोगो, स्लोगन और व्यावसायिक हस्ताक्षर लाइब्रेरी में अधिक ब्रांड, व्यवसाय श्रेणियां, क्षैतिज व ऊर्ध्वाधर लेआउट और इनवर्टेड संस्करण जोड़े गए।",
     "version.change.brand_templates": "चुनने योग्य ब्रांड टेम्पलेट और लोगो, स्लोगन व अन्य तत्वों की स्वचालित रचना जोड़ी गई।",
     "version.change.brand_preview": "ब्रांड परिणाम प्रीव्यू, इतिहास, ज़ूम और डाउनलोड में एकसमान रहते हैं तथा मूल चित्र उपलब्ध रहता है।",
     "version.change.mobile_workspace": "मोबाइल हेडर, एक्शन बार, सामग्री सारांश और खाली प्रीव्यू को अधिक संक्षिप्त बनाया गया।",

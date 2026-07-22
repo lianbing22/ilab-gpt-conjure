@@ -288,6 +288,7 @@ export const EN_DICTIONARY: TranslationDictionary = {
     "version.historyEmpty": "No release notes available",
     "version.currentBadge": "Current",
     "version.releaseDate": "{date}",
+    "version.change.official_asset_library": "Expanded the official Logo, Slogan, and business signature library with additional brands, business lines, horizontal and vertical layouts, and inverted variants.",
     "version.change.brand_templates": "Added selectable brand templates and automatic composition for logos, slogans, and other brand elements.",
     "version.change.brand_preview": "Branded results now stay consistent across previews, history, zoom, and downloads, while the original image remains available.",
     "version.change.mobile_workspace": "Compressed the mobile header, action bar, material summary, and empty preview to expose more of the creation flow.",

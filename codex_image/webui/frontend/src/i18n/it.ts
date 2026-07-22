@@ -271,6 +271,7 @@ export const IT_DICTIONARY: TranslationDictionary = {
     "version.historyEmpty": "Nessuna nota di rilascio disponibile",
     "version.currentBadge": "Attuale",
     "version.releaseDate": "{date}",
+    "version.change.official_asset_library": "La libreria ufficiale di loghi, slogan e firme commerciali è stata ampliata con altri marchi, linee di business, layout orizzontali e verticali e varianti invertite.",
     "version.change.brand_templates": "Aggiunti modelli di brand selezionabili e composizione automatica di loghi, slogan e altri elementi.",
     "version.change.brand_preview": "I risultati brandizzati restano coerenti in anteprima, cronologia, ingrandimento e download, mantenendo disponibile l’immagine originale.",
     "version.change.mobile_workspace": "Compattati intestazione mobile, barra delle azioni, riepilogo materiali e anteprima vuota.",

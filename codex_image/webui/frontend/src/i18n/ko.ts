@@ -271,6 +271,7 @@ export const KO_DICTIONARY: TranslationDictionary = {
     "version.historyEmpty": "업데이트 기록이 없습니다",
     "version.currentBadge": "현재",
     "version.releaseDate": "{date}",
+    "version.change.official_asset_library": "공식 로고, 슬로건 및 비즈니스 시그니처 라이브러리에 여러 브랜드와 사업군, 가로형·세로형 및 반전 버전을 추가했습니다.",
     "version.change.brand_templates": "선택 가능한 브랜드 템플릿과 로고·슬로건 등 브랜드 요소의 자동 합성을 추가했습니다.",
     "version.change.brand_preview": "브랜드 결과를 미리보기, 기록, 확대 보기, 다운로드에서 일관되게 표시하며 원본 이미지 전환도 유지합니다.",
     "version.change.mobile_workspace": "모바일 헤더, 작업 표시줄, 소재 요약, 빈 미리보기를 압축해 핵심 제작 흐름을 더 많이 보여 줍니다.",

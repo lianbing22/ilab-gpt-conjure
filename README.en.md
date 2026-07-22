@@ -14,7 +14,7 @@
 
 <p align="center">
   <a href="https://github.com/lianbing22/ilab-gpt-conjure/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/lianbing22/ilab-gpt-conjure/actions/workflows/ci.yml/badge.svg?branch=main"></a>
-  <img alt="brand version v0.1.0" src="https://img.shields.io/badge/brand%20version-v0.1.0-2F6F5E?style=flat-square">
+  <img alt="brand version v0.1.1" src="https://img.shields.io/badge/brand%20version-v0.1.1-2F6F5E?style=flat-square">
   <img alt="Python 3.11+" src="https://img.shields.io/badge/Python-3.11%2B-3776AB?style=flat-square&logo=python&logoColor=white">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-6.x-3178C6?style=flat-square&logo=typescript&logoColor=white">
   <img alt="AGPL-3.0-only" src="https://img.shields.io/badge/license-AGPL--3.0--only-22C55E?style=flat-square">
@@ -69,7 +69,7 @@ See [architecture](docs/architecture.md), [engineering decisions](docs/engineeri
 
 ## Provenance and scope
 
-This repository is a product-focused derivative of [kadevin/ilab-gpt-conjure](https://github.com/kadevin/ilab-gpt-conjure) `v0.6.2`. The upstream project provides the base generation, editing, task, and desktop packaging capabilities. The branded edition adds the mobile-first workspace and task center, brand asset/template/compositing pipeline, immutable dual-version outputs, recovery and concurrency hardening, and the `v0.1.0` branded release history.
+This repository is a product-focused derivative of [kadevin/ilab-gpt-conjure](https://github.com/kadevin/ilab-gpt-conjure) `v0.6.2`. The upstream project provides the base generation, editing, task, and desktop packaging capabilities. The branded edition adds the mobile-first workspace and task center, brand asset/template/compositing pipeline, immutable dual-version outputs, recovery and concurrency hardening, and the `v0.1.1` branded release history.
 
 There are no public payment, retention, or native-app store metrics yet. The next validation step is measuring mobile time-to-first-generation, completion rate, brand-compositing success, and failure recovery before investing in a native client.
 
