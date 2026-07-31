@@ -272,6 +272,7 @@ export const PT_DICTIONARY: TranslationDictionary = {
     "version.currentBadge": "Atual",
     "version.releaseDate": "{date}",
     "version.change.official_asset_library": "A biblioteca oficial de logotipos, slogans e assinaturas comerciais foi ampliada com mais marcas, linhas de negócio, formatos horizontais e verticais e variantes invertidas.",
+    "version.change.brand_name": "O nome do produto passou a ser AI Innovation Studio em todos os idiomas.",
     "version.change.brand_templates": "Adicionamos modelos de marca selecionáveis e composição automática de logotipos, slogans e outros elementos.",
     "version.change.brand_preview": "Os resultados com marca agora permanecem consistentes na prévia, histórico, ampliação e download, mantendo a imagem original disponível.",
     "version.change.mobile_workspace": "Compactamos o cabeçalho móvel, a barra de ações, o resumo de materiais e a prévia vazia.",

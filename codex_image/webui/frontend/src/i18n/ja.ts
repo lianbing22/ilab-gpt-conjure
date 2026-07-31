@@ -272,6 +272,7 @@ export const JA_DICTIONARY: TranslationDictionary = {
     "version.currentBadge": "現在",
     "version.releaseDate": "{date}",
     "version.change.official_asset_library": "公式のロゴ、スローガン、ビジネスシグネチャ素材ライブラリを拡充し、複数ブランド、事業ライン、横型・縦型、反転版を追加しました。",
+    "version.change.brand_name": "製品名を「AI イノベーションスタジオ」に統一し、英語も AI Innovation Studio に更新しました。",
     "version.change.brand_templates": "選択可能なブランドテンプレートと、ロゴ・スローガンなどの自動合成を追加しました。",
     "version.change.brand_preview": "ブランド結果をプレビュー、履歴、拡大表示、ダウンロードで統一し、元画像への切り替えも維持しました。",
     "version.change.mobile_workspace": "モバイルのヘッダー、操作バー、素材サマリー、空のプレビューを圧縮し、制作フローを見やすくしました。",

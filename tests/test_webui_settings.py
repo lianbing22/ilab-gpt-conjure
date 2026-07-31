@@ -131,7 +131,7 @@ class WebUISettingsTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         payload = response.json()
-        self.assertEqual(APP_VERSION, "0.1.1")
+        self.assertEqual(APP_VERSION, "0.1.2")
         self.assertEqual(payload["current_version"], APP_VERSION)
         self.assertEqual(payload["current_version_label"], f"v{APP_VERSION}")
         self.assertEqual(payload["source"], "source")
@@ -143,6 +143,12 @@ class WebUISettingsTests(unittest.TestCase):
         self.assertEqual(
             payload["release_history"],
             [
+                {
+                    "version": "0.1.2",
+                    "version_label": "v0.1.2",
+                    "released_at": "2026-07-31",
+                    "change_ids": ["brand_name"],
+                },
                 {
                     "version": "0.1.1",
                     "version_label": "v0.1.1",

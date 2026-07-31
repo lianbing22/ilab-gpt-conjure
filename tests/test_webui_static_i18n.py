@@ -14,6 +14,7 @@ class WebUIStaticI18nTests(WebUIStaticTestCase):
             "version.currentBadge",
             "version.releaseDate",
             "version.change.official_asset_library",
+            "version.change.brand_name",
             "version.change.brand_templates",
             "version.change.brand_preview",
             "version.change.mobile_workspace",
