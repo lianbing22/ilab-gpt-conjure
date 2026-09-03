@@ -46219,6 +46219,15 @@ ${galleryText}`;
       const authActionBtn = document.getElementById("authActionBtn");
       const userProfileBtn = document.getElementById("userProfileBtn");
       const openDashboardBtn = document.getElementById("openDashboardBtn");
+      const runBtn = document.getElementById("runButton");
+      runBtn?.addEventListener("click", (e) => {
+        if (!currentUser) {
+          e.preventDefault();
+          e.stopPropagation();
+          alert("\u8BF7\u5148\u767B\u5F55\u4F01\u4E1A\u8D26\u53F7\u540E\u518D\u5F00\u59CB\u751F\u56FE\uFF01");
+          openAuthModal(false);
+        }
+      }, true);
       const authModal = document.getElementById("authModal");
       const authModalClose = document.getElementById("authModalClose");
       const authTabLogin = document.getElementById("authTabLogin");

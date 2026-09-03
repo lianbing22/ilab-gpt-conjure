@@ -285,6 +285,15 @@ function initEnterpriseSystem() {
     const authActionBtn = document.getElementById("authActionBtn");
     const userProfileBtn = document.getElementById("userProfileBtn");
     const openDashboardBtn = document.getElementById("openDashboardBtn");
+    const runBtn = document.getElementById("runButton");
+    runBtn?.addEventListener("click", (e) => {
+      if (!currentUser) {
+        e.preventDefault();
+        e.stopPropagation();
+        alert("请先登录企业账号后再开始生图！");
+        openAuthModal(false);
+      }
+    }, true);
 
     const authModal = document.getElementById("authModal");
     const authModalClose = document.getElementById("authModalClose");

@@ -3,7 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile, Request
+from codex_image.webui.enterprise.routes import require_current_user
 
 from codex_image.client import DEFAULT_MAIN_MODEL, image_model_supports_input_fidelity
 from codex_image.webui.context import WebUIContext
@@ -193,6 +194,7 @@ def register_generation_routes(app: FastAPI, ctx: WebUIContext) -> None:
 
     @app.post("/api/generate")
     async def generate(
+        request: Request,
         prompt: str = Form(...),
         main_model: str = Form(DEFAULT_MAIN_MODEL),
         model: str = Form("gpt-image-2"),
@@ -221,6 +223,9 @@ def register_generation_routes(app: FastAPI, ctx: WebUIContext) -> None:
         branding_logo_template_id: str | None = Form(None),
         branding_slogan_template_id: str | None = Form(None),
     ) -> dict[str, Any]:
+        # 企业安全守卫：必须先登录才能发起生图
+        user = require_current_user(request, ctx)
+
         if not ctx.auth_checker():
             raise HTTPException(status_code=401, detail="Codex auth is not available")
         main_model = effective_reference_file_main_model(main_model)

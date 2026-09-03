@@ -48,7 +48,11 @@ def register_task_routes(app: FastAPI, ctx: WebUIContext) -> None:
         }
 
     @app.get("/api/tasks/recent")
-    def list_recent_tasks(limit: int = Query(200, ge=1, le=500)) -> dict[str, Any]:
+    def list_recent_tasks(request: Request, limit: int = Query(200, ge=1, le=500)) -> dict[str, Any]:
+        user = get_current_user(request, ctx)
+        if not user:
+            return {"tasks": []}
+
         tasks = ctx.storage.list_recent_task_cards(limit=limit)
         tasks_by_id = {str(task.get("task_id") or ""): task for task in tasks}
         queue_state = ctx.queue_storage.read_state()
