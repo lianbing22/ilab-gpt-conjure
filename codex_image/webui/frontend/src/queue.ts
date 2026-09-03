@@ -41,27 +41,49 @@ function bindQueueControls(): void {
   els.queueButton?.addEventListener("click", jumpToActiveTaskGroup);
 }
 
+let realtimeReconnectTimer: number | null = null;
+let realtimeRetryDelay = 1000;
+
 export function startRealtimeUpdates({ migrateLegacyArchives = false } = {}): boolean {
   const state = getState();
   if (!window.EventSource) return false;
   closeRealtimeUpdates();
+  if (realtimeReconnectTimer) {
+    window.clearTimeout(realtimeReconnectTimer);
+    realtimeReconnectTimer = null;
+  }
   state.realtimeSnapshotNeedsArchiveMigration = migrateLegacyArchives;
   const source = new EventSource(REALTIME_EVENTS_URL);
   state.realtimeSource = source;
+
+  source.onopen = () => {
+    realtimeRetryDelay = 1000;
+  };
+
   source.onmessage = (event) => {
     handleRealtimeMessage(event).catch((error: unknown) => {
-      console.error(error);
-      getLegacyBridge().methods.setStatus(errorMessage(error, translate("queue.realtimeUpdateFailed")), "error");
+      console.warn("Realtime message error:", error);
     });
   };
+
   source.onerror = () => {
     if (state.realtimeSource !== source) return;
     const shouldMigrateArchives = state.realtimeSnapshotNeedsArchiveMigration;
     closeRealtimeUpdates();
     state.realtimeSnapshotNeedsArchiveMigration = false;
+
+    // 静默兜底刷新一次队列与任务列表
     void refreshQueue();
     void getLegacyBridge().methods.refreshTasks({ migrateLegacyArchives: shouldMigrateArchives });
-    getLegacyBridge().methods.setStatus(translate("queue.realtimeDisconnected"), "error");
+
+    // 自动指数退避静默重连，绝不再向用户抛出红字“实时状态连接已断开，刷新页面可恢复”
+    if (!realtimeReconnectTimer) {
+      realtimeReconnectTimer = window.setTimeout(() => {
+        realtimeReconnectTimer = null;
+        startRealtimeUpdates({ migrateLegacyArchives: false });
+      }, realtimeRetryDelay);
+      realtimeRetryDelay = Math.min(realtimeRetryDelay * 1.5, 10000);
+    }
   };
   return true;
 }
