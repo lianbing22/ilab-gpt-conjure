@@ -130,7 +130,8 @@ def register_enterprise_routes(app: FastAPI, ctx: WebUIContext) -> None:
                 {"role": "user", "content": f"请优化这段生图提示词：{raw_prompt}"}
             ],
             "temperature": 0.7,
-            "max_tokens": 800
+            "max_tokens": 3000,
+            "enable_thinking": False
         }).encode("utf-8")
 
         headers = {

@@ -652,7 +652,7 @@ const openDashboard = async () => {
       }
 
       optimizePromptBtn.setAttribute("disabled", "true");
-      if (optimizePromptText) optimizePromptText.textContent = "AI 正在扩写优化中...";
+      if (optimizePromptText) optimizePromptText.textContent = "优化中…";
 
       try {
         const res = await fetch("/api/prompt/optimize", {

@@ -46586,7 +46586,7 @@ ${galleryText}`;
           return;
         }
         optimizePromptBtn.setAttribute("disabled", "true");
-        if (optimizePromptText) optimizePromptText.textContent = "AI \u6B63\u5728\u6269\u5199\u4F18\u5316\u4E2D...";
+        if (optimizePromptText) optimizePromptText.textContent = "\u4F18\u5316\u4E2D\u2026";
         try {
           const res = await fetch("/api/prompt/optimize", {
             method: "POST",
