@@ -79,15 +79,14 @@ body.mobile-task-drawer-open {
 }
 
 .workspace-title {
-  position: absolute;
-  left: 50%;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   color: var(--muted);
   font-size: 13px;
-  transform: translateX(-50%);
   pointer-events: none;
+  margin-right: auto;
+  white-space: nowrap;
 }
 
 .workspace-title strong {
