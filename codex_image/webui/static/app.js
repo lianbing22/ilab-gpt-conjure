@@ -46046,36 +46046,37 @@ ${galleryText}`;
   initializeQueueFeature();
   initSegmentedIndicatorFeature();
   function initFeedbackFeature() {
-    const modal = document.getElementById("feedbackModal");
-    const openBtn = document.getElementById("feedbackButton");
-    const closeBtn = document.getElementById("feedbackModalClose");
-    const submitBtn = document.getElementById("feedbackSubmitBtn");
-    const nicknameInput = document.getElementById("feedbackNickname");
-    const contactInput = document.getElementById("feedbackContact");
-    const contentInput = document.getElementById("feedbackContent");
-    const charNotice = document.getElementById("feedbackCharNotice");
-    const countBadge = document.getElementById("feedbackCountBadge");
-    const listContainer = document.getElementById("feedbackListContainer");
-    if (!modal || !openBtn) return;
-    const escapeHtml22 = (str) => {
-      const div = document.createElement("div");
-      div.textContent = str;
-      return div.innerHTML;
-    };
-    const loadFeedbackList = async () => {
-      if (!listContainer) return;
-      try {
-        const res = await fetch("/api/feedback");
-        const data = await res.json();
-        const messages = data.messages || [];
-        if (countBadge) countBadge.textContent = `${messages.length} \u6761`;
-        if (!messages.length) {
-          listContainer.innerHTML = `<div class="feedback-empty-state">\u6682\u65E0\u7559\u8A00\uFF0C\u5FEB\u6765\u7559\u4E0B\u4F60\u7684\u7B2C\u4E00\u6761\u5EFA\u8BAE\u5427\uFF01</div>`;
-          return;
-        }
-        listContainer.innerHTML = messages.map((msg) => {
-          const replies = msg.replies || [];
-          const repliesHtml = replies.map((rep) => `
+    const bindEvents = () => {
+      const modal = document.getElementById("feedbackModal");
+      const openBtn = document.getElementById("feedbackButton");
+      const closeBtn = document.getElementById("feedbackModalClose");
+      const submitBtn = document.getElementById("feedbackSubmitBtn");
+      const nicknameInput = document.getElementById("feedbackNickname");
+      const contactInput = document.getElementById("feedbackContact");
+      const contentInput = document.getElementById("feedbackContent");
+      const charNotice = document.getElementById("feedbackCharNotice");
+      const countBadge = document.getElementById("feedbackCountBadge");
+      const listContainer = document.getElementById("feedbackListContainer");
+      if (!modal || !openBtn) return;
+      const escapeHtml22 = (str) => {
+        const div = document.createElement("div");
+        div.textContent = str;
+        return div.innerHTML;
+      };
+      const loadFeedbackList = async () => {
+        if (!listContainer) return;
+        try {
+          const res = await fetch("/api/feedback");
+          const data = await res.json();
+          const messages = data.messages || [];
+          if (countBadge) countBadge.textContent = `${messages.length} \u6761`;
+          if (!messages.length) {
+            listContainer.innerHTML = `<div class="feedback-empty-state">\u6682\u65E0\u7559\u8A00\uFF0C\u5FEB\u6765\u7559\u4E0B\u4F60\u7684\u7B2C\u4E00\u6761\u5EFA\u8BAE\u5427\uFF01</div>`;
+            return;
+          }
+          listContainer.innerHTML = messages.map((msg) => {
+            const replies = msg.replies || [];
+            const repliesHtml = replies.map((rep) => `
           <div class="feedback-reply-item">
             <div class="feedback-reply-meta">
               <strong class="feedback-admin-badge">\u2605 ${escapeHtml22(rep.author || "\u7BA1\u7406\u5458")}</strong>
@@ -46084,7 +46085,7 @@ ${galleryText}`;
             <div class="feedback-reply-content">${escapeHtml22(rep.content || "")}</div>
           </div>
         `).join("");
-          return `
+            return `
           <div class="feedback-item-card" data-feedback-id="${escapeHtml22(msg.id)}">
             <div class="feedback-item-header">
               <div class="feedback-user-info">
@@ -46107,92 +46108,102 @@ ${galleryText}`;
             </div>
           </div>
         `;
-        }).join("");
-      } catch {
-        if (listContainer) listContainer.innerHTML = `<div class="feedback-empty-state">\u83B7\u53D6\u7559\u8A00\u5217\u8868\u5931\u8D25</div>`;
-      }
-    };
-    const openModal = () => {
-      modal.classList.remove("hidden");
-      void loadFeedbackList();
-      window.setTimeout(() => contentInput?.focus(), 50);
-    };
-    const closeModal = () => {
-      modal.classList.add("hidden");
-    };
-    openBtn.addEventListener("click", openModal);
-    closeBtn?.addEventListener("click", closeModal);
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) closeModal();
-    });
-    contentInput?.addEventListener("input", () => {
-      if (charNotice) charNotice.textContent = `${contentInput.value.length} / 1000`;
-    });
-    submitBtn?.addEventListener("click", async () => {
-      const content = contentInput?.value.trim() || "";
-      if (!content) {
-        alert("\u8BF7\u8F93\u5165\u7559\u8A00\u5185\u5BB9");
-        contentInput?.focus();
-        return;
-      }
-      submitBtn.setAttribute("disabled", "true");
-      submitBtn.textContent = "\u63D0\u4EA4\u4E2D...";
-      try {
-        const res = await fetch("/api/feedback", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            nickname: nicknameInput?.value.trim() || "",
-            contact: contactInput?.value.trim() || "",
-            content
-          })
-        });
-        if (!res.ok) throw new Error("\u63D0\u4EA4\u5931\u8D25");
-        if (contentInput) contentInput.value = "";
-        if (charNotice) charNotice.textContent = "0 / 1000";
-        await loadFeedbackList();
-      } catch (err) {
-        alert(err?.message || "\u7559\u8A00\u53D1\u5E03\u5931\u8D25\uFF0C\u8BF7\u7A0D\u540E\u91CD\u8BD5");
-      } finally {
-        submitBtn.removeAttribute("disabled");
-        submitBtn.textContent = "\u53D1\u9001\u7559\u8A00";
-      }
-    });
-    listContainer?.addEventListener("click", async (e) => {
-      const target = e.target;
-      const trigger = target?.closest("[data-reply-to]");
-      if (trigger) {
-        const msgId = trigger.dataset.replyTo;
-        const box = document.getElementById(`replyBox-${msgId}`);
-        box?.classList.toggle("hidden");
-        box?.querySelector("input")?.focus();
-        return;
-      }
-      const replySubmit = target?.closest("[data-reply-submit]");
-      if (replySubmit) {
-        const msgId = replySubmit.dataset.replySubmit;
-        const box = document.getElementById(`replyBox-${msgId}`);
-        const input = box?.querySelector("input");
-        const replyContent = input?.value.trim() || "";
-        if (!replyContent) return;
-        replySubmit.setAttribute("disabled", "true");
+          }).join("");
+        } catch {
+          if (listContainer) listContainer.innerHTML = `<div class="feedback-empty-state">\u83B7\u53D6\u7559\u8A00\u5217\u8868\u5931\u8D25</div>`;
+        }
+      };
+      const openModal = () => {
+        modal.classList.remove("hidden");
+        void loadFeedbackList();
+        window.setTimeout(() => contentInput?.focus(), 50);
+      };
+      const closeModal = () => {
+        modal.classList.add("hidden");
+      };
+      openBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        openModal();
+      });
+      closeBtn?.addEventListener("click", closeModal);
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal();
+      });
+      contentInput?.addEventListener("input", () => {
+        if (charNotice) charNotice.textContent = `${contentInput.value.length} / 1000`;
+      });
+      submitBtn?.addEventListener("click", async () => {
+        const content = contentInput?.value.trim() || "";
+        if (!content) {
+          alert("\u8BF7\u8F93\u5165\u7559\u8A00\u5185\u5BB9");
+          contentInput?.focus();
+          return;
+        }
+        submitBtn.setAttribute("disabled", "true");
+        submitBtn.textContent = "\u63D0\u4EA4\u4E2D...";
         try {
-          const res = await fetch(`/api/feedback/${encodeURIComponent(String(msgId))}/reply`, {
+          const res = await fetch("/api/feedback", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              author: "\u6211 (\u7BA1\u7406\u5458)",
-              content: replyContent
+              nickname: nicknameInput?.value.trim() || "",
+              contact: contactInput?.value.trim() || "",
+              content
             })
           });
-          if (!res.ok) throw new Error("\u56DE\u590D\u5931\u8D25");
+          if (!res.ok) throw new Error("\u63D0\u4EA4\u5931\u8D25");
+          if (contentInput) contentInput.value = "";
+          if (charNotice) charNotice.textContent = "0 / 1000";
           await loadFeedbackList();
         } catch (err) {
-          alert(err?.message || "\u56DE\u590D\u5931\u8D25");
-          replySubmit.removeAttribute("disabled");
+          alert(err?.message || "\u7559\u8A00\u53D1\u5E03\u5931\u8D25\uFF0C\u8BF7\u7A0D\u540E\u91CD\u8BD5");
+        } finally {
+          submitBtn.removeAttribute("disabled");
+          submitBtn.textContent = "\u53D1\u9001\u7559\u8A00";
         }
-      }
-    });
+      });
+      listContainer?.addEventListener("click", async (e) => {
+        const target = e.target;
+        const trigger = target?.closest("[data-reply-to]");
+        if (trigger) {
+          const msgId = trigger.dataset.replyTo;
+          const box = document.getElementById(`replyBox-${msgId}`);
+          box?.classList.toggle("hidden");
+          box?.querySelector("input")?.focus();
+          return;
+        }
+        const replySubmit = target?.closest("[data-reply-submit]");
+        if (replySubmit) {
+          const msgId = replySubmit.dataset.replySubmit;
+          const box = document.getElementById(`replyBox-${msgId}`);
+          const input = box?.querySelector("input");
+          const replyContent = input?.value.trim() || "";
+          if (!replyContent) return;
+          replySubmit.setAttribute("disabled", "true");
+          try {
+            const res = await fetch(`/api/feedback/${encodeURIComponent(String(msgId))}/reply`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                author: "\u6211 (\u7BA1\u7406\u5458)",
+                content: replyContent
+              })
+            });
+            if (!res.ok) throw new Error("\u56DE\u590D\u5931\u8D25");
+            await loadFeedbackList();
+          } catch (err) {
+            alert(err?.message || "\u56DE\u590D\u5931\u8D25");
+            replySubmit.removeAttribute("disabled");
+          }
+        }
+      });
+    };
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", bindEvents);
+    } else {
+      bindEvents();
+    }
   }
   function initModernUiEnhancements() {
     const bindEvents = () => {

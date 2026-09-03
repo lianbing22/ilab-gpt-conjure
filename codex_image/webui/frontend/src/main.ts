@@ -101,8 +101,9 @@ initSegmentedIndicatorFeature();
 
 // --- Feedback Board Handlers ---
 function initFeedbackFeature() {
-  const modal = document.getElementById("feedbackModal");
-  const openBtn = document.getElementById("feedbackButton");
+  const bindEvents = () => {
+    const modal = document.getElementById("feedbackModal");
+    const openBtn = document.getElementById("feedbackButton");
   const closeBtn = document.getElementById("feedbackModalClose");
   const submitBtn = document.getElementById("feedbackSubmitBtn");
   const nicknameInput = document.getElementById("feedbackNickname") as HTMLInputElement | null;
@@ -182,7 +183,11 @@ function initFeedbackFeature() {
     modal.classList.add("hidden");
   };
 
-  openBtn.addEventListener("click", openModal);
+  openBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openModal();
+  });
   closeBtn?.addEventListener("click", closeModal);
   modal.addEventListener("click", (e) => {
     if (e.target === modal) closeModal();
@@ -260,6 +265,13 @@ function initFeedbackFeature() {
       }
     }
   });
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bindEvents);
+  } else {
+    bindEvents();
+  }
 }
 
 function initModernUiEnhancements() {
