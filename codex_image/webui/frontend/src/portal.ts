@@ -142,11 +142,11 @@ export function initPortalFeature() {
       }
       if (portalOptimizeText) portalOptimizeText.textContent = "优化成功！";
       window.setTimeout(() => {
-        if (portalOptimizeText) portalOptimizeText.textContent = "优化提示词";
+        if (portalOptimizeText) portalOptimizeText.textContent = "✨ 优化提示词";
       }, 2000);
     } catch (err: any) {
       alert(err.message || "请求失败");
-      if (portalOptimizeText) portalOptimizeText.textContent = "优化提示词";
+      if (portalOptimizeText) portalOptimizeText.textContent = "✨ 优化提示词";
     } finally {
       portalOptimizeBtn.removeAttribute("disabled");
     }
@@ -195,7 +195,7 @@ export function initPortalFeature() {
         <div class="portal-gallery-overlay">
           <div class="portal-gallery-prompt">${item.prompt}</div>
           <button class="portal-reuse-btn" type="button" data-prompt="${item.prompt.replace(/"/g, "&quot;")}" data-ratio="${item.ratio}">
-            一键做同款
+            ✨ 一键做同款
           </button>
         </div>
       </div>

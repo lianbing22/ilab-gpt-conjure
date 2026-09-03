@@ -1,19 +1,9 @@
 """Shared application version metadata."""
 
-APP_VERSION = "0.4.2"
+APP_VERSION = "0.4.1"
 APP_VERSION_TAG = f"v{APP_VERSION}"
 
 APP_RELEASE_HISTORY = (
-    {
-        "version": "0.4.2",
-        "version_label": "v0.4.2",
-        "released_at": "2026-09-03",
-        "change_ids": (
-            "editorial_aesthetic_redesign",
-            "remove_cheap_emojis",
-            "real_photography_covers",
-        ),
-    },
     {
         "version": "0.4.1",
         "version_label": "v0.4.1",

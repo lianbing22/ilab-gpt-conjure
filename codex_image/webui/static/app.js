@@ -139,11 +139,11 @@
         }
         if (portalOptimizeText) portalOptimizeText.textContent = "\u4F18\u5316\u6210\u529F\uFF01";
         window.setTimeout(() => {
-          if (portalOptimizeText) portalOptimizeText.textContent = "\u4F18\u5316\u63D0\u793A\u8BCD";
+          if (portalOptimizeText) portalOptimizeText.textContent = "\u2728 \u4F18\u5316\u63D0\u793A\u8BCD";
         }, 2e3);
       } catch (err) {
         alert(err.message || "\u8BF7\u6C42\u5931\u8D25");
-        if (portalOptimizeText) portalOptimizeText.textContent = "\u4F18\u5316\u63D0\u793A\u8BCD";
+        if (portalOptimizeText) portalOptimizeText.textContent = "\u2728 \u4F18\u5316\u63D0\u793A\u8BCD";
       } finally {
         portalOptimizeBtn.removeAttribute("disabled");
       }
@@ -187,7 +187,7 @@
         <div class="portal-gallery-overlay">
           <div class="portal-gallery-prompt">${item.prompt}</div>
           <button class="portal-reuse-btn" type="button" data-prompt="${item.prompt.replace(/"/g, "&quot;")}" data-ratio="${item.ratio}">
-            \u4E00\u952E\u505A\u540C\u6B3E
+            \u2728 \u4E00\u952E\u505A\u540C\u6B3E
           </button>
         </div>
       </div>
@@ -996,9 +996,6 @@
     "version.change.strict_history_privacy_guard": "Strict privacy lockdown preventing unauthenticated history inspection.",
     "version.change.enforce_login_guard": "Mandatory login enforcement for generation and internal assets.",
     "version.change.task_user_privacy_filter": "Strict task privacy filter isolating data between team members.",
-    "version.change.editorial_aesthetic_redesign": "Complete aesthetic overhaul: removed all cheap emojis and adopted clean editorial magazine layout.",
-    "version.change.remove_cheap_emojis": "Purged emojis across UI elements for a professional, sleek enterprise design.",
-    "version.change.real_photography_covers": "Replaced icon placeholders with high-end commercial photography covers in scenario workshops.",
     "version.change.portal_visual_polish": "Major visual polish for portal: enhanced title contrast, tech gradient backdrop, rich workshop cards.",
     "version.change.rich_scene_workshop_cards": "Redesigned workshop cards with visual banners, custom theme gradients and action badges.",
     "version.change.dynamic_team_showcase_stream": "Connected inspiration gallery to real completed team tasks for dynamic 'Reuse Prompt' showcases.",
@@ -10944,9 +10941,6 @@
     "version.change.strict_history_privacy_guard": "\u4E25\u683C\u52A0\u5F3A\u6570\u636E\u4FDD\u5BC6\uFF1A\u672A\u767B\u5F55\u72B6\u6001\u4E0B\u5168\u9762\u7981\u6B62\u67E5\u770B\u5386\u53F2\u4EFB\u52A1\u4E0E\u751F\u56FE\u8BB0\u5F55\u3002",
     "version.change.enforce_login_guard": "\u65B0\u589E\u5168\u94FE\u8DEF\u767B\u5F55\u62E6\u622A\u5B88\u536B\uFF0C\u672A\u767B\u5F55\u7528\u6237\u65E0\u6CD5\u53D1\u8D77\u751F\u6210\u6216\u8BBF\u95EE\u5185\u90E8\u8D44\u4EA7\u3002",
     "version.change.task_user_privacy_filter": "\u591A\u7528\u6237\u7269\u7406\u9690\u79C1\u9694\u79BB\uFF1A\u5458\u5DE5\u4E4B\u95F4\u53EA\u80FD\u67E5\u770B\u548C\u7BA1\u7406\u5C5E\u4E8E\u81EA\u5DF1\u7684\u751F\u56FE\u4EFB\u52A1\u3002",
-    "version.change.editorial_aesthetic_redesign": "\u5168\u9762\u91CD\u5851\u5E73\u53F0\u89C6\u89C9\uFF1A\u79FB\u9664\u6240\u6709\u5EC9\u4EF7 Emoji \u8868\u60C5\uFF0C\u91CD\u6784\u4E3A\u5927\u5382\u5546\u4E1A\u7EA7\u6742\u5FD7\u6392\u7248\u98CE\u683C\uFF08Editorial Design\uFF09\u3002",
-    "version.change.remove_cheap_emojis": "\u51C0\u5316\u5168\u7AD9 UI \u5143\u7D20\uFF1A\u9876\u680F\u3001\u6807\u7B7E\u3001\u6309\u94AE\u4E0E\u5DE5\u574A\u5361\u7247\u5168\u9762\u91C7\u7528\u6781\u7B80\u4E13\u4E1A\u6587\u5B57\u4E0E\u51E0\u4F55\u6307\u5F15\uFF0C\u544A\u522B\u571F\u5473\u611F\u3002",
-    "version.change.real_photography_covers": "\u56DB\u5927\u573A\u666F\u5DE5\u574A\u5168\u9762\u5F15\u5165\u9AD8\u8D28\u611F\u5546\u4E1A\u6444\u5F71\u5C01\u9762\uFF08\u5927\u7406\u77F3\u9759\u7269\u3001\u79D1\u6280\u6D41\u7EBF\u3001\u9AD8\u7BA1\u8096\u50CF\u3001\u5E86\u5178\u4E3B\u89C6\u89C9\uFF09\uFF0C\u8D28\u611F\u5AB2\u7F8E\u4E3B\u6D41\u8BBE\u8BA1\u4E2D\u53F0\u3002",
     "version.change.portal_visual_polish": "\u521B\u610F\u95E8\u6237\u89C6\u89C9\u5168\u9762\u5347\u534E\uFF1A\u4FEE\u590D\u6D45\u8272\u6A21\u5F0F\u4E0B\u4E3B\u6807\u9898\u6587\u5B57\u5BF9\u6BD4\u5EA6\u3001\u6CE8\u5165\u79D1\u6280\u6E10\u53D8\u5E95\u7EB9\u3001\u5F3A\u5316\u56DB\u5927\u5DE5\u574A\u573A\u666F\u5361\u7247\u6A2A\u5E45\u4E0E\u5149\u5F71\u8D28\u611F\u3002",
     "version.change.rich_scene_workshop_cards": "\u91CD\u6784\u56DB\u5927\u5DE5\u574A\u5361\u7247\uFF1A\u91C7\u7528\u56FE\u6587\u6A2A\u5E45\u3001\u4E13\u5C5E\u8272\u5F69\u6E10\u53D8\u4E0E\u6807\u7B7E\u6307\u5F15\uFF0C\u5927\u5E45\u63D0\u5347\u5546\u4E1A\u7EA7\u5E73\u53F0\u8D28\u611F\u3002",
     "version.change.dynamic_team_showcase_stream": "\u6253\u901A\u7CBE\u9009\u7075\u611F\u753B\u5ECA\u4E0E\u56E2\u961F\u5B9E\u9645\u751F\u6210\u4F5C\u54C1\u6D41\uFF0C\u4E00\u952E\u8BFB\u53D6\u9AD8\u8D28\u91CF\u6210\u679C\u56FE\u7247\uFF0C\u5B9E\u73B0\u771F\u6B63\u610F\u4E49\u4E0A\u7684\u300C\u505A\u540C\u6B3E\u300D\u3002",
