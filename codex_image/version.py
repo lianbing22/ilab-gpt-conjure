@@ -1,9 +1,47 @@
 """Shared application version metadata."""
 
-APP_VERSION = "0.1.3"
+APP_VERSION = "0.2.3"
 APP_VERSION_TAG = f"v{APP_VERSION}"
 
 APP_RELEASE_HISTORY = (
+    {
+        "version": "0.2.3",
+        "version_label": "v0.2.3",
+        "released_at": "2026-09-03",
+        "change_ids": (
+            "top_nav_overlap_fix",
+            "user_management_form_responsive_fix",
+            "generation_stats_realtime_sync",
+        ),
+    },
+    {
+        "version": "0.2.2",
+        "version_label": "v0.2.2",
+        "released_at": "2026-09-03",
+        "change_ids": (
+            "clean_mock_users",
+            "strict_history_privacy_guard",
+        ),
+    },
+    {
+        "version": "0.2.1",
+        "version_label": "v0.2.1",
+        "released_at": "2026-09-03",
+        "change_ids": (
+            "enforce_login_guard",
+            "task_user_privacy_filter",
+        ),
+    },
+    {
+        "version": "0.2.0",
+        "version_label": "v0.2.0",
+        "released_at": "2026-09-03",
+        "change_ids": (
+            "enterprise_auth_system",
+            "user_privacy_isolation",
+            "analytics_dashboard",
+        ),
+    },
     {
         "version": "0.1.3",
         "version_label": "v0.1.3",

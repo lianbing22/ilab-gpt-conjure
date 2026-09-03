@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from codex_image.webui.enterprise.db import get_db, datetime, timezone, uuid
+
 from pathlib import Path
 from typing import Any
 
@@ -373,6 +375,21 @@ def register_generation_routes(app: FastAPI, ctx: WebUIContext) -> None:
         )
         ctx.queue_storage.enqueue(task.task_id)
         h["ensure_queue_worker_running"]()
+        # 实时计入企业数据分析大盘与排行榜
+        try:
+            conn = get_db(ctx.source_data_root)
+            cur = conn.cursor()
+            rec_id = uuid.uuid4().hex[:12]
+            rec_now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+            cur.execute("""
+                INSERT INTO generation_records (id, user_id, task_id, prompt, ratio, resolution, status, duration_ms, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, 'completed', 0, ?)
+            """, (rec_id, user.get("id"), task.task_id, str(prompt)[:200], str(ratio or "9:16"), str(resolution or "1K"), rec_now))
+            conn.commit()
+            conn.close()
+        except Exception:
+            pass
+
         return {
             "task": _with_file_urls(
                 metadata,

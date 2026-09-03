@@ -1,4 +1,4 @@
-const CACHE_NAME = "ilab-gpt-conjure-shell-v66";
+const CACHE_NAME = "ilab-gpt-conjure-shell-v68";
 // Brand/static assets that rarely change: cache-first with background update.
 const CACHE_FIRST_PATHS = new Set([
   "/manifest.webmanifest",

@@ -190,6 +190,8 @@ def app_version_payload(output_root: Path) -> dict[str, Any]:
     data_dir = _data_dir_from_output_root(output_root)
     source = _runtime_source(bundle_dir, app_dir)
     current_version = _portable_version(bundle_dir) if source == "portable" else _standard_app_version(app_dir)
+    if not current_version:
+        current_version = APP_VERSION
     notice = _read_update_notice(data_dir, current_version)
     updater = _updater_script(bundle_dir)
     portable = bundle_dir is not None
