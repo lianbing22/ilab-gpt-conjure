@@ -242,6 +242,13 @@ class PromptTemplateSettings:
 
     @staticmethod
     def default_settings() -> dict[str, Any]:
+        default_json = Path(__file__).parent / "default_enterprise_templates.json"
+        if default_json.is_file():
+            try:
+                data = json.loads(default_json.read_text(encoding="utf-8"))
+                return _normalize_prompt_templates_payload(data, default_when_missing=True)
+            except Exception:
+                pass
         return {"version": 1, "templates": [], "categories": [*DEFAULT_PROMPT_TEMPLATE_CATEGORIES]}
 
 
