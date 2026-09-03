@@ -129,6 +129,13 @@ function renderPreview(task: any = null) {
   }
   const outputUrls = taskOutputUrls(selected);
   if (!selected || !outputUrls.length) {
+    // 如果任务状态已经是 completed，说明后端已完成，前端正在拉取大图详情，呈现友好的“加载渲染中”过渡态，不要误显示为灵感空间或运行中
+    if (selected?.status === "completed") {
+      closePromptPopover();
+      cancelDeferredPreviewRender();
+      renderRunningPreview(selected);
+      return;
+    }
     closePromptPopover();
     cancelDeferredPreviewRender();
     clearPreviewGridLayout();
@@ -907,12 +914,21 @@ function renderRunningPreview(task: any) {
   const retryState = taskRetryStateText(task);
   const retryStateHtml = retryState ? `<p data-preview-retry-state>${escapeHtml(retryState)}</p>` : "";
   const failureNotice = runningFailureNotice(task);
+
+  const isCompletedLoading = task.status === "completed";
+  const titleText = isCompletedLoading
+    ? "已生成完毕，正在渲染高清图片…"
+    : escapeHtml(formatTranslation("preview.runningTitle", { mode: modeLabel }));
+  const subtitleText = isCompletedLoading
+    ? '<p class="elapsed-line" style="color:var(--primary);font-weight:500;">正在加载图片资源与画廊布局…</p>'
+    : `<p class="elapsed-line">${previewElapsedLineHtml("preview.elapsedLine", {}, elapsed)}</p>`;
+
   els.previewGrid.innerHTML = `
     <div class="waiting-preview">
       <div class="waiting-spinner" aria-hidden="true"></div>
       <div>
-        <strong>${escapeHtml(formatTranslation("preview.runningTitle", { mode: modeLabel }))}</strong>
-        <p class="elapsed-line">${previewElapsedLineHtml("preview.elapsedLine", {}, elapsed)}</p>
+        <strong>${titleText}</strong>
+        ${subtitleText}
         <p class="elapsed-meta">${size}</p>
         ${retryStateHtml}
         ${failureNotice}

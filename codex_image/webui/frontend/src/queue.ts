@@ -109,6 +109,10 @@ async function applyRealtimeTaskPayloads(tasks: WebUITask[]): Promise<void> {
     const previousTask = state.tasks.find((item) => String(item.task_id) === String(task?.task_id));
     bridge.methods.notifyTaskUpdate?.(previousTask, task);
     await bridge.methods.applyTaskUpdate(task);
+    // 如果当前选中的任务刚好刚刚完成，立刻触发详情拉取与大图渲染
+    if (task && String(task.task_id) === String(state.selectedTaskId) && task.status === "completed") {
+      void (bridge.methods as any).renderSelectedTaskPreview?.();
+    }
   }
 }
 

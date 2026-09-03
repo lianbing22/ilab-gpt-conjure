@@ -107,7 +107,8 @@ async function ensureSelectedTaskDetail(taskId = state.selectedTaskId) {
   if (!normalizedTaskId) return null;
   const task = state.tasks.find((item) => String(item.task_id) === normalizedTaskId);
   if (!task) return null;
-  if (!task.summary_only) return task;
+  // 如果任务已有完整产物数组，无需重复拉取
+  if (!task.summary_only && Array.isArray(task.outputs) && task.outputs.length > 0) return task;
   const detailSeq = ++selectedTaskDetailRequestSeq;
   const fullTask = await loadFullTaskDetail(normalizedTaskId);
   if (detailSeq !== selectedTaskDetailRequestSeq) return null;
