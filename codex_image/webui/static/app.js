@@ -46,13 +46,13 @@
       ratio: "9:16"
     },
     {
-      image: "/outputs/2026-09-03/20260903044957-b5baa915-image-2.png",
-      prompt: "\u6781\u7B80\u73B0\u4EE3\u5927\u7406\u77F3\u5C55\u53F0\uFF0C\u5546\u4E1A\u9759\u7269\u4EA7\u54C1\u6444\u5F71\uFF0C\u4E01\u8FBE\u5C14\u5149\u5F71\uFF0C\u7535\u5F71\u7EA7\u8D28\u611F",
+      image: "/outputs/2026-08-31/20260831012149-c1729900-image-1.png",
+      prompt: "\u73B0\u4EE3\u9AD8\u7AEF\u79D1\u6280\u54C1\u724C\u89C6\u89C9\u5BA3\u4F20\u6D77\u62A5\uFF0C\u6DF1\u84DD\u8272\u4E0E\u54D1\u5149\u94F6\u8272\u8C03\uFF0C\u6D41\u7EBF\u578B\u51E0\u4F55\u66F2\u9762\uFF0C\u53D1\u5149\u7EBF\u6761\u7A7F\u900F\u7A7A\u95F4",
       ratio: "9:16"
     },
     {
-      image: "/outputs/2026-09-03/20260903045758-a8634a1b-image-2.png",
-      prompt: "\u672A\u6765\u667A\u80FD\u529E\u516C\u5927\u5385\uFF0C\u901A\u900F\u843D\u5730\u7A97\uFF0C\u67D4\u548C\u6F2B\u5C04\u5149\u7EBF\uFF0C\u79D1\u6280\u5546\u52A1\u6C1B\u56F4",
+      image: "/outputs/2026-08-21/20260821031014-c83f3bab-image-1.png",
+      prompt: "\u5546\u52A1\u5973\u6027\u9AD8\u7BA1\u804C\u4E1A\u5F62\u8C61\u5927\u7247\uFF0C\u5F71\u68DA\u67D4\u5149\u8F6E\u5ED3\uFF0C\u4E13\u4E1A\u81EA\u4FE1\u795E\u6001",
       ratio: "9:16"
     }
   ];
@@ -158,11 +158,32 @@
       const runButton = document.getElementById("runButton");
       runButton?.click();
     });
-    const renderGallery = () => {
+    const renderGallery = async () => {
       if (!portalGalleryGrid) return;
-      portalGalleryGrid.innerHTML = SEED_GALLERY.map((item) => `
+      let items = SEED_GALLERY;
+      try {
+        const res = await fetch("/api/tasks/recent?limit=25");
+        const data = await res.json();
+        const dynamicItems = [];
+        (data.tasks || []).forEach((t2) => {
+          const thumb = t2.branding_thumbnail_url || Array.isArray(t2.thumbnail_urls) && t2.thumbnail_urls[0] || Array.isArray(t2.output_urls) && t2.output_urls[0];
+          if (thumb && t2.prompt && t2.status === "completed") {
+            dynamicItems.push({
+              image: thumb,
+              prompt: t2.prompt,
+              ratio: t2.params?.ratio || "9:16"
+            });
+          }
+        });
+        if (dynamicItems.length >= 2) {
+          items = dynamicItems.slice(0, 8);
+        }
+      } catch (e) {
+        console.warn("fetch recent tasks for portal gallery error:", e);
+      }
+      portalGalleryGrid.innerHTML = items.map((item) => `
       <div class="portal-gallery-item">
-        <img class="portal-gallery-img" src="${item.image}" alt="" loading="lazy" />
+        <img class="portal-gallery-img" src="${item.image}" alt="" loading="lazy" onerror="this.src='/static/favicon.ico'" />
         <div class="portal-gallery-overlay">
           <div class="portal-gallery-prompt">${item.prompt}</div>
           <button class="portal-reuse-btn" type="button" data-prompt="${item.prompt.replace(/"/g, "&quot;")}" data-ratio="${item.ratio}">
@@ -975,6 +996,9 @@
     "version.change.strict_history_privacy_guard": "Strict privacy lockdown preventing unauthenticated history inspection.",
     "version.change.enforce_login_guard": "Mandatory login enforcement for generation and internal assets.",
     "version.change.task_user_privacy_filter": "Strict task privacy filter isolating data between team members.",
+    "version.change.portal_visual_polish": "Major visual polish for portal: enhanced title contrast, tech gradient backdrop, rich workshop cards.",
+    "version.change.rich_scene_workshop_cards": "Redesigned workshop cards with visual banners, custom theme gradients and action badges.",
+    "version.change.dynamic_team_showcase_stream": "Connected inspiration gallery to real completed team tasks for dynamic 'Reuse Prompt' showcases.",
     "version.change.portal_mode_launch": "Launch brand new Enterprise Creative Portal mode with Hero prompt box, workshop scenarios, and seamless studio switching.",
     "version.change.magic_prompt_box": "New Hero Magic Prompt Box integrating natural language, AI optimizer, quick tags, and instant generation.",
     "version.change.workshop_scenarios": "New 4 enterprise workshop scenarios: E-commerce Product, Brand Poster, Executive Portrait, and Festival KV.",
@@ -10917,6 +10941,9 @@
     "version.change.strict_history_privacy_guard": "\u4E25\u683C\u52A0\u5F3A\u6570\u636E\u4FDD\u5BC6\uFF1A\u672A\u767B\u5F55\u72B6\u6001\u4E0B\u5168\u9762\u7981\u6B62\u67E5\u770B\u5386\u53F2\u4EFB\u52A1\u4E0E\u751F\u56FE\u8BB0\u5F55\u3002",
     "version.change.enforce_login_guard": "\u65B0\u589E\u5168\u94FE\u8DEF\u767B\u5F55\u62E6\u622A\u5B88\u536B\uFF0C\u672A\u767B\u5F55\u7528\u6237\u65E0\u6CD5\u53D1\u8D77\u751F\u6210\u6216\u8BBF\u95EE\u5185\u90E8\u8D44\u4EA7\u3002",
     "version.change.task_user_privacy_filter": "\u591A\u7528\u6237\u7269\u7406\u9690\u79C1\u9694\u79BB\uFF1A\u5458\u5DE5\u4E4B\u95F4\u53EA\u80FD\u67E5\u770B\u548C\u7BA1\u7406\u5C5E\u4E8E\u81EA\u5DF1\u7684\u751F\u56FE\u4EFB\u52A1\u3002",
+    "version.change.portal_visual_polish": "\u521B\u610F\u95E8\u6237\u89C6\u89C9\u5168\u9762\u5347\u534E\uFF1A\u4FEE\u590D\u6D45\u8272\u6A21\u5F0F\u4E0B\u4E3B\u6807\u9898\u6587\u5B57\u5BF9\u6BD4\u5EA6\u3001\u6CE8\u5165\u79D1\u6280\u6E10\u53D8\u5E95\u7EB9\u3001\u5F3A\u5316\u56DB\u5927\u5DE5\u574A\u573A\u666F\u5361\u7247\u6A2A\u5E45\u4E0E\u5149\u5F71\u8D28\u611F\u3002",
+    "version.change.rich_scene_workshop_cards": "\u91CD\u6784\u56DB\u5927\u5DE5\u574A\u5361\u7247\uFF1A\u91C7\u7528\u56FE\u6587\u6A2A\u5E45\u3001\u4E13\u5C5E\u8272\u5F69\u6E10\u53D8\u4E0E\u6807\u7B7E\u6307\u5F15\uFF0C\u5927\u5E45\u63D0\u5347\u5546\u4E1A\u7EA7\u5E73\u53F0\u8D28\u611F\u3002",
+    "version.change.dynamic_team_showcase_stream": "\u6253\u901A\u7CBE\u9009\u7075\u611F\u753B\u5ECA\u4E0E\u56E2\u961F\u5B9E\u9645\u751F\u6210\u4F5C\u54C1\u6D41\uFF0C\u4E00\u952E\u8BFB\u53D6\u9AD8\u8D28\u91CF\u6210\u679C\u56FE\u7247\uFF0C\u5B9E\u73B0\u771F\u6B63\u610F\u4E49\u4E0A\u7684\u300C\u505A\u540C\u6B3E\u300D\u3002",
     "version.change.portal_mode_launch": "\u4E0A\u7EBF\u5168\u65B0\u300C\u6781\u7B80\u73B0\u4EE3\u521B\u610F\u95E8\u6237\u300D\u6A21\u5F0F\uFF0C\u4EE5\u54C1\u724C\u95E8\u9762\u3001\u5BBD\u5E45\u667A\u80FD\u521B\u4F5C\u9B54\u76D2\u6253\u9020\u5546\u4E1A\u7EA7 AI \u8BBE\u8BA1\u4E2D\u53F0\u4F53\u9A8C\uFF0C\u652F\u6301\u4E0E\u4E13\u4E1A\u5DE5\u4F5C\u53F0\u81EA\u7531\u5207\u6362\u3002",
     "version.change.magic_prompt_box": "\u65B0\u589E Hero \u667A\u80FD\u521B\u4F5C\u9B54\u76D2\uFF1A\u96C6\u6210\u81EA\u7136\u8BED\u8A00\u63CF\u8FF0\u3001AI \u6269\u5199\u4F18\u5316\u4E0E\u4E00\u952E\u751F\u6210\uFF0C\u914D\u5957\u4F01\u4E1A\u9AD8\u9891\u7075\u611F\u5FEB\u6377\u6807\u7B7E\u3002",
     "version.change.workshop_scenarios": "\u65B0\u589E\u7535\u5546\u9759\u7269\u6444\u5F71\u3001\u54C1\u724C\u8425\u9500\u6D77\u62A5\u3001\u6570\u5B57\u5458\u5DE5\u804C\u4E1A\u7167\u3001\u8282\u65E5\u5E86\u5178\u7269\u6599\u56DB\u5927\u573A\u666F\u5316\u521B\u610F\u5DE5\u574A\uFF0C\u5F00\u7BB1\u5373\u7528\u3002",

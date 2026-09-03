@@ -34,13 +34,13 @@ const SEED_GALLERY = [
     ratio: "9:16",
   },
   {
-    image: "/outputs/2026-09-03/20260903044957-b5baa915-image-2.png",
-    prompt: "极简现代大理石展台，商业静物产品摄影，丁达尔光影，电影级质感",
+    image: "/outputs/2026-08-31/20260831012149-c1729900-image-1.png",
+    prompt: "现代高端科技品牌视觉宣传海报，深蓝色与哑光银色调，流线型几何曲面，发光线条穿透空间",
     ratio: "9:16",
   },
   {
-    image: "/outputs/2026-09-03/20260903045758-a8634a1b-image-2.png",
-    prompt: "未来智能办公大厅，通透落地窗，柔和漫射光线，科技商务氛围",
+    image: "/outputs/2026-08-21/20260821031014-c83f3bab-image-1.png",
+    prompt: "商务女性高管职业形象大片，影棚柔光轮廓，专业自信神态",
     ratio: "9:16",
   },
 ];
@@ -165,11 +165,33 @@ export function initPortalFeature() {
   });
 
   // 渲染灵感画廊与做同款
-  const renderGallery = () => {
+  const renderGallery = async () => {
     if (!portalGalleryGrid) return;
-    portalGalleryGrid.innerHTML = SEED_GALLERY.map((item) => `
+    let items = SEED_GALLERY;
+    try {
+      const res = await fetch("/api/tasks/recent?limit=25");
+      const data = await res.json();
+      const dynamicItems: any[] = [];
+      (data.tasks || []).forEach((t: any) => {
+        const thumb = t.branding_thumbnail_url || (Array.isArray(t.thumbnail_urls) && t.thumbnail_urls[0]) || (Array.isArray(t.output_urls) && t.output_urls[0]);
+        if (thumb && t.prompt && t.status === "completed") {
+          dynamicItems.push({
+            image: thumb,
+            prompt: t.prompt,
+            ratio: t.params?.ratio || "9:16",
+          });
+        }
+      });
+      if (dynamicItems.length >= 2) {
+        items = dynamicItems.slice(0, 8);
+      }
+    } catch (e) {
+      console.warn("fetch recent tasks for portal gallery error:", e);
+    }
+
+    portalGalleryGrid.innerHTML = items.map((item) => `
       <div class="portal-gallery-item">
-        <img class="portal-gallery-img" src="${item.image}" alt="" loading="lazy" />
+        <img class="portal-gallery-img" src="${item.image}" alt="" loading="lazy" onerror="this.src='/static/favicon.ico'" />
         <div class="portal-gallery-overlay">
           <div class="portal-gallery-prompt">${item.prompt}</div>
           <button class="portal-reuse-btn" type="button" data-prompt="${item.prompt.replace(/"/g, "&quot;")}" data-ratio="${item.ratio}">
