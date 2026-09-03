@@ -367,6 +367,12 @@ function closeBrandMaterialDrawer(options: { restoreFocus?: boolean } = {}): voi
 
 function confirmBrandMaterialDrawer(): void {
   selectBrandLayerTemplate(activeDrawerLayer, draftTemplateId);
+  // 用户在抽屉中选好素材并点击“确认使用”时，符合直觉地自动将该品牌图层设为开启状态
+  if (draftTemplateId) {
+    setLayerEnabled(activeDrawerLayer, true);
+    renderBrandMaterials();
+    legacyMethod("updateRequestPreview");
+  }
   closeBrandMaterialDrawer();
 }
 
