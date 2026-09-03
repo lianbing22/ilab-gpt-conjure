@@ -275,19 +275,31 @@
           <div class="sidebar-api-status-holder" aria-hidden="true">
             <div id="apiStatus" class="status-dot"></div>
           </div>
-          <button
-            id="versionInfo"
-            class="version-info"
-            type="button"
-            aria-label="版本信息"
-            aria-controls="versionModal"
-            aria-expanded="false"
-            title="版本信息"
-            data-i18n-attr="aria-label:footer.versionInfo;title:footer.versionInfo"
-          >
-            <span id="versionLabel" class="version-label" data-i18n="footer.versionLoading">版本 ...</span>
-            <span id="versionUpdateBadge" class="version-update-badge hidden" aria-hidden="true"></span>
-          </button>
+          <div class="sidebar-footer-buttons">
+            <button
+              id="versionInfo"
+              class="version-info"
+              type="button"
+              aria-label="版本信息"
+              aria-controls="versionModal"
+              aria-expanded="false"
+              title="版本信息"
+              data-i18n-attr="aria-label:footer.versionInfo;title:footer.versionInfo"
+            >
+              <span id="versionLabel" class="version-label" data-i18n="footer.versionLoading">版本 ...</span>
+              <span id="versionUpdateBadge" class="version-update-badge hidden" aria-hidden="true"></span>
+            </button>
+            <button
+              id="feedbackButton"
+              class="feedback-trigger-btn"
+              type="button"
+              aria-label="意见反馈"
+              title="用户留言与意见反馈"
+            >
+              <span class="feedback-icon">💬</span>
+              <span>意见反馈</span>
+            </button>
+          </div>
         </div>
         <div
           id="sidebarResizeHandle"
@@ -1527,5 +1539,48 @@
 
       })();
     </script>
-  </body>
+  
+    <!-- 意见反馈与留言板弹窗 -->
+    <div id="feedbackModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-label="意见反馈留言板">
+      <div class="modal-panel feedback-modal-panel">
+        <div class="modal-heading feedback-modal-heading">
+          <div>
+            <h2>💬 意见反馈与留言板</h2>
+            <p>感谢使用！欢迎提出你的宝贵体验建议、功能期待或 BUG 反馈</p>
+          </div>
+          <button id="feedbackModalClose" class="ghost-button drawer-close-button" type="button" aria-label="关闭留言板" title="关闭">
+            <svg class="drawer-close-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M7 7L17 17M17 7L7 17" />
+            </svg>
+          </button>
+        </div>
+        <div class="feedback-modal-body">
+          <!-- 留言发布区 -->
+          <div class="feedback-form-card">
+            <div class="feedback-form-row">
+              <input id="feedbackNickname" class="control" type="text" maxlength="24" placeholder="你的昵称（选填）" />
+              <input id="feedbackContact" class="control" type="text" maxlength="48" placeholder="联系方式/微信/邮箱（选填）" />
+            </div>
+            <textarea id="feedbackContent" class="control feedback-textarea" rows="3" maxlength="1000" placeholder="写下你的建议、想法或遇到的问题..."></textarea>
+            <div class="feedback-form-actions">
+              <span id="feedbackCharNotice" class="feedback-char-notice">0 / 1000</span>
+              <button id="feedbackSubmitBtn" class="run-button" type="button">发送留言</button>
+            </div>
+          </div>
+
+          <!-- 留言列表展示区 -->
+          <div class="feedback-list-section">
+            <div class="feedback-list-header">
+              <strong>全部留言反馈</strong>
+              <span id="feedbackCountBadge" class="feedback-count-badge">加载中...</span>
+            </div>
+            <div id="feedbackListContainer" class="feedback-list-container">
+              <div class="feedback-empty-state">正在获取留言...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+</body>
 </html>
