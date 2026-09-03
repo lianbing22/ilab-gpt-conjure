@@ -1,4 +1,3 @@
-import { initPortalFeature } from "./portal";
 import { getLegacyBridge } from "./state";
 import "../legacy-app.js";
 import { initReferenceFileInputsFeature } from "./reference-file-inputs";
@@ -913,7 +912,6 @@ function initModernUiEnhancements() {
   }
 }
 initModernUiEnhancements();
-initPortalFeature();
 initUniversalRadioButtons();
 initFeedbackFeature();
 initEnterpriseSystem();
