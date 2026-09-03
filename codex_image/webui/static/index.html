@@ -320,10 +320,10 @@
         <header class="top-nav">
           <div class="mode-switch-group" role="tablist" aria-label="工作模式">
             <button id="portalModeBtn" class="mode-switch-btn active" type="button" role="tab" aria-selected="true">
-              <span>🎨</span> 创意门户
+              创意门户
             </button>
             <button id="studioModeBtn" class="mode-switch-btn" type="button" role="tab" aria-selected="false">
-              <span>⚙️</span> 专业工作台
+              专业工作台
             </button>
           </div>
           <div class="workspace-title" aria-label="AI 创新工作室，新建图片" data-i18n-attr="aria-label:workspace.ariaLabel">
@@ -405,7 +405,7 @@
             <!-- 1. Hero 智能创作魔盒 -->
             <section class="portal-hero">
               <div class="portal-hero-badge">
-                <span>✨</span> 阿泰 AI 创新工作室
+                阿泰 AI 创新工作室
               </div>
               <h1 class="portal-hero-title">激发企业无限视觉创意</h1>
               <p class="portal-hero-subtitle">商业海报 · 电商视觉 · 品牌规范 · 数字员工 · 一键生成高品质商业级资产</p>
@@ -421,18 +421,18 @@
                 <div class="portal-magic-footer">
                   <div class="portal-quick-tags">
                     <span class="portal-tag-label">灵感标签：</span>
-                    <button class="portal-tag-chip" type="button" data-tag="高端商业静物摄影，大理石台面，柔和丁达尔光">🛍️ 电商摄影</button>
-                    <button class="portal-tag-chip" type="button" data-tag="企业高管商务职业形象照，影棚柔光轮廓，专业自信">👤 商务肖像</button>
-                    <button class="portal-tag-chip" type="button" data-tag="现代科技感企业视觉海报，极简对称构图，冷光质感">📢 科技海报</button>
-                    <button class="portal-tag-chip" type="button" data-tag="现代高端企业大楼前台大厅，挑高开阔，通透自然采光">🏢 品牌空间</button>
+                    <button class="portal-tag-chip" type="button" data-tag="高端商业静物摄影，大理石台面，柔和丁达尔光">电商摄影</button>
+                    <button class="portal-tag-chip" type="button" data-tag="企业高管商务职业形象照，影棚柔光轮廓，专业自信">商务肖像</button>
+                    <button class="portal-tag-chip" type="button" data-tag="现代科技感企业视觉海报，极简对称构图，冷光质感">科技海报</button>
+                    <button class="portal-tag-chip" type="button" data-tag="现代高端企业大楼前台大厅，挑高开阔，通透自然采光">品牌空间</button>
                   </div>
 
                   <div class="portal-magic-actions">
                     <button id="portalOptimizeBtn" class="portal-optimize-btn" type="button" title="调用 DeepSeek-v4-Flash 智能扩写">
-                      <span id="portalOptimizeText">✨ 优化提示词</span>
+                      <span id="portalOptimizeText">优化提示词</span>
                     </button>
                     <button id="portalGenerateBtn" class="portal-generate-btn" type="button">
-                      <span>🚀 开始生成</span>
+                      <span>开始生成</span>
                     </button>
                   </div>
                 </div>
@@ -443,68 +443,88 @@
             <section class="portal-section">
               <div class="portal-section-header">
                 <div>
-                  <h2 class="portal-section-title"><span>💼</span> 场景化创意工坊</h2>
+                  <h2 class="portal-section-title">场景化创意工坊</h2>
                   <div class="portal-section-desc">为企业各业务线量身定制的标准化视觉模版，点击一键开箱即用</div>
                 </div>
               </div>
 
               <div class="portal-workshop-grid">
-                <div class="workshop-card" style="--card-accent: #3b82f6;" data-scene="product">
-                  <div class="workshop-banner">
-                    <span class="workshop-badge">1:1 静物</span>
-                    <span class="workshop-banner-icon">🛍️</span>
+                <div class="workshop-card" data-scene="product">
+                  <div class="workshop-cover-wrap">
+                    <img class="workshop-cover-img" src="/static/assets/portal/product.jpg" alt="电商摄影" loading="lazy" />
+                    <span class="workshop-spec-badge">1:1</span>
+                    <div class="workshop-cover-shade"></div>
                   </div>
                   <div class="workshop-body">
-                    <h3 class="workshop-card-title">电商 / 产品静物摄影</h3>
-                    <p class="workshop-card-desc">纯净展台、柔光倒影、材质反光与商业带货级光影，赋能商品转化</p>
+                    <div class="workshop-meta-row">
+                      <span class="workshop-category">商业静物</span>
+                      <span class="workshop-ratio-text">方形画幅</span>
+                    </div>
+                    <h3 class="workshop-card-title">产品与电商视觉摄影</h3>
+                    <p class="workshop-card-desc">光影材质反射、通透景深与商业带货级质感</p>
                     <div class="workshop-footer-action">
-                      <span class="workshop-tag">商业摄影</span>
-                      <span class="workshop-btn-link">一键开启 ↗</span>
+                      <span class="workshop-btn-text">立即创作</span>
+                      <span class="workshop-arrow">→</span>
                     </div>
                   </div>
                 </div>
 
-                <div class="workshop-card" style="--card-accent: #8b5cf6;" data-scene="branding">
-                  <div class="workshop-banner">
-                    <span class="workshop-badge">9:16 竖版</span>
-                    <span class="workshop-banner-icon">📢</span>
+                <div class="workshop-card" data-scene="branding">
+                  <div class="workshop-cover-wrap">
+                    <img class="workshop-cover-img" src="/static/assets/portal/branding.jpg" alt="品牌海报" loading="lazy" />
+                    <span class="workshop-spec-badge">9:16</span>
+                    <div class="workshop-cover-shade"></div>
                   </div>
                   <div class="workshop-body">
-                    <h3 class="workshop-card-title">品牌视觉与营销海报</h3>
-                    <p class="workshop-card-desc">大字留白、高视觉冲击力、科技与金融商务规范，宣发展示首选</p>
+                    <div class="workshop-meta-row">
+                      <span class="workshop-category">品牌视觉</span>
+                      <span class="workshop-ratio-text">竖版通栏</span>
+                    </div>
+                    <h3 class="workshop-card-title">品牌宣发与营销海报</h3>
+                    <p class="workshop-card-desc">现代科技流线、大面积留白与商业宣发排版规范</p>
                     <div class="workshop-footer-action">
-                      <span class="workshop-tag">营销宣传</span>
-                      <span class="workshop-btn-link">一键开启 ↗</span>
+                      <span class="workshop-btn-text">立即创作</span>
+                      <span class="workshop-arrow">→</span>
                     </div>
                   </div>
                 </div>
 
-                <div class="workshop-card" style="--card-accent: #10b981;" data-scene="portrait">
-                  <div class="workshop-banner">
-                    <span class="workshop-badge">3:4 肖像</span>
-                    <span class="workshop-banner-icon">👤</span>
+                <div class="workshop-card" data-scene="portrait">
+                  <div class="workshop-cover-wrap">
+                    <img class="workshop-cover-img" src="/static/assets/portal/portrait.jpg" alt="商务职业照" loading="lazy" />
+                    <span class="workshop-spec-badge">3:4</span>
+                    <div class="workshop-cover-shade"></div>
                   </div>
                   <div class="workshop-body">
-                    <h3 class="workshop-card-title">数字员工商务职业照</h3>
-                    <p class="workshop-card-desc">企业高管形象大片、团队领英风采、专业影棚柔光精修质感</p>
+                    <div class="workshop-meta-row">
+                      <span class="workshop-category">人物肖像</span>
+                      <span class="workshop-ratio-text">肖像画幅</span>
+                    </div>
+                    <h3 class="workshop-card-title">团队与商务职业形象照</h3>
+                    <p class="workshop-card-desc">自然皮肤纹理、哈苏质感与影棚伦勃朗柔光大片</p>
                     <div class="workshop-footer-action">
-                      <span class="workshop-tag">团队形象</span>
-                      <span class="workshop-btn-link">一键开启 ↗</span>
+                      <span class="workshop-btn-text">立即创作</span>
+                      <span class="workshop-arrow">→</span>
                     </div>
                   </div>
                 </div>
 
-                <div class="workshop-card" style="--card-accent: #f59e0b;" data-scene="festival">
-                  <div class="workshop-banner">
-                    <span class="workshop-badge">16:9 横版</span>
-                    <span class="workshop-banner-icon">🏮</span>
+                <div class="workshop-card" data-scene="festival">
+                  <div class="workshop-cover-wrap">
+                    <img class="workshop-cover-img" src="/static/assets/portal/festive.jpg" alt="节日庆典" loading="lazy" />
+                    <span class="workshop-spec-badge">16:9</span>
+                    <div class="workshop-cover-shade"></div>
                   </div>
                   <div class="workshop-body">
-                    <h3 class="workshop-card-title">节日庆典与文化物料</h3>
-                    <p class="workshop-card-desc">传统佳节祝福贺卡、企业内刊插画、重大活动与年会主视觉 KV</p>
+                    <div class="workshop-meta-row">
+                      <span class="workshop-category">企业文化</span>
+                      <span class="workshop-ratio-text">宽屏横版</span>
+                    </div>
+                    <h3 class="workshop-card-title">庆典活动与节日主视觉</h3>
+                    <p class="workshop-card-desc">喜庆大气、企业年会KV与重大活动宣发主图</p>
                     <div class="workshop-footer-action">
-                      <span class="workshop-tag">文化宣发</span>
-                      <span class="workshop-btn-link">一键开启 ↗</span>
+                      <span class="workshop-btn-text">立即创作</span>
+                      <span class="workshop-arrow">→</span>
                     </div>
                   </div>
                 </div>
@@ -515,7 +535,7 @@
             <section class="portal-section">
               <div class="portal-section-header">
                 <div>
-                  <h2 class="portal-section-title"><span>🌟</span> 团队精选灵感画廊</h2>
+                  <h2 class="portal-section-title">精选灵感画廊</h2>
                   <div class="portal-section-desc">团队内部创作的爆款佳作，支持一键复用相同提示词与参数</div>
                 </div>
               </div>
