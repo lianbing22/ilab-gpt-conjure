@@ -1,9 +1,18 @@
 """Shared application version metadata."""
 
-APP_VERSION = "0.3.0"
+APP_VERSION = "0.3.1"
 APP_VERSION_TAG = f"v{APP_VERSION}"
 
 APP_RELEASE_HISTORY = (
+    {
+        "version": "0.3.1",
+        "version_label": "v0.3.1",
+        "released_at": "2026-09-03",
+        "change_ids": (
+            "prompt_optimizer_dom_fix",
+            "prompt_actions_compact_layout",
+        ),
+    },
     {
         "version": "0.3.0",
         "version_label": "v0.3.0",

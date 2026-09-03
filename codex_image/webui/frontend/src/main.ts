@@ -1,3 +1,4 @@
+import { getLegacyBridge } from "./state";
 import "../legacy-app.js";
 import { initReferenceFileInputsFeature } from "./reference-file-inputs";
 import { initInputSourcesFeature } from "./input-sources";
@@ -638,10 +639,12 @@ const openDashboard = async () => {
     const promptInput = document.getElementById("prompt") as HTMLTextAreaElement | null;
 
     optimizePromptBtn?.addEventListener("click", async () => {
-      const currentPrompt = promptInput?.value.trim() || "";
+      const bridge = getLegacyBridge();
+      const promptEditorEl = document.getElementById("promptEditor");
+      const currentPrompt = (promptEditorEl?.innerText || promptInput?.value || "").trim();
       if (!currentPrompt) {
         alert("请先输入一段基础生图提示词，然后再进行 AI 优化！");
-        promptInput?.focus();
+        promptEditorEl?.focus();
         return;
       }
 
@@ -663,14 +666,22 @@ const openDashboard = async () => {
         const data = await res.json();
         if (!res.ok) throw new Error(data.detail || "优化失败");
 
-        if (promptInput) {
-          promptInput.value = data.optimized_prompt;
-          promptInput.dispatchEvent(new Event("input", { bubbles: true }));
+        const optimized = String(data.optimized_prompt || "").trim();
+        if (optimized) {
+          if (typeof bridge.methods.setPromptText === "function") {
+            bridge.methods.setPromptText(optimized);
+          } else if (promptEditorEl) {
+            promptEditorEl.innerText = optimized;
+            if (promptInput) promptInput.value = optimized;
+            promptEditorEl.dispatchEvent(new Event("input", { bubbles: true }));
+          }
+          bridge.methods.updatePromptCount?.();
+          bridge.methods.updateRequestPreview?.();
         }
         if (optimizePromptText) optimizePromptText.textContent = "优化成功！";
         window.setTimeout(() => {
           if (optimizePromptText) optimizePromptText.textContent = "优化提示词";
-        }, 2500);
+        }, 2000);
       } catch (err: any) {
         alert(err.message || "提示词优化请求失败，请稍后重试");
         if (optimizePromptText) optimizePromptText.textContent = "优化提示词";

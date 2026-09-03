@@ -8309,6 +8309,54 @@ input[type=range].slider:disabled::-moz-range-thumb {
   50% { transform: scale(1.18); filter: drop-shadow(0 0 6px rgba(79, 70, 229, 0.6)); }
 }
 
+
+/* ============================================================
+   Prompt Actions Compact Layout
+   ============================================================ */
+
+.prompt-template-entry {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 4px !important;
+  min-width: 0 !important;
+}
+
+.prompt-template-entry .optimize-prompt-button,
+.prompt-template-entry .prompt-template-button {
+  flex: 1 1 50% !important;
+  min-width: 0 !important;
+  padding: 0 4px !important;
+  font-size: 11px !important;
+  line-height: normal !important;
+  height: var(--prompt-secondary-action-height) !important;
+  min-height: var(--prompt-secondary-action-height) !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.optimize-prompt-button {
+  background: color-mix(in srgb, var(--primary) 10%, transparent) !important;
+  border-color: color-mix(in srgb, var(--primary) 30%, transparent) !important;
+  color: var(--primary) !important;
+  font-weight: 500 !important;
+}
+
+.optimize-prompt-button:hover {
+  background: color-mix(in srgb, var(--primary) 20%, transparent) !important;
+  border-color: var(--primary) !important;
+}
+
+.optimize-prompt-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
 /* source: styles/71-preview-results.css */
 /* Preview Grid */
 .preview-grid {

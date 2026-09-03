@@ -3,6 +3,18 @@
   var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
   var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
 
+  // codex_image/webui/frontend/src/state.ts
+  function getLegacyBridge() {
+    const bridge40 = window.__codexImageWebUI;
+    if (!bridge40) {
+      throw new Error("WebUI legacy bridge is not initialized");
+    }
+    return bridge40;
+  }
+  function getState() {
+    return getLegacyBridge().state;
+  }
+
   // codex_image/webui/frontend/src/event-bindings.ts
   function call(methods, name, ...args) {
     return methods[name]?.(...args);
@@ -491,18 +503,6 @@
     return proxy2;
   }
 
-  // codex_image/webui/frontend/src/state.ts
-  function getLegacyBridge() {
-    const bridge40 = window.__codexImageWebUI;
-    if (!bridge40) {
-      throw new Error("WebUI legacy bridge is not initialized");
-    }
-    return bridge40;
-  }
-  function getState() {
-    return getLegacyBridge().state;
-  }
-
   // codex_image/webui/frontend/src/i18n/en.ts
   var EN_DICTIONARY = {
     "app.newTask": "New",
@@ -800,6 +800,8 @@
     "version.change.strict_history_privacy_guard": "Strict privacy lockdown preventing unauthenticated history inspection.",
     "version.change.enforce_login_guard": "Mandatory login enforcement for generation and internal assets.",
     "version.change.task_user_privacy_filter": "Strict task privacy filter isolating data between team members.",
+    "version.change.prompt_optimizer_dom_fix": "Fix prompt optimizer text sync to properly update rich prompt editor, character counts and preview.",
+    "version.change.prompt_actions_compact_layout": "Streamline prompt action buttons without bulky icons and symbols, ensuring compact single-line fit.",
     "version.change.deepseek_prompt_optimizer": "Added DeepSeek-v4-Flash powered 'Optimize Prompt' assistant to enrich details, lighting, and textures with one-click adoption.",
     "version.change.auto_enable_brand_material_on_confirm": "Auto-enable selected brand material layer upon confirmation so state turns to 'On' seamlessly.",
     "version.change.graceful_network_json_fallback": "Gracefully handle network hiccups and 502 HTML error pages to avoid raw JSON parse errors.",
@@ -10734,6 +10736,8 @@
     "version.change.strict_history_privacy_guard": "\u4E25\u683C\u52A0\u5F3A\u6570\u636E\u4FDD\u5BC6\uFF1A\u672A\u767B\u5F55\u72B6\u6001\u4E0B\u5168\u9762\u7981\u6B62\u67E5\u770B\u5386\u53F2\u4EFB\u52A1\u4E0E\u751F\u56FE\u8BB0\u5F55\u3002",
     "version.change.enforce_login_guard": "\u65B0\u589E\u5168\u94FE\u8DEF\u767B\u5F55\u62E6\u622A\u5B88\u536B\uFF0C\u672A\u767B\u5F55\u7528\u6237\u65E0\u6CD5\u53D1\u8D77\u751F\u6210\u6216\u8BBF\u95EE\u5185\u90E8\u8D44\u4EA7\u3002",
     "version.change.task_user_privacy_filter": "\u591A\u7528\u6237\u7269\u7406\u9690\u79C1\u9694\u79BB\uFF1A\u5458\u5DE5\u4E4B\u95F4\u53EA\u80FD\u67E5\u770B\u548C\u7BA1\u7406\u5C5E\u4E8E\u81EA\u5DF1\u7684\u751F\u56FE\u4EFB\u52A1\u3002",
+    "version.change.prompt_optimizer_dom_fix": "\u4FEE\u590D\u4F18\u5316\u63D0\u793A\u8BCD\u672A\u80FD\u6B63\u786E\u5199\u5165\u5BCC\u6587\u672C\u7F16\u8F91\u6846\u7684\u95EE\u9898\uFF0C\u4F18\u5316\u540E\u81EA\u52A8\u540C\u6B65\u5199\u5165\u5BCC\u6587\u672C\u5E76\u66F4\u65B0\u5B57\u6570\u7EDF\u8BA1\u4E0E\u9884\u89C8\u3002",
+    "version.change.prompt_actions_compact_layout": "\u7CBE\u7B80\u4F18\u5316\u63D0\u793A\u8BCD\u4E0E\u7BA1\u7406\u6A21\u677F\u6309\u94AE\uFF0C\u79FB\u9664\u591A\u4F59\u88C5\u9970\u7B26\u53F7\u4E0E\u56FE\u6807\uFF0C\u7D27\u51D1\u6392\u7248\u5B8C\u7F8E\u9002\u914D\u72ED\u5C0F\u5BBD\u5EA6\u907F\u514D\u6362\u884C\u9519\u4F4D\u3002",
     "version.change.deepseek_prompt_optimizer": "\u65B0\u589E\u57FA\u4E8E DeepSeek-v4-Flash \u7684\u300C\u2728 \u4F18\u5316\u63D0\u793A\u8BCD\u300DAI \u52A9\u624B\uFF1A\u667A\u80FD\u6269\u5199\u7EC6\u8282\u3001\u589E\u5F3A\u5149\u5F71\u8D28\u611F\u4E0E\u753B\u8D28\uFF0C\u652F\u6301\u4E00\u952E\u66FF\u6362\u91C7\u7EB3\u4E0E\u8FD8\u539F\u3002",
     "version.change.auto_enable_brand_material_on_confirm": "\u54C1\u724C\u7D20\u6750\u4F53\u9A8C\u4F18\u5316\uFF1A\u5728\u62BD\u5C49\u4E2D\u70B9\u51FB\u9009\u4E2D\u5E76\u786E\u8BA4\u4F7F\u7528\u7D20\u6750\u65F6\uFF0C\u81EA\u52A8\u6FC0\u6D3B\u5E76\u5F00\u542F\u8BE5\u54C1\u724C\u5C42\uFF0C\u8054\u52A8\u66F4\u65B0\u72B6\u6001\u4E3A\u300C\u5DF2\u5F00\u542F\u300D\u3002",
     "version.change.graceful_network_json_fallback": "\u4F18\u96C5\u5904\u7406\u7F51\u7EDC\u6CE2\u52A8\u4E0E\u670D\u52A1\u91CD\u542F\u65F6\u7684 502 HTML \u9519\u8BEF\u9875\uFF0C\u907F\u514D\u754C\u9762\u88F8\u9732 JSON \u89E3\u6790\u5F02\u5E38\u3002",
@@ -46574,10 +46578,12 @@ ${galleryText}`;
       const optimizePromptText = document.getElementById("optimizePromptText");
       const promptInput = document.getElementById("prompt");
       optimizePromptBtn?.addEventListener("click", async () => {
-        const currentPrompt = promptInput?.value.trim() || "";
+        const bridge40 = getLegacyBridge();
+        const promptEditorEl = document.getElementById("promptEditor");
+        const currentPrompt = (promptEditorEl?.innerText || promptInput?.value || "").trim();
         if (!currentPrompt) {
           alert("\u8BF7\u5148\u8F93\u5165\u4E00\u6BB5\u57FA\u7840\u751F\u56FE\u63D0\u793A\u8BCD\uFF0C\u7136\u540E\u518D\u8FDB\u884C AI \u4F18\u5316\uFF01");
-          promptInput?.focus();
+          promptEditorEl?.focus();
           return;
         }
         if (!currentUser) {
@@ -46595,14 +46601,22 @@ ${galleryText}`;
           });
           const data = await res.json();
           if (!res.ok) throw new Error(data.detail || "\u4F18\u5316\u5931\u8D25");
-          if (promptInput) {
-            promptInput.value = data.optimized_prompt;
-            promptInput.dispatchEvent(new Event("input", { bubbles: true }));
+          const optimized = String(data.optimized_prompt || "").trim();
+          if (optimized) {
+            if (typeof bridge40.methods.setPromptText === "function") {
+              bridge40.methods.setPromptText(optimized);
+            } else if (promptEditorEl) {
+              promptEditorEl.innerText = optimized;
+              if (promptInput) promptInput.value = optimized;
+              promptEditorEl.dispatchEvent(new Event("input", { bubbles: true }));
+            }
+            bridge40.methods.updatePromptCount?.();
+            bridge40.methods.updateRequestPreview?.();
           }
           if (optimizePromptText) optimizePromptText.textContent = "\u4F18\u5316\u6210\u529F\uFF01";
           window.setTimeout(() => {
             if (optimizePromptText) optimizePromptText.textContent = "\u4F18\u5316\u63D0\u793A\u8BCD";
-          }, 2500);
+          }, 2e3);
         } catch (err) {
           alert(err.message || "\u63D0\u793A\u8BCD\u4F18\u5316\u8BF7\u6C42\u5931\u8D25\uFF0C\u8BF7\u7A0D\u540E\u91CD\u8BD5");
           if (optimizePromptText) optimizePromptText.textContent = "\u4F18\u5316\u63D0\u793A\u8BCD";
