@@ -46567,6 +46567,25 @@ ${galleryText}`;
       bindEvents();
     }
   }
+  function initUniversalRadioButtons() {
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      const button = target?.closest(".radio-btn");
+      if (!button) return;
+      const group = button.closest(".radio-group");
+      if (!group) return;
+      const val = button.dataset.val;
+      if (val === void 0) return;
+      group.querySelectorAll(".radio-btn").forEach((btn) => btn.classList.remove("active"));
+      button.classList.add("active");
+      const select = group.parentElement?.querySelector("select");
+      if (select && select.value !== val) {
+        select.value = val;
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+        select.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+    });
+  }
   function initModernUiEnhancements() {
     const bindEvents = () => {
       const toggleBtn = document.getElementById("desktopAdvancedToggle");
@@ -46619,6 +46638,7 @@ ${galleryText}`;
     }
   }
   initModernUiEnhancements();
+  initUniversalRadioButtons();
   initFeedbackFeature();
   initEnterpriseSystem();
   window.__codexImageWebUI?.boot();

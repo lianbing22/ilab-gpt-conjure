@@ -667,6 +667,34 @@ function initEnterpriseSystem() {
   }
 }
 
+
+// --- Universal Radio-Group Click Delegation Handler ---
+function initUniversalRadioButtons() {
+  document.addEventListener("click", (event: Event) => {
+    const target = event.target as HTMLElement | null;
+    const button = target?.closest<HTMLButtonElement>(".radio-btn");
+    if (!button) return;
+
+    const group = button.closest<HTMLElement>(".radio-group");
+    if (!group) return;
+
+    const val = button.dataset.val;
+    if (val === undefined) return;
+
+    // 1. 切换按钮 active 状态
+    group.querySelectorAll(".radio-btn").forEach((btn) => btn.classList.remove("active"));
+    button.classList.add("active");
+
+    // 2. 联动查找并触发对应的 select 或 input
+    const select = group.parentElement?.querySelector<HTMLSelectElement>("select");
+    if (select && select.value !== val) {
+      select.value = val;
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+      select.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+  });
+}
+
 function initModernUiEnhancements() {
   const bindEvents = () => {
     const toggleBtn = document.getElementById("desktopAdvancedToggle");
@@ -722,6 +750,7 @@ function initModernUiEnhancements() {
   }
 }
 initModernUiEnhancements();
+initUniversalRadioButtons();
 initFeedbackFeature();
 initEnterpriseSystem();
 
