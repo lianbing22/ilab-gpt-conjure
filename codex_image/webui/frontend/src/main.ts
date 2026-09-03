@@ -99,42 +99,58 @@ initSegmentedIndicatorFeature();
 
 // --- Desktop Advanced Settings Toggle & Inspiration Card Handlers ---
 function initModernUiEnhancements() {
-  const bridge = (window as any).__codexImageWebUI?.bridge;
-  const els = bridge?.els;
-  const methods = bridge?.methods;
+  const bindEvents = () => {
+    const toggleBtn = document.getElementById("desktopAdvancedToggle");
+    const collapse = document.getElementById("advancedSettingsCollapse");
+    const arrow = document.getElementById("desktopAdvancedArrow");
 
-  // 1. 高级设置折叠交互
-  els?.desktopAdvancedToggle?.addEventListener("click", () => {
-    const isExpanded = els.desktopAdvancedToggle.getAttribute("aria-expanded") === "true";
-    const nextState = !isExpanded;
-    els.desktopAdvancedToggle.setAttribute("aria-expanded", String(nextState));
-    els.advancedSettingsCollapse?.classList.toggle("hidden", !nextState);
-    if (els.desktopAdvancedArrow) {
-      els.desktopAdvancedArrow.textContent = nextState ? "▴" : "▾";
+    if (toggleBtn && collapse) {
+      toggleBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const isHidden = collapse.classList.contains("hidden");
+        if (isHidden) {
+          collapse.classList.remove("hidden");
+          toggleBtn.setAttribute("aria-expanded", "true");
+          if (arrow) arrow.textContent = "▴";
+        } else {
+          collapse.classList.add("hidden");
+          toggleBtn.setAttribute("aria-expanded", "false");
+          if (arrow) arrow.textContent = "▾";
+        }
+      });
     }
-  });
 
-  // 2. 灵感卡片一键套用交互
-  document.addEventListener("click", (event: Event) => {
-    const target = event.target as HTMLElement | null;
-    const card = target?.closest<HTMLElement>(".inspiration-card");
-    if (!card) return;
-    const prompt = card.dataset.prompt;
-    const ratio = card.dataset.ratio;
-    if (prompt && els?.promptEditor) {
-      els.promptEditor.textContent = prompt;
-      if (els.prompt) els.prompt.value = prompt;
-      methods?.updateCharCount?.();
-      methods?.syncPromptGalleryMentionsFromInputs?.();
-      methods?.updateRequestPreview?.();
-    }
-    if (ratio) {
-      const selector = "#ratioGroup [data-val=\"" + ratio + "\"]";
-      const ratioBtn = document.querySelector<HTMLButtonElement>(selector);
-      ratioBtn?.click();
-    }
-    els?.promptEditor?.focus();
-  });
+    document.addEventListener("click", (event: Event) => {
+      const target = event.target as HTMLElement | null;
+      const card = target?.closest<HTMLElement>(".inspiration-card");
+      if (!card) return;
+      const prompt = card.dataset.prompt;
+      const ratio = card.dataset.ratio;
+      const editor = document.getElementById("promptEditor");
+      const hiddenPrompt = document.getElementById("prompt") as HTMLInputElement | null;
+      if (prompt && editor) {
+        editor.textContent = prompt;
+        if (hiddenPrompt) hiddenPrompt.value = prompt;
+        const bridge = (window as any).__codexImageWebUI?.bridge;
+        bridge?.methods?.updateCharCount?.();
+        bridge?.methods?.syncPromptGalleryMentionsFromInputs?.();
+        bridge?.methods?.updateRequestPreview?.();
+      }
+      if (ratio) {
+        const selector = "#ratioGroup [data-val=\"" + ratio + "\"]";
+        const ratioBtn = document.querySelector<HTMLButtonElement>(selector);
+        ratioBtn?.click();
+      }
+      editor?.focus();
+    });
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bindEvents);
+  } else {
+    bindEvents();
+  }
 }
 initModernUiEnhancements();
 

@@ -132,7 +132,41 @@ function renderPreview(task: any = null) {
     closePromptPopover();
     cancelDeferredPreviewRender();
     clearPreviewGridLayout();
-    els.previewGrid.innerHTML = `<div class="empty-preview">${escapeHtml(translate("preview.empty"))}</div>`;
+    els.previewGrid.innerHTML = `
+      <div class="empty-preview-container">
+        <div class="inspiration-banner">
+          <div class="inspiration-sparkle">✨</div>
+          <h3>灵感创作空间</h3>
+          <p>点击下方灵感卡片，一键填入提示词与最佳参数，快速开启创作</p>
+        </div>
+        <div class="inspiration-grid">
+          <button class="inspiration-card" type="button" data-prompt="科幻赛博朋克城市雨夜，穿黄色机能雨衣的少女背影，霓虹灯倒影在积水街道上，体积光，电影级质感，虚幻引擎5渲染" data-ratio="9:16">
+            <span class="inspiration-tag">赛博机能 · 9:16</span>
+            <strong class="inspiration-title">赛博朋克雨夜街道</strong>
+            <span class="inspiration-desc">霓虹光影 · 电影级虚幻5渲染</span>
+            <span class="inspiration-action">一键套用 ↗</span>
+          </button>
+          <button class="inspiration-card" type="button" data-prompt="极简主义高级咖啡杯品牌产品渲染，柔和自然晨光，大理石台面，浅米色背景，超高清细节，商业摄影" data-ratio="1:1">
+            <span class="inspiration-tag">商业静物 · 1:1</span>
+            <strong class="inspiration-title">极简产品摄影</strong>
+            <span class="inspiration-desc">晨光大理石 · 质感商业渲染</span>
+            <span class="inspiration-action">一键套用 ↗</span>
+          </button>
+          <button class="inspiration-card" type="button" data-prompt="新中式水墨风韵，青山隐于云雾之中，白鹤掠过水面，金色流光勾勒，意境悠远，高雅国风插画" data-ratio="16:9">
+            <span class="inspiration-tag">国风意境 · 16:9</span>
+            <strong class="inspiration-title">新中式水墨山水</strong>
+            <span class="inspiration-desc">云雾青峰 · 金色流光国风插画</span>
+            <span class="inspiration-action">一键套用 ↗</span>
+          </button>
+          <button class="inspiration-card" type="button" data-prompt="皮克斯风格3D小萌兔宇航员，站在微型发光星球上，大眼睛，毛茸茸细腻毛发，温馨暖光，童话感" data-ratio="3:4">
+            <span class="inspiration-tag">3D IP角色 · 3:4</span>
+            <strong class="inspiration-title">3D 潮玩角色</strong>
+            <span class="inspiration-desc">皮克斯质感 · 温暖发光童话风</span>
+            <span class="inspiration-action">一键套用 ↗</span>
+          </button>
+        </div>
+      </div>
+    `;
     return;
   }
 

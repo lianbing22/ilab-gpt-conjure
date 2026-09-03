@@ -42863,7 +42863,41 @@ ${galleryText}`;
       closePromptPopover7();
       cancelDeferredPreviewRender();
       clearPreviewGridLayout();
-      els37.previewGrid.innerHTML = `<div class="empty-preview">${escapeHtml19(translate("preview.empty"))}</div>`;
+      els37.previewGrid.innerHTML = `
+      <div class="empty-preview-container">
+        <div class="inspiration-banner">
+          <div class="inspiration-sparkle">\u2728</div>
+          <h3>\u7075\u611F\u521B\u4F5C\u7A7A\u95F4</h3>
+          <p>\u70B9\u51FB\u4E0B\u65B9\u7075\u611F\u5361\u7247\uFF0C\u4E00\u952E\u586B\u5165\u63D0\u793A\u8BCD\u4E0E\u6700\u4F73\u53C2\u6570\uFF0C\u5FEB\u901F\u5F00\u542F\u521B\u4F5C</p>
+        </div>
+        <div class="inspiration-grid">
+          <button class="inspiration-card" type="button" data-prompt="\u79D1\u5E7B\u8D5B\u535A\u670B\u514B\u57CE\u5E02\u96E8\u591C\uFF0C\u7A7F\u9EC4\u8272\u673A\u80FD\u96E8\u8863\u7684\u5C11\u5973\u80CC\u5F71\uFF0C\u9713\u8679\u706F\u5012\u5F71\u5728\u79EF\u6C34\u8857\u9053\u4E0A\uFF0C\u4F53\u79EF\u5149\uFF0C\u7535\u5F71\u7EA7\u8D28\u611F\uFF0C\u865A\u5E7B\u5F15\u64CE5\u6E32\u67D3" data-ratio="9:16">
+            <span class="inspiration-tag">\u8D5B\u535A\u673A\u80FD \xB7 9:16</span>
+            <strong class="inspiration-title">\u8D5B\u535A\u670B\u514B\u96E8\u591C\u8857\u9053</strong>
+            <span class="inspiration-desc">\u9713\u8679\u5149\u5F71 \xB7 \u7535\u5F71\u7EA7\u865A\u5E7B5\u6E32\u67D3</span>
+            <span class="inspiration-action">\u4E00\u952E\u5957\u7528 \u2197</span>
+          </button>
+          <button class="inspiration-card" type="button" data-prompt="\u6781\u7B80\u4E3B\u4E49\u9AD8\u7EA7\u5496\u5561\u676F\u54C1\u724C\u4EA7\u54C1\u6E32\u67D3\uFF0C\u67D4\u548C\u81EA\u7136\u6668\u5149\uFF0C\u5927\u7406\u77F3\u53F0\u9762\uFF0C\u6D45\u7C73\u8272\u80CC\u666F\uFF0C\u8D85\u9AD8\u6E05\u7EC6\u8282\uFF0C\u5546\u4E1A\u6444\u5F71" data-ratio="1:1">
+            <span class="inspiration-tag">\u5546\u4E1A\u9759\u7269 \xB7 1:1</span>
+            <strong class="inspiration-title">\u6781\u7B80\u4EA7\u54C1\u6444\u5F71</strong>
+            <span class="inspiration-desc">\u6668\u5149\u5927\u7406\u77F3 \xB7 \u8D28\u611F\u5546\u4E1A\u6E32\u67D3</span>
+            <span class="inspiration-action">\u4E00\u952E\u5957\u7528 \u2197</span>
+          </button>
+          <button class="inspiration-card" type="button" data-prompt="\u65B0\u4E2D\u5F0F\u6C34\u58A8\u98CE\u97F5\uFF0C\u9752\u5C71\u9690\u4E8E\u4E91\u96FE\u4E4B\u4E2D\uFF0C\u767D\u9E64\u63A0\u8FC7\u6C34\u9762\uFF0C\u91D1\u8272\u6D41\u5149\u52FE\u52D2\uFF0C\u610F\u5883\u60A0\u8FDC\uFF0C\u9AD8\u96C5\u56FD\u98CE\u63D2\u753B" data-ratio="16:9">
+            <span class="inspiration-tag">\u56FD\u98CE\u610F\u5883 \xB7 16:9</span>
+            <strong class="inspiration-title">\u65B0\u4E2D\u5F0F\u6C34\u58A8\u5C71\u6C34</strong>
+            <span class="inspiration-desc">\u4E91\u96FE\u9752\u5CF0 \xB7 \u91D1\u8272\u6D41\u5149\u56FD\u98CE\u63D2\u753B</span>
+            <span class="inspiration-action">\u4E00\u952E\u5957\u7528 \u2197</span>
+          </button>
+          <button class="inspiration-card" type="button" data-prompt="\u76AE\u514B\u65AF\u98CE\u683C3D\u5C0F\u840C\u5154\u5B87\u822A\u5458\uFF0C\u7AD9\u5728\u5FAE\u578B\u53D1\u5149\u661F\u7403\u4E0A\uFF0C\u5927\u773C\u775B\uFF0C\u6BDB\u8338\u8338\u7EC6\u817B\u6BDB\u53D1\uFF0C\u6E29\u99A8\u6696\u5149\uFF0C\u7AE5\u8BDD\u611F" data-ratio="3:4">
+            <span class="inspiration-tag">3D IP\u89D2\u8272 \xB7 3:4</span>
+            <strong class="inspiration-title">3D \u6F6E\u73A9\u89D2\u8272</strong>
+            <span class="inspiration-desc">\u76AE\u514B\u65AF\u8D28\u611F \xB7 \u6E29\u6696\u53D1\u5149\u7AE5\u8BDD\u98CE</span>
+            <span class="inspiration-action">\u4E00\u952E\u5957\u7528 \u2197</span>
+          </button>
+        </div>
+      </div>
+    `;
       return;
     }
     renderOutputPreview(selected);
@@ -46012,38 +46046,55 @@ ${galleryText}`;
   initializeQueueFeature();
   initSegmentedIndicatorFeature();
   function initModernUiEnhancements() {
-    const bridge40 = window.__codexImageWebUI?.bridge;
-    const els45 = bridge40?.els;
-    const methods = bridge40?.methods;
-    els45?.desktopAdvancedToggle?.addEventListener("click", () => {
-      const isExpanded = els45.desktopAdvancedToggle.getAttribute("aria-expanded") === "true";
-      const nextState = !isExpanded;
-      els45.desktopAdvancedToggle.setAttribute("aria-expanded", String(nextState));
-      els45.advancedSettingsCollapse?.classList.toggle("hidden", !nextState);
-      if (els45.desktopAdvancedArrow) {
-        els45.desktopAdvancedArrow.textContent = nextState ? "\u25B4" : "\u25BE";
+    const bindEvents = () => {
+      const toggleBtn = document.getElementById("desktopAdvancedToggle");
+      const collapse = document.getElementById("advancedSettingsCollapse");
+      const arrow = document.getElementById("desktopAdvancedArrow");
+      if (toggleBtn && collapse) {
+        toggleBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const isHidden = collapse.classList.contains("hidden");
+          if (isHidden) {
+            collapse.classList.remove("hidden");
+            toggleBtn.setAttribute("aria-expanded", "true");
+            if (arrow) arrow.textContent = "\u25B4";
+          } else {
+            collapse.classList.add("hidden");
+            toggleBtn.setAttribute("aria-expanded", "false");
+            if (arrow) arrow.textContent = "\u25BE";
+          }
+        });
       }
-    });
-    document.addEventListener("click", (event) => {
-      const target = event.target;
-      const card = target?.closest(".inspiration-card");
-      if (!card) return;
-      const prompt = card.dataset.prompt;
-      const ratio = card.dataset.ratio;
-      if (prompt && els45?.promptEditor) {
-        els45.promptEditor.textContent = prompt;
-        if (els45.prompt) els45.prompt.value = prompt;
-        methods?.updateCharCount?.();
-        methods?.syncPromptGalleryMentionsFromInputs?.();
-        methods?.updateRequestPreview?.();
-      }
-      if (ratio) {
-        const selector = '#ratioGroup [data-val="' + ratio + '"]';
-        const ratioBtn = document.querySelector(selector);
-        ratioBtn?.click();
-      }
-      els45?.promptEditor?.focus();
-    });
+      document.addEventListener("click", (event) => {
+        const target = event.target;
+        const card = target?.closest(".inspiration-card");
+        if (!card) return;
+        const prompt = card.dataset.prompt;
+        const ratio = card.dataset.ratio;
+        const editor = document.getElementById("promptEditor");
+        const hiddenPrompt = document.getElementById("prompt");
+        if (prompt && editor) {
+          editor.textContent = prompt;
+          if (hiddenPrompt) hiddenPrompt.value = prompt;
+          const bridge40 = window.__codexImageWebUI?.bridge;
+          bridge40?.methods?.updateCharCount?.();
+          bridge40?.methods?.syncPromptGalleryMentionsFromInputs?.();
+          bridge40?.methods?.updateRequestPreview?.();
+        }
+        if (ratio) {
+          const selector = '#ratioGroup [data-val="' + ratio + '"]';
+          const ratioBtn = document.querySelector(selector);
+          ratioBtn?.click();
+        }
+        editor?.focus();
+      });
+    };
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", bindEvents);
+    } else {
+      bindEvents();
+    }
   }
   initModernUiEnhancements();
   window.__codexImageWebUI?.boot();
