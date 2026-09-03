@@ -1,9 +1,17 @@
 """Shared application version metadata."""
 
-APP_VERSION = "0.2.9"
+APP_VERSION = "0.3.0"
 APP_VERSION_TAG = f"v{APP_VERSION}"
 
 APP_RELEASE_HISTORY = (
+    {
+        "version": "0.3.0",
+        "version_label": "v0.3.0",
+        "released_at": "2026-09-03",
+        "change_ids": (
+            "deepseek_prompt_optimizer",
+        ),
+    },
     {
         "version": "0.2.9",
         "version_label": "v0.2.9",

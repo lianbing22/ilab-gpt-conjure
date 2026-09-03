@@ -631,6 +631,54 @@ const openDashboard = async () => {
 
     openDashboardBtn?.addEventListener("click", openDashboard);
     dashboardModalClose?.addEventListener("click", () => dashboardModal?.classList.add("hidden"));
+
+    // --- DeepSeek-v4-Flash Prompt Optimizer ---
+    const optimizePromptBtn = document.getElementById("optimizePromptBtn");
+    const optimizePromptText = document.getElementById("optimizePromptText");
+    const promptInput = document.getElementById("prompt") as HTMLTextAreaElement | null;
+
+    optimizePromptBtn?.addEventListener("click", async () => {
+      const currentPrompt = promptInput?.value.trim() || "";
+      if (!currentPrompt) {
+        alert("请先输入一段基础生图提示词，然后再进行 AI 优化！");
+        promptInput?.focus();
+        return;
+      }
+
+      if (!currentUser) {
+        alert("请先登录企业账号后再使用 AI 提示词优化功能！");
+        openAuthModal(false);
+        return;
+      }
+
+      optimizePromptBtn.setAttribute("disabled", "true");
+      if (optimizePromptText) optimizePromptText.textContent = "AI 正在扩写优化中...";
+
+      try {
+        const res = await fetch("/api/prompt/optimize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: currentPrompt }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || "优化失败");
+
+        if (promptInput) {
+          promptInput.value = data.optimized_prompt;
+          promptInput.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+        if (optimizePromptText) optimizePromptText.textContent = "优化成功！";
+        window.setTimeout(() => {
+          if (optimizePromptText) optimizePromptText.textContent = "优化提示词";
+        }, 2500);
+      } catch (err: any) {
+        alert(err.message || "提示词优化请求失败，请稍后重试");
+        if (optimizePromptText) optimizePromptText.textContent = "优化提示词";
+      } finally {
+        optimizePromptBtn.removeAttribute("disabled");
+      }
+    });
+
     const openUserManagerBtn = document.getElementById("openUserManagerBtn");
     const userManagerModal = document.getElementById("userManagerModal");
     const userManagerModalClose = document.getElementById("userManagerModalClose");
@@ -796,6 +844,7 @@ function initUniversalRadioButtons() {
     }
   });
 }
+
 
 function initModernUiEnhancements() {
   const bindEvents = () => {

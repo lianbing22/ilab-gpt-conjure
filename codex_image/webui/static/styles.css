@@ -8270,6 +8270,43 @@ input[type=range].slider:disabled::-moz-range-thumb {
   color: var(--primary-strong, var(--primary));
 }
 
+
+/* ============================================================
+   Prompt Optimizer Button & Loading Animation Styles
+   ============================================================ */
+
+.optimize-prompt-button {
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 35%, transparent);
+  color: var(--primary);
+  font-weight: 600;
+  transition: all var(--motion-fast);
+  margin-right: 6px;
+}
+
+.optimize-prompt-button:hover {
+  background: color-mix(in srgb, var(--primary) 22%, transparent);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.optimize-prompt-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.optimize-sparkle-icon {
+  font-size: 14px;
+  display: inline-block;
+  animation: pulse-sparkle 2s infinite ease-in-out;
+}
+
+@keyframes pulse-sparkle {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(79, 70, 229, 0)); }
+  50% { transform: scale(1.18); filter: drop-shadow(0 0 6px rgba(79, 70, 229, 0.6)); }
+}
+
 /* source: styles/71-preview-results.css */
 /* Preview Grid */
 .preview-grid {

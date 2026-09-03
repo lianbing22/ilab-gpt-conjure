@@ -1,4 +1,5 @@
 from __future__ import annotations
+import json
 
 import shutil
 import os
@@ -102,6 +103,60 @@ def require_current_user(request: Request, ctx: WebUIContext) -> dict[str, Any]:
     return user
 
 def register_enterprise_routes(app: FastAPI, ctx: WebUIContext) -> None:
+
+    # 8. 基于 DeepSeek-v4-Flash 的提示词智能扩写与优化接口
+    @app.post("/api/prompt/optimize")
+    def optimize_prompt(request: Request, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+        user = require_current_user(request, ctx)
+        raw_prompt = str(payload.get("prompt", "")).strip()
+        if not raw_prompt:
+            raise HTTPException(status_code=400, detail="请输入需要优化的提示词")
+
+        api_url = "https://ai-api.kkidc.com/v1/chat/completions"
+        api_key = "sk-BVbEHeUeFmYIJHehTX81LBiDtzGXOBjUlaJsii6NBLN1BjLn"
+
+        system_instruction = (
+            "你是一个顶级AI绘画生图提示词专家。你的任务是将用户提供的简短或基础生图提示词进行扩写和优化。"
+            "要求："
+            "1. 丰富画面的构图、主体细节、光影氛围（如丁达尔光、轮廓光、柔光）、色彩质感（如胶片质感、金属反光、细腻皮肤）与环境景深。"
+            "2. 保持用户原始意图不失真。"
+            "3. 直接输出一段优化后的可直接用于生图的中文提示词段落，不要包含任何前缀闲聊、寒暄或分点解释，直接给出最终提示词纯文本。"
+        )
+
+        req_data = json.dumps({
+            "model": "deepseek-v4-flash",
+            "messages": [
+                {"role": "system", "content": system_instruction},
+                {"role": "user", "content": f"请优化这段生图提示词：{raw_prompt}"}
+            ],
+            "temperature": 0.7,
+            "max_tokens": 800
+        }).encode("utf-8")
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {api_key}",
+            "User-Agent": "codex-image/0.3.0"
+        }
+
+        import urllib.request
+        import ssl
+        ssl_ctx = ssl.create_default_context()
+        ssl_ctx.check_hostname = False
+        ssl_ctx.verify_mode = ssl.CERT_NONE
+
+        req = urllib.request.Request(api_url, data=req_data, headers=headers)
+        try:
+            with urllib.request.urlopen(req, context=ssl_ctx, timeout=30) as resp:
+                res = json.loads(resp.read().decode("utf-8"))
+                optimized_text = res["choices"][0]["message"]["content"].strip()
+                # 剔除可能带有的首尾引号
+                if optimized_text.startswith(('"', '“')) and optimized_text.endswith(('"', '”')):
+                    optimized_text = optimized_text[1:-1].strip()
+                return {"ok": True, "optimized_prompt": optimized_text, "original_prompt": raw_prompt}
+        except Exception as exc:
+            raise HTTPException(status_code=502, detail=f"提示词优化调用失败: {str(exc)}") from exc
+
 
     # 6. 服务器性能与资源监控接口
     @app.get("/api/admin/system-metrics")
