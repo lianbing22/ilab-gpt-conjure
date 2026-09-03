@@ -48,6 +48,10 @@ export function updateTaskInState(task: WebUITask | null | undefined): boolean {
   if (state.pendingTaskId && String(state.pendingTaskId) === taskId && !task.local_pending) {
     state.pendingTaskId = null;
   }
+  // 如果当前选中的任务已经完成或结束，立刻终止运行中倒计时/状态锁
+  if (String(state.selectedTaskId) === taskId && ["completed", "failed", "partial_failed"].includes(String(task?.status))) {
+    stopRunFeedback();
+  }
   return true;
 }
 

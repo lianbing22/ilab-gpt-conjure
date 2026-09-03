@@ -296,6 +296,8 @@ export const ZH_CN_DICTIONARY: TranslationDictionary = {
     "version.change.strict_history_privacy_guard": "严格加强数据保密：未登录状态下全面禁止查看历史任务与生图记录。",
     "version.change.enforce_login_guard": "新增全链路登录拦截守卫，未登录用户无法发起生成或访问内部资产。",
     "version.change.task_user_privacy_filter": "多用户物理隐私隔离：员工之间只能查看和管理属于自己的生图任务。",
+        "version.change.task_completion_realtime_render_fix": "修复任务完成后预览区停留运行态问题，自动解开运行中锁并立即呈现生成的全部高清图片。",
+    "version.change.sidebar_card_thumbnail_include_fix": "优化侧边栏任务卡片产物映射，任务生成完毕后即刻同步大图与缩略图预览。",
     "version.change.built_in_enterprise_prompt_templates": "内置 50 套覆盖 6 大高频企业职场场景的专业提示词模板（含商务肖像、营销海报、产品电商、VI设计、内刊插图、办公科技等）。",
     "version.change.server_system_metrics": "管理员大盘新增服务器实时监控：支持查看 CPU 负载、内存占用与硬盘剩余空间。",
     "version.change.cleanup_history_images": "新增历史图片清理工具：支持按最近 1 天、7 天、30 天或自定义日期区间一键释放磁盘空间。",

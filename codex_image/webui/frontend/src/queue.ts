@@ -517,19 +517,18 @@ export function applyQueueTasks(queue: QueueState | null | undefined): void {
       void bridge.methods.markTaskViewed(task.task_id);
     }
   });
-  if (!changed) {
-    if (needsTaskReconcile) {
-      void bridge.methods.refreshTasks();
-    }
-    return;
+  if (needsTaskReconcile) {
+    void bridge.methods.refreshTasks();
   }
+  if (!changed) return;
   bridge.methods.cleanupSessionSelections();
   bridge.methods.renderTasks();
   bridge.methods.renderArchiveButton();
   bridge.methods.renderArchiveModal();
-  bridge.methods.renderPreview();
-  if (needsTaskReconcile) {
-    void bridge.methods.refreshTasks();
+  if (typeof (bridge.methods as any).renderSelectedTaskPreview === "function") {
+    void (bridge.methods as any).renderSelectedTaskPreview();
+  } else {
+    bridge.methods.renderPreview();
   }
 }
 

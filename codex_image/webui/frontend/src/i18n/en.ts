@@ -296,6 +296,8 @@ export const EN_DICTIONARY: TranslationDictionary = {
     "version.change.strict_history_privacy_guard": "Strict privacy lockdown preventing unauthenticated history inspection.",
     "version.change.enforce_login_guard": "Mandatory login enforcement for generation and internal assets.",
     "version.change.task_user_privacy_filter": "Strict task privacy filter isolating data between team members.",
+        "version.change.task_completion_realtime_render_fix": "Fix task preview stuck in running feedback and immediately render all generated images.",
+    "version.change.sidebar_card_thumbnail_include_fix": "Synchronize full output images and thumbnails onto sidebar cards instantly.",
     "version.change.built_in_enterprise_prompt_templates": "Built-in 50 production-grade enterprise prompt templates across 6 major professional business categories.",
     "version.change.server_system_metrics": "System telemetry metrics monitoring CPU, Memory, and Disk usage.",
     "version.change.cleanup_history_images": "History image cleanup utility supporting 1/7/30 days and custom date ranges.",

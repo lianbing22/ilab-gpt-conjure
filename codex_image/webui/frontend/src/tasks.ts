@@ -192,7 +192,8 @@ async function syncTaskSearchHistoryResults() {
 
 async function renderSelectedTaskPreview(requestSeq: number | null = null) {
   const selectedTask = state.tasks.find((item: any) => String(item.task_id) === String(state.selectedTaskId));
-  if (selectedTask?.summary_only) {
+  // 只要选中的任务是 summary_only 或者已经完成但缺少产物大图，立刻拉取全量详情并渲染
+  if (selectedTask && (selectedTask.summary_only || (selectedTask.status === "completed" && (!Array.isArray(selectedTask.outputs) || !selectedTask.outputs.length)))) {
     try {
       const detailedTask = await ensureSelectedTaskDetail(selectedTask.task_id);
       if (requestSeq !== null && requestSeq !== state.tasksRequestSeq) return;
