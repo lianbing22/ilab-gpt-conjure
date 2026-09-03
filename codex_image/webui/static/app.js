@@ -46011,6 +46011,41 @@ ${galleryText}`;
   initLightboxFeature();
   initializeQueueFeature();
   initSegmentedIndicatorFeature();
+  function initModernUiEnhancements() {
+    const bridge40 = window.__codexImageWebUI?.bridge;
+    const els45 = bridge40?.els;
+    const methods = bridge40?.methods;
+    els45?.desktopAdvancedToggle?.addEventListener("click", () => {
+      const isExpanded = els45.desktopAdvancedToggle.getAttribute("aria-expanded") === "true";
+      const nextState = !isExpanded;
+      els45.desktopAdvancedToggle.setAttribute("aria-expanded", String(nextState));
+      els45.advancedSettingsCollapse?.classList.toggle("hidden", !nextState);
+      if (els45.desktopAdvancedArrow) {
+        els45.desktopAdvancedArrow.textContent = nextState ? "\u25B4" : "\u25BE";
+      }
+    });
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      const card = target?.closest(".inspiration-card");
+      if (!card) return;
+      const prompt = card.dataset.prompt;
+      const ratio = card.dataset.ratio;
+      if (prompt && els45?.promptEditor) {
+        els45.promptEditor.textContent = prompt;
+        if (els45.prompt) els45.prompt.value = prompt;
+        methods?.updateCharCount?.();
+        methods?.syncPromptGalleryMentionsFromInputs?.();
+        methods?.updateRequestPreview?.();
+      }
+      if (ratio) {
+        const selector = '#ratioGroup [data-val="' + ratio + '"]';
+        const ratioBtn = document.querySelector(selector);
+        ratioBtn?.click();
+      }
+      els45?.promptEditor?.focus();
+    });
+  }
+  initModernUiEnhancements();
   window.__codexImageWebUI?.boot();
 })();
 //# sourceMappingURL=app.js.map

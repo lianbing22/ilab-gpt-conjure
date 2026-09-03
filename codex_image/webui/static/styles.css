@@ -7327,6 +7327,218 @@ input[type=range].slider:disabled::-moz-range-thumb {
 .status-text.error { color: var(--danger); }
 .status-text.running { color: var(--primary-strong); }
 
+
+/* ============================================================
+   Modern UI Enhancements (Output Settings & Inspiration)
+   ============================================================ */
+
+/* 比例标题行与方向紧凑胶囊 */
+.field-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.orientation-group-compact {
+  display: inline-flex;
+  gap: 2px;
+  background: var(--surface-soft);
+  padding: 2px;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, var(--line) 75%, transparent);
+}
+
+.orientation-group-compact .radio-btn {
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 4px;
+}
+
+/* 核心常驻行：分辨率与数量并排 */
+.core-presets-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: center;
+}
+
+.pixel-preview-pill {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary-strong, var(--primary));
+  padding: 6px 10px;
+  background: color-mix(in srgb, var(--primary-light) 65%, var(--surface-soft));
+  border: 1px dashed color-mix(in srgb, var(--primary) 35%, transparent);
+  border-radius: 6px;
+  margin: 2px 0 6px;
+}
+
+/* 高级设置折叠触发条 */
+.advanced-toggle-wrap {
+  margin: 4px 0;
+}
+
+.advanced-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 7px 12px;
+  background: var(--surface-soft);
+  border: 1px solid color-mix(in srgb, var(--line) 85%, transparent);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--motion-fast);
+}
+
+.advanced-toggle-btn:hover {
+  background: color-mix(in srgb, var(--surface-soft) 80%, var(--primary-light));
+  color: var(--text-primary);
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--line));
+}
+
+.advanced-toggle-btn .toggle-arrow {
+  font-size: 12px;
+  transition: transform var(--motion-fast);
+}
+
+.advanced-settings-collapse {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background: color-mix(in srgb, var(--surface-soft) 50%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  border-radius: 8px;
+  margin-top: 4px;
+}
+
+.advanced-settings-collapse.hidden {
+  display: none !important;
+}
+
+.format-moderation-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* ============================================================
+   Inspiration Empty State (右侧灵感空状态)
+   ============================================================ */
+
+.empty-preview-container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  height: 100%;
+  min-height: 480px;
+  padding: 24px;
+  gap: 20px;
+}
+
+.inspiration-banner {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.inspiration-sparkle {
+  font-size: 28px;
+  margin-bottom: 2px;
+  animation: pulse 2.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.12); opacity: 1; }
+}
+
+.inspiration-banner h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.inspiration-banner p {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.inspiration-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+.inspiration-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--line) 85%, transparent);
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  transition: all var(--motion-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.inspiration-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(47, 111, 94, 0.12);
+  background: color-mix(in srgb, var(--primary-light) 40%, var(--surface));
+}
+
+.inspiration-tag {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--primary-strong, var(--primary));
+  background: color-mix(in srgb, var(--primary-light) 80%, var(--surface));
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.inspiration-title {
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.inspiration-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.35;
+  margin-bottom: 10px;
+  flex-grow: 1;
+}
+
+.inspiration-action {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary-strong, var(--primary));
+  align-self: flex-end;
+}
+
 /* source: styles/71-preview-results.css */
 /* Preview Grid */
 .preview-grid {
