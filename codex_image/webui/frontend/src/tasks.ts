@@ -33,10 +33,15 @@ function normalizedTaskSearchResultQuery(query: string): string {
 
 async function refreshTasks({ migrateLegacyArchives = false }: any = {}) {
   const requestSeq = ++state.tasksRequestSeq;
-  const response = await fetch("/api/tasks/recent?limit=50");
-  const data = await response.json();
-  if (requestSeq !== state.tasksRequestSeq) return;
-  await applyTasksSnapshot(data.tasks || [], { migrateLegacyArchives, requestSeq });
+  try {
+    const response = await fetch("/api/tasks/recent?limit=50");
+    if (!response.ok) return;
+    const data = await response.json().catch(() => ({ tasks: [] }));
+    if (requestSeq !== state.tasksRequestSeq) return;
+    await applyTasksSnapshot(data.tasks || [], { migrateLegacyArchives, requestSeq });
+  } catch (error) {
+    console.warn("refreshTasks error ignored:", error);
+  }
 }
 
 async function applyTasksSnapshot(tasks: any, { migrateLegacyArchives = false, requestSeq = state.tasksRequestSeq }: any = {}) {

@@ -118,15 +118,15 @@ export async function refreshQueue(): Promise<void> {
   const requestSeq = ++state.queueRequestSeq;
   try {
     const response = await fetch("/api/queue");
-    const data = await response.json();
     if (requestSeq !== state.queueRequestSeq) return;
-    if (!response.ok) {
-      throw new Error(data.detail || translate("queue.readFailed"));
-    }
+    if (!response.ok) return;
+    const data = await response.json().catch(() => null);
+    if (!data) return;
     state.queue = normalizeQueueState(data);
     renderQueue();
   } catch (error: unknown) {
-    bridge.methods.setStatus(errorMessage(error, translate("queue.readFailed")), "error");
+    // 忽略服务重启瞬态网络异常，避免在界面裸露 HTML 解析报错
+    console.warn("refreshQueue error:", error);
   }
 }
 

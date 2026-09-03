@@ -1,9 +1,17 @@
 """Shared application version metadata."""
 
-APP_VERSION = "0.2.7"
+APP_VERSION = "0.2.8"
 APP_VERSION_TAG = f"v{APP_VERSION}"
 
 APP_RELEASE_HISTORY = (
+    {
+        "version": "0.2.8",
+        "version_label": "v0.2.8",
+        "released_at": "2026-09-03",
+        "change_ids": (
+            "graceful_network_json_fallback",
+        ),
+    },
     {
         "version": "0.2.7",
         "version_label": "v0.2.7",
