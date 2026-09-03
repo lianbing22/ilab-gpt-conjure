@@ -8282,6 +8282,8 @@ input[type=range].slider:disabled::-moz-range-thumb {
   font-weight: 600;
   transition: all var(--motion-fast);
   margin-right: 6px;
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .optimize-prompt-button:hover {
