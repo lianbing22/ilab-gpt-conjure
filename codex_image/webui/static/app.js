@@ -39,8 +39,6 @@
     els45.quickGalleryRail?.addEventListener("mouseover", (event) => call(methods, "handleQuickGalleryCategoryEvent", event));
     els45.quickGalleryRail?.addEventListener("focusin", (event) => call(methods, "handleQuickGalleryCategoryEvent", event));
     els45.quickGalleryRail?.addEventListener("click", (event) => call(methods, "handleQuickGalleryCategoryEvent", event));
-    els45.quickGalleryList?.addEventListener("scroll", () => call(methods, "scheduleQuickGalleryFocusUpdate"));
-    els45.quickGalleryList?.addEventListener("wheel", (event) => call(methods, "handleQuickGalleryBoundaryWheel", event), { passive: false });
     els45.addGalleryCategoryButton?.addEventListener("click", () => call(methods, "createGalleryCategory"));
     els45.addToGalleryClose?.addEventListener("click", () => call(methods, "closeAddToGallery"));
     els45.addToGalleryModal?.addEventListener("click", (event) => {
@@ -326,9 +324,18 @@
       imageUploaderGrid: document.querySelector(".image-uploader-grid"),
       imageUploadSource: document.querySelector("#imageUploadSource"),
       quickGalleryDock: document.querySelector("#quickGalleryDock"),
-      quickGalleryPreview: document.querySelector("#quickGalleryPreview"),
+      quickGalleryOpenButton: document.querySelector("#quickGalleryOpenButton"),
+      quickGalleryModal: document.querySelector("#quickGalleryModal"),
+      quickGalleryModalClose: document.querySelector("#quickGalleryModalClose"),
+      quickGalleryDoneButton: document.querySelector("#quickGalleryDoneButton"),
+      quickGallerySearch: document.querySelector("#quickGallerySearch"),
       quickGalleryList: document.querySelector("#quickGalleryList"),
       quickGalleryRail: document.querySelector("#quickGalleryRail"),
+      modalTabGallery: document.querySelector("#modalTabGallery"),
+      modalTabBrand: document.querySelector("#modalTabBrand"),
+      quickGalleryTabContent: document.querySelector("#quickGalleryTabContent"),
+      quickBrandTabContent: document.querySelector("#quickBrandTabContent"),
+      brandMaterialSummaryText: document.querySelector("#brandMaterialSummaryText"),
       brandMaterialPicker: document.querySelector("#brandMaterialPicker"),
       brandMaterialList: document.querySelector("#brandMaterialList"),
       brandMaterialOpenButton: document.querySelector("#brandMaterialOpenButton"),
@@ -348,6 +355,10 @@
       galleryDrawer: document.querySelector("#galleryDrawer"),
       galleryDrawerClose: document.querySelector("#galleryDrawerClose"),
       galleryDrawerBackdrop: document.querySelector("#galleryDrawerBackdrop"),
+      galleryModeTabReference: document.querySelector("#galleryModeTabReference"),
+      galleryModeTabBrand: document.querySelector("#galleryModeTabBrand"),
+      galleryReferenceToolbar: document.querySelector("#galleryReferenceToolbar"),
+      galleryBrandSection: document.querySelector("#galleryBrandSection"),
       galleryDrawerSubtitle: document.querySelector("#galleryDrawerSubtitle"),
       galleryDrawerCategoryTabs: document.querySelector("#galleryDrawerCategoryTabs"),
       galleryCategoryManagePanel: document.querySelector("#galleryCategoryManagePanel"),
@@ -781,7 +792,9 @@
     "version.historyEmpty": "No release notes available",
     "version.currentBadge": "Current",
     "version.releaseDate": "{date}",
+    "version.change.quick_gallery_picker": "Added a quick gallery modal picker with real-time search, multi-selection, and thumbnail optimizations.",
     "version.change.official_asset_library": "Expanded the official Logo, Slogan, and business signature library with additional brands, business lines, horizontal and vertical layouts, and inverted variants.",
+    "version.change.material_picker_modal": "Material picker is now a dialog with large thumbnails, categories, search, and multi-select.",
     "version.change.brand_name": "Renamed the product to AI Innovation Studio across all languages.",
     "version.change.brand_templates": "Added selectable brand templates and automatic composition for logos, slogans, and other brand elements.",
     "version.change.brand_preview": "Branded results now stay consistent across previews, history, zoom, and downloads, while the original image remains available.",
@@ -939,6 +952,17 @@
     "gallery.fieldPromptNote": "Reference note",
     "gallery.fieldName": "Name",
     "quickGallery.empty": "No {category} images",
+    "quickGallery.searchPlaceholder": "Search images",
+    "quickGallery.noResults": "No matching images",
+    "quickGallery.open": "Pick from gallery",
+    "quickGallery.openTitle": "Pick from gallery",
+    "quickGallery.title": "Pick images",
+    "quickGallery.subtitle": "Click to add to the input area, click to remove",
+    "quickGallery.close": "Close image picker",
+    "quickGallery.done": "Done",
+    "quickGallery.tabGallery": "Public Gallery",
+    "quickGallery.tabBrand": "Brand Assets",
+    "quickGallery.brandSummaryHint": "Configure logo and business signature",
     "promptGallery.remove": "Remove @{name}",
     "prompt.title": "Prompt",
     "prompt.editorLabel": "Prompt",
@@ -1453,7 +1477,8 @@
     "imageEditor.emptyInsertList": "No other input images",
     "imageEditor.selectLayerFirst": "Select a layer first",
     "imageEditor.baseLayer": "Base image",
-    "gallery.title": "Gallery",
+    "gallery.title": "Asset Library",
+    "gallery.tabReferenceImages": "Reference Images",
     "gallery.subtitle": "Choose reference images for the current task",
     "gallery.manageCategories": "Manage categories",
     "gallery.categoryManager": "Manage gallery categories",
@@ -1800,7 +1825,9 @@
     "version.historyEmpty": "Keine Versionshinweise verf\xFCgbar",
     "version.currentBadge": "Aktuell",
     "version.releaseDate": "{date}",
+    "version.change.quick_gallery_picker": "Added a quick gallery modal picker with real-time search, multi-selection, and thumbnail optimizations.",
     "version.change.official_asset_library": "Die offizielle Bibliothek f\xFCr Logos, Slogans und Gesch\xE4ftssignaturen wurde um weitere Marken, Gesch\xE4ftsbereiche, horizontale und vertikale Layouts sowie invertierte Varianten erweitert.",
+    "version.change.material_picker_modal": "Die Materialauswahl ist jetzt ein Dialog mit gro\xDFen Vorschaubildern, Kategorien, Suche und Mehrfachauswahl.",
     "version.change.brand_name": "Das Produkt wurde in allen Sprachen in AI Innovation Studio umbenannt.",
     "version.change.brand_templates": "Ausw\xE4hlbare Markenvorlagen und die automatische Zusammenstellung von Logos, Slogans und weiteren Markenelementen wurden erg\xE4nzt.",
     "version.change.brand_preview": "Markenergebnisse bleiben in Vorschau, Verlauf, Gro\xDFansicht und Download konsistent; das Originalbild bleibt verf\xFCgbar.",
@@ -2783,7 +2810,9 @@
     "version.historyEmpty": "No hay notas de versi\xF3n disponibles",
     "version.currentBadge": "Actual",
     "version.releaseDate": "{date}",
+    "version.change.quick_gallery_picker": "Added a quick gallery modal picker with real-time search, multi-selection, and thumbnail optimizations.",
     "version.change.official_asset_library": "Se ampli\xF3 la biblioteca oficial de logotipos, lemas y firmas comerciales con m\xE1s marcas, l\xEDneas de negocio, formatos horizontales y verticales y variantes invertidas.",
+    "version.change.material_picker_modal": "El selector de material ahora es un cuadro de di\xE1logo con miniaturas grandes, categor\xEDas, b\xFAsqueda y selecci\xF3n m\xFAltiple.",
     "version.change.brand_name": "Se cambi\xF3 el nombre del producto a AI Innovation Studio en todos los idiomas.",
     "version.change.brand_templates": "Se a\xF1adieron plantillas de marca seleccionables y composici\xF3n autom\xE1tica de logotipos, lemas y otros elementos.",
     "version.change.brand_preview": "Los resultados de marca son coherentes en vista previa, historial, ampliaci\xF3n y descarga, conservando el cambio a la imagen original.",
@@ -3766,7 +3795,9 @@
     "version.historyEmpty": "Aucune note de version disponible",
     "version.currentBadge": "Actuelle",
     "version.releaseDate": "{date}",
+    "version.change.quick_gallery_picker": "Added a quick gallery modal picker with real-time search, multi-selection, and thumbnail optimizations.",
     "version.change.official_asset_library": "La biblioth\xE8que officielle de logos, slogans et signatures commerciales a \xE9t\xE9 enrichie avec davantage de marques, de lignes m\xE9tier, de formats horizontaux et verticaux et de variantes invers\xE9es.",
+    "version.change.material_picker_modal": "Le s\xE9lecteur de m\xE9dias devient une fen\xEAtre avec grands aper\xE7us, cat\xE9gories, recherche et s\xE9lection multiple.",
     "version.change.brand_name": "Le nom du produit est d\xE9sormais AI Innovation Studio dans toutes les langues.",
     "version.change.brand_templates": "Ajout de mod\xE8les de marque s\xE9lectionnables et de la composition automatique des logos, slogans et autres \xE9l\xE9ments.",
     "version.change.brand_preview": "Les r\xE9sultats de marque restent coh\xE9rents dans l\u2019aper\xE7u, l\u2019historique, le zoom et le t\xE9l\xE9chargement, avec acc\xE8s \xE0 l\u2019image d\u2019origine.",
@@ -4749,7 +4780,9 @@
     "version.historyEmpty": "\u66F4\u65B0\u5C65\u6B74\u306F\u3042\u308A\u307E\u305B\u3093",
     "version.currentBadge": "\u73FE\u5728",
     "version.releaseDate": "{date}",
+    "version.change.quick_gallery_picker": "Added a quick gallery modal picker with real-time search, multi-selection, and thumbnail optimizations.",
     "version.change.official_asset_library": "\u516C\u5F0F\u306E\u30ED\u30B4\u3001\u30B9\u30ED\u30FC\u30AC\u30F3\u3001\u30D3\u30B8\u30CD\u30B9\u30B7\u30B0\u30CD\u30C1\u30E3\u7D20\u6750\u30E9\u30A4\u30D6\u30E9\u30EA\u3092\u62E1\u5145\u3057\u3001\u8907\u6570\u30D6\u30E9\u30F3\u30C9\u3001\u4E8B\u696D\u30E9\u30A4\u30F3\u3001\u6A2A\u578B\u30FB\u7E26\u578B\u3001\u53CD\u8EE2\u7248\u3092\u8FFD\u52A0\u3057\u307E\u3057\u305F\u3002",
+    "version.change.material_picker_modal": "\u7D20\u6750\u9078\u629E\u3092\u30C0\u30A4\u30A2\u30ED\u30B0\u5316\u3057\u3001\u5927\u304D\u306A\u30B5\u30E0\u30CD\u30A4\u30EB\u30FB\u30AB\u30C6\u30B4\u30EA\u30FB\u691C\u7D22\u30FB\u8907\u6570\u9078\u629E\u3067\u306E\u5165\u529B\u6B04\u3078\u306E\u8FFD\u52A0\u306B\u5BFE\u5FDC\u3057\u307E\u3057\u305F\u3002",
     "version.change.brand_name": "\u88FD\u54C1\u540D\u3092\u300CAI \u30A4\u30CE\u30D9\u30FC\u30B7\u30E7\u30F3\u30B9\u30BF\u30B8\u30AA\u300D\u306B\u7D71\u4E00\u3057\u3001\u82F1\u8A9E\u3082 AI Innovation Studio \u306B\u66F4\u65B0\u3057\u307E\u3057\u305F\u3002",
     "version.change.brand_templates": "\u9078\u629E\u53EF\u80FD\u306A\u30D6\u30E9\u30F3\u30C9\u30C6\u30F3\u30D7\u30EC\u30FC\u30C8\u3068\u3001\u30ED\u30B4\u30FB\u30B9\u30ED\u30FC\u30AC\u30F3\u306A\u3069\u306E\u81EA\u52D5\u5408\u6210\u3092\u8FFD\u52A0\u3057\u307E\u3057\u305F\u3002",
     "version.change.brand_preview": "\u30D6\u30E9\u30F3\u30C9\u7D50\u679C\u3092\u30D7\u30EC\u30D3\u30E5\u30FC\u3001\u5C65\u6B74\u3001\u62E1\u5927\u8868\u793A\u3001\u30C0\u30A6\u30F3\u30ED\u30FC\u30C9\u3067\u7D71\u4E00\u3057\u3001\u5143\u753B\u50CF\u3078\u306E\u5207\u308A\u66FF\u3048\u3082\u7DAD\u6301\u3057\u307E\u3057\u305F\u3002",
@@ -5732,7 +5765,9 @@
     "version.historyEmpty": "\uC5C5\uB370\uC774\uD2B8 \uAE30\uB85D\uC774 \uC5C6\uC2B5\uB2C8\uB2E4",
     "version.currentBadge": "\uD604\uC7AC",
     "version.releaseDate": "{date}",
+    "version.change.quick_gallery_picker": "Added a quick gallery modal picker with real-time search, multi-selection, and thumbnail optimizations.",
     "version.change.official_asset_library": "\uACF5\uC2DD \uB85C\uACE0, \uC2AC\uB85C\uAC74 \uBC0F \uBE44\uC988\uB2C8\uC2A4 \uC2DC\uADF8\uB2C8\uCC98 \uB77C\uC774\uBE0C\uB7EC\uB9AC\uC5D0 \uC5EC\uB7EC \uBE0C\uB79C\uB4DC\uC640 \uC0AC\uC5C5\uAD70, \uAC00\uB85C\uD615\xB7\uC138\uB85C\uD615 \uBC0F \uBC18\uC804 \uBC84\uC804\uC744 \uCD94\uAC00\uD588\uC2B5\uB2C8\uB2E4.",
+    "version.change.material_picker_modal": "\uC18C\uC7AC \uC120\uD0DD\uC774 \uB300\uD654\uC0C1\uC790\uB85C \uBC14\uB00C\uACE0, \uD070 \uC378\uB124\uC77C\xB7\uCE74\uD14C\uACE0\uB9AC\xB7\uAC80\uC0C9\xB7\uB2E4\uC911 \uC120\uD0DD\uC73C\uB85C \uC785\uB825 \uC601\uC5ED\uC5D0 \uCD94\uAC00\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4.",
     "version.change.brand_name": "\uC81C\uD488\uBA85\uC744 AI \uD601\uC2E0 \uC2A4\uD29C\uB514\uC624\uB85C \uBCC0\uACBD\uD558\uACE0 \uC601\uBB38\uBA85\uB3C4 AI Innovation Studio\uB85C \uD1B5\uC77C\uD588\uC2B5\uB2C8\uB2E4.",
     "version.change.brand_templates": "\uC120\uD0DD \uAC00\uB2A5\uD55C \uBE0C\uB79C\uB4DC \uD15C\uD50C\uB9BF\uACFC \uB85C\uACE0\xB7\uC2AC\uB85C\uAC74 \uB4F1 \uBE0C\uB79C\uB4DC \uC694\uC18C\uC758 \uC790\uB3D9 \uD569\uC131\uC744 \uCD94\uAC00\uD588\uC2B5\uB2C8\uB2E4.",
     "version.change.brand_preview": "\uBE0C\uB79C\uB4DC \uACB0\uACFC\uB97C \uBBF8\uB9AC\uBCF4\uAE30, \uAE30\uB85D, \uD655\uB300 \uBCF4\uAE30, \uB2E4\uC6B4\uB85C\uB4DC\uC5D0\uC11C \uC77C\uAD00\uB418\uAC8C \uD45C\uC2DC\uD558\uBA70 \uC6D0\uBCF8 \uC774\uBBF8\uC9C0 \uC804\uD658\uB3C4 \uC720\uC9C0\uD569\uB2C8\uB2E4.",
@@ -6715,7 +6750,9 @@
     "version.historyEmpty": "Nenhuma nota de vers\xE3o dispon\xEDvel",
     "version.currentBadge": "Atual",
     "version.releaseDate": "{date}",
+    "version.change.quick_gallery_picker": "Added a quick gallery modal picker with real-time search, multi-selection, and thumbnail optimizations.",
     "version.change.official_asset_library": "A biblioteca oficial de logotipos, slogans e assinaturas comerciais foi ampliada com mais marcas, linhas de neg\xF3cio, formatos horizontais e verticais e variantes invertidas.",
+    "version.change.material_picker_modal": "O seletor de materiais agora \xE9 uma janela com miniaturas grandes, categorias, pesquisa e sele\xE7\xE3o m\xFAltipla.",
     "version.change.brand_name": "O nome do produto passou a ser AI Innovation Studio em todos os idiomas.",
     "version.change.brand_templates": "Adicionamos modelos de marca selecion\xE1veis e composi\xE7\xE3o autom\xE1tica de logotipos, slogans e outros elementos.",
     "version.change.brand_preview": "Os resultados com marca agora permanecem consistentes na pr\xE9via, hist\xF3rico, amplia\xE7\xE3o e download, mantendo a imagem original dispon\xEDvel.",
@@ -7698,7 +7735,9 @@
     "version.historyEmpty": "\u041D\u0435\u0442 \u0434\u043E\u0441\u0442\u0443\u043F\u043D\u044B\u0445 \u0437\u0430\u043C\u0435\u0442\u043E\u043A \u043E \u0432\u0435\u0440\u0441\u0438\u0438",
     "version.currentBadge": "\u0422\u0435\u043A\u0443\u0449\u0430\u044F",
     "version.releaseDate": "{date}",
+    "version.change.quick_gallery_picker": "Added a quick gallery modal picker with real-time search, multi-selection, and thumbnail optimizations.",
     "version.change.official_asset_library": "\u041E\u0444\u0438\u0446\u0438\u0430\u043B\u044C\u043D\u0430\u044F \u0431\u0438\u0431\u043B\u0438\u043E\u0442\u0435\u043A\u0430 \u043B\u043E\u0433\u043E\u0442\u0438\u043F\u043E\u0432, \u0441\u043B\u043E\u0433\u0430\u043D\u043E\u0432 \u0438 \u0434\u0435\u043B\u043E\u0432\u044B\u0445 \u043F\u043E\u0434\u043F\u0438\u0441\u0435\u0439 \u0440\u0430\u0441\u0448\u0438\u0440\u0435\u043D\u0430 \u043D\u043E\u0432\u044B\u043C\u0438 \u0431\u0440\u0435\u043D\u0434\u0430\u043C\u0438, \u043D\u0430\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u0438\u044F\u043C\u0438, \u0433\u043E\u0440\u0438\u0437\u043E\u043D\u0442\u0430\u043B\u044C\u043D\u044B\u043C\u0438 \u0438 \u0432\u0435\u0440\u0442\u0438\u043A\u0430\u043B\u044C\u043D\u044B\u043C\u0438 \u043A\u043E\u043C\u043F\u043E\u043D\u043E\u0432\u043A\u0430\u043C\u0438 \u0438 \u0438\u043D\u0432\u0435\u0440\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u044B\u043C\u0438 \u0432\u0430\u0440\u0438\u0430\u043D\u0442\u0430\u043C\u0438.",
+    "version.change.material_picker_modal": "\u0412\u044B\u0431\u043E\u0440 \u043C\u0430\u0442\u0435\u0440\u0438\u0430\u043B\u043E\u0432 \u0442\u0435\u043F\u0435\u0440\u044C \u0432 \u0434\u0438\u0430\u043B\u043E\u0433\u043E\u0432\u043E\u043C \u043E\u043A\u043D\u0435: \u043A\u0440\u0443\u043F\u043D\u044B\u0435 \u043C\u0438\u043D\u0438\u0430\u0442\u044E\u0440\u044B, \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438, \u043F\u043E\u0438\u0441\u043A \u0438 \u043C\u043D\u043E\u0436\u0435\u0441\u0442\u0432\u0435\u043D\u043D\u044B\u0439 \u0432\u044B\u0431\u043E\u0440.",
     "version.change.brand_name": "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u043F\u0440\u043E\u0434\u0443\u043A\u0442\u0430 \u0438\u0437\u043C\u0435\u043D\u0435\u043D\u043E \u043D\u0430 AI Innovation Studio \u043D\u0430 \u0432\u0441\u0435\u0445 \u044F\u0437\u044B\u043A\u0430\u0445.",
     "version.change.brand_templates": "\u0414\u043E\u0431\u0430\u0432\u043B\u0435\u043D\u044B \u0432\u044B\u0431\u0438\u0440\u0430\u0435\u043C\u044B\u0435 \u0431\u0440\u0435\u043D\u0434-\u0448\u0430\u0431\u043B\u043E\u043D\u044B \u0438 \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u0447\u0435\u0441\u043A\u0430\u044F \u043A\u043E\u043C\u043F\u043E\u043D\u043E\u0432\u043A\u0430 \u043B\u043E\u0433\u043E\u0442\u0438\u043F\u043E\u0432, \u0441\u043B\u043E\u0433\u0430\u043D\u043E\u0432 \u0438 \u0434\u0440\u0443\u0433\u0438\u0445 \u044D\u043B\u0435\u043C\u0435\u043D\u0442\u043E\u0432.",
     "version.change.brand_preview": "\u0411\u0440\u0435\u043D\u0434\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u044B\u0435 \u0440\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u044B \u043E\u0434\u0438\u043D\u0430\u043A\u043E\u0432\u043E \u043E\u0442\u043E\u0431\u0440\u0430\u0436\u0430\u044E\u0442\u0441\u044F \u0432 \u043F\u0440\u0435\u0434\u043F\u0440\u043E\u0441\u043C\u043E\u0442\u0440\u0435, \u0438\u0441\u0442\u043E\u0440\u0438\u0438, \u0443\u0432\u0435\u043B\u0438\u0447\u0435\u043D\u0438\u0438 \u0438 \u0441\u043A\u0430\u0447\u0438\u0432\u0430\u043D\u0438\u0438; \u0438\u0441\u0445\u043E\u0434\u043D\u0438\u043A \u043E\u0441\u0442\u0430\u0451\u0442\u0441\u044F \u0434\u043E\u0441\u0442\u0443\u043F\u0435\u043D.",
@@ -8681,7 +8720,9 @@
     "version.historyEmpty": "Nessuna nota di rilascio disponibile",
     "version.currentBadge": "Attuale",
     "version.releaseDate": "{date}",
+    "version.change.quick_gallery_picker": "Added a quick gallery modal picker with real-time search, multi-selection, and thumbnail optimizations.",
     "version.change.official_asset_library": "La libreria ufficiale di loghi, slogan e firme commerciali \xE8 stata ampliata con altri marchi, linee di business, layout orizzontali e verticali e varianti invertite.",
+    "version.change.material_picker_modal": "Il selettore dei materiali \xE8 ora una finestra di dialogo con miniature grandi, categorie, ricerca e selezione multipla.",
     "version.change.brand_name": "Il nome del prodotto \xE8 stato cambiato in AI Innovation Studio in tutte le lingue.",
     "version.change.brand_templates": "Aggiunti modelli di brand selezionabili e composizione automatica di loghi, slogan e altri elementi.",
     "version.change.brand_preview": "I risultati brandizzati restano coerenti in anteprima, cronologia, ingrandimento e download, mantenendo disponibile l\u2019immagine originale.",
@@ -9664,7 +9705,9 @@
     "version.historyEmpty": "\u0915\u094B\u0908 \u0930\u093F\u0932\u0940\u091C\u093C \u0928\u094B\u091F \u0909\u092A\u0932\u092C\u094D\u0927 \u0928\u0939\u0940\u0902 \u0939\u0948",
     "version.currentBadge": "\u0935\u0930\u094D\u0924\u092E\u093E\u0928",
     "version.releaseDate": "{date}",
+    "version.change.quick_gallery_picker": "Added a quick gallery modal picker with real-time search, multi-selection, and thumbnail optimizations.",
     "version.change.official_asset_library": "\u0906\u0927\u093F\u0915\u093E\u0930\u093F\u0915 \u0932\u094B\u0917\u094B, \u0938\u094D\u0932\u094B\u0917\u0928 \u0914\u0930 \u0935\u094D\u092F\u093E\u0935\u0938\u093E\u092F\u093F\u0915 \u0939\u0938\u094D\u0924\u093E\u0915\u094D\u0937\u0930 \u0932\u093E\u0907\u092C\u094D\u0930\u0947\u0930\u0940 \u092E\u0947\u0902 \u0905\u0927\u093F\u0915 \u092C\u094D\u0930\u093E\u0902\u0921, \u0935\u094D\u092F\u0935\u0938\u093E\u092F \u0936\u094D\u0930\u0947\u0923\u093F\u092F\u093E\u0902, \u0915\u094D\u0937\u0948\u0924\u093F\u091C \u0935 \u090A\u0930\u094D\u0927\u094D\u0935\u093E\u0927\u0930 \u0932\u0947\u0906\u0909\u091F \u0914\u0930 \u0907\u0928\u0935\u0930\u094D\u091F\u0947\u0921 \u0938\u0902\u0938\u094D\u0915\u0930\u0923 \u091C\u094B\u0921\u093C\u0947 \u0917\u090F\u0964",
+    "version.change.material_picker_modal": "\u0938\u093E\u092E\u0917\u094D\u0930\u0940 \u091A\u092F\u0928\u0915\u0930\u094D\u0924\u093E \u0905\u092C \u090F\u0915 \u0938\u0902\u0935\u093E\u0926 \u0939\u0948 \u091C\u093F\u0938\u092E\u0947\u0902 \u092C\u0921\u093C\u0947 \u0925\u0902\u092C\u0928\u0947\u0932, \u0936\u094D\u0930\u0947\u0923\u093F\u092F\u093E\u0901, \u0916\u094B\u091C \u0914\u0930 \u092C\u0939\u0941-\u091A\u092F\u0928 \u0909\u092A\u0932\u092C\u094D\u0927 \u0939\u0948\u0964",
     "version.change.brand_name": "\u0909\u0924\u094D\u092A\u093E\u0926 \u0915\u093E \u0928\u093E\u092E \u092C\u0926\u0932\u0915\u0930 \u0938\u092D\u0940 \u092D\u093E\u0937\u093E\u0913\u0902 \u092E\u0947\u0902 AI Innovation Studio \u0915\u0930 \u0926\u093F\u092F\u093E \u0917\u092F\u093E \u0939\u0948\u0964",
     "version.change.brand_templates": "\u091A\u0941\u0928\u0928\u0947 \u092F\u094B\u0917\u094D\u092F \u092C\u094D\u0930\u093E\u0902\u0921 \u091F\u0947\u092E\u094D\u092A\u0932\u0947\u091F \u0914\u0930 \u0932\u094B\u0917\u094B, \u0938\u094D\u0932\u094B\u0917\u0928 \u0935 \u0905\u0928\u094D\u092F \u0924\u0924\u094D\u0935\u094B\u0902 \u0915\u0940 \u0938\u094D\u0935\u091A\u093E\u0932\u093F\u0924 \u0930\u091A\u0928\u093E \u091C\u094B\u0921\u093C\u0940 \u0917\u0908\u0964",
     "version.change.brand_preview": "\u092C\u094D\u0930\u093E\u0902\u0921 \u092A\u0930\u093F\u0923\u093E\u092E \u092A\u094D\u0930\u0940\u0935\u094D\u092F\u0942, \u0907\u0924\u093F\u0939\u093E\u0938, \u091C\u093C\u0942\u092E \u0914\u0930 \u0921\u093E\u0909\u0928\u0932\u094B\u0921 \u092E\u0947\u0902 \u090F\u0915\u0938\u092E\u093E\u0928 \u0930\u0939\u0924\u0947 \u0939\u0948\u0902 \u0924\u0925\u093E \u092E\u0942\u0932 \u091A\u093F\u0924\u094D\u0930 \u0909\u092A\u0932\u092C\u094D\u0927 \u0930\u0939\u0924\u093E \u0939\u0948\u0964",
@@ -10664,7 +10707,9 @@
     "version.historyEmpty": "\u6682\u65E0\u66F4\u65B0\u8BB0\u5F55",
     "version.currentBadge": "\u5F53\u524D",
     "version.releaseDate": "{date}",
+    "version.change.quick_gallery_picker": "\u65B0\u589E\u5FEB\u6377\u7D20\u6750\u56FE\u5E93\u5F39\u7A97\u9009\u62E9\u5668\uFF0C\u652F\u6301\u5B9E\u65F6\u641C\u7D22\u3001\u5FEB\u901F\u9009\u62E9\u4E0E\u7F29\u7565\u56FE\u9884\u89C8\u4F18\u5316\u3002",
     "version.change.official_asset_library": "\u6269\u5145\u5B98\u65B9 Logo\u3001Slogan \u4E0E\u5546\u52A1\u7B7E\u540D\u7D20\u6750\u5E93\uFF0C\u65B0\u589E\u591A\u54C1\u724C\u3001\u4E1A\u52A1\u7EBF\u3001\u6A2A\u7248/\u7AD6\u7248\u53CA\u53CD\u767D\u7248\u672C\u3002",
+    "version.change.material_picker_modal": "\u7D20\u6750\u9009\u62E9\u6539\u4E3A\u5F39\u7A97\uFF0C\u63D0\u4F9B\u5927\u5C3A\u5BF8\u7F29\u7565\u56FE\u3001\u5206\u7C7B\u4E0E\u641C\u7D22\uFF0C\u652F\u6301\u591A\u9009\u52A0\u5165\u8F93\u5165\u533A\u3002",
     "version.change.brand_name": "\u4EA7\u54C1\u540D\u66F4\u65B0\u4E3A\u300CAI \u521B\u65B0\u5DE5\u4F5C\u5BA4\u300D\uFF0C\u82F1\u6587\u540C\u6B65\u4E3A AI Innovation Studio\u3002",
     "version.change.brand_templates": "\u65B0\u589E\u53EF\u9009\u62E9\u7684\u54C1\u724C\u6A21\u677F\uFF0C\u5E76\u652F\u6301 Logo\u3001\u53E3\u53F7\u7B49\u54C1\u724C\u5143\u7D20\u81EA\u52A8\u5408\u6210\u3002",
     "version.change.brand_preview": "\u54C1\u724C\u7ED3\u679C\u5728\u9884\u89C8\u3001\u5386\u53F2\u4EFB\u52A1\u3001\u5927\u56FE\u548C\u4E0B\u8F7D\u4E2D\u4FDD\u6301\u4E00\u81F4\uFF0C\u540C\u65F6\u4FDD\u7559\u539F\u59CB\u5E95\u56FE\u5207\u6362\u3002",
@@ -10822,6 +10867,17 @@
     "gallery.fieldPromptNote": "\u5F15\u7528\u5907\u6CE8",
     "gallery.fieldName": "\u540D\u79F0",
     "quickGallery.empty": "\u6682\u65E0{category}\u56FE\u7247",
+    "quickGallery.searchPlaceholder": "\u641C\u7D22\u56FE\u7247\u540D\u79F0",
+    "quickGallery.noResults": "\u6CA1\u6709\u5339\u914D\u7684\u56FE\u7247",
+    "quickGallery.open": "\u9009\u62E9\u7D20\u6750\u56FE",
+    "quickGallery.openTitle": "\u9009\u62E9\u7D20\u6750\u56FE",
+    "quickGallery.title": "\u9009\u62E9\u56FE\u7247",
+    "quickGallery.subtitle": "\u70B9\u51FB\u56FE\u7247\u52A0\u5165\u8F93\u5165\u533A\uFF0C\u518D\u6B21\u70B9\u51FB\u53EF\u79FB\u9664",
+    "quickGallery.close": "\u5173\u95ED\u9009\u62E9\u56FE\u7247\u5F39\u7A97",
+    "quickGallery.done": "\u5B8C\u6210",
+    "quickGallery.tabGallery": "\u516C\u7528\u56FE\u5E93",
+    "quickGallery.tabBrand": "\u54C1\u724C\u7D20\u6750",
+    "quickGallery.brandSummaryHint": "\u70B9\u51FB\u914D\u7F6E Logo \u4E0E\u53E3\u53F7\u843D\u6B3E",
     "promptGallery.remove": "\u79FB\u9664 @{name}",
     "prompt.title": "\u63D0\u793A\u8BCD",
     "prompt.editorLabel": "\u63D0\u793A\u8BCD",
@@ -11336,7 +11392,8 @@
     "imageEditor.emptyInsertList": "\u6682\u65E0\u5176\u4ED6\u8F93\u5165\u56FE",
     "imageEditor.selectLayerFirst": "\u8BF7\u5148\u9009\u62E9\u56FE\u5C42",
     "imageEditor.baseLayer": "\u539F\u56FE",
-    "gallery.title": "\u516C\u7528\u56FE\u5E93",
+    "gallery.title": "\u516C\u7528\u8D44\u4EA7\u5E93",
+    "gallery.tabReferenceImages": "\u53C2\u8003\u56FE\u5E93",
     "gallery.subtitle": "\u9009\u62E9\u53C2\u8003\u56FE\u52A0\u5165\u5F53\u524D\u4EFB\u52A1",
     "gallery.manageCategories": "\u7BA1\u7406\u5206\u7C7B",
     "gallery.categoryManager": "\u7BA1\u7406\u56FE\u5E93\u5206\u7C7B",
@@ -11693,7 +11750,9 @@
     "version.historyEmpty": "\u66AB\u7121\u66F4\u65B0\u8A18\u9304",
     "version.currentBadge": "\u76EE\u524D",
     "version.releaseDate": "{date}",
+    "version.change.quick_gallery_picker": "Added a quick gallery modal picker with real-time search, multi-selection, and thumbnail optimizations.",
     "version.change.official_asset_library": "\u64F4\u5145\u5B98\u65B9 Logo\u3001Slogan \u8207\u5546\u52D9\u7C3D\u540D\u7D20\u6750\u5EAB\uFF0C\u65B0\u589E\u591A\u54C1\u724C\u3001\u696D\u52D9\u7DDA\u3001\u6A6B\u7248\uFF0F\u76F4\u7248\u53CA\u53CD\u767D\u7248\u672C\u3002",
+    "version.change.material_picker_modal": "\u7D20\u6750\u9078\u64C7\u6539\u70BA\u5F48\u7A97\uFF0C\u63D0\u4F9B\u5927\u5C3A\u5BF8\u7E2E\u5716\u3001\u5206\u985E\u8207\u641C\u5C0B\uFF0C\u652F\u63F4\u591A\u9078\u52A0\u5165\u8F38\u5165\u5340\u3002",
     "version.change.brand_name": "\u7522\u54C1\u540D\u66F4\u65B0\u70BA\u300CAI \u5275\u65B0\u5DE5\u4F5C\u5BA4\u300D\uFF0C\u82F1\u6587\u540C\u6B65\u70BA AI Innovation Studio\u3002",
     "version.change.brand_templates": "\u65B0\u589E\u53EF\u9078\u64C7\u7684\u54C1\u724C\u7BC4\u672C\uFF0C\u4E26\u652F\u63F4 Logo\u3001\u53E3\u865F\u7B49\u54C1\u724C\u5143\u7D20\u81EA\u52D5\u5408\u6210\u3002",
     "version.change.brand_preview": "\u54C1\u724C\u7D50\u679C\u5728\u9810\u89BD\u3001\u6B77\u53F2\u4EFB\u52D9\u3001\u5927\u5716\u548C\u4E0B\u8F09\u4E2D\u4FDD\u6301\u4E00\u81F4\uFF0C\u540C\u6642\u4FDD\u7559\u539F\u59CB\u5E95\u5716\u5207\u63DB\u3002",
@@ -12686,7 +12745,9 @@
     "version.historyEmpty": "\u66AB\u7121\u66F4\u65B0\u8A18\u9304",
     "version.currentBadge": "\u76EE\u524D",
     "version.releaseDate": "{date}",
+    "version.change.quick_gallery_picker": "Added a quick gallery modal picker with real-time search, multi-selection, and thumbnail optimizations.",
     "version.change.official_asset_library": "\u64F4\u5145\u5B98\u65B9 Logo\u3001Slogan \u8207\u5546\u52D9\u7C3D\u540D\u7D20\u6750\u5EAB\uFF0C\u65B0\u589E\u591A\u54C1\u724C\u3001\u696D\u52D9\u7DDA\u3001\u6A6B\u5F0F\uFF0F\u76F4\u5F0F\u53CA\u53CD\u767D\u7248\u672C\u3002",
+    "version.change.material_picker_modal": "\u7D20\u6750\u9078\u64C7\u6539\u70BA\u5F48\u7A97\uFF0C\u63D0\u4F9B\u5927\u5C3A\u5BF8\u7E2E\u5716\u3001\u5206\u985E\u8207\u641C\u5C0B\uFF0C\u652F\u63F4\u591A\u9078\u52A0\u5165\u8F38\u5165\u5340\u3002",
     "version.change.brand_name": "\u7522\u54C1\u540D\u66F4\u65B0\u70BA\u300CAI \u5275\u65B0\u5DE5\u4F5C\u5BA4\u300D\uFF0C\u82F1\u6587\u540C\u6B65\u70BA AI Innovation Studio\u3002",
     "version.change.brand_templates": "\u65B0\u589E\u53EF\u9078\u64C7\u7684\u54C1\u724C\u7BC4\u672C\uFF0C\u4E26\u652F\u63F4 Logo\u3001\u53E3\u865F\u7B49\u54C1\u724C\u5143\u7D20\u81EA\u52D5\u5408\u6210\u3002",
     "version.change.brand_preview": "\u54C1\u724C\u7D50\u679C\u5728\u9810\u89BD\u3001\u6B77\u53F2\u4EFB\u52D9\u3001\u5927\u5716\u548C\u4E0B\u8F09\u4E2D\u4FDD\u6301\u4E00\u81F4\uFF0C\u540C\u6642\u4FDD\u7559\u539F\u59CB\u5E95\u5716\u5207\u63DB\u3002",
@@ -29289,13 +29350,10 @@ ${hint}` : hint;
   }
 
   // codex_image/webui/frontend/src/quick-gallery.ts
-  var QUICK_GALLERY_WHEEL_COOLDOWN_MS = 220;
   var bridge3 = getLegacyBridge();
   var state4 = bridge3.state;
   var els4 = bridge3.els;
   var quickGalleryFeatureInitialized = false;
-  var quickGalleryFocusFrameId = null;
-  var quickGalleryWheelLockTimerId = null;
   function legacyMethod8(name, ...args) {
     const method = getLegacyBridge().methods[name];
     if (typeof method !== "function") {
@@ -29324,166 +29382,59 @@ ${hint}` : hint;
   function renderQuickGalleryDock2() {
     renderGalleryCategoryControls2();
     renderQuickGalleryList();
-    hideQuickGalleryPreview();
+  }
+  function selectedGalleryItemIds() {
+    const ids = /* @__PURE__ */ new Set();
+    state4.images.forEach((source) => {
+      if (source?.kind === "gallery" && source?.id) ids.add(String(source.id));
+    });
+    return ids;
   }
   function renderQuickGalleryList() {
     if (!els4.quickGalleryList) return;
-    const items = filterGalleryItems();
+    const query = String(state4.quickGallerySearchQuery || "").trim().toLowerCase();
+    const selectedIds = selectedGalleryItemIds();
+    const items = filterGalleryItems().filter((item) => {
+      if (!query) return true;
+      const nameKey = String(item.name_key || item.name || "").toLowerCase();
+      const name = String(item.name || "").toLowerCase();
+      return name.includes(query) || nameKey.includes(query);
+    });
     if (!items.length) {
-      state4.quickGalleryFocusItemId = null;
-      els4.quickGalleryList.innerHTML = `<div class="quick-gallery-empty">${escapeHtml5(formatTranslation("quickGallery.empty", { category: categoryLabel2(state4.activeGalleryCategory) }))}</div>`;
-      scheduleQuickGalleryFocusUpdate();
+      els4.quickGalleryList.innerHTML = `<div class="quick-gallery-empty">${escapeHtml5(
+        formatTranslation(
+          query ? "quickGallery.noResults" : "quickGallery.empty",
+          { category: categoryLabel2(state4.activeGalleryCategory) }
+        )
+      )}</div>`;
       return;
     }
-    ensureQuickGalleryFocusItem(items);
-    els4.quickGalleryList.innerHTML = items.map((item) => `
-    <button class="quick-gallery-item" type="button" data-quick-gallery-use="${escapeHtml5(item.id)}">
-      <span>${escapeHtml5(item.name)}</span>
-    </button>
-  `).join("");
-    els4.quickGalleryList.querySelectorAll("[data-quick-gallery-use]").forEach((button) => {
-      button.addEventListener("mouseenter", () => previewQuickGalleryItem(button.dataset.quickGalleryUse));
-      button.addEventListener("focus", () => {
-        previewQuickGalleryItem(button.dataset.quickGalleryUse);
-        focusQuickGalleryItem(button.dataset.quickGalleryUse);
-      });
-      button.addEventListener("mouseleave", hideQuickGalleryPreview);
-      button.addEventListener("blur", hideQuickGalleryPreview);
-      button.addEventListener("click", () => {
-        const item = findGalleryItem(button.dataset.quickGalleryUse);
-        if (!item) return;
-        const alreadySelected = state4.images.some((source) => source.kind === "gallery" && source.id === item.id);
-        addGalleryInput2(item);
-        if (!alreadySelected) {
-          animateGalleryItemToInput(item, button);
-        }
-        hideQuickGalleryPreview();
-      });
-    });
+    els4.quickGalleryList.innerHTML = items.map((item) => {
+      const selected = selectedIds.has(String(item.id));
+      return `
+    <button class="quick-gallery-thumb${selected ? " selected" : ""}" type="button"
+      data-quick-gallery-use="${escapeHtml5(item.id)}"
+      title="${escapeHtml5(item.name)}">
+      <img src="/api/gallery/${encodeURIComponent(String(item.id))}/thumbnail" alt="" loading="lazy" decoding="async">
+      <span class="quick-gallery-thumb-name">${escapeHtml5(item.name)}</span>
+      <span class="quick-gallery-thumb-check" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false"><path d="M4.5 12.5 10 18 19.5 6.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </button>`;
+    }).join("");
     els4.quickGalleryList.scrollTop = 0;
-    scheduleQuickGalleryFocusUpdate();
   }
-  function ensureQuickGalleryFocusItem(items) {
-    if (!items.length) {
-      state4.quickGalleryFocusItemId = null;
-      return;
-    }
-    if (!items.some((item) => item.id === state4.quickGalleryFocusItemId)) {
-      state4.quickGalleryFocusItemId = items[0].id;
-    }
-  }
-  function previewQuickGalleryItem(itemId) {
-    state4.hoveredGalleryItemId = itemId || null;
-    if (!els4.quickGalleryPreview) return;
-    const item = findGalleryItem(itemId);
-    els4.quickGalleryList?.querySelectorAll("[data-quick-gallery-use]").forEach((button) => {
-      button.classList.toggle("active", button.dataset.quickGalleryUse === itemId);
-    });
-    if (!item) {
-      hideQuickGalleryPreview();
-      return;
-    }
-    els4.quickGalleryPreview.innerHTML = `
-    <img src="${escapeHtml5(item.image_url)}" alt="${escapeHtml5(item.name)}">
-    <span>${escapeHtml5(item.name)}</span>
-  `;
-    els4.quickGalleryPreview.classList.add("visible");
-    scheduleQuickGalleryFocusUpdate();
-  }
-  function hideQuickGalleryPreview() {
-    state4.hoveredGalleryItemId = null;
-    els4.quickGalleryPreview?.classList.remove("visible");
-    els4.quickGalleryList?.querySelectorAll("[data-quick-gallery-use]").forEach((button) => {
-      button.classList.remove("active");
-    });
-    scheduleQuickGalleryFocusUpdate();
-  }
-  function scheduleQuickGalleryFocusUpdate() {
-    if (quickGalleryFocusFrameId !== null) {
-      window.cancelAnimationFrame(quickGalleryFocusFrameId);
-    }
-    quickGalleryFocusFrameId = window.requestAnimationFrame(() => {
-      quickGalleryFocusFrameId = null;
-      updateQuickGalleryFocus();
-    });
-  }
-  function updateQuickGalleryFocus() {
+  function updateQuickGallerySelection() {
     if (!els4.quickGalleryList) return;
-    const buttons = Array.from(els4.quickGalleryList.querySelectorAll(".quick-gallery-item"));
-    if (!buttons.length) return;
-    const hoveredButton = state4.hoveredGalleryItemId ? buttons.find((button) => button.dataset.quickGalleryUse === state4.hoveredGalleryItemId) : null;
-    const focusedButton = state4.quickGalleryFocusItemId ? buttons.find((button) => button.dataset.quickGalleryUse === state4.quickGalleryFocusItemId) : null;
-    const focusButton = hoveredButton || focusedButton || buttons[0];
-    if (!focusButton) return;
-    const focusIndex = buttons.indexOf(focusButton);
-    buttons.forEach((button) => {
-      button.classList.remove("center", "near");
+    const selectedIds = selectedGalleryItemIds();
+    els4.quickGalleryList.querySelectorAll("[data-quick-gallery-use]").forEach((button) => {
+      button.classList.toggle("selected", selectedIds.has(String(button.dataset.quickGalleryUse)));
     });
-    focusButton.classList.add("center");
-    buttons.map((button) => ({ button, distance: Math.abs(buttons.indexOf(button) - focusIndex) })).filter(({ button }) => button !== focusButton).sort((left, right) => left.distance - right.distance).slice(0, 2).forEach(({ button }) => button.classList.add("near"));
-  }
-  function handleQuickGalleryBoundaryWheel(event) {
-    if (!els4.quickGalleryList) return;
-    const list = els4.quickGalleryList;
-    const buttons = Array.from(list.querySelectorAll(".quick-gallery-item"));
-    if (!buttons.length || Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
-    event.preventDefault();
-    if (quickGalleryWheelLockTimerId !== null) return;
-    quickGalleryWheelLockTimerId = window.setTimeout(() => {
-      quickGalleryWheelLockTimerId = null;
-    }, QUICK_GALLERY_WHEEL_COOLDOWN_MS);
-    const direction = event.deltaY > 0 ? 1 : -1;
-    const currentIndex = currentQuickGalleryFocusIndex(buttons);
-    const nextIndex = currentIndex + direction;
-    if (nextIndex < 0) {
-      triggerQuickGalleryBounce("top");
-      return;
-    }
-    if (nextIndex >= buttons.length) {
-      triggerQuickGalleryBounce("bottom");
-      return;
-    }
-    scrollQuickGalleryItemToFocus(buttons[nextIndex]);
-  }
-  function triggerQuickGalleryBounce(direction) {
-    if (!els4.quickGalleryList) return;
-    if (prefersReducedMotion()) return;
-    const className = direction === "bottom" ? "bounce-bottom" : "bounce-top";
-    els4.quickGalleryList.classList.remove("bounce-top", "bounce-bottom");
-    void els4.quickGalleryList.offsetHeight;
-    els4.quickGalleryList.classList.add(className);
-    window.setTimeout(() => {
-      els4.quickGalleryList?.classList.remove(className);
-    }, 180);
-  }
-  function currentQuickGalleryFocusIndex(buttons) {
-    const focusIndex = buttons.findIndex((button) => button.dataset.quickGalleryUse === state4.quickGalleryFocusItemId);
-    if (focusIndex >= 0) return focusIndex;
-    const classIndex = buttons.findIndex((button) => button.classList.contains("center"));
-    if (classIndex >= 0) return classIndex;
-    return 0;
-  }
-  function focusQuickGalleryItem(itemId) {
-    if (!els4.quickGalleryList || !itemId) return;
-    const button = Array.from(els4.quickGalleryList.querySelectorAll(".quick-gallery-item")).find((itemButton) => itemButton.dataset.quickGalleryUse === itemId);
-    scrollQuickGalleryItemToFocus(button);
-  }
-  function scrollQuickGalleryItemToFocus(button, behavior = "smooth") {
-    if (!els4.quickGalleryList || !button) return;
-    const list = els4.quickGalleryList;
-    state4.quickGalleryFocusItemId = button.dataset.quickGalleryUse || state4.quickGalleryFocusItemId;
-    const targetTop = button.offsetTop;
-    const maxScrollTop = Math.max(0, list.scrollHeight - list.clientHeight);
-    list.scrollTo({
-      top: Math.max(0, Math.min(maxScrollTop, targetTop)),
-      behavior: prefersReducedMotion() ? "auto" : behavior
-    });
-    scheduleQuickGalleryFocusUpdate();
   }
   function animateGalleryItemToInput(item, fromEl) {
     if (prefersReducedMotion()) return;
     if (!item?.image_url || !fromEl || !els4.imageStrip) return;
-    const sourceRect = (els4.quickGalleryPreview?.classList.contains("visible") ? els4.quickGalleryPreview : fromEl).getBoundingClientRect();
+    const sourceRect = fromEl.getBoundingClientRect();
     const targetRect = (els4.imageStrip.querySelector(".thumb:last-child") || els4.imageUploadSource || els4.imageStrip).getBoundingClientRect();
     if (!sourceRect || !targetRect) return;
     const clone = document.createElement("img");
@@ -29508,17 +29459,55 @@ ${hint}` : hint;
     Object.assign(getLegacyBridge().methods, {
       renderQuickGalleryDock: renderQuickGalleryDock2,
       renderQuickGalleryList,
-      ensureQuickGalleryFocusItem,
-      previewQuickGalleryItem,
-      hideQuickGalleryPreview,
-      scheduleQuickGalleryFocusUpdate,
-      updateQuickGalleryFocus,
-      handleQuickGalleryBoundaryWheel,
-      triggerQuickGalleryBounce,
-      currentQuickGalleryFocusIndex,
-      focusQuickGalleryItem,
-      scrollQuickGalleryItemToFocus,
+      updateQuickGallerySelection,
       animateGalleryItemToInput
+    });
+    els4.quickGallerySearch?.addEventListener("input", () => {
+      state4.quickGallerySearchQuery = els4.quickGallerySearch?.value || "";
+      renderQuickGalleryList();
+    });
+    els4.quickGalleryList?.addEventListener("click", (event) => {
+      const button = event.target.closest?.("[data-quick-gallery-use]");
+      if (!button || !els4.quickGalleryList?.contains(button)) return;
+      const item = findGalleryItem(button.dataset.quickGalleryUse);
+      if (!item) return;
+      const sourceIndex = state4.images.findIndex((source) => source.kind === "gallery" && source.id === item.id);
+      if (sourceIndex >= 0) {
+        const removedSource = state4.images[sourceIndex];
+        legacyMethod8("revokeUploadPreviewUrl", removedSource, { ignoredCurrentSources: /* @__PURE__ */ new Set([removedSource]) });
+        state4.images.splice(sourceIndex, 1);
+        legacyMethod8("syncPromptGalleryMentionsFromInputs");
+        if (!state4.images.length) legacyMethod8("setMode", "generate");
+        legacyMethod8("renderImageStrip");
+        legacyMethod8("updateRequestPreview");
+        button.classList.remove("selected");
+        return;
+      }
+      addGalleryInput2(item);
+      button.classList.add("selected");
+      animateGalleryItemToInput(item, button);
+    });
+    const openModal = () => {
+      renderQuickGalleryDock2();
+      els4.quickGalleryModal.classList.remove("hidden");
+      els4.quickGalleryModal.setAttribute("aria-hidden", "false");
+      els4.quickGalleryOpenButton?.setAttribute("aria-expanded", "true");
+      requestAnimationFrame(() => els4.quickGallerySearch?.focus({ preventScroll: true }));
+    };
+    const closeModal = () => {
+      els4.quickGalleryModal.classList.add("hidden");
+      els4.quickGalleryModal.setAttribute("aria-hidden", "true");
+      els4.quickGalleryOpenButton?.setAttribute("aria-expanded", "false");
+    };
+    els4.quickGalleryOpenButton?.addEventListener("click", openModal);
+    els4.quickGalleryModalClose?.addEventListener("click", () => {
+      closeModal();
+    });
+    els4.quickGalleryDoneButton?.addEventListener("click", () => {
+      closeModal();
+    });
+    els4.quickGalleryModal?.addEventListener("click", (event) => {
+      if (event.target === els4.quickGalleryModal) closeModal();
     });
   }
 
@@ -30522,10 +30511,40 @@ ${hint}` : hint;
     els7.galleryDrawerClose?.addEventListener("click", () => closeGallery2());
     els7.galleryDrawerBackdrop?.addEventListener("click", () => closeGallery2());
   }
+  function switchGalleryDrawerMode(mode) {
+    if (mode === "brand") {
+      els7.galleryModeTabReference?.classList.remove("active");
+      els7.galleryModeTabReference?.setAttribute("aria-selected", "false");
+      els7.galleryModeTabBrand?.classList.add("active");
+      els7.galleryModeTabBrand?.setAttribute("aria-selected", "true");
+      els7.galleryReferenceToolbar?.classList.add("hidden");
+      els7.galleryGrid?.classList.add("hidden");
+      els7.galleryCategoryManagePanel?.classList.add("hidden");
+      els7.galleryBrandSection?.classList.remove("hidden");
+      if (els7.galleryDrawerSubtitle) {
+        els7.galleryDrawerSubtitle.textContent = translate("brand.drawerSummary");
+      }
+      legacyMethod11("renderBrandMaterials");
+    } else {
+      els7.galleryModeTabBrand?.classList.remove("active");
+      els7.galleryModeTabBrand?.setAttribute("aria-selected", "false");
+      els7.galleryModeTabReference?.classList.add("active");
+      els7.galleryModeTabReference?.setAttribute("aria-selected", "true");
+      els7.galleryBrandSection?.classList.add("hidden");
+      els7.galleryReferenceToolbar?.classList.remove("hidden");
+      els7.galleryGrid?.classList.remove("hidden");
+      if (els7.galleryDrawerSubtitle) {
+        els7.galleryDrawerSubtitle.textContent = translate("gallery.subtitle");
+      }
+      renderGalleryGrid4();
+    }
+  }
   function initGalleryFeature() {
     if (galleryFeatureInitialized) return;
     galleryFeatureInitialized = true;
     bindGalleryFeatureEvents();
+    els7.galleryModeTabReference?.addEventListener("click", () => switchGalleryDrawerMode("reference"));
+    els7.galleryModeTabBrand?.addEventListener("click", () => switchGalleryDrawerMode("brand"));
     Object.assign(getLegacyBridge().methods, {
       sortGalleryItems,
       filterGalleryItems: filterGalleryItems3,
@@ -43773,6 +43792,25 @@ ${galleryText}`;
     normalizeBrandLayerSelections2();
     els38.brandMaterialList.innerHTML = BRAND_LAYERS.map(layerRowHtml).join("");
     renderBrandMaterialDrawer();
+    updateBrandSummaryBar();
+  }
+  function updateBrandSummaryBar() {
+    if (!els38.brandMaterialSummaryText) return;
+    const parts = [];
+    for (const layer of BRAND_LAYERS) {
+      if (layerEnabled(layer)) {
+        const selected = findOption(layer, selectedTemplateId(layer));
+        const name = selected?.name || layerLabel(layer);
+        parts.push(name);
+      }
+    }
+    if (parts.length > 0) {
+      els38.brandMaterialSummaryText.textContent = parts.join(" \xB7 ");
+      els38.brandMaterialSummaryText.classList.add("active");
+    } else {
+      els38.brandMaterialSummaryText.textContent = translate("brand.notSelected");
+      els38.brandMaterialSummaryText.classList.remove("active");
+    }
   }
   function filteredDrawerOptions() {
     const query = drawerQuery.trim().toLocaleLowerCase();
@@ -45630,7 +45668,7 @@ ${galleryText}`;
       updateButton.disabled = !(payload?.update_available && payload?.updater_available);
     }
     if (modalStatus) {
-      modalStatus.textContent = statusText || (onboarding ? formatTranslation("version.onboardingStatus", { version: onboardingVersion }) : updateAvailable ? formatTranslation(isStandardApp ? "version.standardUpdateAvailable" : "version.updateAvailable", { version: latestLabel }) : isStandardApp ? translate("version.standardManualInstall") : payload?.updater_available === false && !isPortable ? translate("version.noUpdater") : translate("version.upToDate"));
+      modalStatus.textContent = statusText || (onboarding ? formatTranslation("version.onboardingStatus", { version: onboardingVersion }) : updateAvailable ? formatTranslation(isStandardApp ? "version.standardUpdateAvailable" : "version.updateAvailable", { version: latestLabel }) : isStandardApp ? translate("version.standardManualInstall") : translate("version.upToDate"));
     }
   }
   function runtimeSourceLabel(source) {

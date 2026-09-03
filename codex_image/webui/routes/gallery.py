@@ -6,6 +6,7 @@ from fastapi import Body, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse, Response
 
 from codex_image.webui.context import WebUIContext
+from codex_image.webui.thumbnails import THUMBNAIL_EXTENSION, create_image_thumbnail, thumbnail_needs_refresh
 from codex_image.webui.storage import _guess_mime_type
 from codex_image.webui.task_metadata import _gallery_category_response, _gallery_item_response, _reference_asset_response
 
@@ -162,6 +163,24 @@ def register_gallery_routes(app: FastAPI, ctx: WebUIContext) -> None:
         return FileResponse(
             path,
             media_type=str(item.get("mime_type") or "application/octet-stream"),
+            headers={"Cache-Control": "public, max-age=31536000, immutable"},
+        )
+
+    @app.get("/api/gallery/{item_id}/thumbnail")
+    def get_gallery_thumbnail(item_id: str) -> Response:
+        try:
+            ctx.gallery_storage.read_item(item_id)
+            source_path = ctx.gallery_storage.image_path(item_id)
+        except (FileNotFoundError, ValueError) as exc:
+            raise HTTPException(status_code=404, detail="Gallery item not found") from exc
+        thumbnail_path = source_path.parent / f"{item_id}-thumb.{THUMBNAIL_EXTENSION}"
+        if thumbnail_needs_refresh(source_path, thumbnail_path):
+            thumbnail_path = create_image_thumbnail(source_path, thumbnail_path) or thumbnail_path
+        if not thumbnail_path.is_file():
+            raise HTTPException(status_code=404, detail="Thumbnail unavailable")
+        return FileResponse(
+            thumbnail_path,
+            media_type="image/jpeg",
             headers={"Cache-Control": "public, max-age=31536000, immutable"},
         )
 

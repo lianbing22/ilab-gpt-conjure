@@ -2,14 +2,11 @@ import { getLegacyBridge } from "./state";
 import { formatTranslation } from "./i18n";
 import { prefersReducedMotion } from "./webui-utils";
 
-const QUICK_GALLERY_WHEEL_COOLDOWN_MS = 220;
 const bridge = getLegacyBridge();
 const state = bridge.state;
 const els = bridge.els;
 
 let quickGalleryFeatureInitialized = false;
-let quickGalleryFocusFrameId: number | null = null;
-let quickGalleryWheelLockTimerId: number | null = null;
 
 function legacyMethod(name: string, ...args: any[]): any {
   const method = getLegacyBridge().methods[name];
@@ -29,188 +26,63 @@ function renderGalleryCategoryControls(): void { legacyMethod("renderGalleryCate
 function renderQuickGalleryDock() {
   renderGalleryCategoryControls();
   renderQuickGalleryList();
-  hideQuickGalleryPreview();
+}
+
+function selectedGalleryItemIds(): Set<string> {
+  const ids = new Set<string>();
+  state.images.forEach((source: any) => {
+    if (source?.kind === "gallery" && source?.id) ids.add(String(source.id));
+  });
+  return ids;
 }
 
 function renderQuickGalleryList() {
   if (!els.quickGalleryList) return;
-  const items = filterGalleryItems();
+  const query = String(state.quickGallerySearchQuery || "").trim().toLowerCase();
+  const selectedIds = selectedGalleryItemIds();
+  const items = filterGalleryItems().filter((item: any) => {
+    if (!query) return true;
+    const nameKey = String(item.name_key || item.name || "").toLowerCase();
+    const name = String(item.name || "").toLowerCase();
+    return name.includes(query) || nameKey.includes(query);
+  });
   if (!items.length) {
-    state.quickGalleryFocusItemId = null;
-    els.quickGalleryList.innerHTML = `<div class="quick-gallery-empty">${escapeHtml(formatTranslation("quickGallery.empty", { category: categoryLabel(state.activeGalleryCategory) }))}</div>`;
-    scheduleQuickGalleryFocusUpdate();
+    els.quickGalleryList.innerHTML = `<div class="quick-gallery-empty">${escapeHtml(
+      formatTranslation(
+        query ? "quickGallery.noResults" : "quickGallery.empty",
+        { category: categoryLabel(state.activeGalleryCategory) }
+      )
+    )}</div>`;
     return;
   }
-  ensureQuickGalleryFocusItem(items);
-  els.quickGalleryList.innerHTML = items.map((item: any) => `
-    <button class="quick-gallery-item" type="button" data-quick-gallery-use="${escapeHtml(item.id)}">
-      <span>${escapeHtml(item.name)}</span>
-    </button>
-  `).join("");
-  els.quickGalleryList.querySelectorAll("[data-quick-gallery-use]").forEach((button: any) => {
-    button.addEventListener("mouseenter", () => previewQuickGalleryItem(button.dataset.quickGalleryUse));
-    button.addEventListener("focus", () => {
-      previewQuickGalleryItem(button.dataset.quickGalleryUse);
-      focusQuickGalleryItem(button.dataset.quickGalleryUse);
-    });
-    button.addEventListener("mouseleave", hideQuickGalleryPreview);
-    button.addEventListener("blur", hideQuickGalleryPreview);
-    button.addEventListener("click", () => {
-      const item = findGalleryItem(button.dataset.quickGalleryUse);
-      if (!item) return;
-      const alreadySelected = state.images.some((source: any) => source.kind === "gallery" && source.id === item.id);
-      addGalleryInput(item);
-      if (!alreadySelected) {
-        animateGalleryItemToInput(item, button);
-      }
-      hideQuickGalleryPreview();
-    });
-  });
+  els.quickGalleryList.innerHTML = items.map((item: any) => {
+    const selected = selectedIds.has(String(item.id));
+    return `
+    <button class="quick-gallery-thumb${selected ? " selected" : ""}" type="button"
+      data-quick-gallery-use="${escapeHtml(item.id)}"
+      title="${escapeHtml(item.name)}">
+      <img src="/api/gallery/${encodeURIComponent(String(item.id))}/thumbnail" alt="" loading="lazy" decoding="async">
+      <span class="quick-gallery-thumb-name">${escapeHtml(item.name)}</span>
+      <span class="quick-gallery-thumb-check" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false"><path d="M4.5 12.5 10 18 19.5 6.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </button>`;
+  }).join("");
   els.quickGalleryList.scrollTop = 0;
-  scheduleQuickGalleryFocusUpdate();
 }
 
-function ensureQuickGalleryFocusItem(items: any) {
-  if (!items.length) {
-    state.quickGalleryFocusItemId = null;
-    return;
-  }
-  if (!items.some((item: any) => item.id === state.quickGalleryFocusItemId)) {
-    state.quickGalleryFocusItemId = items[0].id;
-  }
-}
-
-function previewQuickGalleryItem(itemId: any) {
-  state.hoveredGalleryItemId = itemId || null;
-  if (!els.quickGalleryPreview) return;
-  const item = findGalleryItem(itemId);
-  els.quickGalleryList?.querySelectorAll("[data-quick-gallery-use]").forEach((button: any) => {
-    button.classList.toggle("active", button.dataset.quickGalleryUse === itemId);
-  });
-  if (!item) {
-    hideQuickGalleryPreview();
-    return;
-  }
-  els.quickGalleryPreview.innerHTML = `
-    <img src="${escapeHtml(item.image_url)}" alt="${escapeHtml(item.name)}">
-    <span>${escapeHtml(item.name)}</span>
-  `;
-  els.quickGalleryPreview.classList.add("visible");
-  scheduleQuickGalleryFocusUpdate();
-}
-
-function hideQuickGalleryPreview() {
-  state.hoveredGalleryItemId = null;
-  els.quickGalleryPreview?.classList.remove("visible");
-  els.quickGalleryList?.querySelectorAll("[data-quick-gallery-use]").forEach((button: any) => {
-    button.classList.remove("active");
-  });
-  scheduleQuickGalleryFocusUpdate();
-}
-
-function scheduleQuickGalleryFocusUpdate() {
-  if (quickGalleryFocusFrameId !== null) {
-    window.cancelAnimationFrame(quickGalleryFocusFrameId);
-  }
-  quickGalleryFocusFrameId = window.requestAnimationFrame(() => {
-    quickGalleryFocusFrameId = null;
-    updateQuickGalleryFocus();
-  });
-}
-
-function updateQuickGalleryFocus() {
+function updateQuickGallerySelection() {
   if (!els.quickGalleryList) return;
-  const buttons = Array.from(els.quickGalleryList.querySelectorAll(".quick-gallery-item")) as HTMLElement[];
-  if (!buttons.length) return;
-  const hoveredButton = state.hoveredGalleryItemId
-    ? buttons.find((button) => button.dataset.quickGalleryUse === state.hoveredGalleryItemId)
-    : null;
-  const focusedButton = state.quickGalleryFocusItemId
-    ? buttons.find((button) => button.dataset.quickGalleryUse === state.quickGalleryFocusItemId)
-    : null;
-  const focusButton = hoveredButton || focusedButton || buttons[0];
-  if (!focusButton) return;
-  const focusIndex = buttons.indexOf(focusButton);
-  buttons.forEach((button) => {
-    button.classList.remove("center", "near");
+  const selectedIds = selectedGalleryItemIds();
+  els.quickGalleryList.querySelectorAll("[data-quick-gallery-use]").forEach((button: any) => {
+    button.classList.toggle("selected", selectedIds.has(String(button.dataset.quickGalleryUse)));
   });
-  focusButton.classList.add("center");
-  buttons
-    .map((button) => ({ button, distance: Math.abs(buttons.indexOf(button) - focusIndex) }))
-    .filter(({ button }) => button !== focusButton)
-    .sort((left, right) => left.distance - right.distance)
-    .slice(0, 2)
-    .forEach(({ button }) => button.classList.add("near"));
-}
-
-function handleQuickGalleryBoundaryWheel(event: any) {
-  if (!els.quickGalleryList) return;
-  const list = els.quickGalleryList;
-  const buttons = Array.from(list.querySelectorAll(".quick-gallery-item")) as HTMLElement[];
-  if (!buttons.length || Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
-  event.preventDefault();
-  if (quickGalleryWheelLockTimerId !== null) return;
-  quickGalleryWheelLockTimerId = window.setTimeout(() => {
-    quickGalleryWheelLockTimerId = null;
-  }, QUICK_GALLERY_WHEEL_COOLDOWN_MS);
-  const direction = event.deltaY > 0 ? 1 : -1;
-  const currentIndex = currentQuickGalleryFocusIndex(buttons);
-  const nextIndex = currentIndex + direction;
-  if (nextIndex < 0) {
-    triggerQuickGalleryBounce("top");
-    return;
-  }
-  if (nextIndex >= buttons.length) {
-    triggerQuickGalleryBounce("bottom");
-    return;
-  }
-  scrollQuickGalleryItemToFocus(buttons[nextIndex]);
-}
-
-function triggerQuickGalleryBounce(direction: any) {
-  if (!els.quickGalleryList) return;
-  if (prefersReducedMotion()) return;
-  const className = direction === "bottom" ? "bounce-bottom" : "bounce-top";
-  els.quickGalleryList.classList.remove("bounce-top", "bounce-bottom");
-  void els.quickGalleryList.offsetHeight;
-  els.quickGalleryList.classList.add(className);
-  window.setTimeout(() => {
-    els.quickGalleryList?.classList.remove(className);
-  }, 180);
-}
-
-function currentQuickGalleryFocusIndex(buttons: any) {
-  const focusIndex = buttons.findIndex((button: any) => button.dataset.quickGalleryUse === state.quickGalleryFocusItemId);
-  if (focusIndex >= 0) return focusIndex;
-  const classIndex = buttons.findIndex((button: any) => button.classList.contains("center"));
-  if (classIndex >= 0) return classIndex;
-  return 0;
-}
-
-function focusQuickGalleryItem(itemId: any) {
-  if (!els.quickGalleryList || !itemId) return;
-  const button = (Array.from(els.quickGalleryList.querySelectorAll(".quick-gallery-item")) as HTMLElement[])
-    .find((itemButton) => itemButton.dataset.quickGalleryUse === itemId);
-  scrollQuickGalleryItemToFocus(button);
-}
-
-function scrollQuickGalleryItemToFocus(button: any, behavior: any = "smooth") {
-  if (!els.quickGalleryList || !button) return;
-  const list = els.quickGalleryList;
-  state.quickGalleryFocusItemId = button.dataset.quickGalleryUse || state.quickGalleryFocusItemId;
-  const targetTop = button.offsetTop;
-  const maxScrollTop = Math.max(0, list.scrollHeight - list.clientHeight);
-  list.scrollTo({
-    top: Math.max(0, Math.min(maxScrollTop, targetTop)),
-    behavior: prefersReducedMotion() ? "auto" : behavior,
-  });
-  scheduleQuickGalleryFocusUpdate();
 }
 
 function animateGalleryItemToInput(item: any, fromEl: any) {
   if (prefersReducedMotion()) return;
   if (!item?.image_url || !fromEl || !els.imageStrip) return;
-  const sourceRect = (els.quickGalleryPreview?.classList.contains("visible") ? els.quickGalleryPreview : fromEl).getBoundingClientRect();
+  const sourceRect = fromEl.getBoundingClientRect();
   const targetRect = (els.imageStrip.querySelector(".thumb:last-child") || els.imageUploadSource || els.imageStrip).getBoundingClientRect();
   if (!sourceRect || !targetRect) return;
   const clone = document.createElement("img");
@@ -236,16 +108,55 @@ export function initQuickGalleryFeature() {
   Object.assign(getLegacyBridge().methods, {
     renderQuickGalleryDock,
     renderQuickGalleryList,
-    ensureQuickGalleryFocusItem,
-    previewQuickGalleryItem,
-    hideQuickGalleryPreview,
-    scheduleQuickGalleryFocusUpdate,
-    updateQuickGalleryFocus,
-    handleQuickGalleryBoundaryWheel,
-    triggerQuickGalleryBounce,
-    currentQuickGalleryFocusIndex,
-    focusQuickGalleryItem,
-    scrollQuickGalleryItemToFocus,
+    updateQuickGallerySelection,
     animateGalleryItemToInput,
+  });
+
+  els.quickGallerySearch?.addEventListener("input", () => {
+    state.quickGallerySearchQuery = els.quickGallerySearch?.value || "";
+    renderQuickGalleryList();
+  });
+
+  els.quickGalleryList?.addEventListener("click", (event: any) => {
+    const button = event.target.closest?.("[data-quick-gallery-use]");
+    if (!button || !els.quickGalleryList?.contains(button)) return;
+    const item = findGalleryItem(button.dataset.quickGalleryUse);
+    if (!item) return;
+    const sourceIndex = state.images.findIndex((source: any) => source.kind === "gallery" && source.id === item.id);
+    if (sourceIndex >= 0) {
+      const removedSource = state.images[sourceIndex];
+      legacyMethod("revokeUploadPreviewUrl", removedSource, { ignoredCurrentSources: new Set([removedSource]) });
+      state.images.splice(sourceIndex, 1);
+      legacyMethod("syncPromptGalleryMentionsFromInputs");
+      if (!state.images.length) legacyMethod("setMode", "generate");
+      legacyMethod("renderImageStrip");
+      legacyMethod("updateRequestPreview");
+      button.classList.remove("selected");
+      return;
+    }
+    addGalleryInput(item);
+    button.classList.add("selected");
+    animateGalleryItemToInput(item, button);
+  });
+
+  const openModal = () => {
+    renderQuickGalleryDock();
+    els.quickGalleryModal.classList.remove("hidden");
+    els.quickGalleryModal.setAttribute("aria-hidden", "false");
+    els.quickGalleryOpenButton?.setAttribute("aria-expanded", "true");
+    requestAnimationFrame(() => els.quickGallerySearch?.focus({ preventScroll: true }));
+  };
+
+  const closeModal = () => {
+    els.quickGalleryModal.classList.add("hidden");
+    els.quickGalleryModal.setAttribute("aria-hidden", "true");
+    els.quickGalleryOpenButton?.setAttribute("aria-expanded", "false");
+  };
+
+  els.quickGalleryOpenButton?.addEventListener("click", openModal);
+  els.quickGalleryModalClose?.addEventListener("click", () => { closeModal(); });
+  els.quickGalleryDoneButton?.addEventListener("click", () => { closeModal(); });
+  els.quickGalleryModal?.addEventListener("click", (event: any) => {
+    if (event.target === els.quickGalleryModal) closeModal();
   });
 }

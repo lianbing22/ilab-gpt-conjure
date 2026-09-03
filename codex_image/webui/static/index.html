@@ -103,7 +103,7 @@
         });
       })();
     </script>
-    <link rel="stylesheet" href="/static/styles.css?v=runtime-576" />
+    <link rel="stylesheet" href="/static/styles.css?v=runtime-577" />
   </head>
   <body>
     <div class="layout-container">
@@ -492,16 +492,13 @@
                 </div>
 
                 <div class="image-gallery-column">
-                  <div id="quickGalleryDock" class="quick-gallery-dock" aria-label="快速选择公用图库" data-i18n-attr="aria-label:gallery.quick">
-                    <div id="quickGalleryPreview" class="quick-gallery-preview"></div>
-                    <div class="quick-gallery-picker">
-                      <div id="quickGalleryList" class="quick-gallery-list" aria-label="当前分类图库" data-i18n-attr="aria-label:gallery.current"></div>
-                      <div id="quickGalleryRail" class="quick-gallery-rail" aria-label="图库分类" data-i18n-attr="aria-label:gallery.categories">
-                        <button class="quick-gallery-category active" data-quick-gallery-category="portrait" type="button" data-i18n="gallery.categoryPortrait">人像</button>
-                        <button class="quick-gallery-category" data-quick-gallery-category="character" type="button" data-i18n="gallery.categoryCharacter">角色</button>
-                        <button class="quick-gallery-category" data-quick-gallery-category="product" type="button" data-i18n="gallery.categoryProduct">产品</button>
-                      </div>
-                    </div>
+                  <div id="quickGalleryDock" class="quick-gallery-dock">
+                    <button id="quickGalleryOpenButton" class="ghost-button text-sm icon-text-button gallery-manage-button" type="button" aria-controls="quickGalleryModal" aria-expanded="false" title="选择素材图" data-i18n-attr="title:quickGallery.openTitle">
+                      <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M4 5h16v14H4zM8 13l2.2-2.2 2.8 3.2 2-2 3 4M8 9h.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                      <span data-i18n="quickGallery.open">选择素材图</span>
+                    </button>
                   </div>
 
                   <div id="galleryManagePanel" class="gallery-manage-panel">
@@ -516,17 +513,10 @@
                 </div>
               </div>
 
-              <div id="brandMaterialPicker" class="brand-material-picker hidden" aria-label="品牌素材" data-i18n-attr="aria-label:brand.materialsTitle">
-                <div class="brand-material-toolbar">
-                  <div class="brand-material-heading">
-                    <strong data-i18n="brand.materialsTitle">品牌素材</strong>
-                    <span data-i18n="brand.materialsHint">生成后原样叠加，不会被 AI 重绘</span>
-                  </div>
-                  <button id="brandMaterialOpenButton" class="sr-only" type="button" tabindex="-1" aria-hidden="true" aria-controls="brandMaterialDrawer" aria-expanded="false" aria-label="查看全部素材" data-i18n-attr="aria-label:brand.viewAll">
-                    <span data-i18n="brand.viewAll">查看全部素材</span>
-                  </button>
-                </div>
-                <div id="brandMaterialList" class="brand-material-list" role="list" aria-label="品牌素材层" data-i18n-attr="aria-label:brand.layers"></div>
+              <!-- 品牌素材收敛合并至公用库抽屉，主面板不占位 -->
+              <div id="brandMaterialPicker" class="hidden" aria-hidden="true" style="display:none !important;">
+                <button id="brandMaterialOpenButton" type="button" style="display:none !important;"></button>
+                <span id="brandMaterialSummaryText" style="display:none !important;"></span>
               </div>
               </div>
             </section>
@@ -1448,7 +1438,16 @@
       </div>
       <div class="resource-sheet-body gallery-drawer-body">
         <div class="gallery-drawer-top">
-          <div class="gallery-drawer-toolbar">
+          <div class="gallery-drawer-mode-tabs" role="tablist">
+            <button id="galleryModeTabReference" class="gallery-mode-tab active" type="button" role="tab" aria-selected="true" data-gallery-mode="reference">
+              <span data-i18n="gallery.tabReferenceImages">参考图库</span>
+            </button>
+            <button id="galleryModeTabBrand" class="gallery-mode-tab" type="button" role="tab" aria-selected="false" data-gallery-mode="brand">
+              <span data-i18n="brand.materialsTitle">品牌素材 (Logo / 落款)</span>
+            </button>
+          </div>
+
+          <div id="galleryReferenceToolbar" class="gallery-drawer-toolbar">
             <div id="galleryDrawerCategoryTabs" class="gallery-drawer-category-tabs" aria-label="图库分类" data-i18n-attr="aria-label:gallery.categories"></div>
             <button id="galleryCategoryManageToggle" class="ghost-button text-sm" type="button" aria-expanded="false" data-i18n="gallery.manageCategories">管理分类</button>
           </div>
@@ -1467,10 +1466,47 @@
         </div>
         <div class="gallery-drawer-main">
           <div id="galleryGrid" class="gallery-grid"></div>
+          <div id="galleryBrandSection" class="gallery-brand-section hidden">
+            <div class="brand-drawer-banner">
+              <div class="brand-material-heading">
+                <strong data-i18n="brand.materialsTitle">品牌素材</strong>
+                <span data-i18n="brand.materialsHint">生成后原样叠加，不会被 AI 重绘</span>
+              </div>
+            </div>
+            <div id="brandMaterialList" class="brand-material-list gallery-brand-material-list" role="list" aria-label="品牌素材层" data-i18n-attr="aria-label:brand.layers"></div>
+          </div>
         </div>
       </div>
     </div>
     <div id="galleryDrawerBackdrop" class="resource-sheet-backdrop gallery-drawer-backdrop hidden"></div>
+
+    <div id="quickGalleryModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-label="选择图片" data-i18n-attr="aria-label:quickGallery.title">
+      <div class="modal-panel quick-gallery-modal-panel">
+        <div class="modal-heading">
+          <div>
+            <h2 data-i18n="quickGallery.title">选择图片</h2>
+            <p data-i18n="quickGallery.subtitle">点击图片加入输入区，再次点击可移除</p>
+          </div>
+          <button id="quickGalleryModalClose" class="ghost-button drawer-close-button" type="button" aria-label="关闭选择图片弹窗" title="关闭" data-i18n-attr="aria-label:quickGallery.close;title:action.close">
+            <svg class="drawer-close-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M7 7L17 17M17 7L7 17" />
+            </svg>
+          </button>
+        </div>
+        <div class="quick-gallery-modal-body">
+          <input id="quickGallerySearch" class="control quick-gallery-search" type="search" autocomplete="off" spellcheck="false" placeholder="搜索图片名称" aria-label="搜索图片名称" data-i18n-attr="placeholder:quickGallery.searchPlaceholder;aria-label:quickGallery.searchPlaceholder" />
+          <div id="quickGalleryRail" class="quick-gallery-rail" aria-label="图库分类" data-i18n-attr="aria-label:gallery.categories">
+            <button class="quick-gallery-category active" data-quick-gallery-category="portrait" type="button" data-i18n="gallery.categoryPortrait">人像</button>
+            <button class="quick-gallery-category" data-quick-gallery-category="character" type="button" data-i18n="gallery.categoryCharacter">角色</button>
+            <button class="quick-gallery-category" data-quick-gallery-category="product" type="button" data-i18n="gallery.categoryProduct">产品</button>
+          </div>
+          <div id="quickGalleryList" class="quick-gallery-list" aria-label="当前分类图库" data-i18n-attr="aria-label:gallery.current"></div>
+        </div>
+        <div class="quick-gallery-modal-footer">
+          <button id="quickGalleryDoneButton" class="run-button" type="button" data-i18n="quickGallery.done">完成</button>
+        </div>
+      </div>
+    </div>
 
     <div id="addToGalleryModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-label="添加到图库" data-i18n-attr="aria-label:addGallery.title">
       <div class="modal-panel add-gallery-panel">
@@ -1509,7 +1545,7 @@
     </div>
 
     <div id="taskNotificationToastRegion" class="task-notification-toast-region" aria-live="polite"></div>
-  <script src="/static/app.js?v=runtime-576"></script>
+  <script src="/static/app.js?v=runtime-577"></script>
     <script>
       (() => {
         document.querySelectorAll(".radio-group").forEach((group) => {

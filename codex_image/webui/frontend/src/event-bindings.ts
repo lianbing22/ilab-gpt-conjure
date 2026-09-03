@@ -50,8 +50,6 @@ export function bindWebUIEvents(state: WebUIState, els: WebUIElements, methods: 
   els.quickGalleryRail?.addEventListener("mouseover", (event: Event) => call(methods, "handleQuickGalleryCategoryEvent", event));
   els.quickGalleryRail?.addEventListener("focusin", (event: Event) => call(methods, "handleQuickGalleryCategoryEvent", event));
   els.quickGalleryRail?.addEventListener("click", (event: Event) => call(methods, "handleQuickGalleryCategoryEvent", event));
-  els.quickGalleryList?.addEventListener("scroll", () => call(methods, "scheduleQuickGalleryFocusUpdate"));
-  els.quickGalleryList?.addEventListener("wheel", (event: Event) => call(methods, "handleQuickGalleryBoundaryWheel", event), { passive: false });
   els.addGalleryCategoryButton?.addEventListener("click", () => call(methods, "createGalleryCategory"));
   els.addToGalleryClose?.addEventListener("click", () => call(methods, "closeAddToGallery"));
   els.addToGalleryModal?.addEventListener("click", (event: Event) => {

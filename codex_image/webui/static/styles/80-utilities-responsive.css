@@ -253,14 +253,16 @@ button:disabled {
     min-height: 0;
   }
 
-  .controls-col .image-input-left,
-  .controls-col .image-gallery-column {
+  .controls-col .image-input-left {
     height: auto;
     min-height: 0;
+    flex: 1 1 auto;
   }
 
-  .controls-col .image-input-left {
-    flex: 1 1 auto;
+  .controls-col .image-gallery-column {
+    height: var(--image-input-total-height);
+    min-height: 0;
+    grid-template-rows: var(--quick-gallery-height) var(--image-input-action-height);
   }
 
   .controls-col .image-input-main {
@@ -269,14 +271,14 @@ button:disabled {
     height: auto;
   }
 
-  .controls-col .image-gallery-column {
-    grid-template-rows: minmax(0, 1fr) var(--image-input-action-height);
-  }
-
   .controls-col .quick-gallery-dock,
   .controls-col .quick-gallery-list {
-    height: auto;
+    height: var(--quick-gallery-height);
     min-height: 0;
+  }
+
+  .controls-col .quick-gallery-list {
+    overflow-y: auto;
   }
 
   .image-uploader-grid {
@@ -329,12 +331,12 @@ button:disabled {
   }
 
   .quick-gallery-category {
-    flex-basis: clamp(24px, calc(0.96dvh + 16.6px), 30px);
+    flex-basis: auto;
     height: clamp(24px, calc(0.96dvh + 16.6px), 30px);
   }
 
   .quick-gallery-list {
-    --quick-gallery-item-height: clamp(24px, calc(0.96dvh + 16.6px), 30px);
+    --quick-gallery-thumb-size: clamp(64px, calc(3.2dvh + 46px), 82px);
   }
 
   .prompt-heading {
@@ -772,19 +774,13 @@ button:disabled {
   }
 
   .controls-col .quick-gallery-dock,
-  .controls-col .quick-gallery-list,
-  .controls-col .quick-gallery-rail {
+  .controls-col .quick-gallery-list {
     height: var(--quick-gallery-height);
+    min-height: 0;
   }
 
-  .controls-col .quick-gallery-picker {
-    grid-template-columns: minmax(0, 1fr) 46px;
-    gap: 6px;
-  }
-
-  .controls-col .quick-gallery-category {
-    padding: 0 6px;
-    font-size: 11px;
+  .controls-col .quick-gallery-list {
+    overflow-y: auto;
   }
 
   .controls-col .gallery-manage-panel .resource-manage-button {
@@ -1076,9 +1072,13 @@ button:disabled {
   }
 
   .controls-col .quick-gallery-dock,
-  .controls-col .quick-gallery-list,
-  .controls-col .quick-gallery-rail {
+  .controls-col .quick-gallery-list {
     height: var(--quick-gallery-height);
+    min-height: 0;
+  }
+
+  .controls-col .quick-gallery-list {
+    overflow-y: auto;
   }
 
   .controls-col .prompt-panel {

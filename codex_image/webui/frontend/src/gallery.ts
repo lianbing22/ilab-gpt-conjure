@@ -164,10 +164,41 @@ function bindGalleryFeatureEvents() {
   els.galleryDrawerBackdrop?.addEventListener("click", () => closeGallery());
 }
 
+function switchGalleryDrawerMode(mode: "reference" | "brand") {
+  if (mode === "brand") {
+    els.galleryModeTabReference?.classList.remove("active");
+    els.galleryModeTabReference?.setAttribute("aria-selected", "false");
+    els.galleryModeTabBrand?.classList.add("active");
+    els.galleryModeTabBrand?.setAttribute("aria-selected", "true");
+    els.galleryReferenceToolbar?.classList.add("hidden");
+    els.galleryGrid?.classList.add("hidden");
+    els.galleryCategoryManagePanel?.classList.add("hidden");
+    els.galleryBrandSection?.classList.remove("hidden");
+    if (els.galleryDrawerSubtitle) {
+      els.galleryDrawerSubtitle.textContent = translate("brand.drawerSummary");
+    }
+    legacyMethod("renderBrandMaterials");
+  } else {
+    els.galleryModeTabBrand?.classList.remove("active");
+    els.galleryModeTabBrand?.setAttribute("aria-selected", "false");
+    els.galleryModeTabReference?.classList.add("active");
+    els.galleryModeTabReference?.setAttribute("aria-selected", "true");
+    els.galleryBrandSection?.classList.add("hidden");
+    els.galleryReferenceToolbar?.classList.remove("hidden");
+    els.galleryGrid?.classList.remove("hidden");
+    if (els.galleryDrawerSubtitle) {
+      els.galleryDrawerSubtitle.textContent = translate("gallery.subtitle");
+    }
+    renderGalleryGrid();
+  }
+}
+
 export function initGalleryFeature() {
   if (galleryFeatureInitialized) return;
   galleryFeatureInitialized = true;
   bindGalleryFeatureEvents();
+  els.galleryModeTabReference?.addEventListener("click", () => switchGalleryDrawerMode("reference"));
+  els.galleryModeTabBrand?.addEventListener("click", () => switchGalleryDrawerMode("brand"));
   Object.assign(getLegacyBridge().methods, {
     sortGalleryItems,
     filterGalleryItems,

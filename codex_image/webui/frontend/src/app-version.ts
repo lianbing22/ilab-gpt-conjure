@@ -240,8 +240,6 @@ function renderAppVersion(statusText?: string): void {
           ? formatTranslation(isStandardApp ? "version.standardUpdateAvailable" : "version.updateAvailable", { version: latestLabel })
           : isStandardApp
             ? translate("version.standardManualInstall")
-            : payload?.updater_available === false && !isPortable
-            ? translate("version.noUpdater")
             : translate("version.upToDate"));
   }
 }

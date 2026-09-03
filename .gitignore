@@ -16,3 +16,8 @@ input/
 inputs/
 output/
 outputs/
+.zcode/
+gallery.py
+codex_image/webui/static/styles/*.ts
+codex_image/webui/static/styles/*.py
+codex_image/webui/static/styles/*.html

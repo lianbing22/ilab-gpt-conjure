@@ -238,6 +238,26 @@ function renderBrandMaterials(): void {
   normalizeBrandLayerSelections();
   els.brandMaterialList.innerHTML = BRAND_LAYERS.map(layerRowHtml).join("");
   renderBrandMaterialDrawer();
+  updateBrandSummaryBar();
+}
+
+function updateBrandSummaryBar(): void {
+  if (!els.brandMaterialSummaryText) return;
+  const parts: string[] = [];
+  for (const layer of BRAND_LAYERS) {
+    if (layerEnabled(layer)) {
+      const selected = findOption(layer, selectedTemplateId(layer));
+      const name = selected?.name || layerLabel(layer);
+      parts.push(name);
+    }
+  }
+  if (parts.length > 0) {
+    els.brandMaterialSummaryText.textContent = parts.join(" · ");
+    els.brandMaterialSummaryText.classList.add("active");
+  } else {
+    els.brandMaterialSummaryText.textContent = translate("brand.notSelected");
+    els.brandMaterialSummaryText.classList.remove("active");
+  }
 }
 
 function filteredDrawerOptions(): BrandMaterialOption[] {
