@@ -1655,7 +1655,38 @@
 
         <div class="dashboard-modal-body">
           <!-- 核心指标卡片 -->
-          <div class="dashboard-metrics-grid">
+          
+          <!-- 管理员可见：服务器性能与资源监控 -->
+          <div id="dashboardServerMetricsSection" class="dashboard-section-card hidden">
+            <div class="metrics-header-row">
+              <h3>🖥️ 网站服务器运行状态</h3>
+              <button id="refreshMetricsBtn" class="ghost-button text-sm" type="button">↻ 刷新指标</button>
+            </div>
+            <div class="server-metrics-grid">
+              <div class="server-metric-item">
+                <span class="s-metric-title">⚡ CPU 负载 / 核心</span>
+                <strong id="cpuMetricVal">0% (1核)</strong>
+                <div class="metric-progress-bar"><div id="cpuProgressBar" class="bar-fill" style="width: 0%;"></div></div>
+                <small id="cpuLoadSub" class="s-metric-sub">负载: 0.0, 0.0, 0.0</small>
+              </div>
+
+              <div class="server-metric-item">
+                <span class="s-metric-title">🧠 内存使用率 (RAM)</span>
+                <strong id="memMetricVal">0%</strong>
+                <div class="metric-progress-bar"><div id="memProgressBar" class="bar-fill" style="width: 0%;"></div></div>
+                <small id="memSub" class="s-metric-sub">可用: 0 MB / 0 MB</small>
+              </div>
+
+              <div class="server-metric-item">
+                <span class="s-metric-title">💾 硬盘存储空间 (Disk)</span>
+                <strong id="diskMetricVal">0%</strong>
+                <div class="metric-progress-bar"><div id="diskProgressBar" class="bar-fill" style="width: 0%;"></div></div>
+                <small id="diskSub" class="s-metric-sub">剩余: 0 GB / 0 GB</small>
+              </div>
+            </div>
+          </div>
+
+<div class="dashboard-metrics-grid">
             <div class="metric-card">
               <span class="metric-label">累计生图次数</span>
               <strong id="metricTotalTasks" class="metric-value">0</strong>
@@ -1684,7 +1715,34 @@
             <div id="dashboardLeaderboardList" class="dashboard-leaderboard-list"></div>
           </div>
 
-          <!-- 管理员可见：员工账户列表 -->
+          
+          <!-- 管理员可见：历史图库与任务清理工具 -->
+          <div id="dashboardCleanupSection" class="dashboard-section-card hidden">
+            <div class="cleanup-header">
+              <div>
+                <h3>🧹 历史图库与图片磁盘清理</h3>
+                <p>定期清理早期的历史生图原文件与缓存，释放服务器硬盘空间</p>
+              </div>
+            </div>
+            <div class="cleanup-controls-wrap">
+              <div class="cleanup-quick-buttons">
+                <span class="cleanup-label">快速清理:</span>
+                <button class="ghost-button text-sm cleanup-btn" type="button" data-days="1">清理 1 天前</button>
+                <button class="ghost-button text-sm cleanup-btn" type="button" data-days="7">清理 7 天前</button>
+                <button class="ghost-button text-sm cleanup-btn" type="button" data-days="30">清理 30 天前</button>
+              </div>
+              <div class="cleanup-custom-range">
+                <span class="cleanup-label">按日期区间:</span>
+                <input id="cleanupStartDate" class="control text-sm" type="date" />
+                <span>至</span>
+                <input id="cleanupEndDate" class="control text-sm" type="date" />
+                <button id="cleanupCustomBtn" class="ghost-button text-sm danger-action" type="button">执行区间清理</button>
+              </div>
+            </div>
+            <div id="cleanupStatusNotice" class="cleanup-status-notice hidden"></div>
+          </div>
+
+<!-- 管理员可见：员工账户列表 -->
           <div id="dashboardUserListSection" class="dashboard-section-card hidden">
             <h3>👥 内部用户管理</h3>
             <div id="dashboardUserTable" class="dashboard-user-table"></div>

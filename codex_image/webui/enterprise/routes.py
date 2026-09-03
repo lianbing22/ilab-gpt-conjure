@@ -1,5 +1,66 @@
 from __future__ import annotations
 
+import shutil
+import os
+
+def _get_server_metrics(output_root: Path) -> dict[str, Any]:
+    # 1. 磁盘使用情况
+    total, used, free = shutil.disk_usage(output_root)
+    disk_total_gb = round(total / (1024 ** 3), 1)
+    disk_used_gb = round(used / (1024 ** 3), 1)
+    disk_free_gb = round(free / (1024 ** 3), 1)
+    disk_percent = round((used / total) * 100, 1)
+
+    # 2. 内存使用情况 (Linux)
+    mem_total_mb = 0
+    mem_avail_mb = 0
+    mem_percent = 0
+    try:
+        with open("/proc/meminfo", "r") as f:
+            lines = f.readlines()
+        meminfo = {}
+        for line in lines:
+            parts = line.split(":")
+            if len(parts) == 2:
+                meminfo[parts[0].strip()] = int(parts[1].split()[0])
+        total_kb = meminfo.get("MemTotal", 0)
+        avail_kb = meminfo.get("MemAvailable", meminfo.get("MemFree", 0))
+        used_kb = total_kb - avail_kb
+        mem_total_mb = round(total_kb / 1024, 1)
+        mem_avail_mb = round(avail_kb / 1024, 1)
+        mem_percent = round((used_kb / total_kb) * 100, 1) if total_kb else 0
+    except Exception:
+        pass
+
+    # 3. CPU 核心数与负载
+    cpu_count = os.cpu_count() or 1
+    load_avg = [0.0, 0.0, 0.0]
+    try:
+        load_avg = [round(x, 2) for x in os.getloadavg()]
+    except Exception:
+        pass
+
+    return {
+        "disk": {
+            "total_gb": disk_total_gb,
+            "used_gb": disk_used_gb,
+            "free_gb": disk_free_gb,
+            "percent": disk_percent,
+        },
+        "memory": {
+            "total_mb": mem_total_mb,
+            "available_mb": mem_avail_mb,
+            "percent": mem_percent,
+        },
+        "cpu": {
+            "cores": cpu_count,
+            "load_1m": load_avg[0],
+            "load_5m": load_avg[1],
+            "load_15m": load_avg[2],
+        }
+    }
+
+
 import uuid
 from datetime import datetime, timezone
 from typing import Any, Optional
@@ -41,6 +102,77 @@ def require_current_user(request: Request, ctx: WebUIContext) -> dict[str, Any]:
     return user
 
 def register_enterprise_routes(app: FastAPI, ctx: WebUIContext) -> None:
+
+    # 6. 服务器性能与资源监控接口
+    @app.get("/api/admin/system-metrics")
+    def get_system_metrics(request: Request) -> dict[str, Any]:
+        user = require_current_user(request, ctx)
+        if user.get("role") != "admin":
+            raise HTTPException(status_code=403, detail="仅管理员可查看服务器状态")
+        return {"metrics": _get_server_metrics(ctx.output_root)}
+
+    # 7. 历史图库与任务清理接口
+    @app.post("/api/admin/cleanup-history")
+    def cleanup_history_images(request: Request, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+        user = require_current_user(request, ctx)
+        if user.get("role") != "admin":
+            raise HTTPException(status_code=403, detail="仅管理员有权清理历史图片")
+
+        days = payload.get("days") # 1, 7, 30 或 None
+        start_date = payload.get("start_date") # YYYY-MM-DD
+        end_date = payload.get("end_date") # YYYY-MM-DD
+
+        now_ts = datetime.now(timezone.utc).timestamp()
+        deleted_count = 0
+        freed_bytes = 0
+
+        # 清理 output 目录下的任务输出文件
+        tasks_dir = ctx.output_root / "tasks"
+        if tasks_dir.exists():
+            for task_path in list(tasks_dir.iterdir()):
+                if not task_path.is_dir():
+                    continue
+                try:
+                    mtime = task_path.stat().st_mtime
+                    age_days = (now_ts - mtime) / 86400
+
+                    should_delete = False
+                    if days is not None:
+                        if age_days >= float(days):
+                            should_delete = True
+                    elif start_date and end_date:
+                        date_str = datetime.fromtimestamp(mtime, tz=timezone.utc).strftime("%Y-%m-%d")
+                        if start_date <= date_str <= end_date:
+                            should_delete = True
+
+                    if should_delete:
+                        for f in task_path.rglob("*"):
+                            if f.is_file():
+                                freed_bytes += f.stat().st_size
+                        shutil.rmtree(task_path, ignore_errors=True)
+                        deleted_count += 1
+                except Exception:
+                    pass
+
+        # 同时也清理数据库中的过期记录
+        try:
+            conn = get_db(ctx.source_data_root)
+            cur = conn.cursor()
+            if days is not None:
+                cur.execute(f"DELETE FROM generation_records WHERE datetime(created_at) < datetime('now', '-{int(days)} days')")
+            elif start_date and end_date:
+                cur.execute("DELETE FROM generation_records WHERE date(created_at) >= ? AND date(created_at) <= ?", (start_date, end_date))
+            conn.commit()
+            conn.close()
+        except Exception:
+            pass
+
+        return {
+            "ok": True,
+            "deleted_tasks": deleted_count,
+            "freed_mb": round(freed_bytes / (1024 * 1024), 2),
+        }
+
     # --- 用户管理增删改查 (仅管理员) ---
     @app.get("/api/admin/users")
     def list_admin_users(request: Request) -> dict[str, Any]:

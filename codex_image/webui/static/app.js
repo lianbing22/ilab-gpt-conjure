@@ -792,6 +792,16 @@
     "version.historyEmpty": "No release notes available",
     "version.currentBadge": "Current",
     "version.releaseDate": "{date}",
+    "version.change.radio_group_delegation_fix": "Fix resolution and quantity selection buttons with universal event delegation.",
+    "version.change.top_nav_overlap_fix": "Fix header title and user badge overlapping on compact viewports.",
+    "version.change.user_management_form_responsive_fix": "Responsive layout for employee creation form to avoid text truncation.",
+    "version.change.generation_stats_realtime_sync": "Realtime synchronization of generation tasks into analytics dashboard.",
+    "version.change.clean_mock_users": "Clean up mock user accounts to ensure pristine database state.",
+    "version.change.strict_history_privacy_guard": "Strict privacy lockdown preventing unauthenticated history inspection.",
+    "version.change.enforce_login_guard": "Mandatory login enforcement for generation and internal assets.",
+    "version.change.task_user_privacy_filter": "Strict task privacy filter isolating data between team members.",
+    "version.change.server_system_metrics": "System telemetry metrics monitoring CPU, Memory, and Disk usage.",
+    "version.change.cleanup_history_images": "History image cleanup utility supporting 1/7/30 days and custom date ranges.",
     "version.change.enterprise_auth_system": "Enterprise user system with multi-role authentication (Admin & Employee)",
     "version.change.user_privacy_isolation": "Strict user privacy isolation for tasks and generation artifacts",
     "version.change.analytics_dashboard": "Analytics dashboard for team enterprise statistics and individual reports",
@@ -10710,6 +10720,16 @@
     "version.historyEmpty": "\u6682\u65E0\u66F4\u65B0\u8BB0\u5F55",
     "version.currentBadge": "\u5F53\u524D",
     "version.releaseDate": "{date}",
+    "version.change.radio_group_delegation_fix": "\u4FEE\u590D\u5206\u8FA8\u7387\u4E0E\u751F\u6210\u6570\u91CF\u80F6\u56CA\u5207\u6362\u5931\u6548\u95EE\u9898\uFF0C\u7EDF\u4E00\u5404\u5355\u9009\u7EC4\u4EF6\u7684\u4E8B\u4EF6\u6D3E\u53D1\u4E0E\u50CF\u7D20\u8054\u52A8\u3002",
+    "version.change.top_nav_overlap_fix": "\u4F18\u5316\u9876\u90E8\u5BFC\u822A\u680F\u6392\u7248\u5E03\u5C40\uFF0C\u5F7B\u5E95\u89E3\u51B3\u6807\u9898\u4E0E\u7528\u6237\u5934\u50CF\u5FBD\u6807\u6587\u5B57\u78B0\u649E\u91CD\u53E0\u7684\u95EE\u9898\u3002",
+    "version.change.user_management_form_responsive_fix": "\u91CD\u6784\u4F01\u4E1A\u5458\u5DE5\u7BA1\u7406\u5F00\u901A\u8868\u5355\uFF0C\u8F93\u5165\u6846\u5BBD\u5EA6\u81EA\u9002\u5E94\u5C55\u5F00\uFF0C\u89E3\u51B3\u5185\u5BB9\u4E0E\u63D0\u793A\u6587\u5B57\u88AB\u622A\u65AD\u95EE\u9898\u3002",
+    "version.change.generation_stats_realtime_sync": "\u6253\u901A\u751F\u56FE\u5E95\u5C42\u4EFB\u52A1\u961F\u5217\uFF0C\u6BCF\u4E00\u6B21\u51FA\u56FE\u81EA\u52A8\u5B9E\u65F6\u8BA1\u5165\u4F01\u4E1A\u6570\u636E\u5927\u76D8\u4E0E\u6392\u884C\u699C\u3002",
+    "version.change.clean_mock_users": "\u6E05\u7406\u7CFB\u7EDF\u6240\u6709\u6D4B\u8BD5\u751F\u6210\u7684\u865A\u62DF\u5458\u5DE5\u8D26\u53F7\uFF0C\u4FDD\u8BC1\u6B63\u5F0F\u8FD0\u8425\u6570\u636E\u5E93\u5E72\u51C0\u7EAF\u7CB9\u3002",
+    "version.change.strict_history_privacy_guard": "\u4E25\u683C\u52A0\u5F3A\u6570\u636E\u4FDD\u5BC6\uFF1A\u672A\u767B\u5F55\u72B6\u6001\u4E0B\u5168\u9762\u7981\u6B62\u67E5\u770B\u5386\u53F2\u4EFB\u52A1\u4E0E\u751F\u56FE\u8BB0\u5F55\u3002",
+    "version.change.enforce_login_guard": "\u65B0\u589E\u5168\u94FE\u8DEF\u767B\u5F55\u62E6\u622A\u5B88\u536B\uFF0C\u672A\u767B\u5F55\u7528\u6237\u65E0\u6CD5\u53D1\u8D77\u751F\u6210\u6216\u8BBF\u95EE\u5185\u90E8\u8D44\u4EA7\u3002",
+    "version.change.task_user_privacy_filter": "\u591A\u7528\u6237\u7269\u7406\u9690\u79C1\u9694\u79BB\uFF1A\u5458\u5DE5\u4E4B\u95F4\u53EA\u80FD\u67E5\u770B\u548C\u7BA1\u7406\u5C5E\u4E8E\u81EA\u5DF1\u7684\u751F\u56FE\u4EFB\u52A1\u3002",
+    "version.change.server_system_metrics": "\u7BA1\u7406\u5458\u5927\u76D8\u65B0\u589E\u670D\u52A1\u5668\u5B9E\u65F6\u76D1\u63A7\uFF1A\u652F\u6301\u67E5\u770B CPU \u8D1F\u8F7D\u3001\u5185\u5B58\u5360\u7528\u4E0E\u786C\u76D8\u5269\u4F59\u7A7A\u95F4\u3002",
+    "version.change.cleanup_history_images": "\u65B0\u589E\u5386\u53F2\u56FE\u7247\u6E05\u7406\u5DE5\u5177\uFF1A\u652F\u6301\u6309\u6700\u8FD1 1 \u5929\u30017 \u5929\u300130 \u5929\u6216\u81EA\u5B9A\u4E49\u65E5\u671F\u533A\u95F4\u4E00\u952E\u91CA\u653E\u78C1\u76D8\u7A7A\u95F4\u3002",
     "version.change.enterprise_auth_system": "\u5168\u65B0\u4F01\u4E1A\u7528\u6237\u7CFB\u7EDF\uFF1A\u652F\u6301\u8D26\u53F7\u5BC6\u7801\u6CE8\u518C\u3001\u666E\u901A\u5458\u5DE5\u4E0E\u7BA1\u7406\u5458\u5206\u6743",
     "version.change.user_privacy_isolation": "\u591A\u7528\u6237\u6570\u636E\u4E25\u683C\u9690\u79C1\u9694\u79BB\uFF1A\u6BCF\u4F4D\u5458\u5DE5\u72EC\u7ACB\u4FDD\u7BA1\u4E2A\u4EBA\u751F\u56FE\u4EFB\u52A1\u4E0E\u4EA7\u7269",
     "version.change.analytics_dashboard": "\u7EDF\u8BA1\u5206\u6790\u5927\u76D8\uFF1A\u7BA1\u7406\u5458\u67E5\u770B\u516C\u53F8\u5168\u5458\u751F\u4EA7\u529B\u770B\u677F\uFF0C\u5458\u5DE5\u67E5\u770B\u4E2A\u4EBA\u5468\u62A5\u4E0E\u6708\u62A5",
@@ -46369,6 +46389,89 @@ ${galleryText}`;
           openAuthModal(false);
         }
       }, true);
+      const dashboardServerMetricsSection = document.getElementById("dashboardServerMetricsSection");
+      const dashboardCleanupSection = document.getElementById("dashboardCleanupSection");
+      const refreshMetricsBtn = document.getElementById("refreshMetricsBtn");
+      const cpuMetricVal = document.getElementById("cpuMetricVal");
+      const cpuProgressBar = document.getElementById("cpuProgressBar");
+      const cpuLoadSub = document.getElementById("cpuLoadSub");
+      const memMetricVal = document.getElementById("memMetricVal");
+      const memProgressBar = document.getElementById("memProgressBar");
+      const memSub = document.getElementById("memSub");
+      const diskMetricVal = document.getElementById("diskMetricVal");
+      const diskProgressBar = document.getElementById("diskProgressBar");
+      const diskSub = document.getElementById("diskSub");
+      const cleanupCustomBtn = document.getElementById("cleanupCustomBtn");
+      const cleanupStartDate = document.getElementById("cleanupStartDate");
+      const cleanupEndDate = document.getElementById("cleanupEndDate");
+      const cleanupStatusNotice = document.getElementById("cleanupStatusNotice");
+      const loadServerMetrics = async () => {
+        try {
+          const res = await fetch("/api/admin/system-metrics");
+          const data = await res.json();
+          const m = data.metrics || {};
+          if (cpuMetricVal && m.cpu) {
+            const load1m = m.cpu.load_1m || 0;
+            const estPercent = Math.min(100, Math.round(load1m / m.cpu.cores * 100));
+            cpuMetricVal.textContent = `${estPercent}% (${m.cpu.cores}\u6838)`;
+            if (cpuProgressBar) cpuProgressBar.style.width = `${estPercent}%`;
+            if (cpuLoadSub) cpuLoadSub.textContent = `\u7CFB\u7EDF\u8D1F\u8F7D: ${m.cpu.load_1m}, ${m.cpu.load_5m}, ${m.cpu.load_15m}`;
+          }
+          if (memMetricVal && m.memory) {
+            memMetricVal.textContent = `${m.memory.percent}%`;
+            if (memProgressBar) memProgressBar.style.width = `${m.memory.percent}%`;
+            if (memSub) memSub.textContent = `\u53EF\u7528: ${m.memory.available_mb} MB / \u603B\u5171: ${m.memory.total_mb} MB`;
+          }
+          if (diskMetricVal && m.disk) {
+            diskMetricVal.textContent = `${m.disk.percent}%`;
+            if (diskProgressBar) diskProgressBar.style.width = `${m.disk.percent}%`;
+            if (diskSub) diskSub.textContent = `\u5269\u4F59\u7A7A\u95F4: ${m.disk.free_gb} GB / \u603B\u5BB9\u91CF: ${m.disk.total_gb} GB`;
+          }
+        } catch {
+        }
+      };
+      refreshMetricsBtn?.addEventListener("click", () => void loadServerMetrics());
+      const executeCleanup = async (payload2) => {
+        const confirmMsg = payload2.days ? `\u786E\u5B9A\u8981\u6E05\u7406 ${payload2.days} \u5929\u524D\u7684\u6240\u6709\u5386\u53F2\u751F\u56FE\u4E0E\u78C1\u76D8\u7F13\u5B58\u5417\uFF1F\u6B64\u64CD\u4F5C\u4E0D\u53EF\u9006\uFF01` : `\u786E\u5B9A\u8981\u6E05\u7406\u4ECE ${payload2.start_date} \u5230 ${payload2.end_date} \u533A\u95F4\u7684\u6240\u6709\u751F\u56FE\u6587\u4EF6\u5417\uFF1F\u6B64\u64CD\u4F5C\u4E0D\u53EF\u9006\uFF01`;
+        if (!confirm(confirmMsg)) return;
+        if (cleanupStatusNotice) {
+          cleanupStatusNotice.classList.remove("hidden");
+          cleanupStatusNotice.textContent = "\u6B63\u5728\u6E05\u7406\u5386\u53F2\u6587\u4EF6\u5E76\u91CA\u653E\u78C1\u76D8...";
+        }
+        try {
+          const res = await fetch("/api/admin/cleanup-history", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload2)
+          });
+          const data = await res.json();
+          if (cleanupStatusNotice) {
+            cleanupStatusNotice.textContent = `\u6E05\u7406\u6210\u529F\uFF01\u5171\u5220\u9664 ${data.deleted_tasks} \u4E2A\u5386\u53F2\u4EFB\u52A1\u6587\u4EF6\uFF0C\u6210\u529F\u91CA\u653E ${data.freed_mb} MB \u78C1\u76D8\u7A7A\u95F4\uFF01`;
+          }
+          await loadServerMetrics();
+        } catch (err) {
+          if (cleanupStatusNotice) cleanupStatusNotice.textContent = `\u6E05\u7406\u5931\u8D25: ${err.message || "\u672A\u77E5\u9519\u8BEF"}`;
+        }
+      };
+      document.querySelectorAll("[data-days]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const days = btn.dataset.days;
+          if (days) void executeCleanup({ days: Number(days) });
+        });
+      });
+      cleanupCustomBtn?.addEventListener("click", () => {
+        const start = cleanupStartDate?.value;
+        const end = cleanupEndDate?.value;
+        if (!start || !end) {
+          alert("\u8BF7\u9009\u62E9\u8D77\u59CB\u4E0E\u7ED3\u675F\u65E5\u671F");
+          return;
+        }
+        if (start > end) {
+          alert("\u8D77\u59CB\u65E5\u671F\u4E0D\u80FD\u665A\u4E8E\u7ED3\u675F\u65E5\u671F");
+          return;
+        }
+        void executeCleanup({ start_date: start, end_date: end });
+      });
       const openDashboard = async () => {
         if (!currentUser) {
           openAuthModal(false);
@@ -46404,6 +46507,9 @@ ${galleryText}`;
           }
           if (isAdmin) {
             dashboardLeaderboardSection?.classList.remove("hidden");
+            dashboardServerMetricsSection?.classList.remove("hidden");
+            dashboardCleanupSection?.classList.remove("hidden");
+            void loadServerMetrics();
             dashboardUserListSection?.classList.remove("hidden");
             if (dashboardLeaderboardList) {
               const list = stats.leaderboard || [];
@@ -46431,6 +46537,8 @@ ${galleryText}`;
             }
           } else {
             dashboardLeaderboardSection?.classList.add("hidden");
+            dashboardServerMetricsSection?.classList.add("hidden");
+            dashboardCleanupSection?.classList.add("hidden");
             dashboardUserListSection?.classList.add("hidden");
           }
         } catch {

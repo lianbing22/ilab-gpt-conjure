@@ -452,7 +452,104 @@ function initEnterpriseSystem() {
       }
     }, true);
 
-    const openDashboard = async () => {
+    
+    const dashboardServerMetricsSection = document.getElementById("dashboardServerMetricsSection");
+    const dashboardCleanupSection = document.getElementById("dashboardCleanupSection");
+    const refreshMetricsBtn = document.getElementById("refreshMetricsBtn");
+    const cpuMetricVal = document.getElementById("cpuMetricVal");
+    const cpuProgressBar = document.getElementById("cpuProgressBar");
+    const cpuLoadSub = document.getElementById("cpuLoadSub");
+    const memMetricVal = document.getElementById("memMetricVal");
+    const memProgressBar = document.getElementById("memProgressBar");
+    const memSub = document.getElementById("memSub");
+    const diskMetricVal = document.getElementById("diskMetricVal");
+    const diskProgressBar = document.getElementById("diskProgressBar");
+    const diskSub = document.getElementById("diskSub");
+
+    const cleanupCustomBtn = document.getElementById("cleanupCustomBtn");
+    const cleanupStartDate = document.getElementById("cleanupStartDate") as HTMLInputElement | null;
+    const cleanupEndDate = document.getElementById("cleanupEndDate") as HTMLInputElement | null;
+    const cleanupStatusNotice = document.getElementById("cleanupStatusNotice");
+
+    const loadServerMetrics = async () => {
+      try {
+        const res = await fetch("/api/admin/system-metrics");
+        const data = await res.json();
+        const m = data.metrics || {};
+        if (cpuMetricVal && m.cpu) {
+          const load1m = m.cpu.load_1m || 0;
+          const estPercent = Math.min(100, Math.round((load1m / m.cpu.cores) * 100));
+          cpuMetricVal.textContent = `${estPercent}% (${m.cpu.cores}核)`;
+          if (cpuProgressBar) cpuProgressBar.style.width = `${estPercent}%`;
+          if (cpuLoadSub) cpuLoadSub.textContent = `系统负载: ${m.cpu.load_1m}, ${m.cpu.load_5m}, ${m.cpu.load_15m}`;
+        }
+        if (memMetricVal && m.memory) {
+          memMetricVal.textContent = `${m.memory.percent}%`;
+          if (memProgressBar) memProgressBar.style.width = `${m.memory.percent}%`;
+          if (memSub) memSub.textContent = `可用: ${m.memory.available_mb} MB / 总共: ${m.memory.total_mb} MB`;
+        }
+        if (diskMetricVal && m.disk) {
+          diskMetricVal.textContent = `${m.disk.percent}%`;
+          if (diskProgressBar) diskProgressBar.style.width = `${m.disk.percent}%`;
+          if (diskSub) diskSub.textContent = `剩余空间: ${m.disk.free_gb} GB / 总容量: ${m.disk.total_gb} GB`;
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    refreshMetricsBtn?.addEventListener("click", () => void loadServerMetrics());
+
+    // 历史清理执行函数
+    const executeCleanup = async (payload: any) => {
+      const confirmMsg = payload.days
+        ? `确定要清理 ${payload.days} 天前的所有历史生图与磁盘缓存吗？此操作不可逆！`
+        : `确定要清理从 ${payload.start_date} 到 ${payload.end_date} 区间的所有生图文件吗？此操作不可逆！`;
+      if (!confirm(confirmMsg)) return;
+
+      if (cleanupStatusNotice) {
+        cleanupStatusNotice.classList.remove("hidden");
+        cleanupStatusNotice.textContent = "正在清理历史文件并释放磁盘...";
+      }
+
+      try {
+        const res = await fetch("/api/admin/cleanup-history", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (cleanupStatusNotice) {
+          cleanupStatusNotice.textContent = `清理成功！共删除 ${data.deleted_tasks} 个历史任务文件，成功释放 ${data.freed_mb} MB 磁盘空间！`;
+        }
+        await loadServerMetrics();
+      } catch (err: any) {
+        if (cleanupStatusNotice) cleanupStatusNotice.textContent = `清理失败: ${err.message || "未知错误"}`;
+      }
+    };
+
+    document.querySelectorAll("[data-days]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const days = (btn as HTMLElement).dataset.days;
+        if (days) void executeCleanup({ days: Number(days) });
+      });
+    });
+
+    cleanupCustomBtn?.addEventListener("click", () => {
+      const start = cleanupStartDate?.value;
+      const end = cleanupEndDate?.value;
+      if (!start || !end) {
+        alert("请选择起始与结束日期");
+        return;
+      }
+      if (start > end) {
+        alert("起始日期不能晚于结束日期");
+        return;
+      }
+      void executeCleanup({ start_date: start, end_date: end });
+    });
+
+const openDashboard = async () => {
       if (!currentUser) {
         openAuthModal(false);
         return;
@@ -491,6 +588,9 @@ function initEnterpriseSystem() {
 
         if (isAdmin) {
           dashboardLeaderboardSection?.classList.remove("hidden");
+          dashboardServerMetricsSection?.classList.remove("hidden");
+          dashboardCleanupSection?.classList.remove("hidden");
+          void loadServerMetrics();
           dashboardUserListSection?.classList.remove("hidden");
 
           if (dashboardLeaderboardList) {
@@ -520,6 +620,8 @@ function initEnterpriseSystem() {
           }
         } else {
           dashboardLeaderboardSection?.classList.add("hidden");
+          dashboardServerMetricsSection?.classList.add("hidden");
+          dashboardCleanupSection?.classList.add("hidden");
           dashboardUserListSection?.classList.add("hidden");
         }
       } catch {
