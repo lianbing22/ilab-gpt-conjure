@@ -33144,8 +33144,8 @@ ${hint}` : hint;
     const key = String(tag || "").replace(/^[~～〜∼˜]+/, "").toLowerCase();
     return state12.promptSnippets.find((snippet) => snippet.tag.toLowerCase() === key) || null;
   }
-  function expandPromptSnippets(prompt) {
-    const text = String(prompt || "");
+  function expandPromptSnippets(prompt2) {
+    const text = String(prompt2 || "");
     return text.replace(/(^|[\s\n，。,.；;：:！？!?、（）()\[\]【】"'“”‘’])([~～〜∼˜]+)([^\s~～〜∼˜@#，。,.；;：:！？!?、（）()\[\]【】"'“”‘’]+)/g, (full, prefix, _trigger, tag) => {
       const snippet = findPromptSnippetByTag(tag);
       if (!snippet) return full;
@@ -35592,8 +35592,8 @@ ${hint}` : hint;
   function getPromptText8() {
     return legacyMethod24("getPromptText");
   }
-  function expandPromptSnippets2(prompt) {
-    return legacyMethod24("expandPromptSnippets", prompt);
+  function expandPromptSnippets2(prompt2) {
+    return legacyMethod24("expandPromptSnippets", prompt2);
   }
   function galleryInputs3() {
     return legacyMethod24("galleryInputs");
@@ -35607,8 +35607,8 @@ ${hint}` : hint;
   function categoryPromptRole3(category) {
     return legacyMethod24("categoryPromptRole", category);
   }
-  function promptTokenReplacement(prompt) {
-    return expandPromptSnippets2(prompt);
+  function promptTokenReplacement(prompt2) {
+    return expandPromptSnippets2(prompt2);
   }
   function galleryPromptText(galleries = galleryInputs3()) {
     if (!galleries.length) return "";
@@ -35618,11 +35618,11 @@ ${hint}` : hint;
 ${lines.join("\n")}`;
   }
   function buildPromptForModel() {
-    const prompt = expandPromptSnippets2(getPromptText8());
+    const prompt2 = expandPromptSnippets2(getPromptText8());
     const galleries = galleryInputs3();
     const galleryText = galleryPromptText(galleries);
-    if (!galleryText) return prompt;
-    return `${prompt}
+    if (!galleryText) return prompt2;
+    return `${prompt2}
 
 ${galleryText}`;
   }
@@ -40210,7 +40210,7 @@ ${galleryText}`;
   async function runTask() {
     syncPromptFromEditor6();
     syncGalleryInputsFromPrompt3();
-    const prompt = getPromptText9();
+    const prompt2 = getPromptText9();
     const promptForModel = currentPromptForModel2();
     const uploads = uploadInputs3();
     const galleries = galleryInputs4();
@@ -40229,7 +40229,7 @@ ${galleryText}`;
       setStatus17(translate("referenceFiles.errorMissing"), "error");
       return;
     }
-    if (!prompt) {
+    if (!prompt2) {
       setStatus17(translate("status.emptyPrompt"), "error");
       return;
     }
@@ -40245,7 +40245,7 @@ ${galleryText}`;
       return;
     }
     const form = new FormData();
-    form.append("prompt", prompt);
+    form.append("prompt", prompt2);
     form.append("prompt_for_model", promptForModel);
     const params = currentTaskParams2();
     form.append("main_model", currentMainModel2());
@@ -41452,9 +41452,9 @@ ${galleryText}`;
         setStatus18(translate("taskContext.idCopied"), "ok");
       } else if (action === "copy-prompt") {
         const detailedTask = await ensureTaskContextTaskDetail(taskId, task);
-        const prompt = taskPromptText(detailedTask);
-        if (!prompt) throw new Error(translate("taskContext.noPrompt"));
-        await copyText(prompt);
+        const prompt2 = taskPromptText(detailedTask);
+        if (!prompt2) throw new Error(translate("taskContext.noPrompt"));
+        await copyText(prompt2);
         setStatus18(translate("taskContext.promptCopied"), "ok");
       } else if (action === "reveal-output") {
         await revealTaskOutputDirectory(taskId);
@@ -41796,7 +41796,7 @@ ${galleryText}`;
     const thumbnailUrl = firstTaskThumbnailUrl(task);
     const successCount = completedOutputCount(task);
     const failedCount = positiveNumber(task.failed_count);
-    const prompt = promptSnippet(task.prompt || task.prompt_for_model || "");
+    const prompt2 = promptSnippet(task.prompt || task.prompt_for_model || "");
     const errorMessage7 = String(task.last_error || task.error || "");
     return {
       id: taskNotificationSeenKey(task, status),
@@ -41806,12 +41806,12 @@ ${galleryText}`;
       message: taskNotificationMessageFromParts(status, {
         successCount,
         failedCount,
-        prompt,
+        prompt: prompt2,
         errorMessage: errorMessage7
       }),
       success_count: successCount,
       failed_count: failedCount,
-      prompt_snippet: prompt,
+      prompt_snippet: prompt2,
       error_message: errorMessage7,
       created_at: (/* @__PURE__ */ new Date()).toISOString(),
       ...thumbnailUrl ? { thumbnail_url: thumbnailUrl } : {},
@@ -46261,6 +46261,8 @@ ${galleryText}`;
             const isAdmin = user.role === "admin";
             userRoleBadge.textContent = isAdmin ? "\u7BA1\u7406\u5458" : "\u5458\u5DE5";
             userRoleBadge.classList.toggle("admin-role", isAdmin);
+            if (isAdmin && openUserManagerBtn) openUserManagerBtn.classList.remove("hidden");
+            else if (openUserManagerBtn) openUserManagerBtn.classList.add("hidden");
           }
           if (authActionBtn) {
             authActionBtn.querySelector("span").textContent = "\u9000\u51FA";
@@ -46358,6 +46360,15 @@ ${galleryText}`;
           }
         }
       });
+      const historyBtn = document.getElementById("historyLink");
+      historyBtn?.addEventListener("click", (e) => {
+        if (!currentUser) {
+          e.preventDefault();
+          e.stopPropagation();
+          alert("\u751F\u56FE\u5386\u53F2\u4E3A\u5185\u90E8\u4FDD\u5BC6\u6570\u636E\uFF0C\u8BF7\u5148\u767B\u5F55\u4F01\u4E1A\u8D26\u53F7\uFF01");
+          openAuthModal(false);
+        }
+      }, true);
       const openDashboard = async () => {
         if (!currentUser) {
           openAuthModal(false);
@@ -46428,6 +46439,123 @@ ${galleryText}`;
       };
       openDashboardBtn?.addEventListener("click", openDashboard);
       dashboardModalClose?.addEventListener("click", () => dashboardModal?.classList.add("hidden"));
+      const openUserManagerBtn = document.getElementById("openUserManagerBtn");
+      const userManagerModal = document.getElementById("userManagerModal");
+      const userManagerModalClose = document.getElementById("userManagerModalClose");
+      const userManageTableBody = document.getElementById("userManageTableBody");
+      const userTotalBadge = document.getElementById("userTotalBadge");
+      const newMemberUsername = document.getElementById("newMemberUsername");
+      const newMemberDisplayName = document.getElementById("newMemberDisplayName");
+      const newMemberPassword = document.getElementById("newMemberPassword");
+      const newMemberRole = document.getElementById("newMemberRole");
+      const newMemberSubmitBtn = document.getElementById("newMemberSubmitBtn");
+      const loadUserManagerList = async () => {
+        if (!userManageTableBody) return;
+        try {
+          const res = await fetch("/api/admin/users");
+          const data = await res.json();
+          const users = data.users || [];
+          if (userTotalBadge) userTotalBadge.textContent = `${users.length} \u4EBA`;
+          if (!users.length) {
+            userManageTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;">\u6682\u65E0\u5458\u5DE5</td></tr>`;
+            return;
+          }
+          userManageTableBody.innerHTML = users.map((u) => {
+            const isSelf = u.id === currentUser?.id;
+            return `
+            <tr>
+              <td><strong>${u.display_name}</strong></td>
+              <td>${u.username}</td>
+              <td><span class="user-role-badge ${u.role === "admin" ? "admin-role" : ""}">${u.role === "admin" ? "\u7BA1\u7406\u5458" : "\u666E\u901A\u5458\u5DE5"}</span></td>
+              <td>${u.task_count || 0} \u6B21</td>
+              <td style="color:var(--text-secondary); font-size:11px;">${u.created_at}</td>
+              <td>
+                <div class="user-action-btns">
+                  <button class="ghost-button user-reset-btn" data-reset-user="${u.id}">\u91CD\u7F6E\u5BC6\u7801</button>
+                  ${!isSelf ? `<button class="ghost-button user-danger-btn" data-delete-user="${u.id}" data-user-name="${u.display_name}">\u5220\u9664</button>` : `<span style="font-size:11px;color:var(--text-secondary);">(\u5F53\u524D\u8D26\u53F7)</span>`}
+                </div>
+              </td>
+            </tr>
+          `;
+          }).join("");
+        } catch {
+          userManageTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#ef4444;">\u83B7\u53D6\u6210\u5458\u5217\u8868\u5931\u8D25</td></tr>`;
+        }
+      };
+      const openUserManager = () => {
+        if (!currentUser || currentUser.role !== "admin") {
+          alert("\u4EC5\u7BA1\u7406\u5458\u6709\u6743\u8BBF\u95EE\u7528\u6237\u7BA1\u7406\u4E2D\u5FC3");
+          return;
+        }
+        userManagerModal?.classList.remove("hidden");
+        void loadUserManagerList();
+      };
+      openUserManagerBtn?.addEventListener("click", openUserManager);
+      userManagerModalClose?.addEventListener("click", () => userManagerModal?.classList.add("hidden"));
+      userManagerModal?.addEventListener("click", (e) => {
+        if (e.target === userManagerModal) userManagerModal?.classList.add("hidden");
+      });
+      newMemberSubmitBtn?.addEventListener("click", async () => {
+        const u = newMemberUsername?.value.trim() || "";
+        const d = newMemberDisplayName?.value.trim() || "";
+        const p = newMemberPassword?.value.trim() || "Htai@123456";
+        const role = newMemberRole?.value || "employee";
+        if (!u) {
+          alert("\u8BF7\u8F93\u5165\u5DE5\u53F7/\u8D26\u53F7\u540D");
+          newMemberUsername?.focus();
+          return;
+        }
+        newMemberSubmitBtn.setAttribute("disabled", "true");
+        try {
+          const res = await fetch("/api/admin/users/create", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username: u, display_name: d, password: p, role })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.detail || "\u521B\u5EFA\u5931\u8D25");
+          alert(`\u8D26\u53F7 ${u} \u5F00\u901A\u6210\u529F\uFF01`);
+          if (newMemberUsername) newMemberUsername.value = "";
+          if (newMemberDisplayName) newMemberDisplayName.value = "";
+          if (newMemberPassword) newMemberPassword.value = "";
+          await loadUserManagerList();
+        } catch (err) {
+          alert(err.message || "\u521B\u5EFA\u5931\u8D25");
+        } finally {
+          newMemberSubmitBtn.removeAttribute("disabled");
+        }
+      });
+      userManageTableBody?.addEventListener("click", async (e) => {
+        const target = e.target;
+        const delBtn = target?.closest("[data-delete-user]");
+        if (delBtn) {
+          const uid = delBtn.dataset.deleteUser;
+          const uname = delBtn.dataset.userName || "\u8BE5\u5458\u5DE5";
+          if (confirm(`\u786E\u5B9A\u8981\u6CE8\u9500\u5E76\u5220\u9664\u5458\u5DE5 [${uname}] \u5417\uFF1F`)) {
+            const res = await fetch(`/api/admin/users/${uid}/delete`, { method: "POST" });
+            if (res.ok) {
+              alert("\u5DF2\u6210\u529F\u5220\u9664\u8BE5\u5458\u5DE5");
+              await loadUserManagerList();
+            } else {
+              alert("\u5220\u9664\u5931\u8D25");
+            }
+          }
+          return;
+        }
+        const resetBtn = target?.closest("[data-reset-user]");
+        if (resetBtn) {
+          const uid = resetBtn.dataset.resetUser;
+          const newPwd = prompt("\u8BF7\u8F93\u5165\u4E3A\u8BE5\u5458\u5DE5\u8BBE\u7F6E\u7684\u65B0\u5BC6\u7801\uFF08\u4E0D\u5C11\u4E8E6\u4F4D\uFF09\uFF1A", "Htai@123456");
+          if (!newPwd) return;
+          const res = await fetch(`/api/admin/users/${uid}/reset-password`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ password: newPwd })
+          });
+          if (res.ok) alert("\u5BC6\u7801\u91CD\u7F6E\u6210\u529F\uFF01");
+          else alert("\u91CD\u7F6E\u5931\u8D25");
+        }
+      });
       dashboardModal?.addEventListener("click", (e) => {
         if (e.target === dashboardModal) dashboardModal?.classList.add("hidden");
       });
@@ -46464,13 +46592,13 @@ ${galleryText}`;
         const target = event.target;
         const card = target?.closest(".inspiration-card");
         if (!card) return;
-        const prompt = card.dataset.prompt;
+        const prompt2 = card.dataset.prompt;
         const ratio = card.dataset.ratio;
         const editor = document.getElementById("promptEditor");
         const hiddenPrompt = document.getElementById("prompt");
-        if (prompt && editor) {
-          editor.textContent = prompt;
-          if (hiddenPrompt) hiddenPrompt.value = prompt;
+        if (prompt2 && editor) {
+          editor.textContent = prompt2;
+          if (hiddenPrompt) hiddenPrompt.value = prompt2;
           const bridge40 = window.__codexImageWebUI?.bridge;
           bridge40?.methods?.updateCharCount?.();
           bridge40?.methods?.syncPromptGalleryMentionsFromInputs?.();

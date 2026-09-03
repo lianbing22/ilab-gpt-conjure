@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from codex_image.webui.enterprise.routes import get_current_user
+
 from io import BytesIO
 from pathlib import Path
 import subprocess
@@ -31,7 +33,10 @@ def register_task_routes(app: FastAPI, ctx: WebUIContext) -> None:
     h = ctx.route_helpers
 
     @app.get("/api/tasks")
-    def list_tasks() -> dict[str, Any]:
+    def list_tasks(request: Request) -> dict[str, Any]:
+        user = get_current_user(request, ctx)
+        if not user:
+            return {"tasks": []}
         active_ids = h["visible_running_task_ids"]()
         return {
             "tasks": [
@@ -72,11 +77,15 @@ def register_task_routes(app: FastAPI, ctx: WebUIContext) -> None:
         return {"tasks": tasks}
 
     @app.get("/api/task-history/summary")
-    def task_history_summary() -> dict[str, Any]:
+    def task_history_summary(request: Request) -> dict[str, Any]:
+        user = get_current_user(request, ctx)
+        if not user:
+            return {"total_tasks": 0, "completed_tasks": 0, "failed_tasks": 0, "months": []}
         return ctx.storage.task_history_summary()
 
     @app.get("/api/task-history/tasks")
     def task_history_tasks(
+        request: Request,
         limit: int = Query(50, ge=1, le=100),
         cursor: str | None = Query(None),
         q: str = Query(""),
@@ -94,6 +103,9 @@ def register_task_routes(app: FastAPI, ctx: WebUIContext) -> None:
         sort: str = Query("newest"),
         direction: str = Query("next"),
     ) -> dict[str, Any]:
+        user = get_current_user(request, ctx)
+        if not user:
+            return {"tasks": [], "next_cursor": None}
         return ctx.storage.query_task_history(
             limit=limit,
             cursor=cursor,

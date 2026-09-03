@@ -341,6 +341,9 @@
                 <span id="userDisplayName" class="user-display-name">未登录</span>
                 <span id="userRoleBadge" class="user-role-badge hidden">员工</span>
               </button>
+              <button id="openUserManagerBtn" class="ghost-button text-sm user-manager-btn hidden" type="button" title="企业员工与用户管理">
+                <span>👥 用户管理</span>
+              </button>
               <button id="openDashboardBtn" class="ghost-button text-sm analytics-btn" type="button" title="统计分析看板">
                 <span>📊 看板</span>
               </button>
@@ -1685,6 +1688,62 @@
           <div id="dashboardUserListSection" class="dashboard-section-card hidden">
             <h3>👥 内部用户管理</h3>
             <div id="dashboardUserTable" class="dashboard-user-table"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- 企业内部独立用户管理中心弹窗 -->
+    <div id="userManagerModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-label="企业用户管理中心">
+      <div class="modal-panel user-manager-modal-panel">
+        <div class="modal-heading user-manager-modal-heading">
+          <div>
+            <h2>👥 企业内部用户与员工管理</h2>
+            <p>添加新成员、管理员工权限、重置密码或停用账号</p>
+          </div>
+          <button id="userManagerModalClose" class="ghost-button drawer-close-button" type="button">✕</button>
+        </div>
+
+        <div class="user-manager-modal-body">
+          <!-- 快速新增员工卡片 -->
+          <div class="user-create-card">
+            <h3>➕ 开通新员工账号</h3>
+            <div class="user-create-form">
+              <input id="newMemberUsername" class="control" type="text" placeholder="员工工号 / 账号名" />
+              <input id="newMemberDisplayName" class="control" type="text" placeholder="姓名（例如：张三）" />
+              <input id="newMemberPassword" class="control" type="password" placeholder="初始密码（默认 Htai@123456）" />
+              <select id="newMemberRole" class="control">
+                <option value="employee" selected>普通员工 (Employee)</option>
+                <option value="admin">管理员 (Admin)</option>
+              </select>
+              <button id="newMemberSubmitBtn" class="run-button text-sm" type="button">创建账号</button>
+            </div>
+          </div>
+
+          <!-- 员工列表与操作区 -->
+          <div class="user-list-card">
+            <div class="user-list-header">
+              <h3>📋 现有团队成员列表</h3>
+              <span id="userTotalBadge" class="feedback-count-badge">加载中...</span>
+            </div>
+            <div class="user-table-wrap">
+              <table class="user-manage-table">
+                <thead>
+                  <tr>
+                    <th>姓名</th>
+                    <th>账号</th>
+                    <th>角色</th>
+                    <th>生图次数</th>
+                    <th>注册时间</th>
+                    <th>管理操作</th>
+                  </tr>
+                </thead>
+                <tbody id="userManageTableBody">
+                  <tr><td colspan="6" style="text-align:center;">正在读取成员列表...</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>

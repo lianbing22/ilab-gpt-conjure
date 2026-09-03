@@ -331,6 +331,8 @@ function initEnterpriseSystem() {
           const isAdmin = user.role === "admin";
           userRoleBadge.textContent = isAdmin ? "管理员" : "员工";
           userRoleBadge.classList.toggle("admin-role", isAdmin);
+          if (isAdmin && openUserManagerBtn) openUserManagerBtn.classList.remove("hidden");
+          else if (openUserManagerBtn) openUserManagerBtn.classList.add("hidden");
         }
         if (authActionBtn) {
           authActionBtn.querySelector("span")!.textContent = "退出";
@@ -440,6 +442,16 @@ function initEnterpriseSystem() {
     });
 
     // 看板逻辑
+        const historyBtn = document.getElementById("historyLink");
+    historyBtn?.addEventListener("click", (e) => {
+      if (!currentUser) {
+        e.preventDefault();
+        e.stopPropagation();
+        alert("生图历史为内部保密数据，请先登录企业账号！");
+        openAuthModal(false);
+      }
+    }, true);
+
     const openDashboard = async () => {
       if (!currentUser) {
         openAuthModal(false);
@@ -517,6 +529,130 @@ function initEnterpriseSystem() {
 
     openDashboardBtn?.addEventListener("click", openDashboard);
     dashboardModalClose?.addEventListener("click", () => dashboardModal?.classList.add("hidden"));
+    const openUserManagerBtn = document.getElementById("openUserManagerBtn");
+    const userManagerModal = document.getElementById("userManagerModal");
+    const userManagerModalClose = document.getElementById("userManagerModalClose");
+    const userManageTableBody = document.getElementById("userManageTableBody");
+    const userTotalBadge = document.getElementById("userTotalBadge");
+    const newMemberUsername = document.getElementById("newMemberUsername") as HTMLInputElement | null;
+    const newMemberDisplayName = document.getElementById("newMemberDisplayName") as HTMLInputElement | null;
+    const newMemberPassword = document.getElementById("newMemberPassword") as HTMLInputElement | null;
+    const newMemberRole = document.getElementById("newMemberRole") as HTMLSelectElement | null;
+    const newMemberSubmitBtn = document.getElementById("newMemberSubmitBtn");
+
+    const loadUserManagerList = async () => {
+      if (!userManageTableBody) return;
+      try {
+        const res = await fetch("/api/admin/users");
+        const data = await res.json();
+        const users: any[] = data.users || [];
+        if (userTotalBadge) userTotalBadge.textContent = `${users.length} 人`;
+        if (!users.length) {
+          userManageTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;">暂无员工</td></tr>`;
+          return;
+        }
+        userManageTableBody.innerHTML = users.map((u) => {
+          const isSelf = u.id === currentUser?.id;
+          return `
+            <tr>
+              <td><strong>${u.display_name}</strong></td>
+              <td>${u.username}</td>
+              <td><span class="user-role-badge ${u.role === "admin" ? "admin-role" : ""}">${u.role === "admin" ? "管理员" : "普通员工"}</span></td>
+              <td>${u.task_count || 0} 次</td>
+              <td style="color:var(--text-secondary); font-size:11px;">${u.created_at}</td>
+              <td>
+                <div class="user-action-btns">
+                  <button class="ghost-button user-reset-btn" data-reset-user="${u.id}">重置密码</button>
+                  ${!isSelf ? `<button class="ghost-button user-danger-btn" data-delete-user="${u.id}" data-user-name="${u.display_name}">删除</button>` : `<span style="font-size:11px;color:var(--text-secondary);">(当前账号)</span>`}
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join("");
+      } catch {
+        userManageTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#ef4444;">获取成员列表失败</td></tr>`;
+      }
+    };
+
+    const openUserManager = () => {
+      if (!currentUser || currentUser.role !== "admin") {
+        alert("仅管理员有权访问用户管理中心");
+        return;
+      }
+      userManagerModal?.classList.remove("hidden");
+      void loadUserManagerList();
+    };
+
+    openUserManagerBtn?.addEventListener("click", openUserManager);
+    userManagerModalClose?.addEventListener("click", () => userManagerModal?.classList.add("hidden"));
+    userManagerModal?.addEventListener("click", (e) => {
+      if (e.target === userManagerModal) userManagerModal?.classList.add("hidden");
+    });
+
+    newMemberSubmitBtn?.addEventListener("click", async () => {
+      const u = newMemberUsername?.value.trim() || "";
+      const d = newMemberDisplayName?.value.trim() || "";
+      const p = newMemberPassword?.value.trim() || "Htai@123456";
+      const role = newMemberRole?.value || "employee";
+      if (!u) {
+        alert("请输入工号/账号名");
+        newMemberUsername?.focus();
+        return;
+      }
+      newMemberSubmitBtn.setAttribute("disabled", "true");
+      try {
+        const res = await fetch("/api/admin/users/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: u, display_name: d, password: p, role }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || "创建失败");
+        alert(`账号 ${u} 开通成功！`);
+        if (newMemberUsername) newMemberUsername.value = "";
+        if (newMemberDisplayName) newMemberDisplayName.value = "";
+        if (newMemberPassword) newMemberPassword.value = "";
+        await loadUserManagerList();
+      } catch (err: any) {
+        alert(err.message || "创建失败");
+      } finally {
+        newMemberSubmitBtn.removeAttribute("disabled");
+      }
+    });
+
+    userManageTableBody?.addEventListener("click", async (e: Event) => {
+      const target = e.target as HTMLElement | null;
+      const delBtn = target?.closest<HTMLElement>("[data-delete-user]");
+      if (delBtn) {
+        const uid = delBtn.dataset.deleteUser;
+        const uname = delBtn.dataset.userName || "该员工";
+        if (confirm(`确定要注销并删除员工 [${uname}] 吗？`)) {
+          const res = await fetch(`/api/admin/users/${uid}/delete`, { method: "POST" });
+          if (res.ok) {
+            alert("已成功删除该员工");
+            await loadUserManagerList();
+          } else {
+            alert("删除失败");
+          }
+        }
+        return;
+      }
+
+      const resetBtn = target?.closest<HTMLElement>("[data-reset-user]");
+      if (resetBtn) {
+        const uid = resetBtn.dataset.resetUser;
+        const newPwd = prompt("请输入为该员工设置的新密码（不少于6位）：", "Htai@123456");
+        if (!newPwd) return;
+        const res = await fetch(`/api/admin/users/${uid}/reset-password`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password: newPwd }),
+        });
+        if (res.ok) alert("密码重置成功！");
+        else alert("重置失败");
+      }
+    });
+
     dashboardModal?.addEventListener("click", (e) => {
       if (e.target === dashboardModal) dashboardModal?.classList.add("hidden");
     });

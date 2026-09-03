@@ -8043,6 +8043,116 @@ input[type=range].slider:disabled::-moz-range-thumb {
   border-radius: 6px;
 }
 
+
+/* ============================================================
+   Dedicated User Management Modal Styles
+   ============================================================ */
+
+.user-manager-modal-panel {
+  max-width: 860px;
+  width: 95vw;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 0;
+}
+
+.user-manager-modal-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 18px 24px 14px;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 75%, transparent);
+}
+
+.user-manager-modal-heading h2 {
+  font-size: 18px;
+  margin: 0 0 4px;
+}
+
+.user-manager-modal-heading p {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.user-manager-modal-body {
+  padding: 20px 24px 28px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.user-create-card, .user-list-card {
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--line) 75%, transparent);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.user-create-form {
+  display: grid;
+  grid-template-columns: 1.5fr 1.5fr 1.5fr 1.5fr 1.2fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.user-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-table-wrap {
+  overflow-x: auto;
+}
+
+.user-manage-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+
+.user-manage-table th {
+  padding: 10px 12px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 75%, transparent);
+  font-weight: 600;
+}
+
+.user-manage-table td {
+  padding: 12px;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 85%, transparent);
+}
+
+.user-manage-table tr:hover {
+  background: color-mix(in srgb, var(--primary-light) 25%, var(--surface));
+}
+
+.user-action-btns {
+  display: flex;
+  gap: 6px;
+}
+
+.user-danger-btn {
+  color: #ef4444 !important;
+  font-size: 11px !important;
+  padding: 2px 6px !important;
+}
+
+.user-reset-btn {
+  color: var(--primary) !important;
+  font-size: 11px !important;
+  padding: 2px 6px !important;
+}
+
 /* source: styles/71-preview-results.css */
 /* Preview Grid */
 .preview-grid {

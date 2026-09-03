@@ -41,6 +41,91 @@ def require_current_user(request: Request, ctx: WebUIContext) -> dict[str, Any]:
     return user
 
 def register_enterprise_routes(app: FastAPI, ctx: WebUIContext) -> None:
+    # --- 用户管理增删改查 (仅管理员) ---
+    @app.get("/api/admin/users")
+    def list_admin_users(request: Request) -> dict[str, Any]:
+        user = require_current_user(request, ctx)
+        if user.get("role") != "admin":
+            raise HTTPException(status_code=403, detail="无权访问用户管理")
+        conn = get_db(ctx.source_data_root)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT u.id, u.username, u.display_name, u.role, u.created_at,
+                   count(r.id) as task_count
+            FROM users u
+            LEFT JOIN generation_records r ON u.id = r.user_id
+            GROUP BY u.id
+            ORDER BY u.created_at DESC
+        """)
+        users = [dict(r) for r in cur.fetchall()]
+        conn.close()
+        return {"users": users}
+
+    @app.post("/api/admin/users/create")
+    def create_admin_user(request: Request, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+        cur_user = require_current_user(request, ctx)
+        if cur_user.get("role") != "admin":
+            raise HTTPException(status_code=403, detail="无权操作")
+        u = str(payload.get("username", "")).strip()
+        p = str(payload.get("password", "")).strip()
+        d = str(payload.get("display_name", "")).strip() or u
+        role = str(payload.get("role", "employee")).strip()
+        if not u or not p:
+            raise HTTPException(status_code=400, detail="账号和密码不能为空")
+
+        conn = get_db(ctx.source_data_root)
+        cur = conn.cursor()
+        cur.execute("SELECT id FROM users WHERE username = ?", (u,))
+        if cur.fetchone():
+            conn.close()
+            raise HTTPException(status_code=400, detail="该账号已存在")
+
+        user_id = uuid.uuid4().hex[:12]
+        now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+        pwd_hash = hash_password(p)
+        cur.execute(
+            "INSERT INTO users (id, username, display_name, password_hash, role, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+            (user_id, u, d, pwd_hash, role, now)
+        )
+        conn.commit()
+        conn.close()
+        return {"ok": True}
+
+    @app.post("/api/admin/users/{user_id}/delete")
+    def delete_admin_user(user_id: str, request: Request) -> dict[str, Any]:
+        cur_user = require_current_user(request, ctx)
+        if cur_user.get("role") != "admin":
+            raise HTTPException(status_code=403, detail="无权操作")
+        if user_id == cur_user.get("id"):
+            raise HTTPException(status_code=400, detail="不能删除当前登录的管理员自己")
+
+        conn = get_db(ctx.source_data_root)
+        cur = conn.cursor()
+        cur.execute("DELETE FROM sessions WHERE user_id = ?", (user_id,))
+        cur.execute("DELETE FROM generation_records WHERE user_id = ?", (user_id,))
+        cur.execute("DELETE FROM users WHERE id = ?", (user_id,))
+        conn.commit()
+        conn.close()
+        return {"ok": True}
+
+    @app.post("/api/admin/users/{user_id}/reset-password")
+    def reset_user_password(user_id: str, request: Request, payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+        cur_user = require_current_user(request, ctx)
+        if cur_user.get("role") != "admin":
+            raise HTTPException(status_code=403, detail="无权操作")
+        new_pwd = str(payload.get("password", "")).strip()
+        if not new_pwd or len(new_pwd) < 6:
+            raise HTTPException(status_code=400, detail="新密码长度不能少于 6 位")
+
+        conn = get_db(ctx.source_data_root)
+        cur = conn.cursor()
+        pwd_hash = hash_password(new_pwd)
+        cur.execute("UPDATE users SET password_hash = ? WHERE id = ?", (pwd_hash, user_id))
+        cur.execute("DELETE FROM sessions WHERE user_id = ?", (user_id,))
+        conn.commit()
+        conn.close()
+        return {"ok": True}
+
     # 确保数据库与默认管理员已初始化
     init_db_and_admin(ctx.source_data_root)
 
