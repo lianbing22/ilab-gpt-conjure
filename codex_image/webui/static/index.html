@@ -318,6 +318,14 @@
       <div class="main-wrapper">
         <!-- Top Navigation -->
         <header class="top-nav">
+          <div class="mode-switch-group" role="tablist" aria-label="工作模式">
+            <button id="portalModeBtn" class="mode-switch-btn active" type="button" role="tab" aria-selected="true">
+              <span>🎨</span> 创意门户
+            </button>
+            <button id="studioModeBtn" class="mode-switch-btn" type="button" role="tab" aria-selected="false">
+              <span>⚙️</span> 专业工作台
+            </button>
+          </div>
           <div class="workspace-title" aria-label="AI 创新工作室，新建图片" data-i18n-attr="aria-label:workspace.ariaLabel">
             <span data-i18n="workspace.title">AI 创新工作室</span>
             <span class="workspace-title-separator" aria-hidden="true">/</span>
@@ -388,6 +396,105 @@
         </header>
 
         <!-- Dashboard Workspace -->
+        
+        <!-- ============================================================
+             Portal Mode View (企业级创意门户)
+             ============================================================ -->
+        <div id="portalView" class="portal-view">
+          <div class="portal-container">
+            <!-- 1. Hero 智能创作魔盒 -->
+            <section class="portal-hero">
+              <div class="portal-hero-badge">
+                <span>✨</span> 阿泰 AI 创新工作室
+              </div>
+              <h1 class="portal-hero-title">激发企业无限视觉创意</h1>
+              <p class="portal-hero-subtitle">商业海报 · 电商视觉 · 品牌规范 · 数字员工 · 一键生成高品质商业级资产</p>
+
+              <div class="portal-magic-box">
+                <textarea
+                  id="portalPromptInput"
+                  class="portal-prompt-textarea"
+                  placeholder="用自然语言描述你要创作的画面（如：极简现代大理石展台上的高端护肤品，晨光柔和光影，商业广告摄影）..."
+                  rows="2"
+                ></textarea>
+
+                <div class="portal-magic-footer">
+                  <div class="portal-quick-tags">
+                    <span class="portal-tag-label">灵感标签：</span>
+                    <button class="portal-tag-chip" type="button" data-tag="高端商业静物摄影，大理石台面，柔和丁达尔光">🛍️ 电商摄影</button>
+                    <button class="portal-tag-chip" type="button" data-tag="企业高管商务职业形象照，影棚柔光轮廓，专业自信">👤 商务肖像</button>
+                    <button class="portal-tag-chip" type="button" data-tag="现代科技感企业视觉海报，极简对称构图，冷光质感">📢 科技海报</button>
+                    <button class="portal-tag-chip" type="button" data-tag="现代高端企业大楼前台大厅，挑高开阔，通透自然采光">🏢 品牌空间</button>
+                  </div>
+
+                  <div class="portal-magic-actions">
+                    <button id="portalOptimizeBtn" class="portal-optimize-btn" type="button" title="调用 DeepSeek-v4-Flash 智能扩写">
+                      <span id="portalOptimizeText">✨ 优化提示词</span>
+                    </button>
+                    <button id="portalGenerateBtn" class="portal-generate-btn" type="button">
+                      <span>🚀 开始生成</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- 2. 场景化创意工坊 -->
+            <section class="portal-section">
+              <div class="portal-section-header">
+                <div>
+                  <h2 class="portal-section-title"><span>💼</span> 场景化创意工坊</h2>
+                  <div class="portal-section-desc">为企业各业务线量身定制的标准化视觉模版，点击一键开箱即用</div>
+                </div>
+              </div>
+
+              <div class="portal-workshop-grid">
+                <div class="workshop-card" style="--card-accent: #3b82f6;" data-scene="product">
+                  <div class="workshop-card-icon">🛍️</div>
+                  <h3 class="workshop-card-title">电商 / 产品静物摄影</h3>
+                  <p class="workshop-card-desc">纯净展台、柔光倒影、材质反光、商业带货级质感</p>
+                  <div class="workshop-card-action">立即创作 ↗</div>
+                </div>
+
+                <div class="workshop-card" style="--card-accent: #8b5cf6;" data-scene="branding">
+                  <div class="workshop-card-icon">📢</div>
+                  <h3 class="workshop-card-title">品牌视觉与营销海报</h3>
+                  <p class="workshop-card-desc">大字留白、高视觉冲击力、科技与金融商务规范</p>
+                  <div class="workshop-card-action">立即创作 ↗</div>
+                </div>
+
+                <div class="workshop-card" style="--card-accent: #10b981;" data-scene="portrait">
+                  <div class="workshop-card-icon">👤</div>
+                  <h3 class="workshop-card-title">数字员工商务职业照</h3>
+                  <p class="workshop-card-desc">高管形象大片、团队风采、专业影棚精修质感</p>
+                  <div class="workshop-card-action">立即创作 ↗</div>
+                </div>
+
+                <div class="workshop-card" style="--card-accent: #f59e0b;" data-scene="festival">
+                  <div class="workshop-card-icon">🏮</div>
+                  <h3 class="workshop-card-title">节日庆典与文化物料</h3>
+                  <p class="workshop-card-desc">传统节日贺卡、企业内刊、庆典活动主视觉 KV</p>
+                  <div class="workshop-card-action">立即创作 ↗</div>
+                </div>
+              </div>
+            </section>
+
+            <!-- 3. 精选灵感画廊 -->
+            <section class="portal-section">
+              <div class="portal-section-header">
+                <div>
+                  <h2 class="portal-section-title"><span>🌟</span> 团队精选灵感画廊</h2>
+                  <div class="portal-section-desc">团队内部创作的爆款佳作，支持一键复用相同提示词与参数</div>
+                </div>
+              </div>
+
+              <div id="portalGalleryGrid" class="portal-gallery-grid">
+                <!-- 动态渲染或展示精选卡片 -->
+              </div>
+            </section>
+          </div>
+        </div>
+
         <main class="dashboard">
           <div class="dashboard-col controls-col">
             <input id="model" type="hidden" value="gpt-image-2" />

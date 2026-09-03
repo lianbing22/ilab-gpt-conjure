@@ -15,6 +15,181 @@
     return getLegacyBridge().state;
   }
 
+  // codex_image/webui/frontend/src/portal.ts
+  var SCENE_TEMPLATES = {
+    product: {
+      prompt: "\u9AD8\u7AEF\u5546\u4E1A\u4EA7\u54C1\u9759\u7269\u6444\u5F71\uFF0C\u7EAF\u51C0\u6781\u7B80\u5927\u7406\u77F3\u5C55\u53F0\uFF0C\u6E05\u900F\u6C34\u6EF4\u4E0E\u81EA\u7136\u6668\u5149\uFF0C\u67D4\u548C\u4E01\u8FBE\u5C14\u5149\u675F\uFF0C\u7EC6\u817B\u91D1\u5C5E\u53CD\u5149\u4E0E\u9676\u74F7\u8D28\u611F\uFF0C\u5546\u4E1A\u5E7F\u544A\u7EA7\u6784\u56FE\uFF0C8K\u753B\u8D28",
+      ratio: "1:1"
+    },
+    branding: {
+      prompt: "\u73B0\u4EE3\u9AD8\u7AEF\u79D1\u6280\u54C1\u724C\u89C6\u89C9\u5BA3\u4F20\u6D77\u62A5\uFF0C\u6DF1\u84DD\u8272\u4E0E\u54D1\u5149\u94F6\u8272\u8C03\uFF0C\u6D41\u7EBF\u578B\u51E0\u4F55\u66F2\u9762\uFF0C\u53D1\u5149\u7EBF\u6761\u7A7F\u900F\u7A7A\u95F4\uFF0C\u5927\u9762\u79EF\u9AD8\u7EA7\u7559\u767D\uFF0C\u5546\u52A1\u4E25\u8C28\uFF0C\u672A\u6765\u611F",
+      ratio: "9:16"
+    },
+    portrait: {
+      prompt: "\u4E9A\u6D32\u5E72\u7EC3\u5546\u52A1\u5973\u6027\u9AD8\u7BA1\u804C\u4E1A\u8096\u50CF\u7167\uFF0C\u8EAB\u7740\u526A\u88C1\u5408\u4F53\u6DF1\u8272\u897F\u88C5\uFF0C\u80CC\u666F\u4E3A\u6D45\u865A\u5316\u73B0\u4EE3\u5199\u5B57\u697C\u843D\u5730\u7A97\uFF0C\u81EA\u4FE1\u6E29\u548C\u5FAE\u7B11\uFF0C\u9AD8\u7EA7\u5F71\u68DA\u4F26\u52C3\u6717\u67D4\u5149",
+      ratio: "3:4"
+    },
+    festival: {
+      prompt: "\u4F01\u4E1A\u65B0\u5E74\u5E86\u5178\u4E3B\u89C6\u89C9KV\u6D77\u62A5\uFF0C\u4E2D\u56FD\u7EA2\u4E0E\u938F\u91D1\u70EB\u91D1\u8D28\u611F\uFF0C\u7965\u4E91\u745E\u6C14\u4E0E\u7ACB\u4F53\u51E0\u4F55\u526A\u7EB8\u6298\u6247\uFF0C\u559C\u5E86\u5927\u6C14\uFF0C\u6D53\u90C1\u8282\u65E5\u6C1B\u56F4\uFF0C\u8D85\u9AD8\u6E053D\u6E32\u67D3",
+      ratio: "16:9"
+    }
+  };
+  var SEED_GALLERY = [
+    {
+      image: "/outputs/2026-09-03/20260903044957-b5baa915-image-1.png",
+      prompt: "\u4F01\u4E1A\u667A\u80FD\u673A\u5668\u4EBA\uFF0C\u5546\u4E1A\u4EA7\u54C1\u9759\u7269\u6444\u5F71\u80CC\u666F\uFF0C\u7EAF\u51C0\u7684\u6C34\u6676\u5C55\u53F0\uFF0C\u67D4\u548C\u51B7\u767D\u9876\u5149",
+      ratio: "9:16"
+    },
+    {
+      image: "/outputs/2026-09-03/20260903045758-a8634a1b-image-1.png",
+      prompt: "\u6052\u6CF0\u5177\u8EAB\u673A\u5668\u4EBA\uFF0C\u5546\u4E1A\u4EA7\u54C1\u9759\u7269\u6444\u5F71\u80CC\u666F\uFF0C\u7EAF\u51C0\u7684\u6C34\u6676\u5C55\u53F0\u4E0E\u5012\u5F71",
+      ratio: "9:16"
+    },
+    {
+      image: "/outputs/2026-09-03/20260903044957-b5baa915-image-2.png",
+      prompt: "\u6781\u7B80\u73B0\u4EE3\u5927\u7406\u77F3\u5C55\u53F0\uFF0C\u5546\u4E1A\u9759\u7269\u4EA7\u54C1\u6444\u5F71\uFF0C\u4E01\u8FBE\u5C14\u5149\u5F71\uFF0C\u7535\u5F71\u7EA7\u8D28\u611F",
+      ratio: "9:16"
+    },
+    {
+      image: "/outputs/2026-09-03/20260903045758-a8634a1b-image-2.png",
+      prompt: "\u672A\u6765\u667A\u80FD\u529E\u516C\u5927\u5385\uFF0C\u901A\u900F\u843D\u5730\u7A97\uFF0C\u67D4\u548C\u6F2B\u5C04\u5149\u7EBF\uFF0C\u79D1\u6280\u5546\u52A1\u6C1B\u56F4",
+      ratio: "9:16"
+    }
+  ];
+  function initPortalFeature() {
+    const portalView = document.getElementById("portalView");
+    const dashboard = document.querySelector(".dashboard");
+    const sidebar = document.getElementById("sidebar");
+    const portalModeBtn = document.getElementById("portalModeBtn");
+    const studioModeBtn = document.getElementById("studioModeBtn");
+    const portalPromptInput = document.getElementById("portalPromptInput");
+    const portalOptimizeBtn = document.getElementById("portalOptimizeBtn");
+    const portalOptimizeText = document.getElementById("portalOptimizeText");
+    const portalGenerateBtn = document.getElementById("portalGenerateBtn");
+    const portalGalleryGrid = document.getElementById("portalGalleryGrid");
+    let currentMode = "portal";
+    const switchMode = (mode) => {
+      currentMode = mode;
+      if (mode === "portal") {
+        portalView?.classList.remove("hidden");
+        if (dashboard) dashboard.style.display = "none";
+        if (sidebar) sidebar.style.display = "none";
+        portalModeBtn?.classList.add("active");
+        portalModeBtn?.setAttribute("aria-selected", "true");
+        studioModeBtn?.classList.remove("active");
+        studioModeBtn?.setAttribute("aria-selected", "false");
+      } else {
+        portalView?.classList.add("hidden");
+        if (dashboard) dashboard.style.display = "";
+        if (sidebar) sidebar.style.display = "";
+        portalModeBtn?.classList.remove("active");
+        portalModeBtn?.setAttribute("aria-selected", "false");
+        studioModeBtn?.classList.add("active");
+        studioModeBtn?.setAttribute("aria-selected", "true");
+      }
+    };
+    portalModeBtn?.addEventListener("click", () => switchMode("portal"));
+    studioModeBtn?.addEventListener("click", () => switchMode("studio"));
+    document.querySelectorAll(".portal-tag-chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const tag = chip.dataset.tag || "";
+        if (!portalPromptInput) return;
+        if (portalPromptInput.value.trim()) {
+          portalPromptInput.value += `\uFF0C${tag}`;
+        } else {
+          portalPromptInput.value = tag;
+        }
+        portalPromptInput.focus();
+      });
+    });
+    document.querySelectorAll(".workshop-card").forEach((card) => {
+      card.addEventListener("click", () => {
+        const scene = card.dataset.scene || "";
+        const template = SCENE_TEMPLATES[scene];
+        if (template) {
+          const bridge40 = getLegacyBridge();
+          bridge40.methods.setPromptText?.(template.prompt);
+          if (template.ratio) {
+            const ratioBtn = document.querySelector(`#ratioGroup [data-val="${template.ratio}"]`);
+            ratioBtn?.click();
+          }
+          switchMode("studio");
+        }
+      });
+    });
+    portalOptimizeBtn?.addEventListener("click", async () => {
+      const text = portalPromptInput?.value.trim() || "";
+      if (!text) {
+        alert("\u8BF7\u5148\u8F93\u5165\u4E00\u6BB5\u57FA\u7840\u63CF\u8FF0\uFF0C\u518D\u8FDB\u884C AI \u4F18\u5316\uFF01");
+        portalPromptInput?.focus();
+        return;
+      }
+      portalOptimizeBtn.setAttribute("disabled", "true");
+      if (portalOptimizeText) portalOptimizeText.textContent = "AI \u6B63\u5728\u6269\u5199\u4F18\u5316\u4E2D\u2026";
+      try {
+        const res = await fetch("/api/prompt/optimize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: text })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || "\u4F18\u5316\u5931\u8D25");
+        if (portalPromptInput && data.optimized_prompt) {
+          portalPromptInput.value = data.optimized_prompt;
+        }
+        if (portalOptimizeText) portalOptimizeText.textContent = "\u4F18\u5316\u6210\u529F\uFF01";
+        window.setTimeout(() => {
+          if (portalOptimizeText) portalOptimizeText.textContent = "\u2728 \u4F18\u5316\u63D0\u793A\u8BCD";
+        }, 2e3);
+      } catch (err) {
+        alert(err.message || "\u8BF7\u6C42\u5931\u8D25");
+        if (portalOptimizeText) portalOptimizeText.textContent = "\u2728 \u4F18\u5316\u63D0\u793A\u8BCD";
+      } finally {
+        portalOptimizeBtn.removeAttribute("disabled");
+      }
+    });
+    portalGenerateBtn?.addEventListener("click", () => {
+      const text = portalPromptInput?.value.trim() || "";
+      const bridge40 = getLegacyBridge();
+      if (text) {
+        bridge40.methods.setPromptText?.(text);
+      }
+      switchMode("studio");
+      const runButton = document.getElementById("runButton");
+      runButton?.click();
+    });
+    const renderGallery = () => {
+      if (!portalGalleryGrid) return;
+      portalGalleryGrid.innerHTML = SEED_GALLERY.map((item) => `
+      <div class="portal-gallery-item">
+        <img class="portal-gallery-img" src="${item.image}" alt="" loading="lazy" />
+        <div class="portal-gallery-overlay">
+          <div class="portal-gallery-prompt">${item.prompt}</div>
+          <button class="portal-reuse-btn" type="button" data-prompt="${item.prompt.replace(/"/g, "&quot;")}" data-ratio="${item.ratio}">
+            \u2728 \u4E00\u952E\u505A\u540C\u6B3E
+          </button>
+        </div>
+      </div>
+    `).join("");
+      portalGalleryGrid.querySelectorAll(".portal-reuse-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const prompt2 = btn.dataset.prompt || "";
+          const ratio = btn.dataset.ratio || "";
+          const bridge40 = getLegacyBridge();
+          bridge40.methods.setPromptText?.(prompt2);
+          if (ratio) {
+            const ratioBtn = document.querySelector(`#ratioGroup [data-val="${ratio}"]`);
+            ratioBtn?.click();
+          }
+          switchMode("studio");
+        });
+      });
+    };
+    renderGallery();
+    switchMode("portal");
+  }
+
   // codex_image/webui/frontend/src/event-bindings.ts
   function call(methods, name, ...args) {
     return methods[name]?.(...args);
@@ -800,6 +975,10 @@
     "version.change.strict_history_privacy_guard": "Strict privacy lockdown preventing unauthenticated history inspection.",
     "version.change.enforce_login_guard": "Mandatory login enforcement for generation and internal assets.",
     "version.change.task_user_privacy_filter": "Strict task privacy filter isolating data between team members.",
+    "version.change.portal_mode_launch": "Launch brand new Enterprise Creative Portal mode with Hero prompt box, workshop scenarios, and seamless studio switching.",
+    "version.change.magic_prompt_box": "New Hero Magic Prompt Box integrating natural language, AI optimizer, quick tags, and instant generation.",
+    "version.change.workshop_scenarios": "New 4 enterprise workshop scenarios: E-commerce Product, Brand Poster, Executive Portrait, and Festival KV.",
+    "version.change.team_inspiration_gallery": "New team inspiration gallery stream supporting hover inspection and one-click 'Reuse Prompt'.",
     "version.change.realtime_auto_reconnect_resilience": "Implement silent exponential backoff auto-reconnection for EventSource, eliminating false 'realtime disconnected' alarms.",
     "version.change.smooth_preview_transition_on_completion": "Smooth preview loading transition after task completion with clear rendering cues.",
     "version.change.prompt_optimizer_dom_fix": "Fix prompt optimizer text sync to properly update rich prompt editor, character counts and preview.",
@@ -10738,6 +10917,10 @@
     "version.change.strict_history_privacy_guard": "\u4E25\u683C\u52A0\u5F3A\u6570\u636E\u4FDD\u5BC6\uFF1A\u672A\u767B\u5F55\u72B6\u6001\u4E0B\u5168\u9762\u7981\u6B62\u67E5\u770B\u5386\u53F2\u4EFB\u52A1\u4E0E\u751F\u56FE\u8BB0\u5F55\u3002",
     "version.change.enforce_login_guard": "\u65B0\u589E\u5168\u94FE\u8DEF\u767B\u5F55\u62E6\u622A\u5B88\u536B\uFF0C\u672A\u767B\u5F55\u7528\u6237\u65E0\u6CD5\u53D1\u8D77\u751F\u6210\u6216\u8BBF\u95EE\u5185\u90E8\u8D44\u4EA7\u3002",
     "version.change.task_user_privacy_filter": "\u591A\u7528\u6237\u7269\u7406\u9690\u79C1\u9694\u79BB\uFF1A\u5458\u5DE5\u4E4B\u95F4\u53EA\u80FD\u67E5\u770B\u548C\u7BA1\u7406\u5C5E\u4E8E\u81EA\u5DF1\u7684\u751F\u56FE\u4EFB\u52A1\u3002",
+    "version.change.portal_mode_launch": "\u4E0A\u7EBF\u5168\u65B0\u300C\u6781\u7B80\u73B0\u4EE3\u521B\u610F\u95E8\u6237\u300D\u6A21\u5F0F\uFF0C\u4EE5\u54C1\u724C\u95E8\u9762\u3001\u5BBD\u5E45\u667A\u80FD\u521B\u4F5C\u9B54\u76D2\u6253\u9020\u5546\u4E1A\u7EA7 AI \u8BBE\u8BA1\u4E2D\u53F0\u4F53\u9A8C\uFF0C\u652F\u6301\u4E0E\u4E13\u4E1A\u5DE5\u4F5C\u53F0\u81EA\u7531\u5207\u6362\u3002",
+    "version.change.magic_prompt_box": "\u65B0\u589E Hero \u667A\u80FD\u521B\u4F5C\u9B54\u76D2\uFF1A\u96C6\u6210\u81EA\u7136\u8BED\u8A00\u63CF\u8FF0\u3001AI \u6269\u5199\u4F18\u5316\u4E0E\u4E00\u952E\u751F\u6210\uFF0C\u914D\u5957\u4F01\u4E1A\u9AD8\u9891\u7075\u611F\u5FEB\u6377\u6807\u7B7E\u3002",
+    "version.change.workshop_scenarios": "\u65B0\u589E\u7535\u5546\u9759\u7269\u6444\u5F71\u3001\u54C1\u724C\u8425\u9500\u6D77\u62A5\u3001\u6570\u5B57\u5458\u5DE5\u804C\u4E1A\u7167\u3001\u8282\u65E5\u5E86\u5178\u7269\u6599\u56DB\u5927\u573A\u666F\u5316\u521B\u610F\u5DE5\u574A\uFF0C\u5F00\u7BB1\u5373\u7528\u3002",
+    "version.change.team_inspiration_gallery": "\u65B0\u589E\u56E2\u961F\u7CBE\u9009\u7075\u611F\u753B\u5ECA\u7011\u5E03\u6D41\uFF0C\u652F\u6301\u60AC\u6D6E\u9884\u89C8\u6838\u5FC3\u63D0\u793A\u8BCD\u4E0E\u300C\u2728 \u4E00\u952E\u505A\u540C\u6B3E\u300D\u79D2\u7EA7\u521B\u4F5C\u3002",
     "version.change.realtime_auto_reconnect_resilience": "\u91CD\u6784\u5B9E\u65F6\u957F\u8FDE\u63A5\u5BB9\u707E\u673A\u5236\uFF1A\u7F51\u7EDC\u77AC\u65AD\u6216\u670D\u52A1\u7AEF\u5E73\u6ED1\u91CD\u542F\u65F6\u540E\u53F0\u9759\u9ED8\u81EA\u52A8\u6307\u6570\u9000\u907F\u91CD\u8FDE\uFF0C\u5F7B\u5E95\u6D88\u9664\u300C\u5B9E\u65F6\u72B6\u6001\u8FDE\u63A5\u5DF2\u65AD\u5F00\u300D\u7EA2\u8272\u5047\u62A5\u8B66\u63D0\u793A\u3002",
     "version.change.smooth_preview_transition_on_completion": "\u4F18\u5316\u4EFB\u52A1\u5B8C\u6210\u540E\u9884\u89C8\u8FC7\u6E21\u4F53\u9A8C\uFF1A\u6536\u5230\u5B8C\u6210\u901A\u77E5\u540E\u5373\u523B\u89E6\u53D1\u5168\u91CF\u9AD8\u6E05\u56FE\u7247\u62C9\u53D6\uFF0C\u5E76\u5728\u8FC7\u6E21\u671F\u95F4\u663E\u793A\u300C\u5DF2\u751F\u6210\u5B8C\u6BD5\uFF0C\u6B63\u5728\u6E32\u67D3\u9AD8\u6E05\u56FE\u7247\u2026\u300D\u4F18\u96C5\u63D0\u793A\uFF0C\u6D88\u9664\u65F6\u95F4\u5DEE\u56F0\u60D1\u3002",
     "version.change.prompt_optimizer_dom_fix": "\u4FEE\u590D\u4F18\u5316\u63D0\u793A\u8BCD\u672A\u80FD\u6B63\u786E\u5199\u5165\u5BCC\u6587\u672C\u7F16\u8F91\u6846\u7684\u95EE\u9898\uFF0C\u4F18\u5316\u540E\u81EA\u52A8\u540C\u6B65\u5199\u5165\u5BCC\u6587\u672C\u5E76\u66F4\u65B0\u5B57\u6570\u7EDF\u8BA1\u4E0E\u9884\u89C8\u3002",
@@ -46853,6 +47036,7 @@ ${galleryText}`;
     }
   }
   initModernUiEnhancements();
+  initPortalFeature();
   initUniversalRadioButtons();
   initFeedbackFeature();
   initEnterpriseSystem();
