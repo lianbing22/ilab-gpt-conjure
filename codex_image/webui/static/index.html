@@ -334,6 +334,21 @@
               </svg>
               <span id="taskNotificationBadge" class="task-notification-dot hidden" aria-hidden="true"></span>
             </button>
+            <!-- 企业用户中心入口 -->
+            <div id="enterpriseUserBar" class="enterprise-user-bar">
+              <button id="userProfileBtn" class="user-profile-btn" type="button">
+                <span class="user-avatar-badge">👤</span>
+                <span id="userDisplayName" class="user-display-name">未登录</span>
+                <span id="userRoleBadge" class="user-role-badge hidden">员工</span>
+              </button>
+              <button id="openDashboardBtn" class="ghost-button text-sm analytics-btn" type="button" title="统计分析看板">
+                <span>📊 看板</span>
+              </button>
+              <button id="authActionBtn" class="ghost-button text-sm auth-btn" type="button">
+                <span>登录</span>
+              </button>
+            </div>
+
             <div id="themeSwitcher" class="theme-switcher" aria-label="主题模式" data-i18n-attr="aria-label:theme.label">
               <button class="theme-option" data-theme-option="system" type="button" aria-pressed="true" data-i18n="theme.system">跟随</button>
               <button class="theme-option" data-theme-option="light" type="button" aria-pressed="false" data-i18n="theme.light">浅色</button>
@@ -1577,6 +1592,99 @@
             <div id="feedbackListContainer" class="feedback-list-container">
               <div class="feedback-empty-state">正在获取留言...</div>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- 企业登录/注册弹窗 -->
+    <div id="authModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+      <div class="modal-panel auth-modal-panel">
+        <div class="modal-heading auth-modal-heading">
+          <h2 id="authModalTitle">🔐 内部账号登录</h2>
+          <button id="authModalClose" class="ghost-button drawer-close-button" type="button">✕</button>
+        </div>
+        <div class="auth-modal-body">
+          <div class="auth-tab-switch">
+            <button id="authTabLogin" class="auth-tab active" type="button">登录</button>
+            <button id="authTabRegister" class="auth-tab" type="button">新员工注册</button>
+          </div>
+
+          <form id="authForm" class="auth-form">
+            <div class="field full-width">
+              <label>用户名 / 工号</label>
+              <input id="authUsername" class="control" type="text" placeholder="请输入用户名" required autocomplete="username" />
+            </div>
+
+            <div id="authDisplayNameField" class="field full-width hidden">
+              <label>真实姓名 / 称呼</label>
+              <input id="authDisplayName" class="control" type="text" placeholder="例如：张三 / 运营部小王" />
+            </div>
+
+            <div class="field full-width">
+              <label>密码</label>
+              <input id="authPassword" class="control" type="password" placeholder="请输入密码" required autocomplete="current-password" />
+            </div>
+
+            <div class="auth-admin-hint">
+              <span>默认管理员：<b>HtaiAI</b> (密码：<b>Htai@123456</b>)</span>
+            </div>
+
+            <div class="auth-actions">
+              <button id="authSubmitBtn" class="run-button full-width" type="submit">立即登录</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- 数据分析看板弹窗（全员大盘 vs 个人周报） -->
+    <div id="dashboardModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+      <div class="modal-panel dashboard-modal-panel">
+        <div class="modal-heading dashboard-modal-heading">
+          <div>
+            <h2 id="dashboardTitle">📊 团队生图统计大盘</h2>
+            <p id="dashboardSubtitle">实时生成效率、使用趋势与员工排行榜</p>
+          </div>
+          <button id="dashboardModalClose" class="ghost-button drawer-close-button" type="button">✕</button>
+        </div>
+
+        <div class="dashboard-modal-body">
+          <!-- 核心指标卡片 -->
+          <div class="dashboard-metrics-grid">
+            <div class="metric-card">
+              <span class="metric-label">累计生图次数</span>
+              <strong id="metricTotalTasks" class="metric-value">0</strong>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label">成功完成数</span>
+              <strong id="metricCompletedTasks" class="metric-value">0</strong>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label">出图成功率</span>
+              <strong id="metricSuccessRate" class="metric-value">100%</strong>
+            </div>
+          </div>
+
+          <!-- 比例偏好分布 -->
+          <div class="dashboard-section-card">
+            <h3>📐 常用尺寸与比例分布</h3>
+            <div id="dashboardRatioContainer" class="dashboard-ratio-pills">
+              <div class="feedback-empty-state">暂无比例统计数据</div>
+            </div>
+          </div>
+
+          <!-- 管理员可见：员工贡献排行 Top 榜 -->
+          <div id="dashboardLeaderboardSection" class="dashboard-section-card hidden">
+            <h3>🏆 员工生图排行榜 Top 10</h3>
+            <div id="dashboardLeaderboardList" class="dashboard-leaderboard-list"></div>
+          </div>
+
+          <!-- 管理员可见：员工账户列表 -->
+          <div id="dashboardUserListSection" class="dashboard-section-card hidden">
+            <h3>👥 内部用户管理</h3>
+            <div id="dashboardUserTable" class="dashboard-user-table"></div>
           </div>
         </div>
       </div>

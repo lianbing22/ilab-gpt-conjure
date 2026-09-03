@@ -792,6 +792,9 @@
     "version.historyEmpty": "No release notes available",
     "version.currentBadge": "Current",
     "version.releaseDate": "{date}",
+    "version.change.enterprise_auth_system": "Enterprise user system with multi-role authentication (Admin & Employee)",
+    "version.change.user_privacy_isolation": "Strict user privacy isolation for tasks and generation artifacts",
+    "version.change.analytics_dashboard": "Analytics dashboard for team enterprise statistics and individual reports",
     "version.change.quick_gallery_picker": "Added a quick gallery modal picker with real-time search, multi-selection, and thumbnail optimizations.",
     "version.change.official_asset_library": "Expanded the official Logo, Slogan, and business signature library with additional brands, business lines, horizontal and vertical layouts, and inverted variants.",
     "version.change.material_picker_modal": "Material picker is now a dialog with large thumbnails, categories, search, and multi-select.",
@@ -10707,6 +10710,9 @@
     "version.historyEmpty": "\u6682\u65E0\u66F4\u65B0\u8BB0\u5F55",
     "version.currentBadge": "\u5F53\u524D",
     "version.releaseDate": "{date}",
+    "version.change.enterprise_auth_system": "\u5168\u65B0\u4F01\u4E1A\u7528\u6237\u7CFB\u7EDF\uFF1A\u652F\u6301\u8D26\u53F7\u5BC6\u7801\u6CE8\u518C\u3001\u666E\u901A\u5458\u5DE5\u4E0E\u7BA1\u7406\u5458\u5206\u6743",
+    "version.change.user_privacy_isolation": "\u591A\u7528\u6237\u6570\u636E\u4E25\u683C\u9690\u79C1\u9694\u79BB\uFF1A\u6BCF\u4F4D\u5458\u5DE5\u72EC\u7ACB\u4FDD\u7BA1\u4E2A\u4EBA\u751F\u56FE\u4EFB\u52A1\u4E0E\u4EA7\u7269",
+    "version.change.analytics_dashboard": "\u7EDF\u8BA1\u5206\u6790\u5927\u76D8\uFF1A\u7BA1\u7406\u5458\u67E5\u770B\u516C\u53F8\u5168\u5458\u751F\u4EA7\u529B\u770B\u677F\uFF0C\u5458\u5DE5\u67E5\u770B\u4E2A\u4EBA\u5468\u62A5\u4E0E\u6708\u62A5",
     "version.change.quick_gallery_picker": "\u65B0\u589E\u5FEB\u6377\u7D20\u6750\u56FE\u5E93\u5F39\u7A97\u9009\u62E9\u5668\uFF0C\u652F\u6301\u5B9E\u65F6\u641C\u7D22\u3001\u5FEB\u901F\u9009\u62E9\u4E0E\u7F29\u7565\u56FE\u9884\u89C8\u4F18\u5316\u3002",
     "version.change.official_asset_library": "\u6269\u5145\u5B98\u65B9 Logo\u3001Slogan \u4E0E\u5546\u52A1\u7B7E\u540D\u7D20\u6750\u5E93\uFF0C\u65B0\u589E\u591A\u54C1\u724C\u3001\u4E1A\u52A1\u7EBF\u3001\u6A2A\u7248/\u7AD6\u7248\u53CA\u53CD\u767D\u7248\u672C\u3002",
     "version.change.material_picker_modal": "\u7D20\u6750\u9009\u62E9\u6539\u4E3A\u5F39\u7A97\uFF0C\u63D0\u4F9B\u5927\u5C3A\u5BF8\u7F29\u7565\u56FE\u3001\u5206\u7C7B\u4E0E\u641C\u7D22\uFF0C\u652F\u6301\u591A\u9009\u52A0\u5165\u8F93\u5165\u533A\u3002",
@@ -46205,6 +46211,225 @@ ${galleryText}`;
       bindEvents();
     }
   }
+  function initEnterpriseSystem() {
+    const bindEvents = () => {
+      let currentUser = null;
+      const userDisplayName = document.getElementById("userDisplayName");
+      const userRoleBadge = document.getElementById("userRoleBadge");
+      const authActionBtn = document.getElementById("authActionBtn");
+      const userProfileBtn = document.getElementById("userProfileBtn");
+      const openDashboardBtn = document.getElementById("openDashboardBtn");
+      const authModal = document.getElementById("authModal");
+      const authModalClose = document.getElementById("authModalClose");
+      const authTabLogin = document.getElementById("authTabLogin");
+      const authTabRegister = document.getElementById("authTabRegister");
+      const authForm = document.getElementById("authForm");
+      const authModalTitle = document.getElementById("authModalTitle");
+      const authUsername = document.getElementById("authUsername");
+      const authDisplayName = document.getElementById("authDisplayName");
+      const authDisplayNameField = document.getElementById("authDisplayNameField");
+      const authPassword = document.getElementById("authPassword");
+      const authSubmitBtn = document.getElementById("authSubmitBtn");
+      const dashboardModal = document.getElementById("dashboardModal");
+      const dashboardModalClose = document.getElementById("dashboardModalClose");
+      const dashboardTitle = document.getElementById("dashboardTitle");
+      const dashboardSubtitle = document.getElementById("dashboardSubtitle");
+      const metricTotalTasks = document.getElementById("metricTotalTasks");
+      const metricCompletedTasks = document.getElementById("metricCompletedTasks");
+      const metricSuccessRate = document.getElementById("metricSuccessRate");
+      const dashboardRatioContainer = document.getElementById("dashboardRatioContainer");
+      const dashboardLeaderboardSection = document.getElementById("dashboardLeaderboardSection");
+      const dashboardLeaderboardList = document.getElementById("dashboardLeaderboardList");
+      const dashboardUserListSection = document.getElementById("dashboardUserListSection");
+      const dashboardUserTable = document.getElementById("dashboardUserTable");
+      let isRegisterMode = false;
+      const updateAuthUI = (user) => {
+        currentUser = user;
+        if (user) {
+          if (userDisplayName) userDisplayName.textContent = user.display_name || user.username;
+          if (userRoleBadge) {
+            userRoleBadge.classList.remove("hidden");
+            const isAdmin = user.role === "admin";
+            userRoleBadge.textContent = isAdmin ? "\u7BA1\u7406\u5458" : "\u5458\u5DE5";
+            userRoleBadge.classList.toggle("admin-role", isAdmin);
+          }
+          if (authActionBtn) {
+            authActionBtn.querySelector("span").textContent = "\u9000\u51FA";
+          }
+        } else {
+          if (userDisplayName) userDisplayName.textContent = "\u672A\u767B\u5F55";
+          if (userRoleBadge) userRoleBadge.classList.add("hidden");
+          if (authActionBtn) {
+            authActionBtn.querySelector("span").textContent = "\u767B\u5F55";
+          }
+        }
+      };
+      const checkCurrentUser = async () => {
+        try {
+          const res = await fetch("/api/auth/me");
+          const data = await res.json();
+          updateAuthUI(data.user);
+        } catch {
+          updateAuthUI(null);
+        }
+      };
+      const openAuthModal = (register = false) => {
+        isRegisterMode = register;
+        authModal?.classList.remove("hidden");
+        if (isRegisterMode) {
+          authTabRegister?.classList.add("active");
+          authTabLogin?.classList.remove("active");
+          if (authModalTitle) authModalTitle.textContent = "\u{1F4DD} \u65B0\u5458\u5DE5\u8D26\u53F7\u6CE8\u518C";
+          authDisplayNameField?.classList.remove("hidden");
+          if (authSubmitBtn) authSubmitBtn.textContent = "\u6CE8\u518C\u5E76\u767B\u5F55";
+        } else {
+          authTabLogin?.classList.add("active");
+          authTabRegister?.classList.remove("active");
+          if (authModalTitle) authModalTitle.textContent = "\u{1F510} \u5185\u90E8\u8D26\u53F7\u767B\u5F55";
+          authDisplayNameField?.classList.add("hidden");
+          if (authSubmitBtn) authSubmitBtn.textContent = "\u7ACB\u5373\u767B\u5F55";
+        }
+        authUsername?.focus();
+      };
+      const closeAuthModal = () => {
+        authModal?.classList.add("hidden");
+      };
+      authTabLogin?.addEventListener("click", () => openAuthModal(false));
+      authTabRegister?.addEventListener("click", () => openAuthModal(true));
+      authModalClose?.addEventListener("click", closeAuthModal);
+      authModal?.addEventListener("click", (e) => {
+        if (e.target === authModal) closeAuthModal();
+      });
+      authActionBtn?.addEventListener("click", async () => {
+        if (currentUser) {
+          if (confirm("\u786E\u5B9A\u8981\u9000\u51FA\u767B\u5F55\u5417\uFF1F")) {
+            await fetch("/api/auth/logout", { method: "POST" });
+            updateAuthUI(null);
+            window.location.reload();
+          }
+        } else {
+          openAuthModal(false);
+        }
+      });
+      userProfileBtn?.addEventListener("click", () => {
+        if (!currentUser) openAuthModal(false);
+        else openDashboard();
+      });
+      authForm?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const u = authUsername?.value.trim() || "";
+        const p = authPassword?.value.trim() || "";
+        const d = authDisplayName?.value.trim() || "";
+        if (!u || !p) return;
+        const endpoint = isRegisterMode ? "/api/auth/register" : "/api/auth/login";
+        const payload2 = { username: u, password: p };
+        if (isRegisterMode) payload2.display_name = d;
+        if (authSubmitBtn) {
+          authSubmitBtn.setAttribute("disabled", "true");
+          authSubmitBtn.textContent = "\u5904\u7406\u4E2D...";
+        }
+        try {
+          const res = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload2)
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.detail || "\u64CD\u4F5C\u5931\u8D25");
+          updateAuthUI(data.user);
+          closeAuthModal();
+          alert(isRegisterMode ? `\u6B22\u8FCE\u52A0\u5165\u56E2\u961F\uFF0C${data.user.display_name}\uFF01` : `\u767B\u5F55\u6210\u529F\uFF0C\u6B22\u8FCE\u56DE\u6765 ${data.user.display_name}\uFF01`);
+          window.location.reload();
+        } catch (err) {
+          alert(err.message || "\u767B\u5F55/\u6CE8\u518C\u5931\u8D25");
+        } finally {
+          if (authSubmitBtn) {
+            authSubmitBtn.removeAttribute("disabled");
+            authSubmitBtn.textContent = isRegisterMode ? "\u6CE8\u518C\u5E76\u767B\u5F55" : "\u7ACB\u5373\u767B\u5F55";
+          }
+        }
+      });
+      const openDashboard = async () => {
+        if (!currentUser) {
+          openAuthModal(false);
+          return;
+        }
+        dashboardModal?.classList.remove("hidden");
+        try {
+          const res = await fetch("/api/analytics/dashboard");
+          const data = await res.json();
+          const stats = data.stats || {};
+          const isAdmin = data.scope === "enterprise_admin";
+          if (dashboardTitle) {
+            dashboardTitle.textContent = isAdmin ? "\u{1F4CA} \u56E2\u961F\u751F\u56FE\u7EDF\u8BA1\u5927\u76D8" : `\u{1F4C8} \u4E2A\u4EBA\u751F\u56FE\u5468\u62A5/\u770B\u677F (${currentUser.display_name})`;
+          }
+          if (dashboardSubtitle) {
+            dashboardSubtitle.textContent = isAdmin ? "\u5168\u516C\u53F8\u751F\u6210\u6548\u7387\u3001\u4F7F\u7528\u8D8B\u52BF\u4E0E\u5458\u5DE5\u6392\u884C\u699C" : "\u4F60\u7684\u4E2A\u4EBA\u521B\u4F5C\u6548\u7387\u4E0E\u51FA\u56FE\u504F\u597D\u7EDF\u8BA1";
+          }
+          if (metricTotalTasks) metricTotalTasks.textContent = String(stats.total_generations || 0);
+          if (metricCompletedTasks) metricCompletedTasks.textContent = String(stats.completed_generations || 0);
+          if (metricSuccessRate) metricSuccessRate.textContent = `${stats.success_rate || 100}%`;
+          if (dashboardRatioContainer) {
+            const ratios = stats.ratio_distribution || [];
+            if (!ratios.length) {
+              dashboardRatioContainer.innerHTML = `<div class="feedback-empty-state">\u6682\u65E0\u6BD4\u4F8B\u7EDF\u8BA1\u6570\u636E</div>`;
+            } else {
+              dashboardRatioContainer.innerHTML = ratios.map((r) => `
+              <div class="ratio-pill-item">
+                <span>\u6BD4\u4F8B ${r.ratio || "9:16"}</span>
+                <strong>${r.count} \u6B21</strong>
+              </div>
+            `).join("");
+            }
+          }
+          if (isAdmin) {
+            dashboardLeaderboardSection?.classList.remove("hidden");
+            dashboardUserListSection?.classList.remove("hidden");
+            if (dashboardLeaderboardList) {
+              const list = stats.leaderboard || [];
+              dashboardLeaderboardList.innerHTML = list.map((item, idx) => `
+              <div class="leaderboard-row">
+                <span><b>#${idx + 1}</b> ${item.display_name} (@${item.username})</span>
+                <strong>${item.task_count} \u6B21</strong>
+              </div>
+            `).join("");
+            }
+            if (dashboardUserTable) {
+              const users = stats.users || [];
+              dashboardUserTable.innerHTML = `
+              <div class="user-table-row" style="font-weight:bold; background: transparent;">
+                <span>\u8D26\u53F7</span><span>\u59D3\u540D</span><span>\u89D2\u8272</span><span>\u6CE8\u518C\u65F6\u95F4</span>
+              </div>
+            ` + users.map((u) => `
+              <div class="user-table-row">
+                <span>${u.username}</span>
+                <span>${u.display_name}</span>
+                <span>${u.role === "admin" ? "\u2605 \u7BA1\u7406\u5458" : "\u666E\u901A\u5458\u5DE5"}</span>
+                <span>${u.created_at}</span>
+              </div>
+            `).join("");
+            }
+          } else {
+            dashboardLeaderboardSection?.classList.add("hidden");
+            dashboardUserListSection?.classList.add("hidden");
+          }
+        } catch {
+          alert("\u83B7\u53D6\u7EDF\u8BA1\u6570\u636E\u5931\u8D25");
+        }
+      };
+      openDashboardBtn?.addEventListener("click", openDashboard);
+      dashboardModalClose?.addEventListener("click", () => dashboardModal?.classList.add("hidden"));
+      dashboardModal?.addEventListener("click", (e) => {
+        if (e.target === dashboardModal) dashboardModal?.classList.add("hidden");
+      });
+      void checkCurrentUser();
+    };
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", bindEvents);
+    } else {
+      bindEvents();
+    }
+  }
   function initModernUiEnhancements() {
     const bindEvents = () => {
       const toggleBtn = document.getElementById("desktopAdvancedToggle");
@@ -46258,6 +46483,7 @@ ${galleryText}`;
   }
   initModernUiEnhancements();
   initFeedbackFeature();
+  initEnterpriseSystem();
   window.__codexImageWebUI?.boot();
 })();
 //# sourceMappingURL=app.js.map

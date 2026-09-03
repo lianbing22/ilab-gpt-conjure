@@ -274,6 +274,254 @@ function initFeedbackFeature() {
   }
 }
 
+
+// --- Enterprise Auth & Dashboard System ---
+function initEnterpriseSystem() {
+  const bindEvents = () => {
+    let currentUser: any = null;
+
+    const userDisplayName = document.getElementById("userDisplayName");
+    const userRoleBadge = document.getElementById("userRoleBadge");
+    const authActionBtn = document.getElementById("authActionBtn");
+    const userProfileBtn = document.getElementById("userProfileBtn");
+    const openDashboardBtn = document.getElementById("openDashboardBtn");
+
+    const authModal = document.getElementById("authModal");
+    const authModalClose = document.getElementById("authModalClose");
+    const authTabLogin = document.getElementById("authTabLogin");
+    const authTabRegister = document.getElementById("authTabRegister");
+    const authForm = document.getElementById("authForm") as HTMLFormElement | null;
+    const authModalTitle = document.getElementById("authModalTitle");
+    const authUsername = document.getElementById("authUsername") as HTMLInputElement | null;
+    const authDisplayName = document.getElementById("authDisplayName") as HTMLInputElement | null;
+    const authDisplayNameField = document.getElementById("authDisplayNameField");
+    const authPassword = document.getElementById("authPassword") as HTMLInputElement | null;
+    const authSubmitBtn = document.getElementById("authSubmitBtn");
+
+    const dashboardModal = document.getElementById("dashboardModal");
+    const dashboardModalClose = document.getElementById("dashboardModalClose");
+    const dashboardTitle = document.getElementById("dashboardTitle");
+    const dashboardSubtitle = document.getElementById("dashboardSubtitle");
+    const metricTotalTasks = document.getElementById("metricTotalTasks");
+    const metricCompletedTasks = document.getElementById("metricCompletedTasks");
+    const metricSuccessRate = document.getElementById("metricSuccessRate");
+    const dashboardRatioContainer = document.getElementById("dashboardRatioContainer");
+    const dashboardLeaderboardSection = document.getElementById("dashboardLeaderboardSection");
+    const dashboardLeaderboardList = document.getElementById("dashboardLeaderboardList");
+    const dashboardUserListSection = document.getElementById("dashboardUserListSection");
+    const dashboardUserTable = document.getElementById("dashboardUserTable");
+
+    let isRegisterMode = false;
+
+    const updateAuthUI = (user: any) => {
+      currentUser = user;
+      if (user) {
+        if (userDisplayName) userDisplayName.textContent = user.display_name || user.username;
+        if (userRoleBadge) {
+          userRoleBadge.classList.remove("hidden");
+          const isAdmin = user.role === "admin";
+          userRoleBadge.textContent = isAdmin ? "管理员" : "员工";
+          userRoleBadge.classList.toggle("admin-role", isAdmin);
+        }
+        if (authActionBtn) {
+          authActionBtn.querySelector("span")!.textContent = "退出";
+        }
+      } else {
+        if (userDisplayName) userDisplayName.textContent = "未登录";
+        if (userRoleBadge) userRoleBadge.classList.add("hidden");
+        if (authActionBtn) {
+          authActionBtn.querySelector("span")!.textContent = "登录";
+        }
+      }
+    };
+
+    const checkCurrentUser = async () => {
+      try {
+        const res = await fetch("/api/auth/me");
+        const data = await res.json();
+        updateAuthUI(data.user);
+      } catch {
+        updateAuthUI(null);
+      }
+    };
+
+    const openAuthModal = (register = false) => {
+      isRegisterMode = register;
+      authModal?.classList.remove("hidden");
+      if (isRegisterMode) {
+        authTabRegister?.classList.add("active");
+        authTabLogin?.classList.remove("active");
+        if (authModalTitle) authModalTitle.textContent = "📝 新员工账号注册";
+        authDisplayNameField?.classList.remove("hidden");
+        if (authSubmitBtn) authSubmitBtn.textContent = "注册并登录";
+      } else {
+        authTabLogin?.classList.add("active");
+        authTabRegister?.classList.remove("active");
+        if (authModalTitle) authModalTitle.textContent = "🔐 内部账号登录";
+        authDisplayNameField?.classList.add("hidden");
+        if (authSubmitBtn) authSubmitBtn.textContent = "立即登录";
+      }
+      authUsername?.focus();
+    };
+
+    const closeAuthModal = () => {
+      authModal?.classList.add("hidden");
+    };
+
+    authTabLogin?.addEventListener("click", () => openAuthModal(false));
+    authTabRegister?.addEventListener("click", () => openAuthModal(true));
+    authModalClose?.addEventListener("click", closeAuthModal);
+    authModal?.addEventListener("click", (e) => {
+      if (e.target === authModal) closeAuthModal();
+    });
+
+    authActionBtn?.addEventListener("click", async () => {
+      if (currentUser) {
+        if (confirm("确定要退出登录吗？")) {
+          await fetch("/api/auth/logout", { method: "POST" });
+          updateAuthUI(null);
+          window.location.reload();
+        }
+      } else {
+        openAuthModal(false);
+      }
+    });
+
+    userProfileBtn?.addEventListener("click", () => {
+      if (!currentUser) openAuthModal(false);
+      else openDashboard();
+    });
+
+    authForm?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const u = authUsername?.value.trim() || "";
+      const p = authPassword?.value.trim() || "";
+      const d = authDisplayName?.value.trim() || "";
+      if (!u || !p) return;
+
+      const endpoint = isRegisterMode ? "/api/auth/register" : "/api/auth/login";
+      const payload: any = { username: u, password: p };
+      if (isRegisterMode) payload.display_name = d;
+
+      if (authSubmitBtn) {
+        authSubmitBtn.setAttribute("disabled", "true");
+        authSubmitBtn.textContent = "处理中...";
+      }
+
+      try {
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || "操作失败");
+        updateAuthUI(data.user);
+        closeAuthModal();
+        alert(isRegisterMode ? `欢迎加入团队，${data.user.display_name}！` : `登录成功，欢迎回来 ${data.user.display_name}！`);
+        window.location.reload();
+      } catch (err: any) {
+        alert(err.message || "登录/注册失败");
+      } finally {
+        if (authSubmitBtn) {
+          authSubmitBtn.removeAttribute("disabled");
+          authSubmitBtn.textContent = isRegisterMode ? "注册并登录" : "立即登录";
+        }
+      }
+    });
+
+    // 看板逻辑
+    const openDashboard = async () => {
+      if (!currentUser) {
+        openAuthModal(false);
+        return;
+      }
+      dashboardModal?.classList.remove("hidden");
+      try {
+        const res = await fetch("/api/analytics/dashboard");
+        const data = await res.json();
+        const stats = data.stats || {};
+        const isAdmin = data.scope === "enterprise_admin";
+
+        if (dashboardTitle) {
+          dashboardTitle.textContent = isAdmin ? "📊 团队生图统计大盘" : `📈 个人生图周报/看板 (${currentUser.display_name})`;
+        }
+        if (dashboardSubtitle) {
+          dashboardSubtitle.textContent = isAdmin ? "全公司生成效率、使用趋势与员工排行榜" : "你的个人创作效率与出图偏好统计";
+        }
+
+        if (metricTotalTasks) metricTotalTasks.textContent = String(stats.total_generations || 0);
+        if (metricCompletedTasks) metricCompletedTasks.textContent = String(stats.completed_generations || 0);
+        if (metricSuccessRate) metricSuccessRate.textContent = `${stats.success_rate || 100}%`;
+
+        if (dashboardRatioContainer) {
+          const ratios: any[] = stats.ratio_distribution || [];
+          if (!ratios.length) {
+            dashboardRatioContainer.innerHTML = `<div class="feedback-empty-state">暂无比例统计数据</div>`;
+          } else {
+            dashboardRatioContainer.innerHTML = ratios.map((r) => `
+              <div class="ratio-pill-item">
+                <span>比例 ${r.ratio || "9:16"}</span>
+                <strong>${r.count} 次</strong>
+              </div>
+            `).join("");
+          }
+        }
+
+        if (isAdmin) {
+          dashboardLeaderboardSection?.classList.remove("hidden");
+          dashboardUserListSection?.classList.remove("hidden");
+
+          if (dashboardLeaderboardList) {
+            const list: any[] = stats.leaderboard || [];
+            dashboardLeaderboardList.innerHTML = list.map((item, idx) => `
+              <div class="leaderboard-row">
+                <span><b>#${idx + 1}</b> ${item.display_name} (@${item.username})</span>
+                <strong>${item.task_count} 次</strong>
+              </div>
+            `).join("");
+          }
+
+          if (dashboardUserTable) {
+            const users: any[] = stats.users || [];
+            dashboardUserTable.innerHTML = `
+              <div class="user-table-row" style="font-weight:bold; background: transparent;">
+                <span>账号</span><span>姓名</span><span>角色</span><span>注册时间</span>
+              </div>
+            ` + users.map((u) => `
+              <div class="user-table-row">
+                <span>${u.username}</span>
+                <span>${u.display_name}</span>
+                <span>${u.role === "admin" ? "★ 管理员" : "普通员工"}</span>
+                <span>${u.created_at}</span>
+              </div>
+            `).join("");
+          }
+        } else {
+          dashboardLeaderboardSection?.classList.add("hidden");
+          dashboardUserListSection?.classList.add("hidden");
+        }
+      } catch {
+        alert("获取统计数据失败");
+      }
+    };
+
+    openDashboardBtn?.addEventListener("click", openDashboard);
+    dashboardModalClose?.addEventListener("click", () => dashboardModal?.classList.add("hidden"));
+    dashboardModal?.addEventListener("click", (e) => {
+      if (e.target === dashboardModal) dashboardModal?.classList.add("hidden");
+    });
+
+    void checkCurrentUser();
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bindEvents);
+  } else {
+    bindEvents();
+  }
+}
+
 function initModernUiEnhancements() {
   const bindEvents = () => {
     const toggleBtn = document.getElementById("desktopAdvancedToggle");
@@ -330,5 +578,6 @@ function initModernUiEnhancements() {
 }
 initModernUiEnhancements();
 initFeedbackFeature();
+initEnterpriseSystem();
 
 window.__codexImageWebUI?.boot();
