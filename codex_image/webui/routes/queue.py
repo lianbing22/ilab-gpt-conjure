@@ -7,7 +7,10 @@ from fastapi import Body, FastAPI, HTTPException, Request
 from fastapi.responses import StreamingResponse
 
 from codex_image.webui.context import WebUIContext
+from codex_image.webui.enterprise.routes import get_current_user
 from codex_image.webui.events import event_key, event_snapshot, queue_event, queue_snapshot, queued_or_running_task_ids, sse_message, task_events
+
+EMPTY_QUEUE = {"waiting": [], "running": []}
 
 EVENT_STREAM_CHECK_INTERVAL_SECONDS = 1.0
 
@@ -16,17 +19,30 @@ def register_queue_routes(app: FastAPI, ctx: WebUIContext) -> None:
     h = ctx.route_helpers
 
     @app.get("/api/queue")
-    async def get_queue() -> dict[str, Any]:
+    async def get_queue(request: Request) -> dict[str, Any]:
         h["ensure_queue_worker_running"]()
+        if not get_current_user(request, ctx):
+            return dict(EMPTY_QUEUE)
         return queue_snapshot(ctx)
 
     @app.get("/api/events", response_model=None)
     async def events(request: Request, stream: bool = False) -> StreamingResponse:
         h["ensure_queue_worker_running"]()
         should_stream = stream
+        user = get_current_user(request, ctx)
 
         async def stream_events():
             h["ensure_queue_worker_running"]()
+            # 未登录只推空快照：任务摘要、队列与素材库都属于内部资产。
+            if not user:
+                yield sse_message({
+                    "type": "snapshot",
+                    "tasks": [],
+                    "queue": dict(EMPTY_QUEUE),
+                    "gallery": [],
+                    "auth": h["auth_event_payload"](),
+                })
+                return
             snapshot = event_snapshot(ctx)
             yield sse_message(snapshot)
             if not should_stream:

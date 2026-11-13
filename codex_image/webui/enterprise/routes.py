@@ -67,6 +67,7 @@ from datetime import datetime, timezone
 from typing import Any, Optional
 
 from fastapi import Body, Cookie, FastAPI, Header, HTTPException, Request, Response
+from fastapi.responses import JSONResponse
 from codex_image.webui.context import WebUIContext
 
 from .db import (
@@ -103,6 +104,22 @@ def require_current_user(request: Request, ctx: WebUIContext) -> dict[str, Any]:
     return user
 
 def register_enterprise_routes(app: FastAPI, ctx: WebUIContext) -> None:
+
+    # 任务详情、缩略图、下载与生成图片等内部资产，未登录一律拒绝。
+    # 列表接口（/api/tasks、/api/tasks/recent）自行返回空集，保持既有行为。
+    public_task_paths = {"/api/tasks", "/api/tasks/recent"}
+    # 素材库与参考文件同样属于内部资产，匿名读写一律拒绝。
+    protected_prefixes = ("/outputs/", "/api/gallery", "/api/reference-files", "/api/reference-assets")
+
+    @app.middleware("http")
+    async def _require_login_for_task_assets(request: Request, call_next):
+        path = request.url.path
+        protected = path.startswith(protected_prefixes) or (
+            path.startswith("/api/tasks/") and path.rstrip("/") not in public_task_paths
+        )
+        if protected and not get_current_user(request, ctx):
+            return JSONResponse({"detail": "请先登录"}, status_code=401)
+        return await call_next(request)
 
     # 8. 基于 DeepSeek-v4-Flash 的提示词智能扩写与优化接口
     @app.post("/api/prompt/optimize")

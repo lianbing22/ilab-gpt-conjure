@@ -196,7 +196,14 @@ async function syncTaskSearchHistoryResults() {
 }
 
 async function renderSelectedTaskPreview(requestSeq: number | null = null) {
-  const selectedTask = state.tasks.find((item: any) => String(item.task_id) === String(state.selectedTaskId));
+  let selectedTask = state.tasks.find((item: any) => String(item.task_id) === String(state.selectedTaskId));
+  // 首屏 selectedTaskId 尚未初始化时用列表第一条兜底：renderPreview() 本身也会兜底选中第一条，
+  // 若这里不补选，详情补全被跳过，预览会永久停在“已生成完毕，正在渲染高清图片…”。
+  const firstTask = state.tasks[0];
+  if (!selectedTask && firstTask) {
+    selectedTask = firstTask;
+    state.selectedTaskId = String(firstTask.task_id);
+  }
   // 只要选中的任务是 summary_only 或者已经完成但缺少产物大图，立刻拉取全量详情并渲染
   if (selectedTask && (selectedTask.summary_only || (selectedTask.status === "completed" && (!Array.isArray(selectedTask.outputs) || !selectedTask.outputs.length)))) {
     try {

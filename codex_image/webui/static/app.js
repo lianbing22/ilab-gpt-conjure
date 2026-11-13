@@ -44459,7 +44459,12 @@ ${galleryText}`;
     }, TASK_SEARCH_HISTORY_DEBOUNCE_MS);
   }
   async function renderSelectedTaskPreview(requestSeq = null) {
-    const selectedTask = state31.tasks.find((item) => String(item.task_id) === String(state31.selectedTaskId));
+    let selectedTask = state31.tasks.find((item) => String(item.task_id) === String(state31.selectedTaskId));
+    const firstTask = state31.tasks[0];
+    if (!selectedTask && firstTask) {
+      selectedTask = firstTask;
+      state31.selectedTaskId = String(firstTask.task_id);
+    }
     if (selectedTask && (selectedTask.summary_only || selectedTask.status === "completed" && (!Array.isArray(selectedTask.outputs) || !selectedTask.outputs.length))) {
       try {
         const detailedTask = await ensureSelectedTaskDetail(selectedTask.task_id);
